@@ -1,0 +1,40 @@
+version: 1
+disable_existing_loggers: False
+formatters:
+  simple:
+    format: '%(asctime)s:%(levelname)s:%(name)s - %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
+  error:
+    class: logging.StreamHandler
+    level: ERROR
+    formatter: simple
+    stream: ext://sys.stderr
+  mail:
+    class: logging.handlers.SMTPHandler
+    level: CRITICAL
+    formatter: simple
+    mailhost: smtp.uvic.ca
+    fromaddr: noreply@pcic.uvic.ca
+    toaddrs:
+      - bveerman@uvic.ca
+    subject: 'Errors with crmprtd daemon'
+  file:
+    class: logging.handlers.RotatingFileHandler
+    level: DEBUG
+    formatter: simple
+    backupCount: 10
+    maxBytes: 10000000 
+    filename: 'crmprtd_log.txt'
+loggers:
+  crmprtd:
+    level: DEBUG
+    handlers: [console,mail,file]
+    propagate: no
+root:
+  level: DEBUG
+  handlers: [console]

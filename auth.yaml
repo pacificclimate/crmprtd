@@ -1,0 +1,8 @@
+# Example yaml file for storing credentials
+# Should be edited and saved in a private location with 600 permissions
+source1:
+  username: exampleuser
+  password: examplepassword
+source2:
+  username: exampleuser
+  password: examplepassword
