@@ -2,6 +2,7 @@
 
 import os
 import logging, logging.config
+import urlparse
 from pkg_resources import resource_stream
 from datetime import datetime
 from argparse import ArgumentParser
@@ -30,6 +31,10 @@ def download(url, auth, out, log):
     with open(out, 'w') as f:
         f.write(req.content)
         log.info('Saved file to: {}'.format(out))
+
+def url_to_from(url):
+    parsed = urlparse.parse_qs(urlparse.urlparse(url).query)
+    return (parsed['from'][0].replace('/', 'T'), parsed['to'][0].replace('/','T'))
 
 def main(args):
     # Setup logging
@@ -70,7 +75,8 @@ def main(args):
 
     if args.station_id:
         for url in url_generator(args.station_id, start_time, end_time):
-            outfile = os.path.join(args.output_dir, 'moti-sawr7110_station-{}_{}_{}.xml'.format(args.station_id, datetime.strftime(start_time, '%Y%m%dT%H'), datetime.strftime(end_time, '%Y%m%dT%H')))
+            to, _from = url_to_from(url)
+            outfile = os.path.join(args.output_dir, 'moti-sawr7110_station-{}_{}_{}.xml'.format(args.station_id, to, _from))
             try:
                 download(url, auth, outfile, log)
             except IOError as e:
@@ -82,7 +88,8 @@ def main(args):
         q = sesh.query(CNG.native_id).filter(CNG.network_name == 'MoTIe')
         for station_id, in q.all():
             for url in url_generator(station_id, start_time, end_time):
-                outfile = os.path.join(args.output_dir, 'moti-sawr7110_station-{}_{}_{}.xml'.format(station_id, datetime.strftime(start_time, '%Y%m%dT%H'), datetime.strftime(end_time, '%Y%m%dT%H')))
+                to, _from = url_to_from(url)
+                outfile = os.path.join(args.output_dir, 'moti-sawr7110_station-{}_{}_{}.xml'.format(station_id, to, _from))
                 try:
                     download(url, auth, outfile, log)
                 except IOError as e:
@@ -101,7 +108,6 @@ if __name__ == '__main__':
                         choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
                         help='Set log level: DEBUG, INFO, WARNING, ERROR, CRITICAL.  Note that debug output by default goes directly to file')
     parser.add_argument('-e', '--error_email', dest='error_email', help='e-mail address to which the program should report error which require human intervention')
-    parser.add_argument('-C', '--cache_dir', dest='cache_dir', help='directory in which to put the downloaded file in the event of a post-download error')
     parser.add_argument('-S', '--start_time', required=True,
                         help="Alternate time to use for downloading (interpreted with strptime(format='Y/m/d H:M:S') in Pacific Time")
     parser.add_argument('-E', '--end_time',
