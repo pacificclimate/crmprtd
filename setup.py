@@ -3,7 +3,7 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-__version__ = (0, 0, 1)
+__version__ = (0, 0, 2)
 
 sw_path = 'hg+ssh://medusa.pcic.uvic.ca//home/data/projects/comp_support/software'
 
@@ -34,6 +34,7 @@ setup(
                "scripts/ec_recovery.py",
                "scripts/moti_hourly.py",
                "scripts/moti_infill_download.py",
+               "scripts/moti_insert_files.py",
                "scripts/moti_infill_insert.py"
                ],
     package_data = {
