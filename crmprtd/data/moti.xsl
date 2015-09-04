@@ -15,7 +15,7 @@
 	<xsl:choose>
 	  <xsl:when test=". = 'air-temperature'">CURRENT_AIR_TEMPERATURE1</xsl:when>
 	  <xsl:when test=". = 'atmospheric'">ATMOSPHERIC_PRESSURE</xsl:when>
-	  <xsl:when test=". = 'average-scalar-speed-over-60minutes'">MEASURED_WIND_SPEED1</xsl:when>-->
+	  <xsl:when test=". = 'average-scalar-speed-over-60minutes'">MEASURED_WIND_SPEED1</xsl:when>
 	  <xsl:when test=". = 'average-direction'">MEASURED_WIND_DIRECTION1</xsl:when>
 	  <xsl:when test=". = 'standard-deviation-of-direction-over-60minutes'">WIND_DIRECTION_STD_DEVIATION1</xsl:when>
 	  <xsl:when test=". = 'dew-point'">DEW_POINT</xsl:when>
