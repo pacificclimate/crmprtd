@@ -106,7 +106,7 @@ def process_observation_series(sesh, os):
 
 def find_var(sesh, varname, vartype, units):
     '''Returns a single Variable instance or None if it's not found'''
-    q = sesh.query(Variable).filter(Variable.name == vartype).filter(Variable.unit == units)
+    q = sesh.query(Variable).join(Network).filter(Network.name == 'MoTIe').filter(Variable.name == vartype).filter(Variable.unit == units)
     return q.first()
 
 def check_history(stn_id, sesh):
