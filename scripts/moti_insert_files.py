@@ -42,7 +42,7 @@ def main(args):
         log.info('Using file pattern: {}'.format(args.file_pattern))
         f_list = glob.glob(args.file_pattern)
     elif args.filename:
-        f_list = [fname]
+        f_list = [args.filename]
 
     log.info('Processing {} files'.format(len(f_list)))
 
