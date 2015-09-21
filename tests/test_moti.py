@@ -124,21 +124,22 @@ def test_missing_client_id(session):
 def test_url_generator():
     urls = url_generator('1', bctz.localize(datetime(2010, 1, 1)), bctz.localize(datetime(2010, 3, 1)))
     actual = [url for url in urls]
-    expected = ['https://apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-01/00&to=2010-01-08/00',
-                'https://apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-08/01&to=2010-01-15/01',
-                'https://apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-15/02&to=2010-01-22/02',
-                'https://apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-22/03&to=2010-01-29/03',
-                'https://apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-29/04&to=2010-02-05/04',
-                'https://apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-02-05/05&to=2010-02-12/05',
-                'https://apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-02-12/06&to=2010-02-19/06',
-                'https://apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-02-19/07&to=2010-02-26/07',
-                'https://apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-02-26/08&to=2010-03-01/00']
+    expected = ['https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-01/00&to=2010-01-07/00',
+                'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-07/01&to=2010-01-13/01',
+                'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-13/02&to=2010-01-19/02',
+                'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-19/03&to=2010-01-25/03',
+                'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-25/04&to=2010-01-31/04',
+                'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-31/05&to=2010-02-06/05',
+                'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-02-06/06&to=2010-02-12/06',
+                'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-02-12/07&to=2010-02-18/07',
+                'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-02-18/08&to=2010-02-24/08',
+                'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-02-24/09&to=2010-03-01/00']
     assert  actual == expected
 
 def test_url_generator_truncates():
     urls = url_generator('1', bctz.localize(datetime(2010, 1, 1, 1, 1)), bctz.localize(datetime(2010, 1, 1, 23, 55)))
     actual = [ url for url in urls ]
-    expected = ['https://apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-01/01&to=2010-01-01/23']
+    expected = ['https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request=historic&station=1&from=2010-01-01/01&to=2010-01-01/23']
     assert actual == expected
 
 def test_url_generator_backwards_dates():
