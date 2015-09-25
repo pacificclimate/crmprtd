@@ -10,25 +10,25 @@ from crmprtd.moti import process, url_generator, slice_timesteps
 
 bctz = pytz.timezone('America/Vancouver')
 
-def test_insert(session, moti_sawr7110_xml):
+def test_data(test_session, moti_sawr7110_xml):
     tz = pytz.timezone('America/Vancouver')
 
-    process(session, moti_sawr7110_xml)
-    q = session.query(Obs)
+    process(test_session, moti_sawr7110_xml)
+    q = test_session.query(Obs)
     obs = q.all()
     assert len(obs) == 2
-    actual = [pytz.utc.localize(o.time) for o in obs]
-    expected = [ datetime(2012, 1, 1, tzinfo=tz), datetime(2012, 1, 1, 1, tzinfo=tz) ]
+    actual = [o.time for o in obs]
+    expected = [ datetime(2012, 1, 1), datetime(2012, 1, 1, 1) ]
     assert actual == expected
 
-def test_catch_duplicates(session, moti_sawr7110_xml):
+def test_catch_duplicates(test_session, moti_sawr7110_xml):
     print 'test_catch_duplicates'
-    rv = process(session, moti_sawr7110_xml)
+    rv = process(test_session, moti_sawr7110_xml)
     print '############## {}'.format(rv)
     assert rv == {'failures': 0, 'successes': 2, 'skips': 2}
-    rv = process(session, moti_sawr7110_xml)
+    rv = process(test_session, moti_sawr7110_xml)
     print '################ {}'.format(rv)
-    assert rv == {'failures': 0, 'successes': 0, 'skips': 6}
+    assert rv == {'failures': 0, 'successes': 0, 'skips': 4}
     
 @pytest.mark.parametrize(('label','xml'),
                          [('no_obs', fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -101,13 +101,13 @@ def test_catch_duplicates(session, moti_sawr7110_xml):
     </observation-series>
   </data>
 </cmml>'''))])
-def test_broken_obs(session, label, xml):
-    n_obs_before = session.query(Obs).count()
-    process(session, xml)
-    n_obs_after = session.query(Obs).count()
+def test_broken_obs(test_session, label, xml):
+    n_obs_before = test_session.query(Obs).count()
+    process(test_session, xml)
+    n_obs_after = test_session.query(Obs).count()
     assert n_obs_before == n_obs_after
     
-def test_missing_client_id(session):
+def test_missing_client_id(test_session):
     et = fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
@@ -118,7 +118,7 @@ def test_missing_client_id(session):
     </observation-series>
   </data>
 </cmml>''')
-    e = pytest.raises(Exception, process, session, et)
+    e = pytest.raises(Exception, process, test_session, et)
     assert e.value.message == "Could not detect the station id: xpath search '//observation-series/origin/id[@type='client']' return no results"
 
 def test_url_generator():

@@ -17,7 +17,10 @@ def pytest_runtest_setup():
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
 @pytest.yield_fixture(scope='function')
-def session():
+def postgis_session():
+    '''
+    Yields a blank PostGIS session with no tables or data
+    '''
     logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
 
     with testing.postgresql.Postgresql() as pg:
@@ -25,35 +28,55 @@ def session():
         engine.execute("create extension postgis")
         sesh = sessionmaker(bind=engine)()
 
-        pycds.Base.metadata.create_all(bind=engine)
-        pycds.DeferredBase.metadata.create_all(bind=engine)
-
-        moti = Network(name='MoTIe')
-        ec = Network(name='EC')
-        wmb = Network(name='FLNROW-WMB')
-        sesh.add_all([moti, ec, wmb])
-
-        simon = Contact(name='Simon', networks=[moti])
-        eric = Contact(name='Eric', networks=[wmb])
-        pat = Contact(name='Pat', networks=[ec])
-        sesh.add_all([simon, eric, pat])
-
-        stations = [
-            Station(native_id='11091', network=moti, histories=[History(station_name='Brandywine')]),
-            Station(native_id='1029', network=wmb, histories=[History(station_name='FIVE MILE')]),
-            Station(native_id='2100160', network=ec, histories=[History(station_name='Beaver Creek Airport')])
-            ]
-        sesh.add_all(stations)
-
-        variables = [Variable(name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti),
-                     Variable(name='precipitation', unit='mm', network=ec),
-                     Variable(name='relative_humidity', unit='percent', network=wmb)
-                     ]
-        sesh.add_all(variables)
-
-        logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO) # Let's not log all the db setup stuff...
-
+        logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
         yield sesh
+
+@pytest.yield_fixture(scope='function')
+def crmp_session(postgis_session):
+    '''
+    Yields a PostGIS enabled session with CRMP schema but no data
+    '''
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
+
+    engine = postgis_session.get_bind()
+    pycds.Base.metadata.create_all(bind=engine)
+    pycds.DeferredBase.metadata.create_all(bind=engine)
+
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    yield postgis_session
+
+@pytest.yield_fixture(scope='function')
+def test_session(crmp_session):
+    '''
+    Yields a PostGIS enabled session with CRMP schema and test data
+    '''
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
+
+    moti = Network(name='MoTIe')
+    ec = Network(name='EC')
+    wmb = Network(name='FLNROW-WMB')
+    crmp_session.add_all([moti, ec, wmb])
+
+    simon = Contact(name='Simon', networks=[moti])
+    eric = Contact(name='Eric', networks=[wmb])
+    pat = Contact(name='Pat', networks=[ec])
+    crmp_session.add_all([simon, eric, pat])
+
+    stations = [
+        Station(native_id='11091', network=moti, histories=[History(station_name='Brandywine')]),
+        Station(native_id='1029', network=wmb, histories=[History(station_name='FIVE MILE')]),
+        Station(native_id='2100160', network=ec, histories=[History(station_name='Beaver Creek Airport')])
+        ]
+    crmp_session.add_all(stations)
+
+    variables = [Variable(name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti),
+                 Variable(name='precipitation', unit='mm', network=ec),
+                 Variable(name='relative_humidity', unit='percent', network=wmb)
+                 ]
+    crmp_session.add_all(variables)
+
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    yield crmp_session
 
 @pytest.fixture(scope='module')
 def moti_sawr7110_xml():
