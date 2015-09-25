@@ -10,7 +10,6 @@ from lxml.etree import parse, fromstring
 import testing.postgresql
 
 import pycds
-from pycds.util import create_test_database
 from pycds import Network, Station, Contact, History, Variable
 import sys
 
@@ -23,9 +22,11 @@ def session():
 
     with testing.postgresql.Postgresql() as pg:
         engine = create_engine(pg.url())
+        engine.execute("create extension postgis")
         sesh = sessionmaker(bind=engine)()
+
         pycds.Base.metadata.create_all(bind=engine)
-        sesh.execute("create extension postgis")
+        pycds.DeferredBase.metadata.create_all(bind=engine)
 
         moti = Network(name='MoTIe')
         ec = Network(name='EC')
