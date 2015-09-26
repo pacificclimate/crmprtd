@@ -145,8 +145,9 @@ def moti_sawr7110_new_station():
   </data>
 </cmml>''')
 
+@pytest.fixture(scope='module')
 def moti_sawr7100_large():
-    return '''<?xml version="1.0" encoding="ISO-8859-1"?>
+    return fromstring('''<?xml version="1.0" encoding="ISO-8859-1"?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -225,4 +226,4 @@ def moti_sawr7100_large():
     </observation-series>
   </data>
 </cmml>
-'''
+''')

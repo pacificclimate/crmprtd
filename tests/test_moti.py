@@ -157,6 +157,20 @@ def test_var_transforms(moti_sawr7110_xml):
     assert et.xpath("/cmml/data/observation-series/observation/temperature/value[@units='celsius']")
     assert et.xpath("/cmml/data/observation-series/observation/pressure[@type='ATMOSPHERIC_PRESSURE']")
 
+def test_var_transforms_all(moti_sawr7100_large):
+    xsl = resource_filename('crmprtd', 'data/moti.xsl')
+    transform = XSLT(parse(xsl))
+    et = transform(moti_sawr7100_large)
+    assert et.xpath("/cmml/data/observation-series/observation/pressure[@type='ATMOSPHERIC_PRESSURE']")
+    assert et.xpath("/cmml/data/observation-series/observation/wind[@type='MEASURED_WIND_SPEED1']")
+    assert et.xpath("/cmml/data/observation-series/observation/wind[@type='MEASURED_WIND_DIRECTION1']")
+    assert et.xpath("/cmml/data/observation-series/observation/wind[@type='WIND_DIRECTION_STD_DEVIATION1']")
+    assert et.xpath("/cmml/data/observation-series/observation/temperature[@type='CURRENT_AIR_TEMPERATURE1']")
+    assert et.xpath("/cmml/data/observation-series/observation/temperature[@type='DEW_POINT']")
+    assert et.xpath("/cmml/data/observation-series/observation/precipitation[@type='HOURLY_PRECIPITATION']")
+    assert et.xpath("/cmml/data/observation-series/observation/humidity[@type='RELATIVE_HUMIDITY1']")
+    assert et.xpath("/cmml/data/observation-series/observation/snow[@type='HEIGHT_OF_SNOW']")
+
 def test_timestep_slices():
     d1 = bctz.localize(datetime(2010, 1, 1))
     d2 = bctz.localize(datetime(2010, 1, 15))
