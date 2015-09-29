@@ -14,6 +14,7 @@ def test_data(test_session, moti_sawr7110_xml):
     tz = pytz.timezone('America/Vancouver')
 
     process(test_session, moti_sawr7110_xml)
+    test_session.commit()
     q = test_session.query(Obs)
     obs = q.all()
     assert len(obs) == 2
@@ -249,7 +250,7 @@ def test_unknown_var(test_session, caplog):
     n_obs_after = test_session.query(Obs).count()
     assert n_obs_before == n_obs_after
 
-    # t = 'Could not find variable temperature, tree-temperature, celsius in the database. Skipping this observation.'
-    # assert t in caplog.text()
+    t = 'Could not find variable temperature, tree-temperature, celsius in the database. Skipping this observation.'
+    assert t in caplog.text()
 
     # TODO: need to actually check log warning
