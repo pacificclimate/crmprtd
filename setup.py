@@ -46,7 +46,7 @@ setup(
                         'python-dateutil',
                         'pytz',
                         'requests',
-                        'pycds'
+                        'pycds >= 2.0.0'
                         ],
     tests_require=['pytest',
                    'pysqlite'],

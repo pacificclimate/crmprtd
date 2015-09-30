@@ -18,6 +18,14 @@ ns = {
     'xsi': "http://www.w3.org/2001/XMLSchema-instance"
     }
 
+unwanted_vars = [
+    ('pavement', 'temperature', 'celsius'),
+    ('pavement', 'freeze-point', 'celsius'),
+    ('pavement', 'surface-status', 'code'),
+    ('subsurface', 'temperature', 'celsius'),
+    ('extension', None, 'unitless')
+]
+
 def makeurl(report='7110', request='historic', station=None, from_=None, to=None):
     '''
     Construct a URL for fetching the data file
@@ -82,7 +90,9 @@ def process_observation_series(sesh, os):
                 
             var = find_var(sesh, varname, vartype, units)
             if not var:
-                log.warn("Could not find variable {}, {}, {} in the database. Skipping this observation.".format(varname, vartype, units))
+                # Test for known unwanted vars, only warn when unknown
+                if (varname, vartype, units) not in unwanted_vars:
+                    log.warn("Could not find variable {}, {}, {} in the database. Skipping this observation.".format(varname, vartype, units))
                 skips += 1
                 continue
             log.debug('{} {} {} {}'.format(varname, vartype, units, value))

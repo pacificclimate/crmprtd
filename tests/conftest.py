@@ -7,84 +7,77 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from lxml.etree import parse, fromstring
+import testing.postgresql
 
-from pycds.util import create_test_database
+import pycds
 from pycds import Network, Station, Contact, History, Variable
 import sys
 
 def pytest_runtest_setup():
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
-@pytest.fixture(scope='function')
-def in_memory_crmpdb_engine():
+@pytest.yield_fixture(scope='function')
+def postgis_session():
+    '''
+    Yields a blank PostGIS session with no tables or data
+    '''
     logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
-    engine = create_engine('sqlite://')
-    create_test_database(engine)
 
-    sesh = sessionmaker(bind=engine)()
-    sesh.connection().connection.enable_load_extension(True)
-    sesh.execute("select load_extension('libspatialite.so')")
+    with testing.postgresql.Postgresql() as pg:
+        engine = create_engine(pg.url())
+        engine.execute("create extension postgis")
+        sesh = sessionmaker(bind=engine)()
+
+        logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+        yield sesh
+
+@pytest.yield_fixture(scope='function')
+def crmp_session(postgis_session):
+    '''
+    Yields a PostGIS enabled session with CRMP schema but no data
+    '''
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
+
+    engine = postgis_session.get_bind()
+    pycds.Base.metadata.create_all(bind=engine)
+    pycds.DeferredBase.metadata.create_all(bind=engine)
+
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    yield postgis_session
+
+@pytest.yield_fixture(scope='function')
+def test_session(crmp_session):
+    '''
+    Yields a PostGIS enabled session with CRMP schema and test data
+    '''
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
 
     moti = Network(name='MoTIe')
     ec = Network(name='EC')
     wmb = Network(name='FLNROW-WMB')
-    sesh.add_all([moti, ec, wmb])
+    crmp_session.add_all([moti, ec, wmb])
 
     simon = Contact(name='Simon', networks=[moti])
     eric = Contact(name='Eric', networks=[wmb])
     pat = Contact(name='Pat', networks=[ec])
-    sesh.add_all([simon, eric, pat])
+    crmp_session.add_all([simon, eric, pat])
 
     stations = [
         Station(native_id='11091', network=moti, histories=[History(station_name='Brandywine')]),
         Station(native_id='1029', network=wmb, histories=[History(station_name='FIVE MILE')]),
         Station(native_id='2100160', network=ec, histories=[History(station_name='Beaver Creek Airport')])
         ]
-    sesh.add_all(stations)
+    crmp_session.add_all(stations)
 
     variables = [Variable(name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti),
                  Variable(name='precipitation', unit='mm', network=ec),
                  Variable(name='relative_humidity', unit='percent', network=wmb)
                  ]
-    sesh.add_all(variables)
+    crmp_session.add_all(variables)
 
-    sesh.commit()
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO) # Re-enable sqlalchemy logging
-    return engine
+    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    yield crmp_session
 
-@pytest.fixture(scope='function')
-def session(in_memory_crmpdb_engine):
-    from sqlalchemy.orm import sessionmaker
-    return sessionmaker(bind=in_memory_crmpdb_engine)()
-
-# http://blog.fizyk.net.pl/blog/testing-web-applications-using-sqlalchemy.html
-# TODO: make this work this is a rough first idea/draft
-@pytest.fixture(scope='function', params=['sqlite', 'mysql', 'postgresql'])
-def db_session(request):
-    """SQLAlchemy session."""
-    from pyramid_fullauth.models import Base
-
-    if request.param == 'sqlite':
-        connection = 'sqlite:///fullauth.sqlite'
-    elif request.param == 'mysql':
-        request.getfuncargvalue('mysqldb')  # takes care of creating database
-        connection = 'mysql+mysqldb://root:@127.0.0.1:3307/tests?charset=utf8'
-    elif request.param == 'postgresql':
-        request.getfuncargvalue('postgresql')  # takes care of creating database
-        connection = 'postgresql+psycopg2://postgres:@127.0.0.1:5433/tests'
-
-    engine = create_engine(connection, echo=False, poolclass=NullPool)
-    pyramid_basemodel.Session = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
-    pyramid_basemodel.bind_engine(engine, pyramid_basemodel.Session, should_drop=True)
-
-    def destroy():
-        transaction.commit()
-        Base.metadata.drop_all(engine)
-
-    request.addfinalizer(destroy)
-
-    return pyramid_basemodel.Session
-    
 @pytest.fixture(scope='module')
 def moti_sawr7110_xml():
     return fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -152,8 +145,9 @@ def moti_sawr7110_new_station():
   </data>
 </cmml>''')
 
+@pytest.fixture(scope='module')
 def moti_sawr7100_large():
-    return '''<?xml version="1.0" encoding="ISO-8859-1"?>
+    return fromstring('''<?xml version="1.0" encoding="ISO-8859-1"?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -232,4 +226,4 @@ def moti_sawr7100_large():
     </observation-series>
   </data>
 </cmml>
-'''
+''')

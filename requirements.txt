@@ -1,9 +1,8 @@
-GeoAlchemy==0.7.3 #Dev version on PCIC pypiserver compatible with sqlalchemy v0.9+
-PyCDS==0.0.17
-PyYAML==3.11
-SQLAlchemy==0.9.4
-lxml==3.3.5
-psycopg2==2.5.2
-python-dateutil==2.2
-pytz==2014.2
-requests==2.2.1
+PyCDS
+PyYAML
+SQLAlchemy
+lxml
+psycopg2
+python-dateutil
+pytz
+requests

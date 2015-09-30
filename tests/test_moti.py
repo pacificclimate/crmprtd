@@ -10,25 +10,24 @@ from crmprtd.moti import process, url_generator, slice_timesteps
 
 bctz = pytz.timezone('America/Vancouver')
 
-def test_insert(session, moti_sawr7110_xml):
+def test_data(test_session, moti_sawr7110_xml):
     tz = pytz.timezone('America/Vancouver')
 
-    process(session, moti_sawr7110_xml)
-    q = session.query(Obs)
+    process(test_session, moti_sawr7110_xml)
+    test_session.commit()
+    q = test_session.query(Obs)
     obs = q.all()
     assert len(obs) == 2
-    actual = [pytz.utc.localize(o.time) for o in obs]
-    expected = [ datetime(2012, 1, 1, tzinfo=tz), datetime(2012, 1, 1, 1, tzinfo=tz) ]
+    actual = [o.time for o in obs]
+    expected = [ datetime(2012, 1, 1), datetime(2012, 1, 1, 1) ]
     assert actual == expected
 
-def test_catch_duplicates(session, moti_sawr7110_xml):
+def test_catch_duplicates(test_session, moti_sawr7110_xml):
     print 'test_catch_duplicates'
-    rv = process(session, moti_sawr7110_xml)
-    print '############## {}'.format(rv)
+    rv = process(test_session, moti_sawr7110_xml)
     assert rv == {'failures': 0, 'successes': 2, 'skips': 2}
-    rv = process(session, moti_sawr7110_xml)
-    print '################ {}'.format(rv)
-    assert rv == {'failures': 0, 'successes': 0, 'skips': 6}
+    rv = process(test_session, moti_sawr7110_xml)
+    assert rv == {'failures': 0, 'successes': 0, 'skips': 4}
     
 @pytest.mark.parametrize(('label','xml'),
                          [('no_obs', fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -101,13 +100,13 @@ def test_catch_duplicates(session, moti_sawr7110_xml):
     </observation-series>
   </data>
 </cmml>'''))])
-def test_broken_obs(session, label, xml):
-    n_obs_before = session.query(Obs).count()
-    process(session, xml)
-    n_obs_after = session.query(Obs).count()
+def test_broken_obs(test_session, label, xml):
+    n_obs_before = test_session.query(Obs).count()
+    process(test_session, xml)
+    n_obs_after = test_session.query(Obs).count()
     assert n_obs_before == n_obs_after
     
-def test_missing_client_id(session):
+def test_missing_client_id(test_session):
     et = fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
@@ -118,7 +117,7 @@ def test_missing_client_id(session):
     </observation-series>
   </data>
 </cmml>''')
-    e = pytest.raises(Exception, process, session, et)
+    e = pytest.raises(Exception, process, test_session, et)
     assert e.value.message == "Could not detect the station id: xpath search '//observation-series/origin/id[@type='client']' return no results"
 
 def test_url_generator():
@@ -157,6 +156,20 @@ def test_var_transforms(moti_sawr7110_xml):
     assert et.xpath("/cmml/data/observation-series/observation/temperature/value[@units='celsius']")
     assert et.xpath("/cmml/data/observation-series/observation/pressure[@type='ATMOSPHERIC_PRESSURE']")
 
+def test_var_transforms_all(moti_sawr7100_large):
+    xsl = resource_filename('crmprtd', 'data/moti.xsl')
+    transform = XSLT(parse(xsl))
+    et = transform(moti_sawr7100_large)
+    assert et.xpath("/cmml/data/observation-series/observation/pressure[@type='ATMOSPHERIC_PRESSURE']")
+    assert et.xpath("/cmml/data/observation-series/observation/wind[@type='MEASURED_WIND_SPEED1']")
+    assert et.xpath("/cmml/data/observation-series/observation/wind[@type='MEASURED_WIND_DIRECTION1']")
+    assert et.xpath("/cmml/data/observation-series/observation/wind[@type='WIND_DIRECTION_STD_DEVIATION1']")
+    assert et.xpath("/cmml/data/observation-series/observation/temperature[@type='CURRENT_AIR_TEMPERATURE1']")
+    assert et.xpath("/cmml/data/observation-series/observation/temperature[@type='DEW_POINT']")
+    assert et.xpath("/cmml/data/observation-series/observation/precipitation[@type='HOURLY_PRECIPITATION']")
+    assert et.xpath("/cmml/data/observation-series/observation/humidity[@type='RELATIVE_HUMIDITY1']")
+    assert et.xpath("/cmml/data/observation-series/observation/snow[@type='HEIGHT_OF_SNOW']")
+
 def test_timestep_slices():
     d1 = bctz.localize(datetime(2010, 1, 1))
     d2 = bctz.localize(datetime(2010, 1, 15))
@@ -164,3 +177,80 @@ def test_timestep_slices():
     expected = [(bctz.localize(datetime(2010, 1, 1)), bctz.localize(datetime(2010, 1, 8))),
                 (bctz.localize(datetime(2010, 1, 8, 1)), bctz.localize(datetime(2010, 1, 15)))]
     assert results == expected
+
+def test_skipped_vars(test_session):
+    xml = fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+  <data>
+    <observation-series>
+      <origin type="station">
+        <id type="client">11091</id>
+        <id type="network">BC_MoT_11091</id>
+      </origin>
+      <observation valid-time="2011-04-07T01:00:00-07:00">
+        <pavement index="1" type="temperature">
+          <qualifier units="unitless" type="lane-number">1</qualifier>
+          <value units="degC">1.7</value>
+        </pavement>
+        <pavement index="2" type="temperature">
+          <qualifier units="unitless" type="lane-number">1</qualifier>
+          <value units="degC">2.6</value>
+        </pavement>
+        <pavement index="1" type="freeze-point">
+          <qualifier units="unitless" type="lane-number">1</qualifier>
+          <value units="degC">-21.1</value>
+        </pavement>
+        <pavement index="1" type="surface-status">
+          <qualifier type="categorical-table" units="string">BC-MoT-pavement-surface-condition-code</qualifier>
+          <value units="code">24</value>
+        </pavement>
+        <subsurface index="1" type="temperature">
+          <qualifier units="unitless" type="lane-number">1</qualifier>
+          <qualifier units="cm" type="sensor-depth">25</qualifier>
+          <value units="degC">6.7</value>
+        </subsurface>
+        <extension index="2">
+          <qualifier units="string" type="name">bcmot-precipitation-detection-ratio</qualifier>
+          <value units="unitless">.079</value>
+        </extension>
+      </observation>
+    </observation-series>
+  </data>
+</cmml>''')
+    n_obs_before = test_session.query(Obs).count()
+    r = process(test_session, xml)
+    assert r == {'failures': 0, 'successes': 0, 'skips': 6}
+
+    n_obs_after = test_session.query(Obs).count()
+    assert n_obs_before == n_obs_after
+
+    # TODO: need to actually check no warnings logged for var lookups
+
+def test_unknown_var(test_session, caplog):
+    xml = fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+  <data>
+    <observation-series>
+      <origin type="station">
+        <id type="client">11091</id>
+        <id type="network">BC_MoT_11091</id>
+      </origin>
+      <observation valid-time="2011-04-07T01:00:00-07:00">
+        <temperature index="1" type="tree-temperature">
+          <value units="degC">-.813</value>
+        </temperature>
+      </observation>
+    </observation-series>
+  </data>
+</cmml>''')
+    n_obs_before = test_session.query(Obs).count()
+    r = process(test_session, xml)
+    assert r == {'failures': 0, 'successes': 0, 'skips': 1}
+
+    n_obs_after = test_session.query(Obs).count()
+    assert n_obs_before == n_obs_after
+
+    t = 'Could not find variable temperature, tree-temperature, celsius in the database. Skipping this observation.'
+    assert t in caplog.text()
+
+    # TODO: need to actually check log warning
