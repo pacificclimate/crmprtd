@@ -31,59 +31,59 @@ def main(args):
     if args.error_email:
         log_conf['handlers']['mail']['toaddrs'] = args.error_email
     logging.config.dictConfig(log_conf)
-    log = logging.getLogger('crmprtd.wmb')
-    log.info('Starting WMB rtd')
+    log = logging.getLogger('crmprtd.ec')
+    log.info('Starting EC rtd')
     if args.log_level:
         log.setLevel(args.log_level)
 
     auto = True
     try:
         if args.filename:
-            logging.debug("Opening local xml file {0} for reading".format(args.filename))
+            log.debug("Opening local xml file {0} for reading".format(args.filename))
             auto = False
             fname = args.filename
             xml_file = open(args.filename, 'r')
-            logging.debug("File opened sucessfully")
+            log.debug("File opened sucessfully")
         else:
             if args.time:
                 args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
-                logging.info("Starting manual run using timestamp {0}".format(args.time))
+                log.info("Starting manual run using timestamp {0}".format(args.time))
                 auto = False
             else:
                 deltat = timedelta(1/24.) if args.frequency == 'hourly' else timedelta(1) # go back a day
                 args.time = datetime.utcnow() - deltat
-                logging.info("Starting automatic run using timestamp {0}".format(args.time))
+                log.info("Starting automatic run using timestamp {0}".format(args.time))
             url = makeurl(args.frequency, args.province, args.language, args.time)
             fname = url['filename']
-            logging.info("Downloading {0}".format(url['url']))
+            log.info("Downloading {0}".format(url['url']))
             xml_file = urlopen(url['url'])
             if xml_file.getcode() == 404: raise IOError("HTTP 404 error for %s" % url['url'])
     except IOError:
-        logging.exception("Unable to download or open xml data")
+        log.exception("Unable to download or open xml data")
         sys.exit(1)
 
     # instantiate the ObsProcessor (do the startup stuff, like opening db connection and parsing the XML)
     try:
-        logging.info("Instantiating the ObsProcessor",)
+        log.info("Instantiating the ObsProcessor")
         op = ObsProcessor(xml_file, args)
-        logging.info("Done setting up ObsProcessor")
+        log.info("Done setting up ObsProcessor")
     except (LxmlSyntaxError, IOError, OperationalError), e:
         if type(e) == OperationalError:
-            logging.exception("Could not connect to database")
+            log.exception("Could not connect to database")
         if type(e) == LxmlSyntaxError:
-            logging.exception("Failed to parse xml file \n {0}".format(xml_file))
+            log.exception("Failed to parse xml file \n {0}".format(xml_file))
         if type(e) == IOError:
-            logging.exception("Failed to open xml file\n{0}".format(xml_file))
+            log.exception("Failed to open xml file\n{0}".format(xml_file))
         # Save data for reprosessing
         if auto:
             fname = os.path.join(args.cache_dir, 'failure-' + fname)
         else:
             fname = os.path.join(args.cache_dir, 'manual_run_' + datetime.now().strftime('%Y%m%dT%H%M%S') + '_failure-' + fname)
-        logging.info("Saving data at: {}".format(fname))
+        log.info("Saving data at: {}".format(fname))
         f = open(fname, 'w')
         f.write(xml_file.read())
-        logging.info("Done saving data")
-        logging.critical('''Critical errors have occured in the EC real time downloader that require a human touch.
+        log.info("Done saving data")
+        log.critical('''Critical errors have occured in the EC real time downloader that require a human touch.
         The daemon was unable to either download, open, or parse the incoming xml and no observations could be inserted.
         Please consult the log file at {log}.
         Data has been archived at {f}.'''.format(log=args.log, f=fname))
@@ -91,18 +91,18 @@ def main(args):
 
     # process the XML and do the db insertions
     try:
-        logging.info("Starting to process observations")
+        log.info("Starting to process observations")
         op.process()
-        logging.info("Done processing observations")
+        log.info("Done processing observations")
     except (InterfaceError, ProgrammingError, Exception), e:
-        logging.exception("Unhandleable exception, saving remaining XML file {} for further examination".format(fname))
+        log.exception("Unhandleable exception, saving remaining XML file {} for further examination".format(fname))
     finally:
         if auto:
             remainder = os.path.join(args.cache_dir, 'remainder-' + fname)
         else:
             remainder = os.path.join(args.cache_dir, 'manual_run_' + datetime.now().strftime('%Y%m%dT%H%M%S') + '_remainder-' + fname)
         op.save(remainder)
-        logging.info("Data saved at {}".format(remainder))
+        log.info("Data saved at {}".format(remainder))
 
 if __name__ == '__main__':
 
