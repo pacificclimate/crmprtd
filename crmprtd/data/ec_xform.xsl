@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:om="http://www.opengis.net/om/1.0"
-    xmlns:mpo="http://dms.ec.gc.ca/schema/point-observation/2.0" xmlns:gml="http://www.opengis.net/gml"
+    xmlns:mpo="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml"
     xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     exclude-result-prefixes="mpo"
     version="1.0">
@@ -15,7 +15,7 @@
      <xsl:template name="elements_template">
          <!-- combine tendency_characteristic and tendency_amount to be one float -->
         <xsl:variable name="new_element">
-            <xsl:element name="element" namespace="http://dms.ec.gc.ca/schema/point-observation/2.0">
+            <xsl:element name="element" namespace="http://dms.ec.gc.ca/schema/point-observation/2.1">
                 <xsl:attribute name="name">tendency_amount</xsl:attribute>
                 <xsl:attribute name="uom">kPa s-1</xsl:attribute>
                 <xsl:attribute name="value">
@@ -35,7 +35,7 @@
 
                 <!-- convert compass directions to degrees float -->
                 <xsl:when test="@name='wind_direction'">
-                    <xsl:element name="element" namespace="http://dms.ec.gc.ca/schema/point-observation/2.0">
+                    <xsl:element name="element" namespace="http://dms.ec.gc.ca/schema/point-observation/2.1">
                         <xsl:attribute name="name">wind_direction</xsl:attribute>
                         <xsl:attribute name="uom">degree</xsl:attribute>
                         <xsl:attribute name="value">
@@ -63,7 +63,7 @@
 
                 <!-- total cloud cover units are mislabeled and should be 'percent' -->
                 <xsl:when test="@name='total_cloud_cover' and @uom='code'">
-                    <xsl:element name="element" namespace="http://dms.ec.gc.ca/schema/point-observation/2.0">
+                    <xsl:element name="element" namespace="http://dms.ec.gc.ca/schema/point-observation/2.1">
                         <xsl:attribute name="name">total_cloud_cover</xsl:attribute>
                         <xsl:attribute name="uom">percent</xsl:attribute>
                         <xsl:attribute name="value"><xsl:value-of select="@value"/></xsl:attribute> 
@@ -79,7 +79,7 @@
     </xsl:template>
 
     <xsl:template match="//om:result//mpo:elements" priority="1">
-        <xsl:element name="elements" namespace="http://dms.ec.gc.ca/schema/point-observation/2.0">
+        <xsl:element name="elements" namespace="http://dms.ec.gc.ca/schema/point-observation/2.1">
             <xsl:call-template name="elements_template"/>
         </xsl:element>
     </xsl:template>
