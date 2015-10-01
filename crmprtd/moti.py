@@ -67,8 +67,7 @@ def process_observation_series(sesh, os):
         # strip the timezone
         tz = pytz.timezone('America/Vancouver')
         t = datetime.strptime(t[:-6], '%Y-%m-%dT%H:%M:%S')
-        t = tz.localize(t).astimezone(pytz.utc)
-        log.debug(t)
+        #t = tz.localize(t).astimezone(pytz.utc) remove this until we have a timezone respecting database
 
         for obs in member.iterchildren():
             varname = obs.tag
