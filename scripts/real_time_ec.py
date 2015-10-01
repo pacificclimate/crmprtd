@@ -5,20 +5,18 @@ import os, sys
 import logging, logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
-from urllib import urlopen
 from traceback import print_exc
 from pkg_resources import resource_filename
 
 # Installed libraries
+import requests
 from psycopg2 import InterfaceError, ProgrammingError, OperationalError
 from lxml.etree import LxmlSyntaxError
 import yaml
 
 # Local
+from crmprtd import retry
 from crmprtd.ec import makeurl, ObsProcessor
-
-# debug
-from pdb import set_trace
 
 def main(args):
     # Setup logging
@@ -42,9 +40,11 @@ def main(args):
             log.debug("Opening local xml file {0} for reading".format(args.filename))
             auto = False
             fname = args.filename
-            xml_file = open(args.filename, 'r')
+            xml_file = open(args.filename, 'r') # Do not catch exception here
             log.debug("File opened sucessfully")
         else:
+
+            # Determine time parameter
             if args.time:
                 args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
                 log.info("Starting manual run using timestamp {0}".format(args.time))
@@ -53,11 +53,25 @@ def main(args):
                 deltat = timedelta(1/24.) if args.frequency == 'hourly' else timedelta(1) # go back a day
                 args.time = datetime.utcnow() - deltat
                 log.info("Starting automatic run using timestamp {0}".format(args.time))
+
+            # Configure requests to use retry
+            s = requests.Session()
+            a = requests.adapters.HTTPAdapter(max_retries=3)
+            s.mount('https://', a)
+
+            # Construct and download the xml
             url = makeurl(args.frequency, args.province, args.language, args.time)
-            fname = url['filename']
+            fname = os.path.join(args.cache_dir, url['filename'])
+
             log.info("Downloading {0}".format(url['url']))
-            xml_file = urlopen(url['url'])
-            if xml_file.getcode() == 404: raise IOError("HTTP 404 error for %s" % url['url'])
+            req = s.get(url['url'])
+            if req.status_code != 200:
+                raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
+
+            log.info("Saving data to {0}".format(fname))
+            with open(fname, 'w') as f:
+                f.write(req.content)
+
     except IOError:
         log.exception("Unable to download or open xml data")
         sys.exit(1)
@@ -65,24 +79,16 @@ def main(args):
     # instantiate the ObsProcessor (do the startup stuff, like opening db connection and parsing the XML)
     try:
         log.info("Instantiating the ObsProcessor")
-        op = ObsProcessor(xml_file, args)
+        op = ObsProcessor(fname, args)
         log.info("Done setting up ObsProcessor")
     except (LxmlSyntaxError, IOError, OperationalError), e:
         if type(e) == OperationalError:
             log.exception("Could not connect to database")
         if type(e) == LxmlSyntaxError:
-            log.exception("Failed to parse xml file \n {0}".format(xml_file))
+            log.exception("Failed to parse xml file \n {0}".format(fname))
         if type(e) == IOError:
-            log.exception("Failed to open xml file\n{0}".format(xml_file))
-        # Save data for reprosessing
-        if auto:
-            fname = os.path.join(args.cache_dir, 'failure-' + fname)
-        else:
-            fname = os.path.join(args.cache_dir, 'manual_run_' + datetime.now().strftime('%Y%m%dT%H%M%S') + '_failure-' + fname)
-        log.info("Saving data at: {}".format(fname))
-        f = open(fname, 'w')
-        f.write(xml_file.read())
-        log.info("Done saving data")
+            log.exception("Failed to open xml file\n{0}".format(fname))
+
         log.critical('''Critical errors have occured in the EC real time downloader that require a human touch.
         The daemon was unable to either download, open, or parse the incoming xml and no observations could be inserted.
         Please consult the log file at {log}.
