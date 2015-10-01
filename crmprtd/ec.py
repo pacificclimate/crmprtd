@@ -11,7 +11,7 @@ from pdb import set_trace
 
 ns = {
     'om': 'http://www.opengis.net/om/1.0',
-    'mpo': "http://dms.ec.gc.ca/schema/point-observation/2.0",
+    'mpo': "http://dms.ec.gc.ca/schema/point-observation/2.1",
     'gml': "http://www.opengis.net/gml",
     'xlink': "http://www.w3.org/1999/xlink",
     'xsi': "http://www.w3.org/2001/XMLSchema-instance"
