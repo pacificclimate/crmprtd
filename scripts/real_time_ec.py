@@ -10,7 +10,8 @@ from pkg_resources import resource_filename
 
 # Installed libraries
 import requests
-import psycopg2
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from psycopg2 import InterfaceError, ProgrammingError, OperationalError
 from lxml.etree import LxmlSyntaxError
 import yaml
@@ -74,15 +75,15 @@ def main(args):
         log.exception("Unable to download or open xml data")
         sys.exit(1)
 
-    # Parse and transform the xml
+    # prepare the xml and open a database session
     et = parse_xml(fname)
-
-    conn = psycopg2.connect(args.connection_string)
+    Session = sessionmaker(create_engine(args.connection_string))
+    sesh = Session()
 
     # instantiate the ObsProcessor (do the startup stuff, like opening db connection and parsing the XML)
     try:
         log.info("Instantiating the ObsProcessor")
-        op = ObsProcessor(et, conn, args.threshold, args.diag)
+        op = ObsProcessor(et, sesh, args.threshold, args.diag)
         log.info("Done setting up ObsProcessor")
     except OperationalError as e:
         log.exception("Could not connect to database")
