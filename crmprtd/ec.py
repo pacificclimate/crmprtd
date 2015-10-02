@@ -5,6 +5,8 @@ import re
 import logging
 from pkg_resources import resource_stream
 
+from pycds import *
+
 log = logging.getLogger(__name__)
 
 ns = {
@@ -36,13 +38,7 @@ def parse_xml(fname):
     return transform(et)
 
 class ObsProcessor:
-    def __init__(self, et, prefs):
-        """Take one file(-like object) of Meteorological Point Observation XML (mpo-xml)
-        and do everything required to get it into the CRMP database
-        prefs should be an object of type optparse.Values with attributes: connection_string, log, cache_dir, error_email
-        raises: lxml.etree.LxmlSyntaxError, IOError, psycopg2.OperationalError
-        """
-
+    def __init__(self, et, conn, threshold, diag):
         # set variables for summary information
         self._members = 0
         self._members_processed = 0
@@ -50,12 +46,11 @@ class ObsProcessor:
         self._obs = 0
         self._obs_errors = 0
         self._obs_insertions = 0
-        
-        self.prefs = prefs
+
         self.et = et
-        log.debug("Opening database connection")
-        self.conn = psycopg2.connect(prefs.connection_string)
-        self._diagnostic_mode = self.prefs.diag
+        self.conn = conn
+        self.threshold = threshold
+        self._diagnostic_mode = diag
 
     def process(self):
         if self._diagnostic_mode: log.info("DIAGNOSTIC MODE, NO RECORDS WILL BE COMMITTED")
@@ -85,7 +80,7 @@ class ObsProcessor:
         cur = self.conn.cursor()
         try:
             cur.execute("SAVEPOINT obs_save") # Set a savepoint to rollback to for minor errors
-            hid = check_history(member, cur, self.prefs.thresh)
+            hid = check_history(member, cur, self.threshold)
             log.debug("Found history id: {0}".format(hid))
             if hid == None:
                 log.debug("Unable to find or create history id for member below\n{0}\n\n".format(tostring(member, pretty_print=True)))

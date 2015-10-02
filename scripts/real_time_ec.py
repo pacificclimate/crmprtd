@@ -10,6 +10,7 @@ from pkg_resources import resource_filename
 
 # Installed libraries
 import requests
+import psycopg2
 from psycopg2 import InterfaceError, ProgrammingError, OperationalError
 from lxml.etree import LxmlSyntaxError
 import yaml
@@ -76,18 +77,15 @@ def main(args):
     # Parse and transform the xml
     et = parse_xml(fname)
 
+    conn = psycopg2.connect(args.connection_string)
+
     # instantiate the ObsProcessor (do the startup stuff, like opening db connection and parsing the XML)
     try:
         log.info("Instantiating the ObsProcessor")
-        op = ObsProcessor(et, args)
+        op = ObsProcessor(et, conn, args.threshold, args.diag)
         log.info("Done setting up ObsProcessor")
-    except (LxmlSyntaxError, IOError, OperationalError), e:
-        if type(e) == OperationalError:
-            log.exception("Could not connect to database")
-        if type(e) == LxmlSyntaxError:
-            log.exception("Failed to parse xml file \n {0}".format(fname))
-        if type(e) == IOError:
-            log.exception("Failed to open xml file\n{0}".format(fname))
+    except OperationalError as e:
+        log.exception("Could not connect to database")
 
         log.critical('''Critical errors have occured in the EC real time downloader that require a human touch.
         The daemon was unable to either download, open, or parse the incoming xml and no observations could be inserted.
@@ -132,7 +130,7 @@ if __name__ == '__main__':
                         help='daily|hourly')
     parser.add_argument('-t', '--time',
                         help="Alternate *UTC* time to use for downloading (interpreted using format=YYYY/MM/DD HH:MM:SS)")
-    parser.add_argument('-T', '--threshold', dest='thresh', default=1000,
+    parser.add_argument('-T', '--threshold', default=1000,
                         help='Distance threshold to use when matching stations.  Stations are considered a match if they have the same id, name, and are within this threshold')
     parser.add_argument('-D', '--diag', default=False, action="store_true",
                         help="Turn on diagnostic mode (no commits)")
