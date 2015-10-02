@@ -1,10 +1,8 @@
-from lxml.etree import parse, tostring, XSLT
-from lxml.etree import LxmlError, XSLTError
+from lxml.etree import LxmlError, parse, tostring, XSLT
 from datetime import datetime
 import psycopg2
 import re
 import logging
-from traceback import format_exc
 from pkg_resources import resource_stream
 
 log = logging.getLogger(__name__)
@@ -30,8 +28,15 @@ def makeurl(freq='daily', province='BC', language='e', time=datetime.utcnow()):
     return {'url': 'http://dd.weatheroffice.ec.gc.ca/observations/xml/%s/%s/%s' % (province.upper(), freq, fname),
             'filename': fname}
 
+def parse_xml(fname):
+    # Parse and transform the xml
+    et = parse(fname)
+    xsl = resource_stream('crmprtd', 'data/ec_xform.xsl')
+    transform = XSLT(parse(xsl))
+    return transform(et)
+
 class ObsProcessor:
-    def __init__(self, xml_filename, prefs):
+    def __init__(self, et, prefs):
         """Take one file(-like object) of Meteorological Point Observation XML (mpo-xml)
         and do everything required to get it into the CRMP database
         prefs should be an object of type optparse.Values with attributes: connection_string, log, cache_dir, error_email
@@ -47,24 +52,13 @@ class ObsProcessor:
         self._obs_insertions = 0
         
         self.prefs = prefs
-        log.debug("Parsing xml")
-        self.et = parse(xml_filename)
+        self.et = et
         log.debug("Opening database connection")
         self.conn = psycopg2.connect(prefs.connection_string)
         self._diagnostic_mode = self.prefs.diag
 
     def process(self):
         if self._diagnostic_mode: log.info("DIAGNOSTIC MODE, NO RECORDS WILL BE COMMITTED")
-        # Apply a transformation to customize the EC records to our needs
-        try:
-            log.debug("Applying transformation")
-            xsl = resource_stream(__name__, 'data/ec_xform.xsl')
-            transform = XSLT(parse(xsl))
-            self.et = transform(self.et)
-            log.debug("Transformation applied")
-        # Non-fatal; there still lots of raw observations that we can record and pick up the rest later after the XSL is fixed
-        except XSLTError as e:
-            log.exception("Failed to apply XLST ec_xform.xsl")
         
         members = self.et.xpath('//om:member', namespaces=ns)
         self._members = len(members)
@@ -127,10 +121,6 @@ class ObsProcessor:
             self.conn.rollback()
         finally:
             cur.close()
-
-    def save(self, filename, mode='w'):
-        f = open(filename, mode)
-        print >>f, tostring(self.et, pretty_print=True)
 
 def check_history(member, cur, threshold):
 

@@ -16,7 +16,7 @@ import yaml
 
 # Local
 from crmprtd import retry
-from crmprtd.ec import makeurl, ObsProcessor
+from crmprtd.ec import makeurl, ObsProcessor, parse_xml
 
 def main(args):
     # Setup logging
@@ -76,10 +76,13 @@ def main(args):
         log.exception("Unable to download or open xml data")
         sys.exit(1)
 
+    # Parse and transform the xml
+    et = parse_xml(fname)
+
     # instantiate the ObsProcessor (do the startup stuff, like opening db connection and parsing the XML)
     try:
         log.info("Instantiating the ObsProcessor")
-        op = ObsProcessor(fname, args)
+        op = ObsProcessor(et, args)
         log.info("Done setting up ObsProcessor")
     except (LxmlSyntaxError, IOError, OperationalError), e:
         if type(e) == OperationalError:
@@ -101,14 +104,7 @@ def main(args):
         op.process()
         log.info("Done processing observations")
     except (InterfaceError, ProgrammingError, Exception), e:
-        log.exception("Unhandleable exception, saving remaining XML file {} for further examination".format(fname))
-    finally:
-        if auto:
-            remainder = os.path.join(args.cache_dir, 'remainder-' + fname)
-        else:
-            remainder = os.path.join(args.cache_dir, 'manual_run_' + datetime.now().strftime('%Y%m%dT%H%M%S') + '_remainder-' + fname)
-        op.save(remainder)
-        log.info("Data saved at {}".format(remainder))
+        log.exception("Unhandleable exception. XML file saved at {}".format(fname))
 
 if __name__ == '__main__':
 
