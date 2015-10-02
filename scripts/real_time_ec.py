@@ -34,11 +34,9 @@ def main(args):
     if args.log_level:
         log.setLevel(args.log_level)
 
-    auto = True
     try:
         if args.filename:
             log.debug("Opening local xml file {0} for reading".format(args.filename))
-            auto = False
             fname = args.filename
             xml_file = open(args.filename, 'r') # Do not catch exception here
             log.debug("File opened sucessfully")
@@ -48,7 +46,6 @@ def main(args):
             if args.time:
                 args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
                 log.info("Starting manual run using timestamp {0}".format(args.time))
-                auto = False
             else:
                 deltat = timedelta(1/24.) if args.frequency == 'hourly' else timedelta(1) # go back a day
                 args.time = datetime.utcnow() - deltat
