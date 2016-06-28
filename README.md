@@ -1,5 +1,8 @@
 # crmprtd
 
+[![Build Status](https://travis-ci.org/pacificclimate/crmprtd.svg?branch=master)](https://travis-ci.org/pacificclimate/crmprtd)
+[![Code Health](https://landscape.io/github/pacificclimate/crmprtd/master/landscape.svg?style=flat)](https://landscape.io/github/pacificclimate/crmprtd/master)
+
 Utility to download near real time weather data and insert it into PCIC's database
 
 ## Installation
