@@ -3,6 +3,7 @@ from datetime import datetime
 import re
 import logging
 from pkg_resources import resource_stream
+from urlparse import urlparse
 
 from pycds import *
 from sqlalchemy import and_, or_
@@ -28,8 +29,11 @@ def makeurl(freq='daily', province='BC', language='e', time=datetime.utcnow()):
     fmt = '%Y%m%d%H' if freq == 'hourly' else '%Y%m%d'
     freq = 'yesterday' if freq == 'daily' else freq
     fname = '%s_%s_%s_%s.xml' % (freq, province.lower(), time.strftime(fmt), language)
-    return {'url': 'http://dd.weatheroffice.ec.gc.ca/observations/xml/%s/%s/%s' % (province.upper(), freq, fname),
-            'filename': fname}
+    return 'http://dd.weatheroffice.ec.gc.ca/observations/xml/%s/%s/%s' % (province.upper(), freq, fname)
+
+def extract_fname_from_url(url):
+    path = urlparse(url)['path']
+    return path.split('/')[-1]
 
 def parse_xml(fname):
     # Parse and transform the xml

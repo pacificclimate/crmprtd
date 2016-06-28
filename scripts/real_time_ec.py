@@ -60,10 +60,10 @@ def main(args):
 
             # Construct and download the xml
             url = makeurl(args.frequency, args.province, args.language, args.time)
-            fname = os.path.join(args.cache_dir, url['filename'])
+            fname = os.path.join(args.cache_dir, extract_fname_from_url(url))
 
-            log.info("Downloading {0}".format(url['url']))
-            req = s.get(url['url'])
+            log.info("Downloading {0}".format(url))
+            req = s.get(url)
             if req.status_code != 200:
                 raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
 
