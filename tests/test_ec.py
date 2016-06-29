@@ -90,7 +90,7 @@ def test_url_to_fname(url, fname):
   </om:member>
 </om:ObservationCollection>'''), '0.12')
 ])
-def test_xsl_transform(x, expected):
+def test_xsl_transform_tendency_amount(x, expected):
     # Apply the transform
     xsl = resource_filename('crmprtd', 'data/ec_xform.xsl')
     transform = XSLT(parse(xsl))
@@ -100,4 +100,67 @@ def test_xsl_transform(x, expected):
     e = et.xpath(".//mpo:element", namespaces=ns)
 
     assert len(e) == 1
+    assert e[0].attrib['value'] == expected
+
+@pytest.mark.parametrize(('x', 'expected'), [
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <om:member>
+    <om:Observation>
+      <om:result>
+        <elements>
+          <element name="wind_direction" uom="code" value="W"/>
+        </elements>
+      </om:result>
+    </om:Observation>
+  </om:member>
+</om:ObservationCollection>'''), '270'),
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <om:member>
+    <om:Observation>
+      <om:result>
+        <elements>
+          <element name="wind_direction" uom="code" value="SE"/>
+        </elements>
+      </om:result>
+    </om:Observation>
+  </om:member>
+</om:ObservationCollection>'''), '135')
+])
+def test_xsl_transform_wind_direction(x, expected):
+    # Apply the transform
+    xsl = resource_filename('crmprtd', 'data/ec_xform.xsl')
+    transform = XSLT(parse(xsl))
+    et = transform(x)
+
+    # Locate changed element
+    e = et.xpath(".//mpo:element", namespaces=ns)
+
+    assert e[0].attrib['value'] == expected
+
+@pytest.mark.parametrize(('x', 'expected'), [
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <om:member>
+    <om:Observation>
+      <om:result>
+        <elements>
+          <element name="total_cloud_cover" uom="code" value="8"/>
+        </elements>
+      </om:result>
+    </om:Observation>
+  </om:member>
+</om:ObservationCollection>'''), '8')
+])
+def test_xsl_transform_cloud_cover(x, expected):
+    # Apply the transform
+    xsl = resource_filename('crmprtd', 'data/ec_xform.xsl')
+    transform = XSLT(parse(xsl))
+    et = transform(x)
+
+    # Locate changed element
+    e = et.xpath(".//mpo:element", namespaces=ns)
+
+    assert e[0].attrib['uom'] == 'percent'
     assert e[0].attrib['value'] == expected
