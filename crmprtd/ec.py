@@ -32,8 +32,8 @@ def makeurl(freq='daily', province='BC', language='e', time=datetime.utcnow()):
     return 'http://dd.weatheroffice.ec.gc.ca/observations/xml/%s/%s/%s' % (province.upper(), freq, fname)
 
 def extract_fname_from_url(url):
-    path = urlparse(url)['path']
-    return path.split('/')[-1]
+    p = urlparse(url).path
+    return p.split('/')[-1]
 
 def parse_xml(fname):
     # Parse and transform the xml
