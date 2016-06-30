@@ -26,6 +26,7 @@ def test_catch_duplicates(test_session, moti_sawr7110_xml):
     print 'test_catch_duplicates'
     rv = process(test_session, moti_sawr7110_xml)
     assert rv == {'failures': 0, 'successes': 2, 'skips': 2}
+    test_session.commit()
     rv = process(test_session, moti_sawr7110_xml)
     assert rv == {'failures': 0, 'successes': 0, 'skips': 4}
     
