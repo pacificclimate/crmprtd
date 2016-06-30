@@ -91,12 +91,36 @@ def test_session(crmp_session, caplog):
     crmp_session.add_all([simon, eric, pat])
 
     stations = [
-        Station(native_id='11091', network=moti, histories=[History(station_name='Brandywine')]),
-        Station(native_id='1029', network=wmb, histories=[History(station_name='FIVE MILE')]),
-        Station(native_id='2100160', network=ec, histories=[History(id=12345,
-                                                                    station_name='Beaver Creek Airport',
-                                                                    the_geom='SRID=4326;POINT(-140.866667 62.416667)')])
-        ]
+        Station(native_id='11091', network=moti, histories=[
+                History(station_name='Brandywine')
+        ]),
+        Station(native_id='1029', network=wmb, histories=[
+                History(station_name='FIVE MILE')
+        ]),
+        Station(native_id='2100160', network=ec, histories=[
+                History(id=12345,
+                        station_name='Beaver Creek Airport',
+                        the_geom='SRID=4326;POINT(-140.866667 62.416667)')
+        ]),
+        Station(native_id='1067742', network=ec, histories=[
+                History(id=10,
+                        station_name='Stewart Airport',
+                        the_geom='SRID=4326;POINT(-129.985 55.9361111111111)')
+        ]),
+        Station(native_id='1047172', network=ec, histories=[
+                History(id=20,
+                        station_name='Sechelt',
+                        sdate='2012-09-24',
+                        edate='2012-09-26',
+                        the_geom='SRID=4326;POINT(-123.7 49.45)')
+        ]),
+        Station(native_id='1047172', network=ec, histories=[
+                History(id=21,
+                        station_name='Sechelt',
+                        sdate='2012-09-26',
+                        the_geom='SRID=4326;POINT(-123.7152625 49.4579966666667)')
+        ])
+    ]
     crmp_session.add_all(stations)
 
     variables = [Variable(name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti),

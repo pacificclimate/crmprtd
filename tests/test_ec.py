@@ -198,9 +198,41 @@ def test_xsl_transform_cloud_cover(x, expected):
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), 12345)
+</om:ObservationCollection>'''), 12345),
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <om:member>
+    <om:Observation>
+      <om:metadata>
+        <set>
+          <general>
+            <dataset name="mscobservation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/"/>
+          </general>
+          <identification-elements>
+            <element name="station_name" uom="unitless" value="Stewart Airport"/>
+            <element name="climate_station_number" uom="unitless" value="1067742"/>
+          </identification-elements>
+        </set>
+      </om:metadata>
+      <om:samplingTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2016-05-28T02:00:00.000Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:samplingTime>
+      <om:featureOfInterest>
+        <gml:FeatureCollection>
+          <gml:location>
+            <gml:Point>
+              <gml:pos>55.9361 -129.985</gml:pos>
+            </gml:Point>
+          </gml:location>
+        </gml:FeatureCollection>
+      </om:featureOfInterest>
+    </om:Observation>
+  </om:member>
+</om:ObservationCollection>'''), 10)
 ])
-def test_check_history_id(test_session, et, expected):
+def test_check_valid_history_id(test_session, et, expected):
     members = et.xpath('//om:member', namespaces=ns)
     print members
     hid = check_history(members[0], test_session, 1000)
