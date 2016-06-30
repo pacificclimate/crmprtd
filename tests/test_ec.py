@@ -6,6 +6,7 @@ from lxml.etree import tostring, fromstring, parse, XSLT
 import pytest
 
 from crmprtd.ec import makeurl, extract_fname_from_url, parse_xml, ns, ObsProcessor, check_history, insert_obs
+from pycds import History, Station
 
 @pytest.mark.parametrize(('label', 'args','expected'), [
     ('daily-BC-EN',
@@ -164,3 +165,10 @@ def test_xsl_transform_cloud_cover(x, expected):
 
     assert e[0].attrib['uom'] == 'percent'
     assert e[0].attrib['value'] == expected
+
+def test_check_history_id(test_session, ec_xml_single_obs):
+    members = ec_xml_single_obs.xpath('//om:member', namespaces=ns)
+    print members
+    hid = check_history(members[0], test_session, 1000)
+    print hid
+    assert 0

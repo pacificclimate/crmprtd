@@ -1,12 +1,14 @@
 from collections import namedtuple
-from pkg_resources import resource_stream
+from pkg_resources import resource_stream, resource_filename
+
 import logging, logging.config
 
 import yaml
 import pytest
-from sqlalchemy import create_engine
+import sqlalchemy
+from sqlalchemy.schema import DDL
 from sqlalchemy.orm import sessionmaker
-from lxml.etree import parse, fromstring
+from lxml.etree import parse, fromstring, fromstring, XSLT
 import testing.postgresql
 
 import pycds
@@ -24,7 +26,7 @@ def postgis_session():
     logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
 
     with testing.postgresql.Postgresql() as pg:
-        engine = create_engine(pg.url())
+        engine = sqlalchemy.create_engine(pg.url())
         engine.execute("create extension postgis")
         sesh = sessionmaker(bind=engine)()
 
@@ -37,6 +39,32 @@ def crmp_session(postgis_session):
     Yields a PostGIS enabled session with CRMP schema but no data
     '''
     logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
+
+    # Add needed functions
+    sqlalchemy.event.listen(
+        pycds.Base.metadata,
+        'before_create',
+        DDL('''CREATE OR REPLACE FUNCTION closest_stns_within_threshold(X numeric, Y numeric, thres integer)
+RETURNS TABLE(history_id integer, lat numeric, lon numeric, dist double precision) AS
+$BODY$
+
+DECLARE
+    mystr TEXT;
+BEGIN
+    mystr = 'WITH stns_in_thresh AS (
+    SELECT history_id, lat, lon, Geography(ST_Transform(the_geom,4326)) as p_existing, Geography(ST_SetSRID(ST_MakePoint('|| X ||','|| Y ||'),4326)) as p_new
+    FROM meta_history
+    WHERE the_geom && ST_Buffer(Geography(ST_SetSRID(ST_MakePoint('|| X || ','|| Y ||'),4326)),'|| thres ||')
+)
+SELECT history_id, lat, lon, ST_Distance(p_existing,p_new) as dist
+FROM stns_in_thresh
+ORDER BY dist';
+    RETURN QUERY EXECUTE mystr;
+END;
+$BODY$
+LANGUAGE plpgsql
+SECURITY DEFINER;''')
+    )
 
     engine = postgis_session.get_bind()
     pycds.Base.metadata.create_all(bind=engine)
@@ -65,7 +93,8 @@ def test_session(crmp_session):
     stations = [
         Station(native_id='11091', network=moti, histories=[History(station_name='Brandywine')]),
         Station(native_id='1029', network=wmb, histories=[History(station_name='FIVE MILE')]),
-        Station(native_id='2100160', network=ec, histories=[History(station_name='Beaver Creek Airport')])
+        Station(native_id='2100160', network=ec, histories=[History(station_name='Beaver Creek Airport',
+                                                                    the_geom='SRID=4326;POINT(-140.866667 62.416667)')])
         ]
     crmp_session.add_all(stations)
 
@@ -230,7 +259,7 @@ def moti_sawr7100_large():
 
 @pytest.fixture(scope='module')
 def ec_xml_single_obs():
-    return fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    x = fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -297,3 +326,6 @@ def ec_xml_single_obs():
     </om:Observation>
   </om:member>
 </om:ObservationCollection>''')
+    xsl = resource_filename('crmprtd', 'data/ec_xform.xsl')
+    transform = XSLT(parse(xsl))
+    return transform(x)

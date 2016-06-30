@@ -176,7 +176,7 @@ def check_history(member, sesh, threshold):
 
         return hid
 
-    if len(possible_hid) < 1:
+    if len(possible_hist) < 1:
         log.debug("No matching open history_id found")
         # Stuff may not match because:
         #   -This a new station/native_id
@@ -194,9 +194,12 @@ def check_history(member, sesh, threshold):
 # -    cur.execute(q)
 
 
-        q = sesh.query(History, func.max(Obs.time).label('max_time')).join(Obs).join(Station).join(Network)\
-            .filter(Station.native_id == native_id).filter(Network.name == 'EC_raw')\
-            .fitler(History.edate.is_(None))
+        q = sesh.query(History.station_id, History.id, func.max(Obs.time).label('max_time'))\
+            .join(Obs).join(Station).join(Network)\
+            .filter(Station.native_id == native_id)\
+            .filter(Network.name == 'EC_raw')\
+            .filter(History.edate.is_(None))\
+            .group_by(History.station_id, History.id)
         r = q.all()
 
         if len(r) > 1:
@@ -233,7 +236,7 @@ def check_history(member, sesh, threshold):
 
     # Must be multiple potentially valid history_id's.
     # FIXME: handle this more appropriately than screaming
-    raise Exception("Found {rc} relevant history_id entries for station name {sn} native id {nid}, unable to process".format(rc=len(possible_hid),sn=stn_name,nid=native_id))
+    raise Exception("Found {rc} relevant history_id entries for station name {sn} native id {nid}, unable to process".format(rc=len(possible_hist),sn=stn_name,nid=native_id))
 
 
 def insert_obs(cur, om, hid, vname, vid):
