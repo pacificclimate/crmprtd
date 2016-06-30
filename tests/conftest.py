@@ -82,7 +82,7 @@ def test_session(crmp_session, caplog):
 
     moti = Network(name='MoTIe')
     ec = Network(name='EC_raw')
-    wmb = Network(name='FLNROW-WMB')
+    wmb = Network(name='FLNRO-WMB')
     crmp_session.add_all([moti, ec, wmb])
 
     simon = Contact(name='Simon', networks=[moti])

@@ -1,4 +1,4 @@
-from pycds import Station, Contact
+from pycds import Contact, Network
 
 def test_can_instantiate(test_session):
     print "I can haz enjun"
@@ -6,8 +6,8 @@ def test_can_instantiate(test_session):
 def test_db_has_data(test_session):
     q = test_session.query(Contact.name)
     assert set([rv[0] for rv in q.all() ]) == set(['Simon', 'Pat', 'Eric'])
-    q = test_session.query(Station)
-    assert len(q.all()) == 3
+    q = test_session.query(Network.name)
+    assert set([rv[0] for rv in q.all() ]) == set(['MoTIe', 'EC_raw', 'FLNRO-WMB'])
 
 def test_db_has_geo(postgis_session):
     res = postgis_session.execute("SELECT ST_AsText(ST_GeomFromText('POLYGON((0 0,0 1,1 1,1 0,0 0))',4326))")
