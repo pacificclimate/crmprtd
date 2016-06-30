@@ -81,7 +81,7 @@ def test_session(crmp_session, caplog):
     caplog.setLevel(logging.ERROR, logger='sqlalchemy.engine')
 
     moti = Network(name='MoTIe')
-    ec = Network(name='EC')
+    ec = Network(name='EC_raw')
     wmb = Network(name='FLNROW-WMB')
     crmp_session.add_all([moti, ec, wmb])
 
@@ -93,7 +93,8 @@ def test_session(crmp_session, caplog):
     stations = [
         Station(native_id='11091', network=moti, histories=[History(station_name='Brandywine')]),
         Station(native_id='1029', network=wmb, histories=[History(station_name='FIVE MILE')]),
-        Station(native_id='2100160', network=ec, histories=[History(station_name='Beaver Creek Airport',
+        Station(native_id='2100160', network=ec, histories=[History(id=12345,
+                                                                    station_name='Beaver Creek Airport',
                                                                     the_geom='SRID=4326;POINT(-140.866667 62.416667)')])
         ]
     crmp_session.add_all(stations)
@@ -103,6 +104,7 @@ def test_session(crmp_session, caplog):
                  Variable(name='relative_humidity', unit='percent', network=wmb)
                  ]
     crmp_session.add_all(variables)
+    crmp_session.commit()
 
     yield crmp_session
 
