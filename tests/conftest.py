@@ -74,11 +74,11 @@ SECURITY DEFINER;''')
     yield postgis_session
 
 @pytest.yield_fixture(scope='function')
-def test_session(crmp_session):
+def test_session(crmp_session, caplog):
     '''
     Yields a PostGIS enabled session with CRMP schema and test data
     '''
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
+    caplog.setLevel(logging.ERROR, logger='sqlalchemy.engine')
 
     moti = Network(name='MoTIe')
     ec = Network(name='EC')
@@ -104,7 +104,6 @@ def test_session(crmp_session):
                  ]
     crmp_session.add_all(variables)
 
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     yield crmp_session
 
 @pytest.fixture(scope='module')
