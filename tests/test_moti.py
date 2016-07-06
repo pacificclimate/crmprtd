@@ -13,14 +13,13 @@ bctz = pytz.timezone('America/Vancouver')
 def test_data(test_session, moti_sawr7110_xml):
     tz = pytz.timezone('America/Vancouver')
 
+    c1 = test_session.query(Obs).count()
+
     process(test_session, moti_sawr7110_xml)
     test_session.commit()
     q = test_session.query(Obs)
     obs = q.all()
-    assert len(obs) == 2
-    actual = [o.time for o in obs]
-    expected = [ datetime(2012, 1, 1), datetime(2012, 1, 1, 1) ]
-    assert actual == expected
+    assert len(obs) - c1 == 2
 
 def test_catch_duplicates(test_session, moti_sawr7110_xml):
     print 'test_catch_duplicates'

@@ -1,5 +1,6 @@
 from collections import namedtuple
 from pkg_resources import resource_stream, resource_filename
+from datetime import datetime
 
 import logging, logging.config
 
@@ -10,9 +11,10 @@ from sqlalchemy.schema import DDL
 from sqlalchemy.orm import sessionmaker
 from lxml.etree import parse, fromstring, fromstring, XSLT
 import testing.postgresql
+import pytz
 
 import pycds
-from pycds import Network, Station, Contact, History, Variable
+from pycds import Network, Station, Contact, History, Variable, Obs
 import sys
 
 def pytest_runtest_setup():
@@ -90,44 +92,47 @@ def test_session(crmp_session, caplog):
     pat = Contact(name='Pat', networks=[ec])
     crmp_session.add_all([simon, eric, pat])
 
+    brandy_hist = History(station_name='Brandywine')
+    five_mile_hist = History(station_name='FIVE MILE')
+    beaver_air_hist = History(id=12345,
+                              station_name='Beaver Creek Airport',
+                              the_geom='SRID=4326;POINT(-140.866667 62.416667)')
+    stewart_air_hist = History(id=10,
+                               station_name='Stewart Airport',
+                               the_geom='SRID=4326;POINT(-129.985 55.9361111111111)')
+    sechelt1 = History(id=20,
+                       station_name='Sechelt',
+                       sdate='2012-09-24',
+                       edate='2012-09-26',
+                       the_geom='SRID=4326;POINT(-123.7 49.45)')
+    sechelt2 = History(id=21,
+                       station_name='Sechelt',
+                       sdate='2012-09-26',
+                       the_geom='SRID=4326;POINT(-123.7152625 49.4579966666667)')
+
     stations = [
-        Station(native_id='11091', network=moti, histories=[
-                History(station_name='Brandywine')
-        ]),
-        Station(native_id='1029', network=wmb, histories=[
-                History(station_name='FIVE MILE')
-        ]),
-        Station(native_id='2100160', network=ec, histories=[
-                History(id=12345,
-                        station_name='Beaver Creek Airport',
-                        the_geom='SRID=4326;POINT(-140.866667 62.416667)')
-        ]),
-        Station(native_id='1067742', network=ec, histories=[
-                History(id=10,
-                        station_name='Stewart Airport',
-                        the_geom='SRID=4326;POINT(-129.985 55.9361111111111)')
-        ]),
-        Station(native_id='1047172', network=ec, histories=[
-                History(id=20,
-                        station_name='Sechelt',
-                        sdate='2012-09-24',
-                        edate='2012-09-26',
-                        the_geom='SRID=4326;POINT(-123.7 49.45)')
-        ]),
-        Station(native_id='1047172', network=ec, histories=[
-                History(id=21,
-                        station_name='Sechelt',
-                        sdate='2012-09-26',
-                        the_geom='SRID=4326;POINT(-123.7152625 49.4579966666667)')
-        ])
+        Station(native_id='11091', network=moti, histories=[brandy_hist]),
+        Station(native_id='1029', network=wmb, histories=[five_mile_hist]),
+        Station(native_id='2100160', network=ec, histories=[beaver_air_hist]),
+        Station(native_id='1067742', network=ec, histories=[stewart_air_hist]),
+        Station(native_id='1047172', network=ec, histories=[sechelt1, sechelt2]),
     ]
     crmp_session.add_all(stations)
 
-    variables = [Variable(name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti),
-                 Variable(name='precipitation', unit='mm', network=ec),
-                 Variable(name='relative_humidity', unit='percent', network=wmb)
-                 ]
-    crmp_session.add_all(variables)
+    moti_air_temp = Variable(name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti)
+    ec_precip = Variable(name='precipitation', unit='mm', network=ec)
+    wmb_humitidy = Variable(name='relative_humidity', unit='percent', network=wmb)
+    crmp_session.add_all([moti_air_temp, ec_precip, wmb_humitidy])
+
+    obs = [
+        Obs(history=sechelt1, datum=2.5, variable=ec_precip,
+            time=datetime(2012, 9, 24, 06, tzinfo=pytz.utc)),
+        Obs(history=sechelt1, datum=2.7, variable=ec_precip,
+            time=datetime(2012, 9, 26, 06, tzinfo=pytz.utc)),
+        Obs(history=sechelt2, datum=2.5, variable=ec_precip,
+            time=datetime(2012, 9, 26, 18, tzinfo=pytz.utc)),
+    ]
+    crmp_session.add_all(obs)
     crmp_session.commit()
 
     yield crmp_session

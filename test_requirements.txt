@@ -1,3 +1,4 @@
 pytest
 pytest-capturelog
 testing.postgresql
+pytz
