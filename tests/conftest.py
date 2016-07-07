@@ -137,6 +137,58 @@ def test_session(crmp_session, caplog):
 
     yield crmp_session
 
+@pytest.yield_fixture(scope='function')
+def ec_session(crmp_session, caplog):
+    '''
+    Yields a PostGIS enabled session with CRMP schema and test data
+    '''
+    caplog.setLevel(logging.ERROR, logger='sqlalchemy.engine')
+
+    ec = Network(name='EC_raw')
+    crmp_session.add(ec)
+
+    pat = Contact(name='Pat', networks=[ec])
+    crmp_session.add(pat)
+
+    beaver_air_hist = History(id=12345,
+                              station_name='Beaver Creek Airport',
+                              the_geom='SRID=4326;POINT(-140.866667 62.416667)')
+    stewart_air_hist = History(id=10,
+                               station_name='Stewart Airport',
+                               the_geom='SRID=4326;POINT(-129.985 55.9361111111111)')
+    sechelt1 = History(id=20,
+                       station_name='Sechelt',
+                       sdate='2012-09-24',
+                       edate='2012-09-26',
+                       the_geom='SRID=4326;POINT(-123.7 49.45)')
+    sechelt2 = History(id=21,
+                       station_name='Sechelt',
+                       sdate='2012-09-26',
+                       the_geom='SRID=4326;POINT(-123.7152625 49.4579966666667)')
+
+    stations = [
+        Station(native_id='2100160', network=ec, histories=[beaver_air_hist]),
+        Station(native_id='1067742', network=ec, histories=[stewart_air_hist]),
+        Station(native_id='1047172', network=ec, histories=[sechelt1, sechelt2]),
+    ]
+    crmp_session.add_all(stations)
+
+    ec_precip = Variable(name='precipitation', unit='mm', network=ec)
+    crmp_session.add(ec_precip)
+
+    obs = [
+        Obs(history=sechelt1, datum=2.5, variable=ec_precip,
+            time=datetime(2012, 9, 24, 06, tzinfo=pytz.utc)),
+        Obs(history=sechelt1, datum=2.7, variable=ec_precip,
+            time=datetime(2012, 9, 26, 06, tzinfo=pytz.utc)),
+        Obs(history=sechelt2, datum=2.5, variable=ec_precip,
+            time=datetime(2012, 9, 26, 18, tzinfo=pytz.utc)),
+    ]
+    crmp_session.add_all(obs)
+    crmp_session.commit()
+
+    yield crmp_session
+
 @pytest.fixture(scope='module')
 def moti_sawr7110_xml():
     return fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
