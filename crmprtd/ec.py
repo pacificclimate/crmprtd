@@ -149,6 +149,7 @@ def check_history(member, sesh, threshold):
     q = sesh.execute('SELECT history_id from closest_stns_within_threshold(:lon, :lat, :threshold)', 
         {'lon': lon, 'lat': lat, 'threshold': threshold})
     valid_hid = set([x[0] for x in q.fetchall()])
+    log.debug("history_ids in threshold %s" % valid_hid)
 
     q = sesh.query(History.id, History.freq).join(Station).join(Network)\
         .filter(Station.native_id == native_id).filter(Network.name == 'EC_raw')\
@@ -158,6 +159,7 @@ def check_history(member, sesh, threshold):
         ))\
         .filter(History.station_name == stn_name)
     r = q.all()
+    log.debug("history_ids based on native_id, station_name, and data sdate/edate %s" % r)
 
     # log.info(histories)
 
@@ -231,6 +233,7 @@ def check_history(member, sesh, threshold):
                        station = stn,
                        lon = lon,
                        lat = lat,
+                       the_geom = 'SRID=4326;POINT({} {})'.format(lon, lat),
                        sdate = obs_time,
                        freq = freq)
         with sesh.begin_nested():
