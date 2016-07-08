@@ -6,7 +6,7 @@ from lxml.etree import tostring, fromstring, parse, XSLT
 import pytest
 
 from crmprtd.ec import makeurl, extract_fname_from_url, parse_xml, ns, ObsProcessor, check_history, insert_obs
-from pycds import History, Station
+from pycds import History, Station, Obs, Network
 
 @pytest.mark.parametrize(('label', 'args','expected'), [
     ('daily-BC-EN',
@@ -234,7 +234,6 @@ def test_xsl_transform_cloud_cover(x, expected):
 ])
 def test_check_valid_history_id(test_session, et, expected):
     members = et.xpath('//om:member', namespaces=ns)
-    print members
     hid = check_history(members[0], test_session, 1000)
     assert hid == expected
 
@@ -272,8 +271,46 @@ def test_check_valid_history_id(test_session, et, expected):
   </om:member>
 </om:ObservationCollection>'''), 12345)
 ])
-def test_station_movement(test_session, et, expected):
+def test_station_movement(ec_session, et, expected):
     members = et.xpath('//om:member', namespaces=ns)
-    hid = check_history(members[0], test_session, 1000)
+    hid = check_history(members[0], ec_session, 1000)
+    assert hid
 
+@pytest.mark.parametrize(('et'), [
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <om:member>
+    <om:Observation>
+      <om:metadata>
+        <set>
+          <general>
+            <dataset name="mscobservation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/"/>
+          </general>
+          <identification-elements>
+            <element name="station_name" uom="unitless" value="Entrance Island"/>
+            <element name="climate_station_number" uom="unitless" value="1022689"/>
+          </identification-elements>
+        </set>
+      </om:metadata>
+      <om:samplingTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2016-05-28T02:00:00.000Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:samplingTime>
+      <om:featureOfInterest>
+        <gml:FeatureCollection>
+          <gml:location>
+            <gml:Point>
+              <gml:pos>49.208665 -123.810556</gml:pos>
+            </gml:Point>
+          </gml:location>
+        </gml:FeatureCollection>
+      </om:featureOfInterest>
+    </om:Observation>
+  </om:member>
+</om:ObservationCollection>'''))
+])
+def test_new_station(ec_session, et):
+    members = et.xpath('//om:member', namespaces=ns)
+    hid = check_history(members[0], ec_session, 1000)
     assert hid

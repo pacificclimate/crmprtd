@@ -5,7 +5,7 @@ import logging
 from pkg_resources import resource_stream
 from urlparse import urlparse
 
-from pycds import *
+from pycds import History, Station, Network, Obs
 from sqlalchemy import and_, or_
 from sqlalchemy.sql import func
 
@@ -170,9 +170,11 @@ def check_history(member, sesh, threshold):
         log.debug('Found hid: {}'.format(hid))
 
         # 'Upgrade' the frequency if we're receiving hourly results for a station marked as daily
-        if db_freq == 'daily' and freq == '1-hourly':
-            log.debug("Upgrading frequency to hourly")
-            hist.freq = freq
+
+        # TODO: Fix this code, it doens't work
+        # if db_freq == 'daily' and freq == '1-hourly':
+        #     log.debug("Upgrading frequency to hourly")
+        #     hist.freq = freq
 
         return hid
 
@@ -185,21 +187,12 @@ def check_history(member, sesh, threshold):
         #   -A station that was previously 'closed' has started reporting again
 
         # First close out the old history_id if it exists
-
-# -    SELECT station_id, history_id, max(obs_time)
-# -    FROM obs_raw NATURAL JOIN meta_history NATURAL JOIN meta_station NATURAL JOIN meta_network
-# -    WHERE network_name = 'EC_raw' AND native_id = %s AND edate IS NULL
-# -    GROUP BY station_id, history_id
-# -    """, (native_id,))
-# -    cur.execute(q)
-
-
-        q = sesh.query(History.station_id, History.id, func.max(Obs.time).label('max_time'))\
+        q = sesh.query(History, func.max(Obs.time).label('max_time'))\
             .join(Obs).join(Station).join(Network)\
             .filter(Station.native_id == native_id)\
             .filter(Network.name == 'EC_raw')\
             .filter(History.edate.is_(None))\
-            .group_by(History.station_id, History.id)
+            .group_by(History.id, Station.id)
         r = q.all()
 
         if len(r) > 1:
@@ -207,32 +200,43 @@ def check_history(member, sesh, threshold):
             log.debug("Multiple open records found for this member")
             raise Exception("Multiple open records with same native_id {0} found in member".format(native_id))
 
+        # If we only have one record, close it out
         if len(r) == 1:
-            pass
-        # stn_id, hid, tn = record
-        # log.debug("Closing history_id {0}".format(hid))
-        # q = cur.mogrify("UPDATE meta_history SET edate = %s WHERE history_id = %s AND edate IS NULL", (tn, hid))
-        # cur.execute(q)
+            hist, max_time = r[0]
+            hist.edate = max_time
+
+        q = sesh.query(Network).filter(Network.name == 'EC_raw')
+        assert q.count() == 1
+        ec = q.first()
+
+        # If we have no record of that native_id, this is a new station and we must insert it
+        q = sesh.query(Station)\
+                .filter(Station.native_id == native_id)\
+                .filter(Station.network == ec)
+        r = q.all()
+        if len(r) < 1:
+            stn = Station(native_id=native_id, network=ec)
+            with sesh.begin_nested():
+                sesh.add(stn)
+            log.debug("Created new station_id {0}".format(stn.id))
+
+        elif len(r) > 1:
+            raise Exception("Multiple stations with native_id {0}. Panicing".format(native_id))
 
         else:
-            pass
-            # # If it doesn't exist, this is a new station so create a new station_id
-            # else:
-            #     q = cur.mogrify("INSERT INTO meta_station (native_id, network_id) VALUES (%s, (SELECT network_id FROM meta_network WHERE network_name = 'EC_raw')) RETURNING station_id", (native_id,))
-            #     cur.execute(q)
-            #     stn_id = cur.fetchone()[0]
-            #     log.debug("Created new station_id {0}".format(stn_id))
+            stn = r[0]
 
-            # # Insert the new meta_history entry
-            # q = cur.mogrify("INSERT INTO meta_history (station_name, station_id, lat, lon, sdate, freq) VALUES (%s, %s, %s, %s, %s, %s) RETURNING history_id", (stn_name, stn_id, lat, lon, obs_time, freq))
-            # cur.execute(q)
-            # hid = cur.fetchone()[0]
-            # log.debug("Created new meta_history entry with id {0}".format(hid))
-            # update_geom(cur)
-            # cur.execute("SAVEPOINT obs_save") 
+        # Insert the new meta_history entry
+        hist = History(station_name = stn_name,
+                       station = stn,
+                       lon = lon,
+                       lat = lat,
+                       sdate = obs_time,
+                       freq = freq)
+        with sesh.begin_nested():
+            sesh.add(hist)
 
-            # return hid
-
+        return hist.id
 
     # Must be multiple potentially valid history_id's.
     # FIXME: handle this more appropriately than screaming

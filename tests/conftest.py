@@ -158,11 +158,13 @@ def ec_session(crmp_session, caplog):
                                the_geom='SRID=4326;POINT(-129.985 55.9361111111111)')
     sechelt1 = History(id=20,
                        station_name='Sechelt',
+                       freq='1-hourly',
                        sdate='2012-09-24',
                        edate='2012-09-26',
                        the_geom='SRID=4326;POINT(-123.7 49.45)')
     sechelt2 = History(id=21,
                        station_name='Sechelt',
+                       freq='1-hourly',
                        sdate='2012-09-26',
                        the_geom='SRID=4326;POINT(-123.7152625 49.4579966666667)')
 
@@ -178,11 +180,11 @@ def ec_session(crmp_session, caplog):
 
     obs = [
         Obs(history=sechelt1, datum=2.5, variable=ec_precip,
-            time=datetime(2012, 9, 24, 06, tzinfo=pytz.utc)),
+            time=datetime(2012, 9, 24, 06)),
         Obs(history=sechelt1, datum=2.7, variable=ec_precip,
-            time=datetime(2012, 9, 26, 06, tzinfo=pytz.utc)),
+            time=datetime(2012, 9, 26, 06)),
         Obs(history=sechelt2, datum=2.5, variable=ec_precip,
-            time=datetime(2012, 9, 26, 18, tzinfo=pytz.utc)),
+            time=datetime(2012, 9, 26, 18)),
     ]
     crmp_session.add_all(obs)
     crmp_session.commit()
