@@ -5,7 +5,7 @@ import pytz
 from lxml.etree import tostring, fromstring, parse, XSLT
 import pytest
 
-from crmprtd.ec import makeurl, extract_fname_from_url, parse_xml, ns, ObsProcessor, check_history, insert_obs, recordable_vars
+from crmprtd.ec import makeurl, extract_fname_from_url, parse_xml, ns, ObsProcessor, check_history, insert_obs, recordable_vars, db_unit
 from pycds import History, Station, Obs, Network
 
 @pytest.mark.parametrize(('label', 'args','expected'), [
@@ -351,3 +351,11 @@ def test_get_recordable_vars(ec_session):
     rv = recordable_vars(ec_session)
     assert rv['total_precipitation'] == 100
     assert rv['air_temperature'] == 101
+
+@pytest.mark.parametrize(('net_var_name', 'unit'), [
+    ('total_precipitation', 'mm'),
+    ('air_temperature', 'Celsius')
+])
+def test_db_unit(ec_session, net_var_name, unit):
+    dbu = db_unit(ec_session, net_var_name)
+    assert dbu == unit

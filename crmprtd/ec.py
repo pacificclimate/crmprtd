@@ -285,11 +285,13 @@ def recordable_vars(sesh):
     q = sesh.query(Variable.name, Variable.id).join(Network).filter(Network.name == 'EC_raw')
     return dict(q.all())
 
-def db_unit(cur, var_name):
-    q = cur.mogrify("SELECT unit FROM meta_vars NATURAL JOIN meta_network WHERE network_name = 'EC_raw' AND net_var_name = %s", (var_name,))
-    cur.execute(q)
+def db_unit(sesh, var_name):
+    q = sesh.query(Variable.unit).join(Network)\
+            .filter(Variable.name == var_name)\
+            .filter(Network.name == 'EC_raw')
+    r = q.all()
     try:
-        return cur.fetchone()[0]
+        return r[0][0]
     except IndexError: # zero rows
         return None
 
