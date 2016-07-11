@@ -285,11 +285,6 @@ def recordable_vars(sesh):
     q = sesh.query(Variable.name, Variable.id).join(Network).filter(Network.name == 'EC_raw')
     return dict(q.all())
 
-def update_geom(cur):
-    '''Update the geometry column based on the lat/lon fields
-       FIXME: There is some question that this may not be updating; check for sure'''
-    cur.execute('UPDATE meta_history SET the_geom = ST_SetSRID(ST_Point(lon,lat),4326)')
-
 def db_unit(cur, var_name):
     q = cur.mogrify("SELECT unit FROM meta_vars NATURAL JOIN meta_network WHERE network_name = 'EC_raw' AND net_var_name = %s", (var_name,))
     cur.execute(q)
