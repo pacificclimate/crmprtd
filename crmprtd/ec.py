@@ -5,7 +5,7 @@ import logging
 from pkg_resources import resource_stream
 from urlparse import urlparse
 
-from pycds import History, Station, Network, Obs
+from pycds import History, Station, Network, Obs, Variable
 from sqlalchemy import and_, or_
 from sqlalchemy.sql import func
 
@@ -92,7 +92,7 @@ class ObsProcessor:
         om = OmMember(member)
         log.debug("Member unit initialized")
 
-        rec_vars = recordable_vars(self.conn)
+        rec_vars = recordable_vars(self.sesh)
         insert_vars = set(om.observed_vars()).intersection(rec_vars.keys())
         log.debug("Insertable variables: {0}".format(insert_vars))
 
@@ -281,11 +281,9 @@ def insert_obs(cur, om, hid, vname, vid):
         ele.getparent().remove(ele) # Remove element from XML "processing queue"
         log.debug("Element removed from processing queue")
 
-def recordable_vars(conn):
-    q = "SELECT net_var_name, vars_id FROM meta_vars NATURAL JOIN meta_network WHERE network_name = 'EC_raw'"
-    cur = conn.cursor()
-    cur.execute(q)
-    return dict(cur.fetchall())
+def recordable_vars(sesh):
+    q = sesh.query(Variable.name, Variable.id).join(Network).filter(Network.name == 'EC_raw')
+    return dict(q.all())
 
 def update_geom(cur):
     '''Update the geometry column based on the lat/lon fields

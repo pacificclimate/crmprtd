@@ -175,7 +175,8 @@ def ec_session(crmp_session, caplog):
     ]
     crmp_session.add_all(stations)
 
-    ec_precip = Variable(name='precipitation', unit='mm', network=ec)
+    ec_precip = Variable(id = 100, name='total_precipitation', unit='mm', network=ec)
+    ec_precip = Variable(id = 101, name='air_temperature', unit='Celsius', network=ec)
     crmp_session.add(ec_precip)
 
     obs = [

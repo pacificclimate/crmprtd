@@ -5,7 +5,7 @@ import pytz
 from lxml.etree import tostring, fromstring, parse, XSLT
 import pytest
 
-from crmprtd.ec import makeurl, extract_fname_from_url, parse_xml, ns, ObsProcessor, check_history, insert_obs
+from crmprtd.ec import makeurl, extract_fname_from_url, parse_xml, ns, ObsProcessor, check_history, insert_obs, recordable_vars
 from pycds import History, Station, Obs, Network
 
 @pytest.mark.parametrize(('label', 'args','expected'), [
@@ -346,3 +346,8 @@ def test_new_station(ec_session):
 
     hid3 = check_history(stn1, ec_session, 1000)
     assert hid3 == 1
+
+def test_get_recordable_vars(ec_session):
+    rv = recordable_vars(ec_session)
+    assert rv['total_precipitation'] == 100
+    assert rv['air_temperature'] == 101
