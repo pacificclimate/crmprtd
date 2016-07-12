@@ -198,7 +198,7 @@ def test_xsl_transform_cloud_cover(x, expected):
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), 12345),
+</om:ObservationCollection>'''), 10000),
     (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
@@ -230,14 +230,14 @@ def test_xsl_transform_cloud_cover(x, expected):
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), 10)
+</om:ObservationCollection>'''), 10001)
 ])
 def test_check_valid_history_id(test_session, et, expected):
     members = et.xpath('//om:member', namespaces=ns)
     hid = check_history(members[0], test_session, 1000)
     assert hid == expected
 
-@pytest.mark.parametrize(('et', 'expected'), [
+@pytest.mark.parametrize(('et'), [
     (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
@@ -269,9 +269,9 @@ def test_check_valid_history_id(test_session, et, expected):
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), 12345)
+</om:ObservationCollection>'''))
 ])
-def test_station_movement(ec_session, et, expected):
+def test_station_movement(ec_session, et):
     members = et.xpath('//om:member', namespaces=ns)
     hid = check_history(members[0], ec_session, 1000)
     assert hid
@@ -425,7 +425,7 @@ def test_db_unit(ec_session, net_var_name, unit):
       </elements>
     </om:result>
   </om:Observation>
-</om:member>'''), 10, 'air_temperature', 101)
+</om:member>'''), 10001, 'air_temperature', 101)
 ])
 def test_insert_duplicate_obs(ec_session, et, hid, vname, vid):
     from copy import deepcopy

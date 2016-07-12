@@ -150,19 +150,19 @@ def ec_session(crmp_session, caplog):
     pat = Contact(name='Pat', networks=[ec])
     crmp_session.add(pat)
 
-    beaver_air_hist = History(id=12345,
+    beaver_air_hist = History(id=10000,
                               station_name='Beaver Creek Airport',
                               the_geom='SRID=4326;POINT(-140.866667 62.416667)')
-    stewart_air_hist = History(id=10,
+    stewart_air_hist = History(id=10001,
                                station_name='Stewart Airport',
                                the_geom='SRID=4326;POINT(-129.985 55.9361111111111)')
-    sechelt1 = History(id=20,
+    sechelt1 = History(id=20000,
                        station_name='Sechelt',
                        freq='1-hourly',
                        sdate='2012-09-24',
                        edate='2012-09-26',
                        the_geom='SRID=4326;POINT(-123.7 49.45)')
-    sechelt2 = History(id=21,
+    sechelt2 = History(id=20001,
                        station_name='Sechelt',
                        freq='1-hourly',
                        sdate='2012-09-26',
