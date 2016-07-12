@@ -8,6 +8,7 @@ from urlparse import urlparse
 from pycds import History, Station, Network, Obs, Variable
 from sqlalchemy import and_, or_
 from sqlalchemy.sql import func
+from sqlalchemy.exc import IntegrityError
 
 log = logging.getLogger(__name__)
 
@@ -246,10 +247,10 @@ def check_history(member, sesh, threshold):
     raise Exception("Found {rc} relevant history_id entries for station name {sn} native id {nid}, unable to process".format(rc=len(possible_hist),sn=stn_name,nid=native_id))
 
 
-def insert_obs(cur, om, hid, vname, vid):
+def insert_obs(sesh, om, hid, vname, vid):
 
     try:
-        assert db_unit(cur, vname) == om.member_unit(vname)
+        assert db_unit(sesh, vname) == om.member_unit(vname)
     except:
         # UnitsError
         raise Exception("reported units '%s' does not match the database units '%s' for variable %s" % (om.member_unit(vname), db_unit(cur, vname), vname))
@@ -263,21 +264,22 @@ def insert_obs(cur, om, hid, vname, vid):
     except ValueError, e:
         raise e
 
-    q = cur.mogrify("INSERT INTO obs_raw (obs_time, datum, vars_id, history_id) VALUES (%s, %s, %s, %s)", (t, val, vid, hid))
+    o = Obs(time = t,
+            datum = val,
+            vars_id = vid,
+            history_id = hid)
     try:
-        cur.execute(q)
-        cur.execute('SAVEPOINT obs_save')
-        log.debug("Inserted obs using query: {0}".format(q))
-    # On the event of a unique constraint error or aborted transaction respectively
-    except (psycopg2.IntegrityError, psycopg2.InternalError), e:
-        cur.execute('ROLLBACK TO obs_save')
-        log.exception("Problem inserting observation with query {0}".format(q))
-        raise e
-    # DataError (invalid input sytax), ProgrammingError (column does not exist)
-    except (psycopg2.DataError, psycopg2.ProgrammingError), e:
-        # FIXME
-        raise e
+        with sesh.begin_nested():
+            sesh.add(o)
+    except IntegrityError as e:
+        # Use psycopg2 wrapped 'orig' pgcode attribute
+        if e.orig.pgcode == '23505':
+            log.warning('Obs already exists')
+            pass
+        else:
+            raise e
     else:
+        log.debug("Added observation %s of variable %s at %s on %s" % (o.datum, o.vars_id, o.history_id, o.time))
         ele.getparent().remove(ele) # Remove element from XML "processing queue"
         log.debug("Element removed from processing queue")
 
