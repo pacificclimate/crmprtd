@@ -439,3 +439,23 @@ def test_insert_duplicate_obs(ec_session, et, hid, vname, vid):
     insert_obs(ec_session, om2, hid, vname, vid)
     count3 = ec_session.query(Obs).count()
     assert count3 == count2
+
+def test_process_xml(ec_session, caplog):
+    import logging
+    caplog.setLevel(logging.INFO)
+
+    # Just check to make sure this doesn't error
+    from ec_data import hourly_bc_2016061115, hourly_bc_2016061116,\
+                        yesterday_bc_20160616, yesterday_bc_20160617
+    op = ObsProcessor(hourly_bc_2016061115, ec_session, 1000, False)
+    op.process()
+    print ec_session.query(Obs).count()
+    op = ObsProcessor(hourly_bc_2016061116, ec_session, 1000, False)
+    op.process()
+    print ec_session.query(Obs).count()
+    op = ObsProcessor(yesterday_bc_20160616, ec_session, 1000, False)
+    op.process()
+    print ec_session.query(Obs).count()
+    op = ObsProcessor(yesterday_bc_20160617, ec_session, 1000, False)
+    op.process()
+    print ec_session.query(Obs).count()

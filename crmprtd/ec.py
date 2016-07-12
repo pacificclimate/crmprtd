@@ -88,8 +88,6 @@ class ObsProcessor:
             # This is not a station
             return
 
-        return # Debug to here
-
         om = OmMember(member)
         log.debug("Member unit initialized")
 
@@ -101,7 +99,7 @@ class ObsProcessor:
             vid = rec_vars[vname]
             try:
                 self._obs += 1
-                insert_obs(cur, om, hid, vname, vid) # FIMXE: handle units errors (assertionError)
+                insert_obs(self.sesh, om, hid, vname, vid) # FIMXE: handle units errors (assertionError)
                 self._obs_insertions += 1
             except Exception, e:
                 log.exception("Unable to insert this observation")
@@ -110,9 +108,6 @@ class ObsProcessor:
         # Remove member from XML "processing queue"
         if len(om.member.xpath("./om:Observation/om:result//mpo:element", namespaces=ns)) == 0:
             member.getparent().remove(member)
-
-        if not self._diagnostic_mode:
-            self.conn.commit()
 
 def check_history(member, sesh, threshold):
     '''
