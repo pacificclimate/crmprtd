@@ -232,9 +232,9 @@ def test_xsl_transform_cloud_cover(x, expected):
   </om:member>
 </om:ObservationCollection>'''), 10001)
 ])
-def test_check_valid_history_id(test_session, et, expected):
+def test_check_valid_history_id(ec_session, et, expected):
     members = et.xpath('//om:member', namespaces=ns)
-    hid = check_history(members[0], test_session, 1000)
+    hid = check_history(members[0], ec_session, 1000)
     assert hid == expected
 
 @pytest.mark.parametrize(('et'), [
@@ -444,18 +444,14 @@ def test_process_xml(ec_session, caplog):
     import logging
     caplog.setLevel(logging.INFO)
 
-    # Just check to make sure this doesn't error
-    from ec_data import hourly_bc_2016061115, hourly_bc_2016061116,\
-                        yesterday_bc_20160616, yesterday_bc_20160617
+    from ec_data import hourly_bc_2016061115, hourly_bc_2016061116
+
+    obs_count = ec_session.query(Obs).count()
+
     op = ObsProcessor(hourly_bc_2016061115, ec_session, 1000, False)
     op.process()
-    print ec_session.query(Obs).count()
+    assert ec_session.query(Obs).count() == obs_count + 130
+
     op = ObsProcessor(hourly_bc_2016061116, ec_session, 1000, False)
     op.process()
-    print ec_session.query(Obs).count()
-    op = ObsProcessor(yesterday_bc_20160616, ec_session, 1000, False)
-    op.process()
-    print ec_session.query(Obs).count()
-    op = ObsProcessor(yesterday_bc_20160617, ec_session, 1000, False)
-    op.process()
-    print ec_session.query(Obs).count()
+    assert ec_session.query(Obs).count() == obs_count + 260
