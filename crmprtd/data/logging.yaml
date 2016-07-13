@@ -32,9 +32,9 @@ handlers:
     filename: 'crmprtd_log.txt'
 loggers:
   crmprtd:
-    level: DEBUG
-    handlers: [console,mail,file]
-    propagate: no
+    level: INFO
+    handlers: [console,mail]
+    propagate: yes
 root:
   level: DEBUG
-  handlers: [console]
+  handlers: [file]

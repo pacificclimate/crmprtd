@@ -1,16 +1,20 @@
 from collections import namedtuple
-from pkg_resources import resource_stream
+from pkg_resources import resource_stream, resource_filename
+from datetime import datetime
+
 import logging, logging.config
 
 import yaml
 import pytest
-from sqlalchemy import create_engine
+import sqlalchemy
+from sqlalchemy.schema import DDL
 from sqlalchemy.orm import sessionmaker
-from lxml.etree import parse, fromstring
+from lxml.etree import parse, fromstring, fromstring, XSLT
 import testing.postgresql
+import pytz
 
 import pycds
-from pycds import Network, Station, Contact, History, Variable
+from pycds import Network, Station, Contact, History, Variable, Obs
 import sys
 
 def pytest_runtest_setup():
@@ -24,7 +28,7 @@ def postgis_session():
     logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
 
     with testing.postgresql.Postgresql() as pg:
-        engine = create_engine(pg.url())
+        engine = sqlalchemy.create_engine(pg.url())
         engine.execute("create extension postgis")
         sesh = sessionmaker(bind=engine)()
 
@@ -38,6 +42,32 @@ def crmp_session(postgis_session):
     '''
     logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
 
+    # Add needed functions
+    sqlalchemy.event.listen(
+        pycds.Base.metadata,
+        'before_create',
+        DDL('''CREATE OR REPLACE FUNCTION closest_stns_within_threshold(X numeric, Y numeric, thres integer)
+RETURNS TABLE(history_id integer, lat numeric, lon numeric, dist double precision) AS
+$BODY$
+
+DECLARE
+    mystr TEXT;
+BEGIN
+    mystr = 'WITH stns_in_thresh AS (
+    SELECT history_id, lat, lon, Geography(ST_Transform(the_geom,4326)) as p_existing, Geography(ST_SetSRID(ST_MakePoint('|| X ||','|| Y ||'),4326)) as p_new
+    FROM meta_history
+    WHERE the_geom && ST_Buffer(Geography(ST_SetSRID(ST_MakePoint('|| X || ','|| Y ||'),4326)),'|| thres ||')
+)
+SELECT history_id, lat, lon, ST_Distance(p_existing,p_new) as dist
+FROM stns_in_thresh
+ORDER BY dist';
+    RETURN QUERY EXECUTE mystr;
+END;
+$BODY$
+LANGUAGE plpgsql
+SECURITY DEFINER;''')
+    )
+
     engine = postgis_session.get_bind()
     pycds.Base.metadata.create_all(bind=engine)
     pycds.DeferredBase.metadata.create_all(bind=engine)
@@ -46,15 +76,15 @@ def crmp_session(postgis_session):
     yield postgis_session
 
 @pytest.yield_fixture(scope='function')
-def test_session(crmp_session):
+def test_session(crmp_session, caplog):
     '''
     Yields a PostGIS enabled session with CRMP schema and test data
     '''
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
+    caplog.setLevel(logging.ERROR, logger='sqlalchemy.engine')
 
     moti = Network(name='MoTIe')
-    ec = Network(name='EC')
-    wmb = Network(name='FLNROW-WMB')
+    ec = Network(name='EC_raw')
+    wmb = Network(name='FLNRO-WMB')
     crmp_session.add_all([moti, ec, wmb])
 
     simon = Contact(name='Simon', networks=[moti])
@@ -62,20 +92,104 @@ def test_session(crmp_session):
     pat = Contact(name='Pat', networks=[ec])
     crmp_session.add_all([simon, eric, pat])
 
+    brandy_hist = History(station_name='Brandywine')
+    five_mile_hist = History(station_name='FIVE MILE')
+    beaver_air_hist = History(id=12345,
+                              station_name='Beaver Creek Airport',
+                              the_geom='SRID=4326;POINT(-140.866667 62.416667)')
+    stewart_air_hist = History(id=10,
+                               station_name='Stewart Airport',
+                               the_geom='SRID=4326;POINT(-129.985 55.9361111111111)')
+    sechelt1 = History(id=20,
+                       station_name='Sechelt',
+                       sdate='2012-09-24',
+                       edate='2012-09-26',
+                       the_geom='SRID=4326;POINT(-123.7 49.45)')
+    sechelt2 = History(id=21,
+                       station_name='Sechelt',
+                       sdate='2012-09-26',
+                       the_geom='SRID=4326;POINT(-123.7152625 49.4579966666667)')
+
     stations = [
-        Station(native_id='11091', network=moti, histories=[History(station_name='Brandywine')]),
-        Station(native_id='1029', network=wmb, histories=[History(station_name='FIVE MILE')]),
-        Station(native_id='2100160', network=ec, histories=[History(station_name='Beaver Creek Airport')])
-        ]
+        Station(native_id='11091', network=moti, histories=[brandy_hist]),
+        Station(native_id='1029', network=wmb, histories=[five_mile_hist]),
+        Station(native_id='2100160', network=ec, histories=[beaver_air_hist]),
+        Station(native_id='1067742', network=ec, histories=[stewart_air_hist]),
+        Station(native_id='1047172', network=ec, histories=[sechelt1, sechelt2]),
+    ]
     crmp_session.add_all(stations)
 
-    variables = [Variable(name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti),
-                 Variable(name='precipitation', unit='mm', network=ec),
-                 Variable(name='relative_humidity', unit='percent', network=wmb)
-                 ]
-    crmp_session.add_all(variables)
+    moti_air_temp = Variable(name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti)
+    ec_precip = Variable(name='precipitation', unit='mm', network=ec)
+    wmb_humitidy = Variable(name='relative_humidity', unit='percent', network=wmb)
+    crmp_session.add_all([moti_air_temp, ec_precip, wmb_humitidy])
 
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    obs = [
+        Obs(history=sechelt1, datum=2.5, variable=ec_precip,
+            time=datetime(2012, 9, 24, 06, tzinfo=pytz.utc)),
+        Obs(history=sechelt1, datum=2.7, variable=ec_precip,
+            time=datetime(2012, 9, 26, 06, tzinfo=pytz.utc)),
+        Obs(history=sechelt2, datum=2.5, variable=ec_precip,
+            time=datetime(2012, 9, 26, 18, tzinfo=pytz.utc)),
+    ]
+    crmp_session.add_all(obs)
+    crmp_session.commit()
+
+    yield crmp_session
+
+@pytest.yield_fixture(scope='function')
+def ec_session(crmp_session, caplog):
+    '''
+    Yields a PostGIS enabled session with CRMP schema and test data
+    '''
+    caplog.setLevel(logging.ERROR, logger='sqlalchemy.engine')
+
+    ec = Network(name='EC_raw')
+    crmp_session.add(ec)
+
+    pat = Contact(name='Pat', networks=[ec])
+    crmp_session.add(pat)
+
+    beaver_air_hist = History(id=10000,
+                              station_name='Beaver Creek Airport',
+                              the_geom='SRID=4326;POINT(-140.866667 62.416667)')
+    stewart_air_hist = History(id=10001,
+                               station_name='Stewart Airport',
+                               the_geom='SRID=4326;POINT(-129.985 55.9361111111111)')
+    sechelt1 = History(id=20000,
+                       station_name='Sechelt',
+                       freq='1-hourly',
+                       sdate='2012-09-24',
+                       edate='2012-09-26',
+                       the_geom='SRID=4326;POINT(-123.7 49.45)')
+    sechelt2 = History(id=20001,
+                       station_name='Sechelt',
+                       freq='1-hourly',
+                       sdate='2012-09-26',
+                       the_geom='SRID=4326;POINT(-123.7152625 49.4579966666667)')
+
+    stations = [
+        Station(native_id='2100160', network=ec, histories=[beaver_air_hist]),
+        Station(native_id='1067742', network=ec, histories=[stewart_air_hist]),
+        Station(native_id='1047172', network=ec, histories=[sechelt1, sechelt2]),
+    ]
+    crmp_session.add_all(stations)
+
+    ec_precip = Variable(id = 100, name='total_precipitation', unit='mm', network=ec)
+    ec_precip = Variable(id = 101, name='air_temperature', unit='Celsius', network=ec)
+    crmp_session.add(ec_precip)
+
+    obs = [
+        Obs(history=sechelt1, datum=2.5, variable=ec_precip,
+            time=datetime(2012, 9, 24, 06)),
+        Obs(history=sechelt1, datum=2.7, variable=ec_precip,
+            time=datetime(2012, 9, 26, 06)),
+        Obs(history=sechelt2, datum=2.5, variable=ec_precip,
+            time=datetime(2012, 9, 26, 18)),
+    ]
+    crmp_session.add_all(obs)
+    crmp_session.commit()
+
     yield crmp_session
 
 @pytest.fixture(scope='module')
@@ -227,3 +341,76 @@ def moti_sawr7100_large():
   </data>
 </cmml>
 ''')
+
+@pytest.fixture(scope='module')
+def ec_xml_single_obs():
+    x = fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <om:member>
+    <om:Observation>
+      <om:metadata>
+        <set>
+          <general>
+            <author build="build.4063" name="MSC-DMS-PG-WXO-Summary" version="2.4"/>
+            <dataset name="mscobservation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/"/>
+            <phase name="product-wxo_xml-1.0/"/>
+            <id xlink:href="/data/msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
+            <parent xlink:href="/data/msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
+          </general>
+          <identification-elements>
+            <element name="station_name" uom="unitless" value="Abbotsford Airport"/>
+            <element name="latitude" uom="degree" value="49.025278"/>
+            <element name="longitude" uom="degree" value="-122.36"/>
+            <element name="transport_canada_id" uom="unitless" value="YXX"/>
+            <element name="observation_date_utc" uom="unitless" value="2016-05-28T02:00:00.000Z"/>
+            <element name="observation_date_local_time" uom="unitless" value="2016-05-27T19:00:00.000 PDT"/>
+            <element name="climate_station_number" uom="unitless" value="1100031"/>
+            <element name="wmo_station_number" uom="unitless" value="71108"/>
+          </identification-elements>
+        </set>
+      </om:metadata>
+      <om:samplingTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2016-05-28T02:00:00.000Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:samplingTime>
+      <om:resultTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2016-05-28T02:00:00.000Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:resultTime>
+      <om:procedure xlink:href="msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
+      <om:observedProperty gml:remoteSchema="/schema/point-observation/2.0.xsd"/>
+      <om:featureOfInterest>
+        <gml:FeatureCollection>
+          <gml:location>
+            <gml:Point>
+              <gml:pos>49.025278 -122.36</gml:pos>
+            </gml:Point>
+          </gml:location>
+        </gml:FeatureCollection>
+      </om:featureOfInterest>
+      <om:result>
+        <elements>
+          <element name="present_weather" uom="code" value="Mostly Cloudy"/>
+          <element name="mean_sea_level" uom="kPa" value="101.9"/>
+          <element name="tendency_amount" uom="kPa" value="0.12"/>
+          <element name="tendency_characteristic" uom="code" value="falling"/>
+          <element name="horizontal_visibility" uom="km" value="40.2"/>
+          <element name="air_temperature" uom="Celsius" value="13.7"/>
+          <element name="dew_point" uom="Celsius" value="5.7"/>
+          <element name="relative_humidity" uom="percent" value="58"/>
+          <element name="wind_speed" uom="km/h" value="18"/>
+          <element name="wind_direction" uom="code" value="S"/>
+          <element name="wind_gust_speed" uom="km/h" value="29"/>
+          <element name="total_cloud_cover" uom="code" value="8"/>
+          <element name="wind_chill" uom="unitless" value=""/>
+          <element name="humidex" uom="unitless" value=""/>
+        </elements>
+      </om:result>
+    </om:Observation>
+  </om:member>
+</om:ObservationCollection>''')
+    xsl = resource_filename('crmprtd', 'data/ec_xform.xsl')
+    transform = XSLT(parse(xsl))
+    return transform(x)

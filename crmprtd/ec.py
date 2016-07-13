@@ -1,13 +1,16 @@
-from lxml.etree import parse, tostring, XSLT
-from lxml.etree import LxmlError, XSLTError
+from lxml.etree import LxmlError, parse, tostring, XSLT
 from datetime import datetime
-import psycopg2
 import re
 import logging
-from traceback import format_exc
 from pkg_resources import resource_stream
+from urlparse import urlparse
 
-from pdb import set_trace
+from pycds import History, Station, Network, Obs, Variable
+from sqlalchemy import and_, or_
+from sqlalchemy.sql import func
+from sqlalchemy.exc import IntegrityError
+
+log = logging.getLogger(__name__)
 
 ns = {
     'om': 'http://www.opengis.net/om/1.0',
@@ -27,17 +30,21 @@ def makeurl(freq='daily', province='BC', language='e', time=datetime.utcnow()):
     fmt = '%Y%m%d%H' if freq == 'hourly' else '%Y%m%d'
     freq = 'yesterday' if freq == 'daily' else freq
     fname = '%s_%s_%s_%s.xml' % (freq, province.lower(), time.strftime(fmt), language)
-    return {'url': 'http://dd.weatheroffice.ec.gc.ca/observations/xml/%s/%s/%s' % (province.upper(), freq, fname),
-            'filename': fname}
+    return 'http://dd.weatheroffice.ec.gc.ca/observations/xml/%s/%s/%s' % (province.upper(), freq, fname)
+
+def extract_fname_from_url(url):
+    p = urlparse(url).path
+    return p.split('/')[-1]
+
+def parse_xml(fname):
+    # Parse and transform the xml
+    et = parse(fname)
+    xsl = resource_stream('crmprtd', 'data/ec_xform.xsl')
+    transform = XSLT(parse(xsl))
+    return transform(et)
 
 class ObsProcessor:
-    def __init__(self, xml_filename, prefs):
-        """Take one file(-like object) of Meteorological Point Observation XML (mpo-xml)
-        and do everything required to get it into the CRMP database
-        prefs should be an object of type optparse.Values with attributes: connection_string, log, cache_dir, error_email
-        raises: lxml.etree.LxmlSyntaxError, IOError, psycopg2.OperationalError
-        """
-
+    def __init__(self, et, sesh, threshold):
         # set variables for summary information
         self._members = 0
         self._members_processed = 0
@@ -45,111 +52,85 @@ class ObsProcessor:
         self._obs = 0
         self._obs_errors = 0
         self._obs_insertions = 0
-        
-        self.prefs = prefs
-        logging.debug("Parsing xml")
-        self.et = parse(xml_filename)
-        logging.debug("Opening database connection")
-        self.conn = psycopg2.connect(prefs.connection_string)
-        self._diagnostic_mode = self.prefs.diag
+        self._obs_existing = 0
+
+        self.et = et
+        self.sesh = sesh
+        self.threshold = threshold
 
     def process(self):
-        if self._diagnostic_mode: logging.info("DIAGNOSTIC MODE, NO RECORDS WILL BE COMMITTED")
-        # Apply a transformation to customize the EC records to our needs
-        try:
-            logging.debug("Applying transformation")
-            xsl = resource_stream(__name__, 'data/ec_xform.xsl')
-            transform = XSLT(parse(xsl))
-            self.et = transform(self.et)
-            logging.debug("Transformation applied")
-        # Non-fatal; there still lots of raw observations that we can record and pick up the rest later after the XSL is fixed
-        except XSLTError as e:
-            logging.exception("Failed to apply XLST ec_xform.xsl")
-        
         members = self.et.xpath('//om:member', namespaces=ns)
         self._members = len(members)
-        logging.info("Found {} members in the xml".format(self._members))
+        log.info("Found {} members in the xml".format(self._members))
 
         for member in members:
             try:
-                logging.debug("Processing next member")
+                log.debug("Processing next member")
                 self.process_member(member)
                 self._members_processed += 1
             except Exception as e: # FIXME: More specific exception handling
                 self._member_errors += 1
-                logging.exception("Error processing member.  Member has been saved in logs")
-                logging.debug("Error processing member:\n{0}".format(tostring(member, pretty_print=True)))
+                log.exception("Error processing member.  Member has been saved in logs")
+                log.debug("Error processing member:\n{0}".format(tostring(member, pretty_print=True)))
 
-        logging.info("Finished processing {mp}/{mt} members and inserted {oi}/{ot} insertable observations".format(mp=self._members_processed, mt=self._members, oi=self._obs_insertions, ot=self._obs))
+        log.info("Finished processing {mp}/{mt} members and inserted {oi}/{ot} insertable observations with {oe} already existing".format(mp=self._members_processed, mt=self._members, oi=self._obs_insertions, ot=self._obs, oe=self._obs_existing))
         if self._member_errors or self._obs_errors:
             raise Exception('''Unable to parse {me} members,
             Unable to insert {oe} insertable obs'''.format(me=self._member_errors, oe=self._obs_errors))
-            
+
 
     def process_member(self, member):
-        logging.debug("Opening cursor")
-        cur = self.conn.cursor()
-        try:
-            cur.execute("SAVEPOINT obs_save") # Set a savepoint to rollback to for minor errors
-            hid = check_history(member, cur, self.prefs.thresh)
-            logging.debug("Found history id: {0}".format(hid))
-            if hid == None:
-                logging.debug("Unable to find or create history id for member below\n{0}\n\n".format(tostring(member, pretty_print=True)))
-                return
+        hid = check_history(member, self.sesh, self.threshold)
+        log.debug("Found history id: {0}".format(hid))
+        if hid == None:
+            # This is not a station
+            return
 
-            om = OmMember(member)
-            logging.debug("Member unit initialized")
+        om = OmMember(member)
+        log.debug("Member unit initialized")
 
-            rec_vars = recordable_vars(self.conn)
-            insert_vars = set(om.observed_vars()).intersection(rec_vars.keys())
-            logging.debug("Insertable variables: {0}".format(insert_vars))
+        rec_vars = recordable_vars(self.sesh)
+        insert_vars = set(om.observed_vars()).intersection(rec_vars.keys())
+        log.debug("Insertable variables: {0}".format(insert_vars))
 
-            for vname in insert_vars:
-                vid = rec_vars[vname]
-                try:
-                    self._obs += 1
-                    insert_obs(cur, om, hid, vname, vid) # FIMXE: handle units errors (assertionError)
+        for vname in insert_vars:
+            vid = rec_vars[vname]
+            try:
+                self._obs += 1
+                inserted = insert_obs(self.sesh, om, hid, vname, vid) # FIMXE: handle units errors (assertionError)
+                if inserted:
                     self._obs_insertions += 1
-                except Exception, e:
-                    logging.exception("Unable to insert this observation")
-                    self._obs_errors += 1
+                else:
+                    self._obs_existing += 1
+            except Exception, e:
+                log.exception("Unable to insert this observation")
+                self._obs_errors += 1
 
-            # Remove member from XML "processing queue"
-            if len(om.member.xpath("./om:Observation/om:result//mpo:element", namespaces=ns)) == 0:
-                member.getparent().remove(member)
+        # Remove member from XML "processing queue"
+        if len(om.member.xpath("./om:Observation/om:result//mpo:element", namespaces=ns)) == 0:
+            member.getparent().remove(member)
 
-            if not self._diagnostic_mode:
-                self.conn.commit()
-
-        except psycopg2.InternalError, e:
-            logging.exception("Error processing member. Member has been saved in logs.")
-            logging.debug("Error processing member:\n{0}".format(tostring(member,pretty_print=True)))
-            self.conn.rollback()
-        finally:
-            cur.close()
-
-    def save(self, filename, mode='w'):
-        f = open(filename, mode)
-        print >>f, tostring(self.et, pretty_print=True)
-
-def check_history(member, cur, threshold):
+def check_history(member, sesh, threshold):
+    '''
+    Returns None if member does not have station attributes
+    '''
 
     attrs = ['station_name', 'climate_station_number']
     # Select critical information from XML
     try:
-        logging.debug("Finding Station attributes")
+        log.debug("Finding Station attributes")
         stn_name, native_id = map(lambda x: member.xpath(".//mpo:identification-elements/mpo:element[@name='%s']" % x, namespaces=ns)[0].get('value'), attrs)
         lat, lon = map(float, member.xpath('.//gml:pos', namespaces=ns)[0].text.split())
         obs_time = member.xpath('./om:Observation/om:samplingTime//gml:timePosition', namespaces=ns)[0].text
-        logging.debug("Found station name {name}, id {id}, at {lon}, {lat}, with obs at {t}".format(name=stn_name, id=native_id, lon=lon, lat=lat, t=obs_time))
+        log.debug("Found station name {name}, id {id}, at {lon}, {lat}, with obs at {t}".format(name=stn_name, id=native_id, lon=lon, lat=lat, t=obs_time))
     # An IndexError here means that the member has no station_name or climate_station_number (or identification-elements),
     # lat/lon, or obs_time in which case we don't need to process this item
     except IndexError:
-        logging.debug("Could not find station attributes, likely not a station")
+        log.debug("This member does not appear to be a station")
         return None
 
     # Determine the frequency for this station
-    logging.debug("Finding station frequency")
+    log.debug("Finding station frequency")
     dataset = member.xpath('.//mpo:dataset', namespaces=ns)[0].get('name')
     if re.search('product-hourly', dataset) or re.search('hour_summary', dataset):
         freq = '1-hourly'
@@ -157,83 +138,115 @@ def check_history(member, cur, threshold):
         freq = 'daily'
     else:
         raise Exception("Could not determine frequency for a meta_history insertion.  Unexpected product: %s", dataset)
-    logging.debug("Found frequency {0}".format(freq))
+    log.debug("Found frequency {0}".format(freq))
 
     # Select all history entries that match this station
-    logging.debug("Searching for matching meta_history entries")
-    q = cur.mogrify("""
-    SELECT history_id, freq
-    FROM meta_history NATURAL JOIN meta_station NATURAL JOIN meta_network
-    WHERE network_name = 'EC_raw' AND native_id = %s AND station_name = %s
-    AND sdate <= %s AND (edate >= %s OR edate IS NULL)
-    AND history_id IN (SELECT history_id FROM closest_stns_within_threshold(%s, %s, %s))
-    """, (native_id, stn_name, obs_time, obs_time, lon, lat, threshold))
-    logging.debug("Query text:\n{0}".format(q))
-    cur.execute(q)
+    log.debug("Searching for matching meta_history entries")
 
-    # Could return 0-1 results  ## FIXME - should process in order of (ideal) likelihood: 1 record (always), no record (perhaps), multiple records (ideally never) 
+    q = sesh.execute('SELECT history_id from closest_stns_within_threshold(:lon, :lat, :threshold)', 
+        {'lon': lon, 'lat': lat, 'threshold': threshold})
+    valid_hid = set([x[0] for x in q.fetchall()])
+    log.debug("history_ids in threshold %s" % valid_hid)
 
-    if cur.rowcount > 1:
-        ## FIXME - handle multiple results appropriately
-        raise Exception("Found {rc} relevant history_id entries for station name {sn} native id {nid}, unable to process".format(rc=cur.rowcount,sn=stn_name,nid=native_id))
-    record = cur.fetchone()
-    if record:
-        hid, db_freq = record
-        logging.debug("Found history id {0}".format(hid))
+    q = sesh.query(History.id, History.freq).join(Station).join(Network)\
+        .filter(Station.native_id == native_id).filter(Network.name == 'EC_raw')\
+        .filter(and_(
+            or_(History.sdate <= obs_time, History.sdate.is_(None)), 
+            or_(History.edate >= obs_time, History.edate.is_(None))
+        ))\
+        .filter(History.station_name == stn_name)
+    r = q.all()
+    log.debug("history_ids based on native_id, station_name, and data sdate/edate %s" % r)
+
+    # log.info(histories)
+
+    possible_hist = [hist for hist in r if hist.id in valid_hid]
+
+    if len(possible_hist) == 1:
+        # We've got a hit
+        hist = possible_hist[0]
+        hid, db_freq = hist.id, hist.freq
+        log.debug('Found hid: {}'.format(hid))
+
         # 'Upgrade' the frequency if we're receiving hourly results for a station marked as daily
-        if db_freq == 'daily' and freq == '1-hourly':
-            logging.debug("Upgrading frequency to hourly")
-            q = cur.mogrify("UPDATE meta_history SET freq = %s WHERE history_id = %s", (freq, hid))
-            cur.execute(q)
+
+        # TODO: Fix this code, it doens't work
+        # if db_freq == 'daily' and freq == '1-hourly':
+        #     log.debug("Upgrading frequency to hourly")
+        #     hist.freq = freq
+
         return hid
 
-    logging.debug("No matching open history_id found")
-    # Stuff may not match because:
-    #   -This a new station/native_id
-    #   -A station as moved but kept old identifying information
-    #   -A station has a new name
-    #   -A station that was previously 'closed' has started reporting again
-    # First close out the old history_id if it exists
-    q = cur.mogrify("""
-    SELECT station_id, history_id, max(obs_time)
-    FROM obs_raw NATURAL JOIN meta_history NATURAL JOIN meta_station NATURAL JOIN meta_network
-    WHERE network_name = 'EC_raw' AND native_id = %s AND edate IS NULL
-    GROUP BY station_id, history_id
-    """, (native_id,))
-    cur.execute(q)
+    if len(possible_hist) < 1:
+        log.debug("No matching open history_id found")
+        # Stuff may not match because:
+        #   -This a new station/native_id
+        #   -A station as moved but kept old identifying information
+        #   -A station has a new name
+        #   -A station that was previously 'closed' has started reporting again
 
-    ## TODO: handle possible case of multple records
-    if cur.rowcount > 1:
-        logging.debug("Multiple open but not entirely matching records found for this member")
-        raise Exception("Multiple open records with same native_id {0} found in member".format(native_id))
+        # First close out the old history_id if it exists
+        q = sesh.query(History, func.max(Obs.time).label('max_time'))\
+            .join(Obs).join(Station).join(Network)\
+            .filter(Station.native_id == native_id)\
+            .filter(Network.name == 'EC_raw')\
+            .filter(History.edate.is_(None))\
+            .group_by(History.id, Station.id)
+        r = q.all()
 
-    record = cur.fetchone()
-    if record:
-        stn_id, hid, tn = record
-        logging.debug("Closing history_id {0}".format(hid))
-        q = cur.mogrify("UPDATE meta_history SET edate = %s WHERE history_id = %s AND edate IS NULL", (tn, hid))
-        cur.execute(q)
-    # If it doesn't exist, this is a new station so create a new station_id
-    else:
-        q = cur.mogrify("INSERT INTO meta_station (native_id, network_id) VALUES (%s, (SELECT network_id FROM meta_network WHERE network_name = 'EC_raw')) RETURNING station_id", (native_id,))
-        cur.execute(q)
-        stn_id = cur.fetchone()[0]
-        logging.debug("Created new station_id {0}".format(stn_id))
+        if len(r) > 1:
+            ## TODO: handle possible case of multple records
+            log.debug("Multiple open records found for this member")
+            raise Exception("Multiple open records with same native_id {0} found in member".format(native_id))
 
-    # Insert the new meta_history entry
-    q = cur.mogrify("INSERT INTO meta_history (station_name, station_id, lat, lon, sdate, freq) VALUES (%s, %s, %s, %s, %s, %s) RETURNING history_id", (stn_name, stn_id, lat, lon, obs_time, freq))
-    cur.execute(q)
-    hid = cur.fetchone()[0]
-    logging.debug("Created new meta_history entry with id {0}".format(hid))
-    update_geom(cur)
-    cur.execute("SAVEPOINT obs_save") 
+        # If we only have one record, close it out
+        if len(r) == 1:
+            hist, max_time = r[0]
+            hist.edate = max_time
 
-    return hid
+        q = sesh.query(Network).filter(Network.name == 'EC_raw')
+        assert q.count() == 1
+        ec = q.first()
 
-def insert_obs(cur, om, hid, vname, vid):
+        # If we have no record of that native_id, this is a new station and we must insert it
+        q = sesh.query(Station)\
+                .filter(Station.native_id == native_id)\
+                .filter(Station.network == ec)
+        r = q.all()
+        if len(r) < 1:
+            stn = Station(native_id=native_id, network=ec)
+            with sesh.begin_nested():
+                sesh.add(stn)
+            log.debug("Created new station_id {0}".format(stn.id))
+
+        elif len(r) > 1:
+            raise Exception("Multiple stations with native_id {0}. Panicing".format(native_id))
+
+        else:
+            stn = r[0]
+
+        # Insert the new meta_history entry
+        hist = History(station_name = stn_name,
+                       station = stn,
+                       lon = lon,
+                       lat = lat,
+                       the_geom = 'SRID=4326;POINT({} {})'.format(lon, lat),
+                       sdate = obs_time,
+                       freq = freq)
+        with sesh.begin_nested():
+            sesh.add(hist)
+
+        return hist.id
+
+    # Must be multiple potentially valid history_id's.
+    # FIXME: handle this more appropriately than screaming
+    raise Exception("Found {rc} relevant history_id entries for station name {sn} native id {nid}, unable to process".format(rc=len(possible_hist),sn=stn_name,nid=native_id))
+
+
+def insert_obs(sesh, om, hid, vname, vid):
 
     try:
-        assert db_unit(cur, vname) == om.member_unit(vname)
+        assert db_unit(sesh, vname) == om.member_unit(vname)
     except:
         # UnitsError
         raise Exception("reported units '%s' does not match the database units '%s' for variable %s" % (om.member_unit(vname), db_unit(cur, vname), vname))
@@ -247,40 +260,38 @@ def insert_obs(cur, om, hid, vname, vid):
     except ValueError, e:
         raise e
 
-    q = cur.mogrify("INSERT INTO obs_raw (obs_time, datum, vars_id, history_id) VALUES (%s, %s, %s, %s)", (t, val, vid, hid))
+    o = Obs(time = t,
+            datum = val,
+            vars_id = vid,
+            history_id = hid)
     try:
-        cur.execute(q)
-        cur.execute('SAVEPOINT obs_save')
-        logging.debug("Inserted obs using query: {0}".format(q))
-    # On the event of a unique constraint error or aborted transaction respectively
-    except (psycopg2.IntegrityError, psycopg2.InternalError), e:
-        cur.execute('ROLLBACK TO obs_save')
-        logging.exception("Problem inserting observation with query {0}".format(q))
-        raise e
-    # DataError (invalid input sytax), ProgrammingError (column does not exist)
-    except (psycopg2.DataError, psycopg2.ProgrammingError), e:
-        # FIXME
-        raise e
+        with sesh.begin_nested():
+            sesh.add(o)
+    except IntegrityError as e:
+        # Use psycopg2 wrapped 'orig' pgcode attribute
+        if e.orig.pgcode == '23505':
+            log.debug('Obs already exists')
+            return False
+        else:
+            raise e
     else:
+        log.debug("Added observation %s of variable %s at %s on %s" % (o.datum, o.vars_id, o.history_id, o.time))
         ele.getparent().remove(ele) # Remove element from XML "processing queue"
-        logging.debug("Element removed from processing queue")
+        log.debug("Element removed from processing queue")
 
-def recordable_vars(conn):
-    q = "SELECT net_var_name, vars_id FROM meta_vars NATURAL JOIN meta_network WHERE network_name = 'EC_raw'"
-    cur = conn.cursor()
-    cur.execute(q)
-    return dict(cur.fetchall())
+    return True
 
-def update_geom(cur):
-    '''Update the geometry column based on the lat/lon fields
-       FIXME: There is some question that this may not be updating; check for sure'''
-    cur.execute('UPDATE meta_history SET the_geom = ST_SetSRID(ST_Point(lon,lat),4326)')
+def recordable_vars(sesh):
+    q = sesh.query(Variable.name, Variable.id).join(Network).filter(Network.name == 'EC_raw')
+    return dict(q.all())
 
-def db_unit(cur, var_name):
-    q = cur.mogrify("SELECT unit FROM meta_vars NATURAL JOIN meta_network WHERE network_name = 'EC_raw' AND net_var_name = %s", (var_name,))
-    cur.execute(q)
+def db_unit(sesh, var_name):
+    q = sesh.query(Variable.unit).join(Network)\
+            .filter(Variable.name == var_name)\
+            .filter(Network.name == 'EC_raw')
+    r = q.all()
     try:
-        return cur.fetchone()[0]
+        return r[0][0]
     except IndexError: # zero rows
         return None
 
