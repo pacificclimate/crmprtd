@@ -52,6 +52,7 @@ class ObsProcessor:
         self._obs = 0
         self._obs_errors = 0
         self._obs_insertions = 0
+        self._obs_existing = 0
 
         self.et = et
         self.sesh = sesh
@@ -72,7 +73,7 @@ class ObsProcessor:
                 log.exception("Error processing member.  Member has been saved in logs")
                 log.debug("Error processing member:\n{0}".format(tostring(member, pretty_print=True)))
 
-        log.info("Finished processing {mp}/{mt} members and inserted {oi}/{ot} insertable observations".format(mp=self._members_processed, mt=self._members, oi=self._obs_insertions, ot=self._obs))
+        log.info("Finished processing {mp}/{mt} members and inserted {oi}/{ot} insertable observations with {oe} already existing".format(mp=self._members_processed, mt=self._members, oi=self._obs_insertions, ot=self._obs, oe=self._obs_existing))
         if self._member_errors or self._obs_errors:
             raise Exception('''Unable to parse {me} members,
             Unable to insert {oe} insertable obs'''.format(me=self._member_errors, oe=self._obs_errors))
@@ -96,8 +97,11 @@ class ObsProcessor:
             vid = rec_vars[vname]
             try:
                 self._obs += 1
-                insert_obs(self.sesh, om, hid, vname, vid) # FIMXE: handle units errors (assertionError)
-                self._obs_insertions += 1
+                inserted = insert_obs(self.sesh, om, hid, vname, vid) # FIMXE: handle units errors (assertionError)
+                if inserted:
+                    self._obs_insertions += 1
+                else:
+                    self._obs_existing += 1
             except Exception, e:
                 log.exception("Unable to insert this observation")
                 self._obs_errors += 1
@@ -266,14 +270,16 @@ def insert_obs(sesh, om, hid, vname, vid):
     except IntegrityError as e:
         # Use psycopg2 wrapped 'orig' pgcode attribute
         if e.orig.pgcode == '23505':
-            log.warning('Obs already exists')
-            pass
+            log.debug('Obs already exists')
+            return False
         else:
             raise e
     else:
         log.debug("Added observation %s of variable %s at %s on %s" % (o.datum, o.vars_id, o.history_id, o.time))
         ele.getparent().remove(ele) # Remove element from XML "processing queue"
         log.debug("Element removed from processing queue")
+
+    return True
 
 def recordable_vars(sesh):
     q = sesh.query(Variable.name, Variable.id).join(Network).filter(Network.name == 'EC_raw')

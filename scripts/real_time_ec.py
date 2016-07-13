@@ -85,7 +85,7 @@ def main(args):
         sesh = Session()
 
     except Exception as e:
-        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, fname))
+        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, fname), exc_info=True)
         sys.exit(1)
 
     try:
@@ -105,7 +105,7 @@ def main(args):
 
     except Exception as e:
         sesh.rollback()
-        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, fname))
+        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, fname), exc_info=True)
         sys.exit(1)
 
     finally:
