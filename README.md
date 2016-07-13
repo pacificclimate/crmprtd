@@ -42,3 +42,18 @@ apt-get install postgresql postgis
 pip install -r test_requirements.txt
 py.test -v tests
 ```
+
+## Releasing
+
+1. Increment `__version__` in `setup.py`
+1. Summarize release changes in `NEWS.md`
+1. Commit these changes, then tag the release
+  ```bash
+git add setup.py NEWS.md
+git commit -m"Bump to version x.x.x"
+git tag -a -m"x.x.x" x.x.x
+git push --follow-tags
+  ```
+1. Build and release the new package
+  - `python setup.py sdist`, then copy the `dist/<package_name>.tar.gz` to the pypiserver, OR
+  - `python setup.py sdist upload -r <server>` if you have that set up in your `.pypirc` file
