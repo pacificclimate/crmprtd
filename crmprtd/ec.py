@@ -44,7 +44,7 @@ def parse_xml(fname):
     return transform(et)
 
 class ObsProcessor:
-    def __init__(self, et, sesh, threshold, diag):
+    def __init__(self, et, sesh, threshold):
         # set variables for summary information
         self._members = 0
         self._members_processed = 0
@@ -56,11 +56,8 @@ class ObsProcessor:
         self.et = et
         self.sesh = sesh
         self.threshold = threshold
-        self._diagnostic_mode = diag
 
     def process(self):
-        if self._diagnostic_mode: log.info("DIAGNOSTIC MODE, NO RECORDS WILL BE COMMITTED")
-        
         members = self.et.xpath('//om:member', namespaces=ns)
         self._members = len(members)
         log.info("Found {} members in the xml".format(self._members))
