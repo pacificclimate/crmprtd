@@ -455,3 +455,19 @@ def test_process_xml(ec_session, caplog):
     op = ObsProcessor(hourly_bc_2016061116, ec_session, 1000)
     op.process()
     assert ec_session.query(Obs).count() == obs_count + 260
+
+def test_process_daily_xml(ec_session, caplog):
+    import logging
+    caplog.setLevel(logging.INFO)
+
+    from ec_data import yesterday_bc_20160616, yesterday_bc_20160617
+
+    obs_count = ec_session.query(Obs).count()
+
+    op = ObsProcessor(yesterday_bc_20160616, ec_session, 1000)
+    op.process()
+    assert ec_session.query(Obs).count() == obs_count + 130
+
+    op = ObsProcessor(yesterday_bc_20160617, ec_session, 1000)
+    op.process()
+    assert ec_session.query(Obs).count() == obs_count + 260
