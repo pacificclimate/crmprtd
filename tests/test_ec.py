@@ -448,10 +448,10 @@ def test_process_xml(ec_session, caplog):
 
     obs_count = ec_session.query(Obs).count()
 
-    op = ObsProcessor(hourly_bc_2016061115, ec_session, 1000, False)
+    op = ObsProcessor(hourly_bc_2016061115, ec_session, 1000)
     op.process()
     assert ec_session.query(Obs).count() == obs_count + 130
 
-    op = ObsProcessor(hourly_bc_2016061116, ec_session, 1000, False)
+    op = ObsProcessor(hourly_bc_2016061116, ec_session, 1000)
     op.process()
     assert ec_session.query(Obs).count() == obs_count + 260
