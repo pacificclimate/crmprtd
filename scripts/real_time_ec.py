@@ -32,9 +32,10 @@ def main(args):
         log_conf['handlers']['mail']['toaddrs'] = args.error_email
     logging.config.dictConfig(log_conf)
     log = logging.getLogger('crmprtd.ec')
-    log.info('Starting EC rtd')
     if args.log_level:
         log.setLevel(args.log_level)
+
+    log.info('Starting EC rtd')
 
     try:
         if args.filename:

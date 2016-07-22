@@ -46,9 +46,10 @@ def main(args):
         log_conf['handlers']['mail']['toaddrs'] = args.error_email
     logging.config.dictConfig(log_conf)
     log = logging.getLogger('crmprtd.wmb')
-    log.info('Starting WMB rtd')
     if args.log_level:
         log.setLevel(args.log_level)
+
+    log.info('Starting WMB rtd')
     data = []
     
     # Pull auth from file or command line
