@@ -50,7 +50,7 @@ def process_observation_series(sesh, os):
 
     try:
         stn_id = os.xpath("./origin/id[@type='client']")[0].text.strip()
-    except IndexError, e:
+    except IndexError as e:
         raise Exception("Could not detect the station id: xpath search '//observation-series/origin/id[@type='client']' return no results")
 
     hist = check_history(stn_id, sesh)
@@ -74,7 +74,7 @@ def process_observation_series(sesh, os):
             vartype = obs.get('type')
             try:
                 value_element = obs.xpath('./value')[0]
-            except IndexError, e:
+            except IndexError as e:
                 log.warn("Could not find the actual value for observation {}/{}. xpath search './value' returned no results".format(varname, vartype))
                 skips += 1
                 continue

@@ -102,11 +102,11 @@ class ObsProcessor:
     def print_data(self):
         order = ['station_code','weather_date','precipitation','temperature','relative_humidity','wind_speed','wind_direction']
         for k in order:
-            print k + '\t|\t',
+            print(k + '\t|\t'),
         for obs in self.data:
-            print ''
+            print('')
             for k in order:
-                print str(obs[k]) + '\t|\t',
+                print(str(obs[k]) + '\t|\t')
     
     def process(self):
         """

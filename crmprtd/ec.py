@@ -3,7 +3,7 @@ from datetime import datetime
 import re
 import logging
 from pkg_resources import resource_stream
-from urlparse import urlparse
+from crmprtd.compat import urlparse
 
 from pycds import History, Station, Network, Obs, Variable
 from sqlalchemy import and_, or_
@@ -102,7 +102,7 @@ class ObsProcessor:
                     self._obs_insertions += 1
                 else:
                     self._obs_existing += 1
-            except Exception, e:
+            except Exception as e:
                 log.exception("Unable to insert this observation")
                 self._obs_errors += 1
 
@@ -257,7 +257,7 @@ def insert_obs(sesh, om, hid, vname, vid):
         ele = om.member.xpath("./om:Observation/om:result//mpo:element[@name='%s']" % vname, namespaces=ns)[0]
         val = float(ele.get('value'))
     # This shouldn't every be empty based on our xpath for selecting elements... however I think that it _could_ be non-numeric and still be valid XML
-    except ValueError, e:
+    except ValueError as e:
         raise e
 
     o = Obs(time = t,

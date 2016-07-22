@@ -22,15 +22,14 @@ def test_data(test_session, moti_sawr7110_xml):
     assert len(obs) - c1 == 2
 
 def test_catch_duplicates(test_session, moti_sawr7110_xml):
-    print 'test_catch_duplicates'
+    print('test_catch_duplicates')
     rv = process(test_session, moti_sawr7110_xml)
     assert rv == {'failures': 0, 'successes': 2, 'skips': 2}
     test_session.commit()
     rv = process(test_session, moti_sawr7110_xml)
     assert rv == {'failures': 0, 'successes': 0, 'skips': 4}
-    
-@pytest.mark.parametrize(('label','xml'),
-                         [('no_obs', fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -39,8 +38,8 @@ def test_catch_duplicates(test_session, moti_sawr7110_xml):
       </origin>
     </observation-series>
   </data>
-</cmml>''')),
-                         ('no_valid_time', fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+</cmml>''',
+       'no_valid_time': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -55,8 +54,8 @@ def test_catch_duplicates(test_session, moti_sawr7110_xml):
       </observation>
     </observation-series>
   </data>
-</cmml>''')),
-                         ('bad_value', fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+       </cmml>''',
+       'bad_value': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -70,8 +69,8 @@ def test_catch_duplicates(test_session, moti_sawr7110_xml):
       </observation>
     </observation-series>
   </data>
-</cmml>''')),
-                         ('no_value', fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+       </cmml>''',
+       'no_value': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -84,8 +83,8 @@ def test_catch_duplicates(test_session, moti_sawr7110_xml):
       </observation>
     </observation-series>
   </data>
-</cmml>''')),
-                         ('no_units', fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+       </cmml>''',
+       'no_units': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -99,15 +98,17 @@ def test_catch_duplicates(test_session, moti_sawr7110_xml):
       </observation>
     </observation-series>
   </data>
-</cmml>'''))])
-def test_broken_obs(test_session, label, xml):
+ </cmml>'''}
+@pytest.mark.parametrize(('xml'), xml.values(), ids=list(xml.keys()))
+def test_broken_obs(test_session, xml):
+    xml = fromstring(xml)
     n_obs_before = test_session.query(Obs).count()
     process(test_session, xml)
     n_obs_after = test_session.query(Obs).count()
     assert n_obs_before == n_obs_after
     
 def test_missing_client_id(test_session):
-    et = fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    et = fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
   </head>
@@ -118,7 +119,7 @@ def test_missing_client_id(test_session):
   </data>
 </cmml>''')
     e = pytest.raises(Exception, process, test_session, et)
-    assert e.value.message == "Could not detect the station id: xpath search '//observation-series/origin/id[@type='client']' return no results"
+    assert "Could not detect the station id: xpath search '//observation-series/origin/id[@type='client']' return no results" in str(e)
 
 def test_url_generator():
     urls = url_generator('1', bctz.localize(datetime(2010, 1, 1)), bctz.localize(datetime(2010, 3, 1)))
@@ -179,7 +180,7 @@ def test_timestep_slices():
     assert results == expected
 
 def test_skipped_vars(test_session):
-    xml = fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    xml = fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -227,7 +228,7 @@ def test_skipped_vars(test_session):
     # TODO: need to actually check no warnings logged for var lookups
 
 def test_unknown_var(test_session, caplog):
-    xml = fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    xml = fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>

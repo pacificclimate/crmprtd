@@ -9,7 +9,7 @@ import pytest
 import sqlalchemy
 from sqlalchemy.schema import DDL
 from sqlalchemy.orm import sessionmaker
-from lxml.etree import parse, fromstring, fromstring, XSLT
+from lxml.etree import parse, fromstring, XSLT
 import testing.postgresql
 import pytz
 
@@ -126,9 +126,9 @@ def test_session(crmp_session, caplog):
 
     obs = [
         Obs(history=sechelt1, datum=2.5, variable=ec_precip,
-            time=datetime(2012, 9, 24, 06, tzinfo=pytz.utc)),
+            time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc)),
         Obs(history=sechelt1, datum=2.7, variable=ec_precip,
-            time=datetime(2012, 9, 26, 06, tzinfo=pytz.utc)),
+            time=datetime(2012, 9, 26, 6, tzinfo=pytz.utc)),
         Obs(history=sechelt2, datum=2.5, variable=ec_precip,
             time=datetime(2012, 9, 26, 18, tzinfo=pytz.utc)),
     ]
@@ -181,9 +181,9 @@ def ec_session(crmp_session, caplog):
 
     obs = [
         Obs(history=sechelt1, datum=2.5, variable=ec_precip,
-            time=datetime(2012, 9, 24, 06)),
+            time=datetime(2012, 9, 24, 6)),
         Obs(history=sechelt1, datum=2.7, variable=ec_precip,
-            time=datetime(2012, 9, 26, 06)),
+            time=datetime(2012, 9, 26, 6)),
         Obs(history=sechelt2, datum=2.5, variable=ec_precip,
             time=datetime(2012, 9, 26, 18)),
     ]
@@ -194,7 +194,7 @@ def ec_session(crmp_session, caplog):
 
 @pytest.fixture(scope='module')
 def moti_sawr7110_xml():
-    return fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -248,7 +248,7 @@ def moti_sawr7110_xml():
 
 @pytest.fixture(scope='module')
 def moti_sawr7110_new_station():
-    return fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -261,7 +261,7 @@ def moti_sawr7110_new_station():
 
 @pytest.fixture(scope='module')
 def moti_sawr7100_large():
-    return fromstring('''<?xml version="1.0" encoding="ISO-8859-1"?>
+    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1"?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -344,7 +344,7 @@ def moti_sawr7100_large():
 
 @pytest.fixture(scope='module')
 def ec_xml_single_obs():
-    x = fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    x = fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
