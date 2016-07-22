@@ -43,7 +43,7 @@ setup(
                         'pyyaml',
                         'python-dateutil',
                         'pytz',
-                        'requests',
+                        'requests[security]',
                         'pycds >= 2.0.0'
                         ],
     tests_require=['pytest',
