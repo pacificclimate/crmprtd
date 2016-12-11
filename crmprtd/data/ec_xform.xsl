@@ -70,6 +70,15 @@
                     </xsl:element>
                 </xsl:when>
 
+                <!-- Trace precip and empty string should have a value of 0.0 -->
+                <xsl:when test="@value='' or @value='Trace'">
+                    <xsl:element name="element" namespace="http://dms.ec.gc.ca/schema/point-observation/2.1">
+                        <xsl:attribute name="name"><xsl:value-of select="@name"/></xsl:attribute>
+                        <xsl:attribute name="uom"><xsl:value-of select="@uom"/></xsl:attribute>
+                        <xsl:attribute name="value">0.0</xsl:attribute>
+                    </xsl:element>
+                </xsl:when>
+
                 <!-- leave everything else unchanged -->
                 <xsl:otherwise>
                     <xsl:copy-of select="." />
