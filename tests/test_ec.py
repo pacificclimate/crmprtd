@@ -2,9 +2,10 @@ from pkg_resources import resource_filename
 from datetime import datetime
 
 import pytz
-from lxml.etree import tostring, fromstring, parse, XSLT
+from lxml.etree import parse, XSLT
 import pytest
 
+from crmprtd.compat import fromstring
 from crmprtd.ec import makeurl, extract_fname_from_url, parse_xml, ns, ObsProcessor, check_history, insert_obs, recordable_vars, db_unit, OmMember
 from pycds import History, Station, Obs, Network
 
@@ -64,7 +65,7 @@ def test_url_to_fname(url, fname):
     assert extract_fname_from_url(url) == fname
 
 @pytest.mark.parametrize(('x', 'expected'), [
-    (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -77,7 +78,7 @@ def test_url_to_fname(url, fname):
     </om:Observation>
   </om:member>
 </om:ObservationCollection>'''), '-0.12'),
-    (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -104,7 +105,7 @@ def test_xsl_transform_tendency_amount(x, expected):
     assert e[0].attrib['value'] == expected
 
 @pytest.mark.parametrize(('x', 'expected'), [
-    (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -116,7 +117,7 @@ def test_xsl_transform_tendency_amount(x, expected):
     </om:Observation>
   </om:member>
 </om:ObservationCollection>'''), '270'),
-    (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -141,7 +142,7 @@ def test_xsl_transform_wind_direction(x, expected):
     assert e[0].attrib['value'] == expected
 
 @pytest.mark.parametrize(('x', 'expected'), [
-    (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -167,7 +168,7 @@ def test_xsl_transform_cloud_cover(x, expected):
     assert e[0].attrib['value'] == expected
 
 @pytest.mark.parametrize(('et', 'expected'), [
-    (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -199,7 +200,7 @@ def test_xsl_transform_cloud_cover(x, expected):
     </om:Observation>
   </om:member>
 </om:ObservationCollection>'''), 10000),
-    (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -238,7 +239,7 @@ def test_check_valid_history_id(ec_session, et, expected):
     assert hid == expected
 
 @pytest.mark.parametrize(('et'), [
-    (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -281,7 +282,7 @@ def test_station_movement(ec_session, et):
     ''
 ])
 def test_xsl_transform_no_precip(value):
-    xml = fromstring(bytes('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    xml = fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -292,7 +293,7 @@ def test_xsl_transform_no_precip(value):
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''.format(value), encoding='utf-8'))
+</om:ObservationCollection>'''.format(value))
 
     # Apply the transform
     xsl = resource_filename('crmprtd', 'data/ec_xform.xsl')
@@ -308,7 +309,7 @@ def test_xsl_transform_no_precip(value):
 
 
 def test_new_station(ec_session):
-    stn1 = fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    stn1 = fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:member xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:Observation>
     <om:metadata>
@@ -338,7 +339,7 @@ def test_new_station(ec_session):
     </om:featureOfInterest>
   </om:Observation>
 </om:member>''')
-    stn2 = fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    stn2 = fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:member xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:Observation>
     <om:metadata>
@@ -392,7 +393,7 @@ def test_db_unit(ec_session, net_var_name, unit):
     assert dbu == unit
 
 @pytest.mark.parametrize(('et', 'hid', 'vname', 'vid'), [
-    (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    (fromstring('''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:member xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:Observation>
     <om:metadata>

@@ -2,10 +2,11 @@ from pkg_resources import resource_filename
 from datetime import datetime
 
 import pytz
-from lxml.etree import fromstring, parse, XSLT
+from lxml.etree import parse, XSLT
 import pytest
 
 from pycds import Obs
+from pycds.compat import fromstring
 from crmprtd.moti import process, url_generator, slice_timesteps
 
 bctz = pytz.timezone('America/Vancouver')
@@ -29,7 +30,7 @@ def test_catch_duplicates(test_session, moti_sawr7110_xml):
     rv = process(test_session, moti_sawr7110_xml)
     assert rv == {'failures': 0, 'successes': 0, 'skips': 4}
 
-xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+xml = {'no_obs': '''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -39,7 +40,7 @@ xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
     </observation-series>
   </data>
 </cmml>''',
-       'no_valid_time': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+       'no_valid_time': '''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -55,7 +56,7 @@ xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
     </observation-series>
   </data>
        </cmml>''',
-       'bad_value': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+       'bad_value': '''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -70,7 +71,7 @@ xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
     </observation-series>
   </data>
        </cmml>''',
-       'no_value': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+       'no_value': '''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -84,7 +85,7 @@ xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
     </observation-series>
   </data>
        </cmml>''',
-       'no_units': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+       'no_units': '''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -108,7 +109,7 @@ def test_broken_obs(test_session, xml):
     assert n_obs_before == n_obs_after
     
 def test_missing_client_id(test_session):
-    et = fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    et = fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
   </head>
@@ -180,7 +181,7 @@ def test_timestep_slices():
     assert results == expected
 
 def test_skipped_vars(test_session):
-    xml = fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    xml = fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -228,7 +229,7 @@ def test_skipped_vars(test_session):
     # TODO: need to actually check no warnings logged for var lookups
 
 def test_unknown_var(test_session, caplog):
-    xml = fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    xml = fromstring('''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
