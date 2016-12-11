@@ -6,6 +6,6 @@ addons:
 before_install:
   - export TZ=Canada/Pacific
 install:
-  - pip install -i http://tools.pacificclimate.org/pypiserver/ --trusted-host tools.pacificclimate.org -r requirements.txt -r test_requirements.txt
+  - pip install -i https://pypi.pacificclimate.org/simple/ -r requirements.txt -r test_requirements.txt
   - pip install .
 script: py.test -v --tb=short tests
