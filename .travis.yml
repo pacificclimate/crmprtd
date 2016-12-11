@@ -5,6 +5,7 @@ addons:
   postgresql: "9.3"
 before_install:
   - export TZ=Canada/Pacific
+  - pip install -U pip
 install:
   - pip install -i https://pypi.pacificclimate.org/simple/ -r requirements.txt -r test_requirements.txt
   - pip install .
