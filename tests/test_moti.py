@@ -6,7 +6,7 @@ from lxml.etree import parse, XSLT
 import pytest
 
 from pycds import Obs
-from pycds.compat import fromstring
+from crmprtd.compat import fromstring
 from crmprtd.moti import process, url_generator, slice_timesteps
 
 bctz = pytz.timezone('America/Vancouver')
