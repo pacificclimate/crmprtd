@@ -27,7 +27,7 @@ from sqlalchemy.orm import sessionmaker
 
 # Local
 from crmprtd import retry
-from crmprtd.wamr import ObsProcessor, DataLogger
+from crmprtd.wamr import process_obs, ObsProcessor, DataLogger
 
 
 def setup_logging(level, filename=None, email=None):
@@ -78,10 +78,11 @@ def main(args):
         # Fetch file from FTP and read into memory
         log.info('Fetching file from FTP')
 
-        log.info('Downloading {}/{}'.format(args.ftp_server, args.ftp_file))
+        log.info('Listing {}/{}'.format(args.ftp_server, args.ftp_dir))
+
         try:
             ftpreader = FTPReader(args.ftp_server, None,
-                                  None, args.ftp_file, log)
+                                  None, args.ftp_dir, log)
             log.info('Opened a connection to {}'.format(args.ftp_server))
             reader = ftpreader.csv_reader()
             for row in reader:
@@ -94,7 +95,8 @@ def main(args):
         # save the downloaded file
         fname_out = os.path.join(args.cache_dir, 'wmb_download' +
                                  datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
-        with open(fname_out, 'wb') as f_out:
+        with open(fname_out, 'w') as f_out:
+            #fieldnames = [field.encode('utf-8') for field in reader.fieldnames]
             copier = csv.DictWriter(f_out, fieldnames=reader.fieldnames)
             copier.writeheader()
             copier.writerows(data)
@@ -117,6 +119,9 @@ def main(args):
         sys.exit(1)
 
     try:
+        log.debug('Processing observations')
+        process_obs(sesh, data, args)
+        sys.exit(0)
         op = ObsProcessor(sesh, data, args)
         op.process()
         if args.diag:
@@ -160,7 +165,6 @@ class FTPReader(object):
             print(line)
             self.filenames.append(line)
         self.connection.retrlines('NLST ' + data_path, callback)
-        print(self.filenames)
 
     def csv_reader(self):
         # Just store the lines in memory
@@ -213,7 +217,7 @@ if __name__ == '__main__':
                         default='HUMIDITY,PRECIP,PRESSURE,SNOW,TEMP,VAPOUR,WDIR,WSPD',
                         help='Comma separated list of variables to download')
     parser.add_argument('-C', '--cache_dir',
-                        help='Directory in which to put the downloaded file')
+                        help='Directory in which to put the downloaded observations')
     parser.add_argument('-a', '--archive_dir',
                         help='Directory in which to put data that could not be added to the database')
     parser.add_argument('-A', '--archive_file',
