@@ -41,7 +41,7 @@ def setup_logging(level, filename=None, email=None):
     if email:
         log_conf['handlers']['mail']['toaddrs'] = email
     logging.config.dictConfig(log_conf)
-    log = logging.getLogger('crmprtd.wmb')
+    log = logging.getLogger('crmprtd.wamr')
     if level:
         log.setLevel(level)
 
@@ -95,6 +95,7 @@ def main(args):
         # save the downloaded file
         fname_out = os.path.join(args.cache_dir, 'wmb_download' +
                                  datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
+
         with open(fname_out, 'w') as f_out:
             #fieldnames = [field.encode('utf-8') for field in reader.fieldnames]
             copier = csv.DictWriter(f_out, fieldnames=reader.fieldnames)
@@ -120,10 +121,10 @@ def main(args):
 
     try:
         log.debug('Processing observations')
-        process_obs(sesh, data, args)
-        sys.exit(0)
-        op = ObsProcessor(sesh, data, args)
-        op.process()
+        process_obs(sesh, data, log)
+        #sys.exit(0)
+        #op = ObsProcessor(sesh, data, args)
+        #op.process()
         if args.diag:
             log.info('Diagnostic mode, rolling back all transactions')
             sesh.rollback()
@@ -217,6 +218,7 @@ if __name__ == '__main__':
                         default='HUMIDITY,PRECIP,PRESSURE,SNOW,TEMP,VAPOUR,WDIR,WSPD',
                         help='Comma separated list of variables to download')
     parser.add_argument('-C', '--cache_dir',
+                        default='./',
                         help='Directory in which to put the downloaded observations')
     parser.add_argument('-a', '--archive_dir',
                         help='Directory in which to put data that could not be added to the database')
