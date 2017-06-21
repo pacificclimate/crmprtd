@@ -33,23 +33,26 @@ def mass_insert_obs(sesh, obs, log=None):
     # Base cases
     if len(obs) < 1:
         pass
-    elif len(obs == 1):
-        sesh.add(obs[0])
+    elif len(obs) == 1:
         try:
-            sesh.commit()
+            # Create a nested SAVEPOINT context manager to rollback to in the
+            # event of unique constraint errors
+            with sesh.begin_nested():
+                sesh.add(obs[0])
         except psycopg2.IntegrityError as e:
-            log.debug("%s %s", obs, e)
+            log.debug("Already exists: %s %s", obs, e)
         else:
             return 1
 
     # The happy case: add everything at once
     else:
-        sesh.add_all(obs)
         try:
-            sesh.commit()
-            return len(obs)
+            with sesh.begin_nested():
+                sesh.add_all(obs)
         except psycopg2.IntegrityError:
             a, b = split(obs)
             return mass_insert_obs(sesh, a, log) + \
                 mass_insert_obs(sesh, b, log)
+        else:
+            return len(obs)
     return 0

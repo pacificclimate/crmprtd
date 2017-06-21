@@ -27,7 +27,9 @@ from sqlalchemy.orm import sessionmaker
 
 # Local
 from crmprtd import retry
-from crmprtd.wamr import process_obs, ObsProcessor, DataLogger
+from crmprtd.db import mass_insert_obs
+from crmprtd.wamr import process_obs, DataLogger
+from crmprtd.wamr import create_station_mapping, create_variable_mapping
 
 
 def setup_logging(level, filename=None, email=None):
@@ -93,7 +95,7 @@ def main(args):
             sys.exit(1)
 
         # save the downloaded file
-        fname_out = os.path.join(args.cache_dir, 'wmb_download' +
+        fname_out = os.path.join(args.cache_dir, 'wamr_download' +
                                  datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
 
         with open(fname_out, 'w') as f_out:
@@ -103,7 +105,7 @@ def main(args):
             copier.writerows(data)
 
     log.info('{0} observations read into memory'.format(len(data)))
-    dl = DataLogger()
+    dl = DataLogger(log)
 
     # Open database connection
     try:
@@ -121,10 +123,20 @@ def main(args):
 
     try:
         log.debug('Processing observations')
-        process_obs(sesh, data, log)
-        #sys.exit(0)
-        #op = ObsProcessor(sesh, data, args)
-        #op.process()
+        histories = create_station_mapping(sesh, data)
+        variables = create_variable_mapping(sesh, data)
+
+        obs = []
+        for row in data:
+            try:
+                obs.append(process_obs(sesh, row, log, histories, variables))
+            except Exception as e:
+                dl.add_row(row, e.args[0])
+
+        log.info("Starting a mass insertion of %d obs", len(obs))
+        n_insertions = mass_insert_obs(sesh, obs, log)
+        log.info("Inserted %d obs", n_insertions)
+
         if args.diag:
             log.info('Diagnostic mode, rolling back all transactions')
             sesh.rollback()
