@@ -85,7 +85,8 @@ def test_session(crmp_session, caplog):
     moti = Network(name='MoTIe')
     ec = Network(name='EC_raw')
     wmb = Network(name='FLNRO-WMB')
-    crmp_session.add_all([moti, ec, wmb])
+    wamr = Network(name='ENV-AQN')
+    crmp_session.add_all([moti, ec, wmb, wamr])
 
     simon = Contact(name='Simon', networks=[moti])
     eric = Contact(name='Eric', networks=[wmb])
@@ -109,6 +110,9 @@ def test_session(crmp_session, caplog):
                        station_name='Sechelt',
                        sdate='2012-09-26',
                        the_geom='SRID=4326;POINT(-123.7152625 49.4579966666667)')
+    warfield = History(station_name='Warfield Elementary',
+                       sdate='2005-01-12')
+
 
     stations = [
         Station(native_id='11091', network=moti, histories=[brandy_hist]),
@@ -116,13 +120,16 @@ def test_session(crmp_session, caplog):
         Station(native_id='2100160', network=ec, histories=[beaver_air_hist]),
         Station(native_id='1067742', network=ec, histories=[stewart_air_hist]),
         Station(native_id='1047172', network=ec, histories=[sechelt1, sechelt2]),
+        Station(native_id='0260011', network=wamr, histories=[warfield]),
     ]
     crmp_session.add_all(stations)
 
     moti_air_temp = Variable(name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti)
     ec_precip = Variable(name='precipitation', unit='mm', network=ec)
     wmb_humitidy = Variable(name='relative_humidity', unit='percent', network=wmb)
-    crmp_session.add_all([moti_air_temp, ec_precip, wmb_humitidy])
+    wamr_temp = Variable(name='TEMP_MEAN', unit='celsius', network=wamr)
+
+    crmp_session.add_all([moti_air_temp, ec_precip, wmb_humitidy, wamr_temp])
 
     obs = [
         Obs(history=sechelt1, datum=2.5, variable=ec_precip,

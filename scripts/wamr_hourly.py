@@ -99,7 +99,7 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
         sesh.commit()
         sesh.close()
 
-    dl.archive(error_file)
+    #dl.archive(error_file)
 
 
 class FTPReader(object):
