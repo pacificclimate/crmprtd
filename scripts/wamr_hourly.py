@@ -50,112 +50,56 @@ def setup_logging(level, filename=None, email=None):
     return log
 
 
-def main(args):
+def rows2db(sesh, rows, error_file, log, diagnostic=False):
+    '''
+    Args:
+        sesh (sqlalchemy.Session): The first parameter.
+        rows ():
+        error_file ():
+        log (): The second parameter.
 
-    log = setup_logging(args.log_level, args.log, args.error_email)
-    log.info('Starting WAMR rtd')
-    data = []
-
-    # Check for local file source
-    if args.archive_file:
-        # adjust to full path
-        path = args.archive_file
-        if args.archive_file[0] != '/':
-            path = os.path.join(args.archive_dir, args.archive_file)
-        log.info('Loading local file {0}'.format(path))
-
-        # open and read into data
-        try:
-            with open(path) as f:
-                log.debug('opened the local file')
-                reader = csv.DictReader(f)
-                for row in reader:
-                    data.append(row)
-        except IOError as e:
-            log.exception('Unable to load data from local file')
-            sys.exit(1)
-
-    # Or use FTP source
-    else:
-        # Fetch file from FTP and read into memory
-        log.info('Fetching file from FTP')
-
-        log.info('Listing {}/{}'.format(args.ftp_server, args.ftp_dir))
-
-        try:
-            ftpreader = FTPReader(args.ftp_server, None,
-                                  None, args.ftp_dir, log)
-            log.info('Opened a connection to {}'.format(args.ftp_server))
-            reader = ftpreader.csv_reader()
-            for row in reader:
-                data.append(row)
-            log.info('instantiated the reader and processed all rows')
-        except ftplib.all_errors as e:
-            log.critical('Unable to load data from ftp source', exc_info=True)
-            sys.exit(1)
-
-        # save the downloaded file
-        fname_out = os.path.join(args.cache_dir, 'wamr_download' +
-                                 datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
-
-        with open(fname_out, 'w') as f_out:
-            #fieldnames = [field.encode('utf-8') for field in reader.fieldnames]
-            copier = csv.DictWriter(f_out, fieldnames=reader.fieldnames)
-            copier.writeheader()
-            copier.writerows(data)
-
-    log.info('{0} observations read into memory'.format(len(data)))
+    '''
     dl = DataLogger(log)
 
-    # Open database connection
-    try:
-        engine = create_engine(args.connection_string)
-        Session = sessionmaker(engine)
-        sesh = Session()
-        sesh.begin_nested()
-    except Exception as e:
-        dl.add_row(data, 'db-connection error')
-        log.critical('''Error with Database connection 
-                            See logfile at {l}
-                            Data saved at {d}
-                            '''.format(l=args.log, d=data_archive), exc_info=True)
-        sys.exit(1)
+    sesh.begin_nested()
 
     try:
         log.debug('Processing observations')
-        histories = create_station_mapping(sesh, data)
-        variables = create_variable_mapping(sesh, data)
+        histories = create_station_mapping(sesh, rows)
+        variables = create_variable_mapping(sesh, rows)
 
         obs = []
-        for row in data:
+        for row in rows:
             try:
                 obs.append(process_obs(sesh, row, log, histories, variables))
             except Exception as e:
-                dl.add_row(row, e.args[0])
+                dl.add_row(row, e.args[0]) # FIXME: no args here
 
         log.info("Starting a mass insertion of %d obs", len(obs))
         n_insertions = mass_insert_obs(sesh, obs, log)
         log.info("Inserted %d obs", n_insertions)
 
-        if args.diag:
+        if diagnostic: 
             log.info('Diagnostic mode, rolling back all transactions')
             sesh.rollback()
         else:
-            log.info('Commiting the session')
+            log.info('Commiting the sesh')
             sesh.commit()
 
-    except Exception as e:
-        dl.add_row(data, 'preproc error')
+    except Exception as e: # FIXME: sqlalchemy.exc.OperationalError? (cannot connect to db) sqlalchemy.exc.InternalError (read-only transaction)
+        dl.add_row(rows, 'preproc error')
         sesh.rollback()
-        data_archive = dl.archive(args.archive_dir)
+        data_archive = dl.archive(error_file)
         log.critical('''Error data preprocessing. 
                             See logfile at {l}
                             Data saved at {d}
-                            '''.format(l=args.log, d=data_archive), exc_info=True)
+                            '''.format(l=args.log, d=data_archive), exc_info=True) # FIXME: no args here
         sys.exit(1)
     finally:
         sesh.commit()
         sesh.close()
+
+    dl.archive(error_file)
 
 
 class FTPReader(object):
@@ -175,20 +119,23 @@ class FTPReader(object):
         self.connection = ftp_connect_with_retry(host, user, password)
 
         def callback(line):
-            print(line)
             self.filenames.append(line)
+
         self.connection.retrlines('NLST ' + data_path, callback)
 
-    def csv_reader(self):
+    def csv_reader(self, log=None):
         # Just store the lines in memory
         # It's non-ideal but neither classes support coroutine send/yield
+        if not log:
+            log = logging.getLogger('__name__')
         lines = []
 
         def callback(line):
             lines.append(line)
 
         for filename in self.filenames:
-            print(filename)
+            log.info("Downloading %s", filename)
+            # FIXME: This line has some kind of race condition with this
             self.connection.retrlines('RETR {}'.format(filename), callback)
 
         r = csv.DictReader(lines)
@@ -201,11 +148,50 @@ class FTPReader(object):
             self.connection.close()
 
 
-if __name__ == '__main__':
+def file2rows(file_, log):
+    try:
+        reader = csv.DictReader(file_)
+    except csv.Error as e:
+        log.critical('Unable to load data from local file', exc_info=True)
+        sys.exit(1)
 
+    return [row for row in reader], reader.fieldnames
+
+
+def ftp2rows(host, path, log):
+    log.info('Fetching file from FTP')
+    log.info('Listing {}/{}'.format(host, path))
+
+    try:
+        ftpreader = FTPReader(host, None,
+                              None, path, log)
+        log.info('Opened a connection to {}'.format(host))
+        reader = ftpreader.csv_reader(log)
+        log.info('instantiated the reader and downloaded all of the data')
+    except ftplib.all_errors as e:
+        log.critical('Unable to load data from ftp source', exc_info=True)
+        sys.exit(1)
+
+    return [row for row in reader], reader.fieldnames
+
+
+def cache_rows(file_, rows, fieldnames):
+    copier = csv.DictWriter(file_, fieldnames=fieldnames)
+    copier.writeheader()
+    copier.writerows(rows)
+
+
+def main():
+    # Process the command line arguments
     parser = ArgumentParser()
-    parser.add_argument('-c', '--connection_string',
+    # Database options
+    parser.add_argument('-x', '--connection_string',
                         help='PostgreSQL connection string')
+    parser.add_argument('-D', '--diag',
+                        default=False, action="store_true",
+                        help="Turn on diagnostic mode (no commits)")
+
+    # Logging options
     parser.add_argument('-L', '--log_conf',
                         default=resource_stream(
                             'crmprtd', '/data/logging.yaml'),
@@ -213,32 +199,83 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--log',
                         default=None,
                         help='Override the default log filename')
-    parser.add_argument('-e', '--error_email',
+    parser.add_argument('-m', '--error_email',
                         default=None,
                         help='Override the default e-mail address to which the program should report critical errors')
     parser.add_argument('--log_level',
                         choices=['DEBUG', 'INFO',
                                  'WARNING', 'ERROR', 'CRITICAL'],
                         help='Set log level: DEBUG, INFO, WARNING, ERROR, CRITICAL.  Note that debug output by default goes directly to file')
+
+    # FTP options
     parser.add_argument('-f', '--ftp_server',
                         default='ftp.env.gov.bc.ca',
                         help='Full hostname of Water and Air Monitoring and Reporting\'s ftp server')
     parser.add_argument('-F', '--ftp_dir',
                         default='pub/outgoing/AIR/Hourly_Raw_Air_Data/Meteorological/',
                         help='FTP Directory containing WAMR\'s data files')
-    parser.add_argument('-V', '--variables',
-                        default='HUMIDITY,PRECIP,PRESSURE,SNOW,TEMP,VAPOUR,WDIR,WSPD',
-                        help='Comma separated list of variables to download')
+
+    # File input option(s)
+    parser.add_argument('-i', '--input_file',
+                        default=None,
+                        help='')
+
+    # File output options
+    parser.add_argument('-c', '--cache_file',
+                        default=None,
+                        help='Full path of file in which to put downloaded observations (--cache_dir will be ignored)')
     parser.add_argument('-C', '--cache_dir',
                         default='./',
-                        help='Directory in which to put the downloaded observations')
-    parser.add_argument('-a', '--archive_dir',
-                        help='Directory in which to put data that could not be added to the database')
-    parser.add_argument('-A', '--archive_file',
+                        help='Directory in which to put downloaded observations (filename will be autogenerated)')
+    parser.add_argument('-e', '--error_file',
                         default=None,
-                        help='An archive file to parse INSTEAD OF downloading from ftp. Can be a local reference in the archive_dir or absolute file path')
-    parser.add_argument('-D', '--diag',
-                        default=False, action="store_true",
-                        help="Turn on diagnostic mode (no commits)")
+                        help='Full path of file in which to put data that could not be added to the database (--error_dir will be ignored)')
+    parser.add_argument('-E', '--error_dir',
+                        default='./',
+                        help='Directory in which to put data that could not be added to the database (filename will be autogenerated)')
+
     args = parser.parse_args()
-    main(args)
+
+    # Open up any resources that we need for the program
+
+    # Logging
+    log = setup_logging(args.log_level, args.log, args.error_email)
+    log.info('Starting WAMR rtd')
+
+    # Database connection
+    try:
+        engine = create_engine(args.connection_string)
+        Session = sessionmaker(engine)
+        sesh = Session()
+    except Exception as e:
+        log.critical('Error with Database connection', exc_info=True)
+        sys.exit(1)
+
+    # Output files
+    if args.error_file:
+        error_file = open(args.error_file, 'a')
+    else:
+        error_filename = 'wamr_errors_{}.csv'.format(datetime.strftime(
+                datetime.now(), '%Y-%m-%dT%H-%M-%S'))
+        error_file = open(os.path.join(args.cache_dir, error_filename), 'a')
+
+    if args.input_file:
+        with open(args.input_file) as f:
+            rows, fieldnames = file2rows(f, log)
+    else: #FTP
+        rows, fieldnames = ftp2rows(args.ftp_server, args.ftp_dir, log)
+
+        if not args.cache_file:
+            args.cache_file = 'wamr_download_{}.csv'.format(datetime.strftime(
+                datetime.now(), '%Y-%m-%dT%H-%M-%S'))
+        with open(args.cache_file, 'w') as cache_file:
+            cache_rows(cache_file, rows, fieldnames)
+
+    log.info('{0} observations read into memory'.format(len(rows)))
+
+    # Hand the row off to the database processings/insertion part of the script
+    rows2db(sesh, rows, error_file, log)
+
+
+if __name__ == '__main__':
+    main()

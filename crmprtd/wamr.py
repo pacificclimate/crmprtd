@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+import csv
 
 import pytz
 from dateutil.parser import parse
@@ -90,29 +91,19 @@ class DataLogger(object):
             data['reason'] = reason
             self.bad_rows.append(data)
 
-    def archive(self, out_dir):
+    def archive(self, out_file):
         """
         Archive the unsuccessfull additions in a manner that allows
         easy re-insertion attempts.
-
-        Returns full path of output csv
         """
-        import csv
-        import os.path
-
-        outcsv = os.path.join(out_dir, 'wamr_data_errors_' +
-                      datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') +
-                              '.csv')
-
-        with open(outcsv, 'wb') as f:
-            order = 'DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,'\
+        order = 'DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,'\
                     'INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,'\
                     'STATUS_DESCRIPTION,REPORTED_VALUE'.split(',')
-            w = csv.DictWriter(f, fieldnames=order)
-            w.writeheader()
-            w.writerows(self.data)
+        w = csv.DictWriter(out_file, fieldnames=order)
+        w.writeheader()
+        w.writerows(self.data)
 
-        return outcsv
+        return
 
     @property
     def data(self):
