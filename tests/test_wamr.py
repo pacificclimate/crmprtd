@@ -1,7 +1,6 @@
 # coding=utf-8
 
-from types import SimpleNamespace
-from tempfile import NamedTemporaryFile, TemporaryFile, TemporaryDirectory
+from tempfile import TemporaryFile
 from io import StringIO
 
 import pytest
