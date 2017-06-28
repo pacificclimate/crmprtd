@@ -1,10 +1,13 @@
 import logging
 from datetime import datetime
 import csv
+from pkg_resources import resource_stream
 
 import pytz
 from dateutil.parser import parse
+import yaml
 
+from crmprtd.db import mass_insert_obs
 from pycds import Network, Station, History, Obs, Variable
 
 tz = pytz.timezone('Canada/Pacific')
@@ -110,3 +113,100 @@ class DataLogger(object):
         import itertools
         for row in itertools.chain(self.bad_rows, self.bad_obs):
             yield row
+
+
+def setup_logging(level, filename=None, email=None):
+    '''Read in the logging configuration and return a logger object
+    '''
+    log_conf = yaml.load(resource_stream('crmprtd', '/data/logging.yaml'))
+    if filename:
+        log_conf['handlers']['file']['filename'] = filename
+    else:
+        filename = log_conf['handlers']['file']['filename']
+    if email:
+        log_conf['handlers']['mail']['toaddrs'] = email
+    logging.config.dictConfig(log_conf)
+    log = logging.getLogger('crmprtd.wamr')
+    if level:
+        log.setLevel(level)
+
+    return log
+
+
+def rows2db(sesh, rows, error_file, log, diagnostic=False):
+    '''
+    Args:
+        sesh (sqlalchemy.Session): The first parameter.
+        rows ():
+        error_file ():
+        log (): The second parameter.
+
+    '''
+    dl = DataLogger(log)
+
+    sesh.begin_nested()
+
+    try:
+        log.debug('Processing observations')
+        histories = create_station_mapping(sesh, rows)
+        variables = create_variable_mapping(sesh, rows)
+
+        obs = []
+        for row in rows:
+            try:
+                obs.append(process_obs(sesh, row, log, histories, variables))
+            except Exception as e:
+                dl.add_row(row, e.args[0]) # FIXME: no args here
+
+        log.info("Starting a mass insertion of %d obs", len(obs))
+        n_insertions = mass_insert_obs(sesh, obs, log)
+        log.info("Inserted %d obs", n_insertions)
+
+        if diagnostic: 
+            log.info('Diagnostic mode, rolling back all transactions')
+            sesh.rollback()
+        else:
+            log.info('Commiting the sesh')
+            sesh.commit()
+
+    except Exception as e: # FIXME: sqlalchemy.exc.OperationalError? (cannot connect to db) sqlalchemy.exc.InternalError (read-only transaction)
+        dl.add_row(rows, 'preproc error')
+        sesh.rollback()
+        data_archive = dl.archive(error_file)
+        log.critical('''Error data preprocessing.
+                            See logfile at {l}
+                            Data saved at {d}
+                            '''.format(l=args.log, d=data_archive), exc_info=True) # FIXME: no args here
+        sys.exit(1)
+    finally:
+        sesh.commit()
+        sesh.close()
+
+    #dl.archive(error_file)
+
+
+def file2rows(file_, log):
+    try:
+        reader = csv.DictReader(file_)
+    except csv.Error as e:
+        log.critical('Unable to load data from local file', exc_info=True)
+        sys.exit(1)
+
+    return [row for row in reader], reader.fieldnames
+
+
+def ftp2rows(host, path, log):
+    log.info('Fetching file from FTP')
+    log.info('Listing {}/{}'.format(host, path))
+
+    try:
+        ftpreader = FTPReader(host, None,
+                              None, path, log)
+        log.info('Opened a connection to {}'.format(host))
+        reader = ftpreader.csv_reader(log)
+        log.info('instantiated the reader and downloaded all of the data')
+    except ftplib.all_errors as e:
+        log.critical('Unable to load data from ftp source', exc_info=True)
+        sys.exit(1)
+
+    return [row for row in reader], reader.fieldnames

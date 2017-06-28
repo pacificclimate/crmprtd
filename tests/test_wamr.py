@@ -4,7 +4,7 @@ from io import StringIO
 
 import pytest
 
-from scripts.wamr_hourly import rows2db, setup_logging, file2rows
+from crmprtd.wamr import rows2db, setup_logging, file2rows
 from pycds import Obs, History
 
 # def test_insert(crmp_session):
