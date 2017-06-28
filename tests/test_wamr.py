@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from types import SimpleNamespace
 from tempfile import NamedTemporaryFile, TemporaryFile, TemporaryDirectory
 from io import StringIO
