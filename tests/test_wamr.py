@@ -1,5 +1,6 @@
 # coding=utf-8
 
+import sys
 from tempfile import TemporaryFile
 from io import StringIO
 
@@ -33,8 +34,18 @@ def test_rows2db(test_session):
 2017-05-21 16:00,0260011,Warfield Elementary Met_60,TEMP_MEAN,TEMP_MEAN,TEMP 10M,26.65,°C,1,n/a,Data Ok,26.7
 2017-05-21 15:00,0260011,Warfield Elementary Met_60,TEMP_MEAN,TEMP_MEAN,TEMP 10M,26.38,°C,1,n/a,Data Ok,26.4
 '''
+    def maybe_fake_file():
+        # StringIO combined with csv.DictReader really don't like utf-8
+        # Just use a temp file if we have to
+        if sys.version_info.major < 3:
+            f = TemporaryFile()
+            f.write(lines)
+            f.seek(0)
+            return f
+        else:
+            return StringIO(lines)
 
-    with StringIO(lines) as f:
+    with maybe_fake_file() as f:
         rows, fieldnames = file2rows(f, log)
 
     with TemporaryFile() as error_file:
