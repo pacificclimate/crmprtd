@@ -1,13 +1,13 @@
 from math import floor
 import logging
 
-import psycopg2
+from sqlalchemy.exc import IntegrityError
 
 
 def split(tuple_):
     if len(tuple_) < 1:
         return (), ()
-    elif len(tuple_ < 2):
+    elif len(tuple_) < 2:
         return (tuple_[0], ())
     else:
         i = floor(len(tuple_) / 2)
@@ -30,29 +30,43 @@ def mass_insert_obs(sesh, obs, log=None):
     if not log:
         log = logging.getLogger(__name__)
 
+    log.debug("mass_insert_obs() called with %d obs", len(obs))
+        
     # Base cases
     if len(obs) < 1:
-        pass
+        return 0
     elif len(obs) == 1:
         try:
             # Create a nested SAVEPOINT context manager to rollback to in the
             # event of unique constraint errors
+            log.debug("New SAVEPOINT for 1 obs")
             with sesh.begin_nested():
                 sesh.add(obs[0])
-        except psycopg2.IntegrityError as e:
-            log.debug("Already exists: %s %s", obs, e)
+        except IntegrityError as e:
+            log.debug("Failure: already exists: %s %s", obs, e)
+            sesh.rollback()
+            return 0
         else:
+            log.debug("Success for 1 obs")
+            sesh.commit()
             return 1
 
     # The happy case: add everything at once
     else:
         try:
             with sesh.begin_nested():
+                log.debug("New SAVEPOINT for %s obs", len(obs))
                 sesh.add_all(obs)
-        except psycopg2.IntegrityError:
+        except IntegrityError:
+            log.debug("Failure. Splitting.")
+            sesh.rollback()
             a, b = split(obs)
-            return mass_insert_obs(sesh, a, log) + \
-                mass_insert_obs(sesh, b, log)
+            log.debug("Split to (%s, %s)", a, b)
+            a, b = mass_insert_obs(sesh, a, log), mass_insert_obs(sesh, b, log)
+            log.debug("Returning combined %d + %d = %d", a, b, a+b)
+            return a + b
         else:
+            log.debug("Success for %s obs", len(obs))
+            sesh.commit()
             return len(obs)
     return 0
