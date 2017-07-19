@@ -10,7 +10,7 @@ def split(tuple_):
     elif len(tuple_) < 2:
         return (tuple_[0], ())
     else:
-        i = floor(len(tuple_) / 2)
+        i = int(floor(len(tuple_) / 2))
         return (tuple_[:i], tuple_[i:])
 
 
