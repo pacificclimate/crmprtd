@@ -139,10 +139,10 @@ def setup_logging(level, filename=None, email=None):
 def rows2db(sesh, rows, error_file, log, diagnostic=False):
     '''
     Args:
-        sesh (sqlalchemy.Session): The first parameter.
-        rows ():
-        error_file ():
-        log (): The second parameter.
+        sesh (sqlalchemy.Session): A session with the crmp database
+        rows (list):
+        error_file (file):
+        log (logging.Logger):
 
     '''
     dl = DataLogger(log)
