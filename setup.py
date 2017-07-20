@@ -29,6 +29,7 @@ setup(
     scripts = ["scripts/real_time_ec.py",
                "scripts/fetch.py",
                "scripts/hourly_wmb.py",
+               "scripts/wamr_hourly.py",
                "scripts/ec_recovery.py",
                "scripts/moti_hourly.py",
                "scripts/moti_infill_download.py",
