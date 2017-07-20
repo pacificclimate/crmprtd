@@ -25,7 +25,11 @@ from pycds import Obs, History
 #     pass
 
 
-def test_rows2db(test_session):
+@pytest.mark.parametrize(('diagnostic', 'expected'), [
+    (False, 3),
+    (True, 0)
+])
+def test_rows2db(test_session, diagnostic, expected):
 
     log = setup_logging('DEBUG')
 
@@ -49,8 +53,8 @@ def test_rows2db(test_session):
         rows, fieldnames = file2rows(f, log)
 
     with TemporaryFile() as error_file:
-        rows2db(test_session, rows, error_file, log, diagnostic=False)
+        rows2db(test_session, rows, error_file, log, diagnostic=diagnostic)
 
-    # Check that some obs were inserted
+    # Check that some obs were or were not inserted (depending on diagnostic mode)
     q = test_session.query(Obs).join(History).filter(History.station_name == 'Warfield Elementary')
-    assert q.count() == len(lines.splitlines()) - 1
+    assert q.count() == expected
