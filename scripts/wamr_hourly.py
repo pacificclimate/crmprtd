@@ -113,7 +113,7 @@ def main():
     if args.input_file:
         with open(args.input_file) as f:
             rows, fieldnames = file2rows(f, log)
-    else: #FTP
+    else:  # FTP
         rows, fieldnames = ftp2rows(args.ftp_server, args.ftp_dir, log)
 
         if not args.cache_file:

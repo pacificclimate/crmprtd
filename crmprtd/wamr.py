@@ -103,8 +103,8 @@ class DataLogger(object):
         easy re-insertion attempts.
         """
         order = 'DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,'\
-                    'INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,'\
-                    'STATUS_DESCRIPTION,REPORTED_VALUE'.split(',')
+                'INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,'\
+                'STATUS_DESCRIPTION,REPORTED_VALUE'.split(',')
         w = csv.DictWriter(out_file, fieldnames=order)
         w.writeheader()
         w.writerows(self.data)
@@ -165,14 +165,14 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
         n_insertions = mass_insert_obs(sesh, obs, log)
         log.info("Inserted %d obs", n_insertions)
 
-        if diagnostic: 
+        if diagnostic:
             log.info('Diagnostic mode, rolling back all transactions')
             sesh.rollback()
         else:
             log.info('Commiting the sesh')
             sesh.commit()
 
-    except Exception as e: # FIXME: sqlalchemy.exc.OperationalError? (cannot connect to db) sqlalchemy.exc.InternalError (read-only transaction)
+    except Exception as e:  # FIXME: sqlalchemy.exc.OperationalError? (cannot connect to db) sqlalchemy.exc.InternalError (read-only transaction)
         dl.add_row(rows, 'preproc error')
         sesh.rollback()
         data_archive = dl.archive(error_file)
