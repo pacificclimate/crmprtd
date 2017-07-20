@@ -93,9 +93,8 @@ class DataLogger(object):
 
     def add_row(self, data=None, reason=None):
         # handle single observations
-        if type(data) == dict:
-            data['reason'] = reason
-            self.bad_rows.append(data)
+        data['reason'] = reason
+        self.bad_rows.append(data)
 
     def archive(self, out_file):
         """
@@ -104,7 +103,7 @@ class DataLogger(object):
         """
         order = 'DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,'\
                 'INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,'\
-                'STATUS_DESCRIPTION,REPORTED_VALUE'.split(',')
+                'STATUS_DESCRIPTION,REPORTED_VALUE,reason'.split(',')
         w = csv.DictWriter(out_file, fieldnames=order)
         w.writeheader()
         w.writerows(self.data)
