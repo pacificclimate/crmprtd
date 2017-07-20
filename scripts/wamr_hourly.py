@@ -125,7 +125,7 @@ def main():
     log.info('{0} observations read into memory'.format(len(rows)))
 
     # Hand the row off to the database processings/insertion part of the script
-    rows2db(sesh, rows, error_file, log)
+    rows2db(sesh, rows, error_file, log, args.diag)
 
 
 if __name__ == '__main__':
