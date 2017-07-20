@@ -1,12 +1,15 @@
+import sys
 import logging
-from datetime import datetime
+import logging.config
 import csv
 from pkg_resources import resource_stream
+import ftplib
 
 import pytz
 from dateutil.parser import parse
 import yaml
 
+from crmprtd import retry
 from crmprtd.db import mass_insert_obs
 from pycds import Network, Station, History, Obs, Variable
 
@@ -156,7 +159,7 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
             try:
                 obs.append(process_obs(sesh, row, log, histories, variables))
             except Exception as e:
-                dl.add_row(row, e.args[0]) # FIXME: no args here
+                dl.add_row(row, e.args[0])
 
         log.info("Starting a mass insertion of %d obs", len(obs))
         n_insertions = mass_insert_obs(sesh, obs, log)
@@ -174,15 +177,59 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
         sesh.rollback()
         data_archive = dl.archive(error_file)
         log.critical('''Error data preprocessing.
-                            See logfile at {l}
+                            See logfile
                             Data saved at {d}
-                            '''.format(l=args.log, d=data_archive), exc_info=True) # FIXME: no args here
+                            '''.format(d=data_archive), exc_info=True)
         sys.exit(1)
     finally:
         sesh.commit()
         sesh.close()
 
-    #dl.archive(error_file)
+
+class FTPReader(object):
+    '''Glue between the FTP class methods (which are callback based)
+       and the csv.DictReader class (which is iteration based)
+    '''
+
+    def __init__(self, host, user, password, data_path, log=None):
+        self.filenames = []
+
+        @retry(ftplib.error_temp, tries=4, delay=3, backoff=2, logger=log)
+        def ftp_connect_with_retry(host, user, password):
+            con = ftplib.FTP(host)
+            con.login(user, password)
+            return con
+
+        self.connection = ftp_connect_with_retry(host, user, password)
+
+        def callback(line):
+            self.filenames.append(line)
+
+        self.connection.retrlines('NLST ' + data_path, callback)
+
+    def csv_reader(self, log=None):
+        # Just store the lines in memory
+        # It's non-ideal but neither classes support coroutine send/yield
+        if not log:
+            log = logging.getLogger('__name__')
+        lines = []
+
+        def callback(line):
+            lines.append(line)
+
+        for filename in self.filenames:
+            log.info("Downloading %s", filename)
+            # FIXME: This line has some kind of race condition with this
+            self.connection.retrlines('RETR {}'.format(filename), callback)
+
+        r = csv.DictReader(lines)
+        return r
+
+    def __del__(self):
+        try:
+            self.connection.quit()
+        except:
+            self.connection.close()
 
 
 def file2rows(file_, log):

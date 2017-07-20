@@ -11,13 +11,10 @@ This is largely lifted and modified from the hourly_wmb.py script
 import sys
 import csv
 import logging
-import logging.config
 import os
-import ftplib
 
 from datetime import datetime
 from argparse import ArgumentParser
-from contextlib import closing
 from pkg_resources import resource_stream
 
 # Installed libraries
@@ -25,56 +22,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Local
-from crmprtd import retry
-from crmprtd.wamr import create_station_mapping, create_variable_mapping
 from crmprtd.wamr import setup_logging, rows2db
 from crmprtd.wamr import file2rows, ftp2rows
-
-
-class FTPReader(object):
-    '''Glue between the FTP class methods (which are callback based)
-       and the csv.DictReader class (which is iteration based)
-    '''
-
-    def __init__(self, host, user, password, data_path, log=None):
-        self.filenames = []
-
-        @retry(ftplib.error_temp, tries=4, delay=3, backoff=2, logger=log)
-        def ftp_connect_with_retry(host, user, password):
-            con = ftplib.FTP(host)
-            con.login(user, password)
-            return con
-
-        self.connection = ftp_connect_with_retry(host, user, password)
-
-        def callback(line):
-            self.filenames.append(line)
-
-        self.connection.retrlines('NLST ' + data_path, callback)
-
-    def csv_reader(self, log=None):
-        # Just store the lines in memory
-        # It's non-ideal but neither classes support coroutine send/yield
-        if not log:
-            log = logging.getLogger('__name__')
-        lines = []
-
-        def callback(line):
-            lines.append(line)
-
-        for filename in self.filenames:
-            log.info("Downloading %s", filename)
-            # FIXME: This line has some kind of race condition with this
-            self.connection.retrlines('RETR {}'.format(filename), callback)
-
-        r = csv.DictReader(lines)
-        return r
-
-    def __del__(self):
-        try:
-            self.connection.quit()
-        except:
-            self.connection.close()
 
 
 def cache_rows(file_, rows, fieldnames):
