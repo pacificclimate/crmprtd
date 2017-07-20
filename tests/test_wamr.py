@@ -52,7 +52,7 @@ def test_rows2db(test_session, diagnostic, expected):
     with maybe_fake_file() as f:
         rows, fieldnames = file2rows(f, log)
 
-    with TemporaryFile() as error_file:
+    with TemporaryFile('w+t') as error_file:
         rows2db(test_session, rows, error_file, log, diagnostic=diagnostic)
 
     # Check that some obs were or were not inserted (depending on diagnostic mode)
