@@ -32,6 +32,10 @@ Many of the data sources require authentication. For most scripts, credentials c
 
 `moti_hourly.py`
 
+### ENV-AQN
+
+`wamr_hourly.py`
+
 
 ## Testing
 
