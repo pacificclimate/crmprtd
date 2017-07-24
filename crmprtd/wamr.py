@@ -8,13 +8,21 @@ import ftplib
 import pytz
 from dateutil.parser import parse
 import yaml
+from pint import UnitRegistry
 
 from crmprtd import retry
 from crmprtd.db import mass_insert_obs
 from pycds import Network, Station, History, Obs, Variable
 
 tz = pytz.timezone('Canada/Pacific')
-
+ureg = UnitRegistry()
+Q_ = ureg.Quantity
+for def_ in (
+        "degreeC = degC; offset: 273.15",
+        "degreeF = 5 / 9 * kelvin; offset: 255.372222",
+        "degreeK = degK; offset: 0"
+):
+    ureg.define(def_)
 
 def create_station_mapping(sesh, rows):
     '''Create a names -> history object map for the set of stations that are
@@ -78,10 +86,23 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
     # Parse the date
     d = parse(row['DATE_PST']).replace(tzinfo=tz)
 
-    value = float(row['REPORTED_VALUE'])
+    # Check/convert the unit if applicable
+    val = float(row['REPORTED_VALUE'])
+    src_unit = row['UNIT']
+    dst_unit = var.unit
+    if src_unit != dst_unit:
+        log.debug("Source %f %s", val, src_unit)
+        try:
+            val = Q_(val, ureg.parse_expression(src_unit)) # src
+            val = val.to(dst_unit).magnitude # dest
+        except:
+            raise Exception(
+                "Can't convert source unit %s to destination unit %s",
+                src_unit, dst_unit)
+        log.debug("Converted to %f %s", val, dst_unit)
 
     # Create and return the object
-    return Obs(time=d, variable=var, history=hist, datum=value)
+    return Obs(time=d, variable=var, history=hist, datum=val)
 
 
 class DataLogger(object):
