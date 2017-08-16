@@ -51,5 +51,6 @@ setup(
     tests_require=['pytest',
                    'pysqlite'],
     cmdclass = {'test': PyTest},
-    include_package_data=True
+    include_package_data=True,
+    classifiers=["Programming Language :: Python :: 3 :: Only"]
     )
