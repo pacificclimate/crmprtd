@@ -1,3 +1,4 @@
+dist: trusty
 language: python
 python:
   - 3.3
@@ -6,10 +7,15 @@ python:
   - 3.6
 addons:
   postgresql: "9.3"
+  apt:
+    packages:
+      - postgresql-9.3-postgis-2.3
 before_install:
   - export TZ=Canada/Pacific
   - pip install -U pip pytest # upgrade pytest to get pytest.approx
 install:
   - pip install -i https://pypi.pacificclimate.org/simple/ -r requirements.txt -r test_requirements.txt
   - pip install .
+before_script:
+  - psql -U postgres -c "create extension postgis"
 script: py.test -v --tb=short tests
