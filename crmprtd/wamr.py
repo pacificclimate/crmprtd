@@ -78,6 +78,10 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
     else:
         hist = histories[row['EMS_ID']]
 
+
+    # This variable is actually named wrong in WAMR's files
+    row['PARAMETER'] = re.sub('WSPD_VECT', 'WSPD_SCLR', row['PARAMETER'])
+
     if row['PARAMETER'] not in variables:
         raise Exception('Could not find variable {} in the db'
                         .format(row['PARAMETER']))
