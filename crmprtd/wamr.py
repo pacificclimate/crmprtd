@@ -105,8 +105,9 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
             val = val.to(dst_unit).magnitude # dest
         except:
             raise Exception(
-                "Can't convert source unit %s to destination unit %s",
-                src_unit, dst_unit)
+                "Can't convert source unit {} to destination unit {}".format(
+                    src_unit, dst_unit)
+            )
         log.debug("Converted to %f %s", val, dst_unit)
 
     # Create and return the object
