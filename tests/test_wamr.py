@@ -77,6 +77,7 @@ def test_rows2db_units_conversion(test_session):
     network = sesh.query(Network).filter(Network.name == 'ENV-AQN').first()
     # Define the units in the database to always be stored as degrees celsius
     sesh.add(Variable(name='TEMP_CELSIUS', unit='degC', network=network))
+    sesh.add(Variable(name='HUMIDITY', unit='%', network=network))
     sesh.commit()
 
     lines = '''DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE
@@ -84,6 +85,7 @@ def test_rows2db_units_conversion(test_session):
 2017-05-21 16:00,0260011,Warfield Elementary Met_60,TEMP_CELSIUS,TEMP_MEAN,TEMP 10M,0.0,°C,1,n/a,Data Ok,0.0
 2017-05-21 15:00,0260011,Warfield Elementary Met_60,TEMP_CELSIUS,TEMP_MEAN,TEMP 10M,273.15,°K,1,n/a,Data Ok,273.15
 2017-05-21 15:00,0260011,Warfield Elementary Met_60,TEMP_CELSIUS,TEMP_MEAN,TEMP 10M,273.15,not_convertable,1,n/a,Data Ok,273.15
+2017-09-20 09:00,0260011,Warfield Elementary Met_60,HUMIDITY,HUMIDITY,HUMIDITY,0,% RH,1,n/a,Data Ok,0
 '''
     header_line, error_line = lines.splitlines()[0], lines.splitlines()[-1]
 
@@ -97,7 +99,7 @@ def test_rows2db_units_conversion(test_session):
 
     obs = q.all()
 
-    assert len(obs) == 3 # The not_conertable obs was not included
+    assert len(obs) == 4 # The not_convertable obs was not included
 
     for ob in q.all():
         assert ob.datum == pytest.approx(0, abs=1.0e-6)

@@ -1,3 +1,4 @@
+import re
 import sys
 import logging
 import logging.config
@@ -90,6 +91,13 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
     val = float(row['REPORTED_VALUE'])
     src_unit = row['UNIT']
     dst_unit = var.unit
+
+    # Hack the units. We shouldn't have to do this, but our units library (pint) is
+    # kind of a pain when it comes to processing the % sign.
+    # Let's just do a simple string replace and move on with our lives
+    src_unit = re.sub('% RH', 'percent', row['UNIT'])
+    dst_unit = re.sub('%', 'percent', dst_unit)
+
     if src_unit != dst_unit:
         log.debug("Source %f %s", val, src_unit)
         try:
