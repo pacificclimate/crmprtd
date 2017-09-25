@@ -88,7 +88,7 @@ def main(args):
             log.info('{}: {}'.format(req.status_code, req.url))
             if req.status_code != 200:
                 raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
-            with open(fname, 'w') as f:
+            with open(fname, 'wb') as f:
                 f.write(req.content)
     except IOError:
         log.exception("Unable to download or open xml data")

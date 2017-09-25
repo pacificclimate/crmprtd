@@ -69,7 +69,7 @@ def main(args):
                 raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
 
             log.info("Saving data to {0}".format(fname))
-            with open(fname, 'w') as f:
+            with open(fname, 'wb') as f:
                 f.write(req.content)
 
     except IOError:
