@@ -37,12 +37,12 @@ def main(opts, args):
     files = glob(os.sep.join([opts.cache_dir, '*']))
     
     for file_ in files:
-        print file_
+        print(file_)
         et = parse(file_)
         try:
             rv = process(sesh, et)
             logging.info("Processed {} with the following results {}".format(file_, rv))
-        except Exception, e:
+        except Exception as e:
             logging.error(e)
 
 # Just for testing inserts w/ sqlite

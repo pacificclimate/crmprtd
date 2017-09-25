@@ -2,7 +2,7 @@
 
 import os
 import logging, logging.config
-import urlparse
+from urllib.parse import urlparse, parse_qs
 from pkg_resources import resource_stream
 from datetime import datetime
 from argparse import ArgumentParser
@@ -28,12 +28,12 @@ def download(url, auth, out, log):
     if req.status_code != 200:
         raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
 
-    with open(out, 'w') as f:
+    with open(out, 'wb') as f:
         f.write(req.content)
         log.info('Saved file to: {}'.format(out))
 
 def url_to_from(url):
-    parsed = urlparse.parse_qs(urlparse.urlparse(url).query)
+    parsed = parse_qs(urlparse(url).query)
     return (parsed['from'][0].replace('/', 'T'), parsed['to'][0].replace('/','T'))
 
 def main(args):
