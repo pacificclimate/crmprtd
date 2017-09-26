@@ -10,7 +10,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.sql import exists
 
 from pycds import *
-from wmb_exceptions import InsertionError, UniquenessError
+from crmprtd.wmb_exceptions import InsertionError, UniquenessError
 
 log = logging.getLogger(__name__)
 
@@ -83,7 +83,7 @@ class ObsProcessor:
                 t = obs['weather_date'][-2:]
                 dt = parse(d) + relativedelta(hours=+int(t))
                 obs['weather_date'] = dt
-            except ValueError, e:
+            except ValueError as e:
                 log.error('Unexpected values when parsing date: {0}'.format(obs['weather_date']))
                 self._line_errors += 1
                 self._unhandled_errors += 1

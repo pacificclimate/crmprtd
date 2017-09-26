@@ -12,7 +12,6 @@ import csv
 import logging, logging.config
 import os
 import socket
-import urllib2
 import ftplib
 
 from datetime import datetime, timedelta
@@ -99,7 +98,7 @@ def main(args):
 
         # save the downloaded file
         fname_out = os.path.join(args.cache_dir, 'wmb_download' + datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
-        with open(fname_out, 'wb') as f_out:
+        with open(fname_out, 'w') as f_out:
             copier = csv.DictWriter(f_out, fieldnames = reader.fieldnames)
             copier.writeheader()
             copier.writerows(data)
