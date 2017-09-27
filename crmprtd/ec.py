@@ -249,7 +249,7 @@ def insert_obs(sesh, om, hid, vname, vid):
         assert db_unit(sesh, vname) == om.member_unit(vname)
     except:
         # UnitsError
-        raise Exception("reported units '%s' does not match the database units '%s' for variable %s" % (om.member_unit(vname), db_unit(cur, vname), vname))
+        raise Exception("reported units '%s' does not match the database units '%s' for variable %s" % (om.member_unit(vname), db_unit(sesh, vname), vname))
 
     t = om.member.xpath('./om:Observation/om:samplingTime//gml:timePosition', namespaces=ns)[0].text
 
