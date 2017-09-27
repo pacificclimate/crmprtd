@@ -38,7 +38,9 @@ def main(opts, args):
             for freq in ['hourly', 'daily']:
                 s = "python {script} -e bveerman@uvic.ca -c '{conn_string}' -p {prov} -F {freq} --starttime '{s}' --endtime '{e}' --threshold 1000 -l {logdir}/ec_recovery_{prov}_{freq}_{ss}_{ee}.log".format(script=script, conn_string=opts.conn_string, prov=prov, freq=freq, s=opts.stime, e=opts.etime, logdir=logdir, ss=ss, ee=ee)
                 f.write(s)
-                print s
+                print(s)
+
+
 if __name__ == '__main__':
     parser = OptionParser()
     parser.add_option('-c', '--conn_string', dest='conn_string', help='PostgreSQL connection string')

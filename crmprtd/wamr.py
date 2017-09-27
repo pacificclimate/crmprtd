@@ -60,7 +60,7 @@ def create_variable_mapping(sesh, rows):
     return {var_name: var_ for var_name, var_ in mapping if var_}
 
 
-def process_obs(sesh, row, log=None, histories={}, variables={}):
+def process_obs(row, log=None, histories={}, variables={}):
     """Take a list of dictionary based observations and return a list of
     pycds.Obs objects
 
@@ -190,7 +190,7 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
         obs = []
         for row in rows:
             try:
-                obs.append(process_obs(sesh, row, log, histories, variables))
+                obs.append(process_obs(row, log, histories, variables))
             except Exception as e:
                 dl.add_row(row, e.args[0])
 
@@ -263,14 +263,14 @@ class FTPReader(object):
     def __del__(self):
         try:
             self.connection.quit()
-        except:
+        except Exception:
             self.connection.close()
 
 
 def file2rows(file_, log):
     try:
         reader = csv.DictReader(file_)
-    except csv.Error as e:
+    except csv.Error:
         log.critical('Unable to load data from local file', exc_info=True)
         sys.exit(1)
 
@@ -287,7 +287,7 @@ def ftp2rows(host, path, log):
         log.info('Opened a connection to {}'.format(host))
         reader = ftpreader.csv_reader(log)
         log.info('instantiated the reader and downloaded all of the data')
-    except ftplib.all_errors as e:
+    except ftplib.all_errors:
         log.critical('Unable to load data from ftp source', exc_info=True)
         sys.exit(1)
 

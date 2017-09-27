@@ -71,8 +71,6 @@ def main(args):
 
             if args.station_id:
                 fmt = '%Y-%m-%d/%H'
-                from_ = from_.strftime(fmt)
-                to = to.strftime(fmt)
                 payload = {'request': 'historic', 'station': args.station_id, 'from': args.start_time, 'to':args.end_time}
             else:
                 payload = {}

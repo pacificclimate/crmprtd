@@ -105,6 +105,7 @@ def main(args):
 
     log.info('{0} observations read into memory'.format(len(data)))
     dl = DataLogger()
+    data_archive = dl.archive(args.archive_dir)
     
     # Open database connection
     try:
@@ -133,7 +134,6 @@ def main(args):
     except Exception as e:
         dl.add_row(data, 'preproc error')
         sesh.rollback()
-        data_archive = dl.archive(args.archive_dir)
         log.critical('''Error data preprocessing. 
                             See logfile at {l}
                             Data saved at {d}

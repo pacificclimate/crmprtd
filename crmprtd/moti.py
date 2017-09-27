@@ -1,13 +1,12 @@
 from pkg_resources import resource_filename
-from datetime import datetime, tzinfo, timedelta
+from datetime import datetime, timedelta
 import logging
 
 import pytz
 from lxml.etree import parse, XSLT
 from sqlalchemy.exc import IntegrityError
 
-from pycds import Obs, Variable, History, Station
-from pdb import set_trace
+from pycds import Obs, Variable, History, Station, Network
 
 log = logging.getLogger(__name__)
 
@@ -54,9 +53,9 @@ def process_observation_series(sesh, os):
         raise Exception("Could not detect the station id: xpath search '//observation-series/origin/id[@type='client']' return no results")
 
     hist = check_history(stn_id, sesh)
-    log.debug('Got history_id {}'.format(hist.id))
+    log.debug('Got history_id %s', hist.id)
     members = os.xpath('./observation', namespaces=ns)
-    log.debug("Found {} members for station {}".format(len(members), stn_id))
+    log.debug("Found %d members for station %s", len(members), stn_id)
 
     successes, failures, skips = 0, 0, 0            
     for member in members:
@@ -65,7 +64,7 @@ def process_observation_series(sesh, os):
             log.warn("Could not find a valid-time attribute for this observation")
             continue
         # strip the timezone
-        tz = pytz.timezone('America/Vancouver')
+        #tz = pytz.timezone('America/Vancouver')
         t = datetime.strptime(t[:-6], '%Y-%m-%dT%H:%M:%S')
         #t = tz.localize(t).astimezone(pytz.utc) remove this until we have a timezone respecting database
 
@@ -75,7 +74,7 @@ def process_observation_series(sesh, os):
             try:
                 value_element = obs.xpath('./value')[0]
             except IndexError as e:
-                log.warn("Could not find the actual value for observation {}/{}. xpath search './value' returned no results".format(varname, vartype))
+                log.warn("Could not find the actual value for observation %s/%s. xpath search './value' returned no results", varname, vartype)
                 skips += 1
                 continue
             
@@ -83,15 +82,15 @@ def process_observation_series(sesh, os):
             try:
                 value = float(value_element.text)
             except ValueError:
-                log.warn("Could not convert value '{}' to a number. Skipping this observation.".format(value))
+                log.warn("Could not convert value '%f' to a number. Skipping this observation.", value)
                 skips += 1
                 continue
                 
-            var = find_var(sesh, varname, vartype, units)
+            var = find_var(sesh, vartype, units)
             if not var:
                 # Test for known unwanted vars, only warn when unknown
                 if (varname, vartype, units) not in unwanted_vars:
-                    log.warn("Could not find variable {}, {}, {} in the database. Skipping this observation.".format(varname, vartype, units))
+                    log.warn("Could not find variable %s, %s, %s in the database. Skipping this observation.", varname, vartype, units)
                 skips += 1
                 continue
             log.debug('{} {} {} {}'.format(varname, vartype, units, value))
@@ -102,21 +101,23 @@ def process_observation_series(sesh, os):
                 with sesh.begin_nested():
                     sesh.add(o)
                 successes += 1
-                log.debug("Inserted {}".format(o))
+                log.debug("Inserted %s", o)
             except IntegrityError as e:
-                log.debug("Skipped, already exists: {} {}".format(o, e))
+                log.debug("Skipped, already exists: %s %s", o, e)
                 sesh.rollback()
                 skips += 1
-            except:
-                log.error("Failed to insert {}".format(o), exc_info=True)
+            except Exception:
+                log.error("Failed to insert %s", o, exc_info=True)
                 failures += 1
 
     return {'successes': successes, 'skips': skips, 'failures': failures}
 
-def find_var(sesh, varname, vartype, units):
+
+def find_var(sesh, vartype, units):
     '''Returns a single Variable instance or None if it's not found'''
     q = sesh.query(Variable).join(Network).filter(Network.name == 'MoTIe').filter(Variable.name == vartype).filter(Variable.unit == units)
     return q.first()
+
 
 def check_history(stn_id, sesh):
     log.debug('Lookup up history_id')
@@ -134,9 +135,9 @@ def check_history(stn_id, sesh):
                 stn = Station(native_id = stn_id, network = sesh.query(Network).filter(Network.name == 'MoTIe').first())
                 sesh.add(stn)
         except Exception as e:
-            log.error("Station '{}' does not exist in the database and could not be added".format(stn_id), exc_info=True)
+            log.error("Station '%d' does not exist in the database and could not be added", stn_id, exc_info=True)
             raise e
-        log.debug('Created station_id {}'.format(stn.id))
+        log.debug('Created station_id %d', stn.id)
 
     # Station_id added or exists, create history_id
     try:
@@ -144,11 +145,12 @@ def check_history(stn_id, sesh):
             hist = History(station = stn)
             sesh.add(hist)
     except Exception as e:
-        log.error('History_id could not be found or created for native_id {}'.format(stn_id), exc_info=True)
+        log.error('History_id could not be found or created for native_id %d', stn_id, exc_info=True)
         raise e
-    log.debug('Created history_id {}'.format(hist.id))
+    log.debug('Created history_id %d', hist.id)
 
     return hist
+
 
 def url_generator(station, from_, to, report='7110', request='historic'):
     if not isinstance(from_, datetime):

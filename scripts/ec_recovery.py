@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# FIXME: real_time_ec has been converted to argparse.
+# This script will need to be converted as well to use it
+
 # Standard module
 import os, sys
 from datetime import datetime, timedelta
