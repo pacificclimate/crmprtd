@@ -11,7 +11,7 @@ from pkg_resources import resource_filename
 import requests
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from psycopg2 import InterfaceError, OperationalError
+from psycopg2 import InterfaceError
 import yaml
 
 # Local
@@ -102,9 +102,9 @@ def main(args):
             sesh.commit()
         ### END BEGIN NESTED ###
 
-    except Exception as e:
+    except Exception:
         sesh.rollback()
-        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, fname), exc_info=True)
+        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s", args.log, fname, exc_info=True)
         sys.exit(1)
 
     finally:

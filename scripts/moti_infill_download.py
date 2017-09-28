@@ -91,7 +91,7 @@ def main(args):
                 outfile = os.path.join(args.output_dir, 'moti-sawr7110_station-{}_{}_{}.xml'.format(station_id, to, _from))
                 try:
                     download(url, auth, outfile, log)
-                except IOError as e:
+                except IOError:
                     log.exception("Unable to download file")
                     continue
 

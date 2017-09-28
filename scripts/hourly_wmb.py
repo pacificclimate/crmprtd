@@ -18,7 +18,7 @@ from argparse import ArgumentParser
 from pkg_resources import resource_stream
 
 # Installed libraries
-from psycopg2 import InterfaceError, ProgrammingError
+from psycopg2 import InterfaceError
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -86,7 +86,7 @@ def main(args):
             for row in reader:
                 data.append(row)
             log.info('instantiated the reader and processed all rows')
-        except ftplib.all_errors as e:
+        except ftplib.all_errors:
             log.critical('Unable to load data from ftp source', exc_info=True)
             sys.exit(1)
 
