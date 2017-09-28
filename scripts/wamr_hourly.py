@@ -10,7 +10,6 @@ This is largely lifted and modified from the hourly_wmb.py script
 # Standard library module
 import sys
 import csv
-import logging
 import os
 
 from datetime import datetime
@@ -98,7 +97,7 @@ def main():
         engine = create_engine(args.connection_string)
         Session = sessionmaker(engine)
         sesh = Session()
-    except Exception as e:
+    except Exception:
         log.critical('Error with Database connection', exc_info=True)
         sys.exit(1)
 
@@ -122,7 +121,7 @@ def main():
         with open(args.cache_file, 'w') as cache_file:
             cache_rows(cache_file, rows, fieldnames)
 
-    log.info('{0} observations read into memory'.format(len(rows)))
+    log.info('%d observations read into memory'. len(rows))
 
     # Hand the row off to the database processings/insertion part of the script
     rows2db(sesh, rows, error_file, log, args.diag)

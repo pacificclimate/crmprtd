@@ -11,18 +11,14 @@ import sys
 import csv
 import logging, logging.config
 import os
-import socket
 import ftplib
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from argparse import ArgumentParser
-from contextlib import closing
-from traceback import format_exc
 from pkg_resources import resource_stream
 
 # Installed libraries
-import requests
-from psycopg2 import InterfaceError, ProgrammingError, OperationalError
+from psycopg2 import InterfaceError, ProgrammingError
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -31,8 +27,6 @@ from sqlalchemy.orm import sessionmaker
 from crmprtd import retry
 from crmprtd.wmb import ObsProcessor, DataLogger
 
-# debug
-from pdb import set_trace
 
 def main(args):
     # Setup logging
@@ -66,7 +60,7 @@ def main(args):
         path = args.archive_file
         if args.archive_file[0] != '/':
             path = os.path.join(args.archive_dir, args.archive_file)            
-        log.info('Loading local file {0}'.format(path))
+        log.info('Loading local file %s', path)
         
         # open and read into data
         try:
@@ -75,7 +69,7 @@ def main(args):
                 reader = csv.DictReader(f)
                 for row in reader:
                     data.append(row)
-        except IOError as e:
+        except IOError:
             log.exception('Unable to load data from local file')
             sys.exit(1)
     
@@ -84,10 +78,10 @@ def main(args):
         # Fetch file from FTP and read into memory
         log.info('Fetching file from FTP')
 
-        log.info('Downloading {}/{}'.format(args.ftp_server, args.ftp_file))
+        log.info('Downloading %s/%s', args.ftp_server, args.ftp_file)
         try:
             ftpreader = FTPReader(args.ftp_server, auth['u'], auth['p'], args.ftp_file, log)
-            log.info('Opened a connection to {}'.format(args.ftp_server))
+            log.info('Opened a connection to %s', args.ftp_server)
             reader = ftpreader.csv_reader()
             for row in reader:
                 data.append(row)
@@ -103,7 +97,7 @@ def main(args):
             copier.writeheader()
             copier.writerows(data)
 
-    log.info('{0} observations read into memory'.format(len(data)))
+    log.info('%d observations read into memory', len(data))
     dl = DataLogger()
     data_archive = dl.archive(args.archive_dir)
     
@@ -116,9 +110,9 @@ def main(args):
     except Exception as e:
         dl.add_row(data, 'db-connection error')
         log.critical('''Error with Database connection 
-                            See logfile at {l}
-                            Data saved at {d}
-                            '''.format(l = args.log, d = data_archive), exc_info=True)
+                            See logfile at %s
+                            Data saved at %s
+                            ''', args.log, data_archive, exc_info=True)
         sys.exit(1)
 
     try:
@@ -135,9 +129,9 @@ def main(args):
         dl.add_row(data, 'preproc error')
         sesh.rollback()
         log.critical('''Error data preprocessing. 
-                            See logfile at {l}
-                            Data saved at {d}
-                            '''.format(l = args.log, d = data_archive), exc_info=True)
+                            See logfile at %s
+                            Data saved at %s
+                            ''', args.log, data_archive, exc_info=True)
         sys.exit(1)
     finally:
         sesh.commit()
@@ -171,7 +165,7 @@ class FTPReader(object):
     def __del__(self):
         try:
             self.connection.quit()
-        except:
+        except Exception:
             self.connection.close()
     
 if __name__ == '__main__':

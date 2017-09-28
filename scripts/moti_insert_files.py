@@ -1,26 +1,22 @@
 #!/usr/bin/env python
 
 # Standard module
-import os, sys
+import os
 import glob
 import logging, logging.config
-from datetime import datetime, timedelta
+from datetime import datetime
 from argparse import ArgumentParser
-import requests
-from traceback import print_exc
 from pkg_resources import resource_stream
 from shutil import move
 
 # Installed libraries
-from lxml.etree import LxmlSyntaxError
 from lxml.etree import parse
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Local
-from crmprtd import retry
-from crmprtd.moti import makeurl, process
+from crmprtd.moti import process
 
 def main(args):
     # Setup logging
@@ -39,15 +35,15 @@ def main(args):
 
     # Generate file list if necessary
     if args.file_pattern:
-        log.info('Using file pattern: {}'.format(args.file_pattern))
+        log.info('Using file pattern: %s', args.file_pattern)
         f_list = glob.glob(args.file_pattern)
     elif args.filename:
         f_list = [args.filename]
 
-    log.info('Processing {} files'.format(len(f_list)))
+    log.info('Processing %d files', len(f_list))
 
     for fname in f_list:
-        log.info('Processing file {}'.format(fname))
+        log.info('Processing file %s', fname)
 
         Session = sessionmaker(create_engine(args.connection_string))
         sesh = Session()
@@ -63,9 +59,9 @@ def main(args):
             else:
                 log.info('Comitting session')
                 sesh.commit()
-        except Exception as e:
+        except Exception:
             sesh.rollback()
-            log.critical('Serious errors with MOTIe rtd, see logs at {}'.format(args.log), exc_info=True)
+            log.critical('Serious errors with MOTIe rtd, see logs at %s', args.log, exc_info=True)
             continue
         else:
             move(fname, os.path.join(args.output_dir, os.path.basename(fname)))

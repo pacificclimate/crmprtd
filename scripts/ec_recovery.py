@@ -4,7 +4,7 @@
 # This script will need to be converted as well to use it
 
 # Standard module
-import os, sys
+import sys
 from datetime import datetime, timedelta
 from optparse import OptionParser
 from pkg_resources import resource_stream
@@ -12,8 +12,6 @@ from pkg_resources import resource_stream
 # Local
 from real_time_ec import main as ec_recover
 
-# debug
-from pdb import set_trace
 
 def main(opts, args):
     # It is assumed that start and end times are correctly formatted on entry

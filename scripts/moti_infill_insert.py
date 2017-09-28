@@ -15,7 +15,7 @@ from pycds import Station, History, Network, Variable
 from pycds.util import create_test_database
 from crmprtd.moti import process
 
-def main(opts, args):
+def main(opts):
     log_conf = yaml.load(opts.log_conf)
     if opts.log:
         log_conf['handlers']['file']['filename'] = opts.log
@@ -41,7 +41,7 @@ def main(opts, args):
         et = parse(file_)
         try:
             rv = process(sesh, et)
-            logging.info("Processed {} with the following results {}".format(file_, rv))
+            logging.info("Processed %s with the following results %s", file_, rv)
         except Exception as e:
             logging.error(e)
 
@@ -87,6 +87,6 @@ if __name__ == '__main__':
                         source_dsn=None,
                         new_db=False,
                         )
-    (opts, args) = parser.parse_args()
-    main(opts, args)
+    opts, _ = parser.parse_args()
+    main(opts)
 

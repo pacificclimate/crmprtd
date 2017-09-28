@@ -6,22 +6,17 @@ import logging, logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 import requests
-from traceback import print_exc
 from pkg_resources import resource_stream
 
 # Installed libraries
-from lxml.etree import LxmlSyntaxError
 from lxml.etree import parse
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Local
-from crmprtd import retry
-from crmprtd.moti import makeurl, process
+from crmprtd.moti import process
 
-# debug
-from pdb import set_trace
 
 def main(args):
     # Setup logging
@@ -47,11 +42,9 @@ def main(args):
             config = yaml.load(f)
         auth = (config[args.auth_key]['username'], config[args.auth_key]['password'])
 
-    auto = True
     try:
         if args.filename:
-            log.debug("Opening local xml file {0} for reading".format(args.filename))
-            auto = False
+            log.debug("Opening local xml file %s for reading", args.filename)
             fname = args.filename
             xml_file = open(args.filename, 'r')
             log.debug("File opened sucessfully")
@@ -60,18 +53,17 @@ def main(args):
             if args.start_time and args.end_time:
                 args.start_time = datetime.strptime(args.start_time, '%Y/%m/%d %H:%M:%S')
                 args.end_time = datetime.strptime(args.end_time, '%Y/%m/%d %H:%M:%S')
-                log.info("Starting manual run using timestamps {0} {1}".format(args.start_time, args.end_time))
+                log.info("Starting manual run using timestamps %s %s", args.start_time, args.end_time)
                 assert args.end_time - args.start_time <= timedelta(7) # Requests of longer than 7 days not allowed by MoTI
-                auto = False
             else:
                 deltat = timedelta(1) # go back a day
                 args.start_time = datetime.utcnow() - deltat
                 args.end_time = datetime.utcnow()
-                log.info("Starting automatic run using timestamps {0} {1}".format(args.start_time, args.end_time))
+                log.info("Starting automatic run using timestamps %s %s", args.start_time, args.end_time)
 
             if args.station_id:
-                fmt = '%Y-%m-%d/%H'
-                payload = {'request': 'historic', 'station': args.station_id, 'from': args.start_time, 'to':args.end_time}
+                # fmt = '%Y-%m-%d/%H'
+                payload = {'request': 'historic', 'station': args.station_id, 'from': args.start_time, 'to': args.end_time}
             else:
                 payload = {}
 
@@ -83,7 +75,7 @@ def main(args):
             s.mount('https://', a)
             req = s.get('https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110', params=payload, auth=auth)
             
-            log.info('{}: {}'.format(req.status_code, req.url))
+            log.info('%s: %s', req.status_code, req.url)
             if req.status_code != 200:
                 raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
             with open(fname, 'wb') as f:
@@ -105,9 +97,9 @@ def main(args):
         else:
             log.info('Comitting session')
             sesh.commit()
-    except Exception as e:
+    except Exception:
         sesh.rollback()
-        log.critical('Serious errors with MOTIe rtd, see logs at {}'.format(args.log), exc_info=True)
+        log.critical('Serious errors with MOTIe rtd, see logs at %s', args.log, exc_info=True)
         sys.exit(1)
     finally:
         sesh.commit()

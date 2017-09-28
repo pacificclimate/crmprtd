@@ -5,19 +5,16 @@ import os, sys
 import logging, logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
-from traceback import print_exc
 from pkg_resources import resource_filename
 
 # Installed libraries
 import requests
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from psycopg2 import InterfaceError, ProgrammingError, OperationalError
-from lxml.etree import LxmlSyntaxError
+from psycopg2 import InterfaceError, OperationalError
 import yaml
 
 # Local
-from crmprtd import retry
 from crmprtd.ec import makeurl, ObsProcessor, parse_xml, extract_fname_from_url
 
 def main(args):
@@ -39,20 +36,21 @@ def main(args):
 
     try:
         if args.filename:
-            log.debug("Opening local xml file {0} for reading".format(args.filename))
+            log.debug("Opening local xml file %s for reading", args.filename)
             fname = args.filename
-            xml_file = open(args.filename, 'r') # Do not catch exception here
+            # Just test that we *can* open the file. Don't catch exception here
+            _ = open(args.filename, 'r')
             log.debug("File opened sucessfully")
         else:
 
             # Determine time parameter
             if args.time:
                 args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
-                log.info("Starting manual run using timestamp {0}".format(args.time))
+                log.info("Starting manual run using timestamp %s", args.time)
             else:
                 deltat = timedelta(1/24.) if args.frequency == 'hourly' else timedelta(1) # go back a day
                 args.time = datetime.utcnow() - deltat
-                log.info("Starting automatic run using timestamp {0}".format(args.time))
+                log.info("Starting automatic run using timestamp %s", args.time)
 
             # Configure requests to use retry
             s = requests.Session()
@@ -63,12 +61,12 @@ def main(args):
             url = makeurl(args.frequency, args.province, args.language, args.time)
             fname = os.path.join(args.cache_dir, extract_fname_from_url(url))
 
-            log.info("Downloading {0}".format(url))
+            log.info("Downloading %s", url)
             req = s.get(url)
             if req.status_code != 200:
                 raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
 
-            log.info("Saving data to {0}".format(fname))
+            log.info("Saving data to %s", fname)
             with open(fname, 'wb') as f:
                 f.write(req.content)
 
@@ -85,8 +83,8 @@ def main(args):
         Session = sessionmaker(create_engine(args.connection_string))
         sesh = Session()
 
-    except Exception as e:
-        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, fname), exc_info=True)
+    except Exception:
+        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s", args.log, fname, exc_info=True)
         sys.exit(1)
 
     try:

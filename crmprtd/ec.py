@@ -165,7 +165,7 @@ def check_history(member, sesh, threshold):
     if len(possible_hist) == 1:
         # We've got a hit
         hist = possible_hist[0]
-        hid, _ = hist.id, hist.freq
+        hid = hist.id
         log.debug('Found hid: %s', hid)
 
         # 'Upgrade' the frequency if we're receiving hourly results for a station marked as daily

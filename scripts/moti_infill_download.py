@@ -6,7 +6,6 @@ from urllib.parse import urlparse, parse_qs
 from pkg_resources import resource_stream
 from datetime import datetime
 from argparse import ArgumentParser
-import pdb
 
 import yaml
 import pytz
@@ -79,7 +78,7 @@ def main(args):
             outfile = os.path.join(args.output_dir, 'moti-sawr7110_station-{}_{}_{}.xml'.format(args.station_id, to, _from))
             try:
                 download(url, auth, outfile, log)
-            except IOError as e:
+            except IOError:
                 log.exception("Unable to download file")
                 continue
     else:

@@ -93,7 +93,7 @@ def process_observation_series(sesh, os):
                     log.warn("Could not find variable %s, %s, %s in the database. Skipping this observation.", varname, vartype, units)
                 skips += 1
                 continue
-            log.debug('{} {} {} {}'.format(varname, vartype, units, value))
+            log.debug('%s %s %s %s', varname, vartype, units, value)
 
             o = Obs(time=t, datum=float(value), variable=var, history=hist)
 

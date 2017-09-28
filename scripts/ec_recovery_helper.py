@@ -4,23 +4,17 @@
 # Not intended as anything more than a convenience function when performing a manual recovery on EC data
 
 # Standard module
-import os, sys
-from datetime import datetime, timedelta
+import os
+from datetime import datetime
 from optparse import OptionParser
-from pkg_resources import resource_stream
 
-# Local
-from real_time_ec import main as ec_recover
-
-# debug
-from pdb import set_trace
 
 def makeDir(d):
     if not os.path.exists(d):
         os.makedirs(d)
     return d
 
-def main(opts, args):
+def main(opts):
     # It is assumed that start and end times are correctly formatted on entry
     # Exceptions are not handled by design.
     stime = datetime.strptime(opts.stime, '%Y/%m/%d %H:%M:%S')
@@ -64,4 +58,4 @@ if __name__ == '__main__':
                         thresh=0
                         )
     (opts, args) = parser.parse_args()
-    main(opts, args)
+    main(opts)

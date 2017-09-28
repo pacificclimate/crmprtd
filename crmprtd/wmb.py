@@ -250,14 +250,14 @@ class ObsProcessor:
             try:
                 stn = Station(native_id = station, network = self.network)
                 self.sesh.add(stn)
-            except Exception as e:
+            except Exception:
                 self.sesh.rollback()
-                log.error('Could not add station %s, archiving data', station, e)
+                log.error('Could not add station %s, archiving data', station, exc_info=True)
                 self._unhandled_errors += 1
                 self._archive_station(station)
             else:
                 self.sesh.commit()
-                log.debug('Added native id $s', station)
+                log.debug('Added native id %s', station)
         
         return new_stations
 
