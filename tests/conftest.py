@@ -7,7 +7,7 @@ import logging, logging.config
 import yaml
 import pytest
 import sqlalchemy
-from sqlalchemy.schema import DDL
+from sqlalchemy.schema import DDL, CreateSchema
 from sqlalchemy.orm import sessionmaker
 from lxml.etree import parse, fromstring, XSLT
 import testing.postgresql
@@ -30,6 +30,7 @@ def postgis_session():
     with testing.postgresql.Postgresql() as pg:
         engine = sqlalchemy.create_engine(pg.url())
         engine.execute("create extension postgis")
+        engine.execute(CreateSchema('crmp'))
         sesh = sessionmaker(bind=engine)()
 
         logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
