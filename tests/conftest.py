@@ -34,6 +34,7 @@ def postgis_session():
         sesh = sessionmaker(bind=engine)()
 
         logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+        sesh.execute('SET search_path TO crmp,public')
         yield sesh
 
 @pytest.yield_fixture(scope='function')
@@ -56,7 +57,7 @@ DECLARE
 BEGIN
     mystr = 'WITH stns_in_thresh AS (
     SELECT history_id, lat, lon, Geography(ST_Transform(the_geom,4326)) as p_existing, Geography(ST_SetSRID(ST_MakePoint('|| X ||','|| Y ||'),4326)) as p_new
-    FROM meta_history
+    FROM crmp.meta_history
     WHERE the_geom && ST_Buffer(Geography(ST_SetSRID(ST_MakePoint('|| X || ','|| Y ||'),4326)),'|| thres ||')
 )
 SELECT history_id, lat, lon, ST_Distance(p_existing,p_new) as dist
@@ -206,49 +207,115 @@ def moti_sawr7110_xml():
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
-      <title>Observation from BC Meteorological Stations
-      </title>
-      <field>meteorological
-      </field>
-      <category>observation
-      </category>
-      <creation-date refresh-frequency="PT1H">2013-11-29T13:22:57-08:00
-      </creation-date>
+      <title>Observation from BC Meteorological Stations</title>
+      <field>meteorological </field>
+      <category>observation</category>
+      <creation-date refresh-frequency="PT1H">2013-11-29T13:22:57-08:00</creation-date>
     </product>
     <source>
       <production-center>British Columbia Ministry of Transportation
-	<sub-center>AWP
-	</sub-center>
+        <sub-center>AWP</sub-center>
       </production-center>
     </source>
   </head>
   <data>
     <observation-series>
       <origin type="station">
-	<id type="client">11091
-	</id>
-	<id type="network">BC_MoT_11091
-	</id>
+        <id type="client">11091 </id>
+        <id type="network">BC_MoT_11091 </id>
       </origin>
       <observation valid-time="2012-01-01T00:00:00-08:00">
-	<pressure index="1" type="atmospheric">
-	  <value units="mb">964
-	  </value>
-	</pressure>
-	<temperature index="1" type="air-temperature">
-	  <value units="degC">-2.368
-	  </value>
-	</temperature>
+        <pressure index="1" type="atmospheric">
+          <value units="mb">964</value>
+        </pressure>
+        <temperature index="1" type="air-temperature">
+          <value units="degC">-2.368</value>
+        </temperature>
       </observation>
       <observation valid-time="2012-01-01T01:00:00-08:00">
-	<temperature index="1" type="air-temperature">
-	  <value units="degC">-2.417
-	  </value>
-	</temperature>
-	<temperature index="1" type="dew-point">
-	  <value units="degC">-4
-	  </value>
-	</temperature>
+        <temperature index="1" type="air-temperature">
+          <value units="degC">-2.417</value>
+        </temperature>
+        <temperature index="1" type="dew-point"> 
+          <value units="degC">-4</value>
+        </temperature>
+      </observation>
+    </observation-series>
+  </data>
+</cmml>''')
+
+@pytest.fixture(scope='module')
+def moti_sawr7110_xml_2a():
+    """No duplicates"""
+    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+  <head>
+    <product operational-mode="official">
+      <title>Observation from BC Meteorological Stations</title>
+      <field>meteorological </field>
+      <category>observation</category>
+      <creation-date refresh-frequency="PT1H">2013-11-29T13:22:57-08:00</creation-date>
+    </product>
+    <source>
+      <production-center>British Columbia Ministry of Transportation
+        <sub-center>AWP</sub-center>
+      </production-center>
+    </source>
+  </head>
+  <data>
+    <observation-series>
+      <origin type="station">
+        <id type="client">11091 </id>
+        <id type="network">BC_MoT_11091 </id>
+      </origin>
+      <observation valid-time="2012-01-02T01:00:00-08:00">
+        <temperature index="1" type="air-temperature">
+          <value units="degC">-2.417</value>
+        </temperature>
+      </observation>
+    </observation-series>
+  </data>
+</cmml>''')
+
+@pytest.fixture(scope='module')
+def moti_sawr7110_xml_2b():
+    """Duplicates observations in 2a, plus non-duplicate observations
+    before and after the duplicates."""
+    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+  <head>
+    <product operational-mode="official">
+      <title>Observation from BC Meteorological Stations</title>
+      <field>meteorological </field>
+      <category>observation</category>
+      <creation-date refresh-frequency="PT1H">2013-11-29T13:22:57-08:00</creation-date>
+    </product>
+    <source>
+      <production-center>British Columbia Ministry of Transportation
+        <sub-center>AWP</sub-center>
+      </production-center>
+    </source>
+  </head>
+  <data>
+    <observation-series>
+      <origin type="station">
+        <id type="client">11091 </id>
+        <id type="network">BC_MoT_11091 </id>
+      </origin>
+      <observation valid-time="2012-01-01T01:00:00-08:00">
+        <temperature index="1" type="air-temperature">
+          <value units="degC">-2.417</value>
+        </temperature>
+      </observation>
+      <observation valid-time="2012-01-02T01:00:00-08:00">
+        <temperature index="1" type="air-temperature">
+          <value units="degC">-2.417</value>
+        </temperature>
+      </observation>
+      <observation valid-time="2012-01-03T01:00:00-08:00">
+        <temperature index="1" type="air-temperature">
+          <value units="degC">-2.417</value>
+        </temperature>
       </observation>
     </observation-series>
   </data>
@@ -261,7 +328,7 @@ def moti_sawr7110_new_station():
   <data>
     <observation-series>
       <origin type="station">
-	    <id type="client">11092</id>
+        <id type="client">11092</id>
       </origin>
     </observation-series>
   </data>

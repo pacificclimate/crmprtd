@@ -5,7 +5,7 @@ import pytz
 from lxml.etree import fromstring, parse, XSLT
 import pytest
 
-from pycds import Obs
+from pycds import Obs, Station, History
 from crmprtd.moti import process, url_generator, slice_timesteps
 
 bctz = pytz.timezone('America/Vancouver')
@@ -28,6 +28,41 @@ def test_catch_duplicates(test_session, moti_sawr7110_xml):
     test_session.commit()
     rv = process(test_session, moti_sawr7110_xml)
     assert rv == {'failures': 0, 'successes': 0, 'skips': 4}
+
+
+def test_duplicates(test_session, moti_sawr7110_xml_2a, moti_sawr7110_xml_2b):
+    """Test that duplicates are skipped, but that skipping them does not
+    cause preceding or following non-duplicate inserts to be abandoned."""
+
+    # Insert initial observation set, no duplicates
+    try:
+        rv = process(test_session, moti_sawr7110_xml_2a)
+    except Exception as e:
+        assert False, \
+            "Didn't expect to get an exception on first insert\n{}".format(e)
+    # Check the claim about what happened
+    assert rv == {'failures': 0, 'successes': 1, 'skips': 0}
+
+    # Insert next observation set, with duplicate of first
+    try:
+        rv = process(test_session, moti_sawr7110_xml_2b)
+    except Exception as e:
+        assert False, \
+            "Didn't expect to get an exception on second insert\n{}".format(e)
+    # Check the claim about what happened
+    assert rv == {'failures': 0, 'successes': 2, 'skips': 1}
+
+    # Check that all non-duplicates actually got commited
+    # to the database and not rolled back due to the duplicate
+    test_session.commit()
+    q = (
+        test_session.query(Obs)
+        .join(History)
+        .join(Station)
+        .filter(Station.native_id == '11091')
+    )
+    assert q.count() == 3
+
 
 xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
