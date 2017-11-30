@@ -82,7 +82,7 @@ def test_session(crmp_session, caplog):
     '''
     Yields a PostGIS enabled session with CRMP schema and test data
     '''
-    caplog.setLevel(logging.ERROR, logger='sqlalchemy.engine')
+    caplog.set_level(logging.ERROR, logger='sqlalchemy.engine')
 
     moti = Network(name='MoTIe')
     ec = Network(name='EC_raw')
@@ -151,7 +151,7 @@ def ec_session(crmp_session, caplog):
     '''
     Yields a PostGIS enabled session with CRMP schema and test data
     '''
-    caplog.setLevel(logging.ERROR, logger='sqlalchemy.engine')
+    caplog.set_level(logging.ERROR, logger='sqlalchemy.engine')
 
     ec = Network(name='EC_raw')
     crmp_session.add(ec)
