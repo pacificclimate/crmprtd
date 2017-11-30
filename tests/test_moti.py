@@ -22,33 +22,24 @@ def test_data(test_session, moti_sawr7110_xml):
     assert len(obs) - c1 == 2
 
 def test_catch_duplicates(test_session, moti_sawr7110_xml):
-    print('test_catch_duplicates')
+    """Original test of duplicates that didn't check what actually got
+    committed to the database."""
     rv = process(test_session, moti_sawr7110_xml)
     assert rv == {'failures': 0, 'successes': 2, 'skips': 2}
-    test_session.commit()
     rv = process(test_session, moti_sawr7110_xml)
     assert rv == {'failures': 0, 'successes': 0, 'skips': 4}
 
 def test_duplicates(test_session, moti_sawr7110_xml_2a, moti_sawr7110_xml_2b):
-    """Test that duplicates are skipped, but that skipping them does not
+    """Test that duplicates are skipped, and that skipping them does not
     cause preceding or following non-duplicate inserts to be abandoned."""
 
     # Insert initial observation set, no duplicates
-    try:
-        rv = process(test_session, moti_sawr7110_xml_2a)
-    except Exception as e:
-        assert False, \
-            "Didn't expect to get an exception on first insert\n{}".format(e)
-    # Check the claim about what happened
+    rv = process(test_session, moti_sawr7110_xml_2a)
     assert rv == {'failures': 0, 'successes': 1, 'skips': 0}
 
-    # Insert next observation set, with duplicate of first
-    try:
-        rv = process(test_session, moti_sawr7110_xml_2b)
-    except Exception as e:
-        assert False, \
-            "Didn't expect to get an exception on second insert\n{}".format(e)
-    # Check the claim about what happened
+    # Insert next observation set, with duplicate of first bracketed by
+    # non-duplicates before and after
+    rv = process(test_session, moti_sawr7110_xml_2b)
     assert rv == {'failures': 0, 'successes': 2, 'skips': 1}
 
     # Check that all non-duplicates actually got commited
