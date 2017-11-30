@@ -98,6 +98,8 @@ def process_observation_series(sesh, os):
 
             o = Obs(time=t, datum=float(value), variable=var, history=hist)
 
+            # Regarding the following non-canonical but working code, see
+            # https://github.com/pacificclimate/crmprtd/issues/9#issuecomment-348042673
             try:
                 with sesh.begin_nested():
                     sesh.add(o)
