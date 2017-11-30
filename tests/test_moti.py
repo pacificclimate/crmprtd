@@ -61,6 +61,9 @@ def test_duplicates(test_session, moti_sawr7110_xml_2a, moti_sawr7110_xml_2b):
         .join(Station)
         .filter(Station.native_id == '11091')
     )
+    print('Commited observations')
+    for obs in q.all():
+        print(obs.time)
     assert q.count() == 3
 
 

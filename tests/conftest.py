@@ -270,7 +270,7 @@ def moti_sawr7110_xml_2a():
       </origin>
       <observation valid-time="2012-01-02T01:00:00-08:00">
         <temperature index="1" type="air-temperature">
-          <value units="degC">-2.417</value>
+          <value units="degC">2</value>
         </temperature>
       </observation>
     </observation-series>
@@ -304,17 +304,17 @@ def moti_sawr7110_xml_2b():
       </origin>
       <observation valid-time="2012-01-01T01:00:00-08:00">
         <temperature index="1" type="air-temperature">
-          <value units="degC">-2.417</value>
+          <value units="degC">1</value>
         </temperature>
       </observation>
       <observation valid-time="2012-01-02T01:00:00-08:00">
         <temperature index="1" type="air-temperature">
-          <value units="degC">-2.417</value>
+          <value units="degC">2</value>
         </temperature>
       </observation>
       <observation valid-time="2012-01-03T01:00:00-08:00">
         <temperature index="1" type="air-temperature">
-          <value units="degC">-2.417</value>
+          <value units="degC">3</value>
         </temperature>
       </observation>
     </observation-series>
