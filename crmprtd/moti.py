@@ -145,7 +145,7 @@ def check_history(stn_id, sesh):
         with sesh.begin_nested():
             hist = History(station = stn)
             sesh.add(hist)
-    except Excetion as e:
+    except Exception as e:
         log.error('History_id could not be found or created for native_id {}'.format(stn_id), exc_info=True)
         raise e
     log.debug('Created history_id {}'.format(hist.id))
