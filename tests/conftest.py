@@ -7,7 +7,7 @@ import logging, logging.config
 import yaml
 import pytest
 import sqlalchemy
-from sqlalchemy.schema import DDL
+from sqlalchemy.schema import DDL, CreateSchema
 from sqlalchemy.orm import sessionmaker
 from lxml.etree import parse, fromstring, XSLT
 import testing.postgresql
@@ -30,6 +30,8 @@ def postgis_session():
     with testing.postgresql.Postgresql() as pg:
         engine = sqlalchemy.create_engine(pg.url())
         engine.execute("create extension postgis")
+        engine.execute(CreateSchema('crmp'))
+        engine.execute('SET search_path TO crmp,public')
         sesh = sessionmaker(bind=engine)()
 
         logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
@@ -55,7 +57,7 @@ DECLARE
 BEGIN
     mystr = 'WITH stns_in_thresh AS (
     SELECT history_id, lat, lon, Geography(ST_Transform(the_geom,4326)) as p_existing, Geography(ST_SetSRID(ST_MakePoint('|| X ||','|| Y ||'),4326)) as p_new
-    FROM meta_history
+    FROM crmp.meta_history
     WHERE the_geom && ST_Buffer(Geography(ST_SetSRID(ST_MakePoint('|| X || ','|| Y ||'),4326)),'|| thres ||')
 )
 SELECT history_id, lat, lon, ST_Distance(p_existing,p_new) as dist
