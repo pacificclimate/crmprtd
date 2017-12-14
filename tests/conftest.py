@@ -256,6 +256,83 @@ def moti_sawr7110_xml():
 </cmml>''')
 
 @pytest.fixture(scope='module')
+def moti_sawr7110_xml_2a():
+    """No duplicates"""
+    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+  <head>
+    <product operational-mode="official">
+      <title>Observation from BC Meteorological Stations</title>
+      <field>meteorological </field>
+      <category>observation</category>
+      <creation-date refresh-frequency="PT1H">2013-11-29T13:22:57-08:00</creation-date>
+    </product>
+    <source>
+      <production-center>British Columbia Ministry of Transportation
+        <sub-center>AWP</sub-center>
+      </production-center>
+    </source>
+  </head>
+  <data>
+    <observation-series>
+      <origin type="station">
+        <id type="client">11091 </id>
+        <id type="network">BC_MoT_11091 </id>
+      </origin>
+      <observation valid-time="2012-01-02T01:00:00-08:00">
+        <temperature index="1" type="air-temperature">
+          <value units="degC">-2.417</value>
+        </temperature>
+      </observation>
+    </observation-series>
+  </data>
+</cmml>''')
+
+@pytest.fixture(scope='module')
+def moti_sawr7110_xml_2b():
+    """Duplicates observations in 2a, plus non-duplicate observations
+    before and after the duplicates."""
+    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+  <head>
+    <product operational-mode="official">
+      <title>Observation from BC Meteorological Stations</title>
+      <field>meteorological </field>
+      <category>observation</category>
+      <creation-date refresh-frequency="PT1H">2013-11-29T13:22:57-08:00</creation-date>
+    </product>
+    <source>
+      <production-center>British Columbia Ministry of Transportation
+        <sub-center>AWP</sub-center>
+      </production-center>
+    </source>
+  </head>
+  <data>
+    <observation-series>
+      <origin type="station">
+        <id type="client">11091 </id>
+        <id type="network">BC_MoT_11091 </id>
+      </origin>
+      <observation valid-time="2012-01-01T01:00:00-08:00">
+        <temperature index="1" type="air-temperature">
+          <value units="degC">-2.417</value>
+        </temperature>
+      </observation>
+      <observation valid-time="2012-01-02T01:00:00-08:00">
+        <temperature index="1" type="air-temperature">
+          <value units="degC">-2.417</value>
+        </temperature>
+      </observation>
+      <observation valid-time="2012-01-03T01:00:00-08:00">
+        <temperature index="1" type="air-temperature">
+          <value units="degC">-2.417</value>
+        </temperature>
+      </observation>
+    </observation-series>
+  </data>
+</cmml>''')
+
+@pytest.fixture(scope='module')
 def moti_sawr7110_new_station():
     return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
