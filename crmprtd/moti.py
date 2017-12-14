@@ -101,6 +101,7 @@ def process_observation_series(sesh, os):
             try:
                 with sesh.begin_nested():
                     sesh.add(o)
+                sesh.commit()
                 successes += 1
                 log.debug("Inserted {}".format(o))
             except IntegrityError as e:
@@ -109,6 +110,7 @@ def process_observation_series(sesh, os):
                 skips += 1
             except:
                 log.error("Failed to insert {}".format(o), exc_info=True)
+                sesh.rollback()
                 failures += 1
 
     return {'successes': successes, 'skips': skips, 'failures': failures}
