@@ -58,8 +58,10 @@ def test_several_items(
 ])
 def test_sqlalchemy_doc(
         generic_test_sqlalchemy_doc,
+        generic_item_count,
         test_session,
         names_name, names,
 ):
     items = (SimpleItem(name=name) for name in names)
     generic_test_sqlalchemy_doc(test_session, SimpleItem, items)
+    assert generic_item_count(SimpleItem) == len(set(names))

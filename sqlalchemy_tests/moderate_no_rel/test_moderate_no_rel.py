@@ -83,6 +83,7 @@ def test_insert(
 ])
 def test_sqlalchemy_doc(
         generic_test_sqlalchemy_doc,
+        generic_item_count,
         test_session_with_history,
         history,
         obs_args_name, obs_args_list,
@@ -96,3 +97,4 @@ def test_sqlalchemy_doc(
         for obs_args in obs_args_list
     )
     generic_test_sqlalchemy_doc(test_session_with_history, Obs, items)
+    assert generic_item_count(Obs) == len(set(time for time, _ in obs_args_list))

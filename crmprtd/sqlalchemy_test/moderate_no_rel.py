@@ -7,7 +7,7 @@ from sqlalchemy.schema import UniqueConstraint
 Base = declarative_base(metadata=MetaData(schema='moderate'))
 
 
-# Simplified case modelled after PyCDS
+# Simplified case modelled after PyCDS, no 'relationship' components declared
 
 class History(Base):
     __tablename__ = 'meta_history'

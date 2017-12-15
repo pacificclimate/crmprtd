@@ -87,6 +87,16 @@ def generic_test_sqlalchemy_doc(test_session_factory):
     yield test_sqlalchemy_doc
 
 
+@pytest.fixture(scope='function')
+def generic_item_count(test_session_factory):
+    def item_count(OrmItem):
+        sesh2 = test_session_factory()
+        q = sesh2.query(OrmItem)
+        return q.count()
+        sesh2.close()
+    yield item_count
+
+
 @pytest.fixture(scope='module')
 def insert():
     def f(sesh, item, item_attr_name, nested=False, method='add', commit=False, rollback=False):
