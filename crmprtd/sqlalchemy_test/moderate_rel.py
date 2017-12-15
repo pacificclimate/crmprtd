@@ -5,7 +5,7 @@ from sqlalchemy.schema import UniqueConstraint
 from sqlalchemy.orm import relationship, backref
 
 
-Base = declarative_base(metadata=MetaData(schema='moderate'))
+Base = declarative_base(metadata=MetaData(schema='moderate_rel'))
 
 
 # Simplified case modelled after PyCDS

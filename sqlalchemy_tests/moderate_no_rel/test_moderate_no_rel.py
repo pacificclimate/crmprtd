@@ -51,9 +51,9 @@ def test_insert(
     for obs_args in obs_args_list:
         item = Obs(
             time=datetime.strptime(obs_args[0], '%Y-%m-%dT%H:%M:%S'),
-            history=history,
+            history_id=history.id,
         )
-        insert(sesh, item, 'name', nested=nested, method=method, commit=commit, rollback=rollback)
+        insert(sesh, item, 'time', nested=nested, method=method, commit=commit, rollback=rollback)
 
     final_commit(sesh)
     sesh.close()

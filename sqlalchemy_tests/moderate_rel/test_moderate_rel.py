@@ -53,7 +53,7 @@ def test_insert(
             time=datetime.strptime(obs_args[0], '%Y-%m-%dT%H:%M:%S'),
             history=history,
         )
-        insert(sesh, item, 'name', nested=nested, method=method, commit=commit, rollback=rollback)
+        insert(sesh, item, 'time', nested=nested, method=method, commit=commit, rollback=rollback)
 
     final_commit(sesh)
     sesh.close()

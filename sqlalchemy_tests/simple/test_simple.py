@@ -25,7 +25,7 @@ from crmprtd.sqlalchemy_test.simple import SimpleItem
     # ('B', 'test1 test1'.split()),
     ('C', 'test1 test2 test2 test3'.split()),
 ])
-def test_several_items(
+def test_insert(
         test_session_factory,
         insert, final_commit, args, add_result,
         names_name, names,

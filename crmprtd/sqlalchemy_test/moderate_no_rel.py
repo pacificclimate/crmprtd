@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.schema import UniqueConstraint
 
 
-Base = declarative_base(metadata=MetaData(schema='moderate'))
+Base = declarative_base(metadata=MetaData(schema='moderate_no_rel'))
 
 
 # Simplified case modelled after PyCDS, no 'relationship' components declared

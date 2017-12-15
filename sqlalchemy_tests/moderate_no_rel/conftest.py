@@ -7,7 +7,7 @@ from sqlalchemy.schema import CreateSchema
 @pytest.fixture(scope='function')
 def create_test_database():
     def create(engine):
-        engine.execute(CreateSchema('moderate'))
+        engine.execute(CreateSchema('moderate_no_rel'))
         Base.metadata.create_all(bind=engine)
     yield create
 
