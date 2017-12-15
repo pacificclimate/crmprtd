@@ -57,8 +57,6 @@ def insert():
 
         def do_it():
             {'add': sesh.add, 'merge': sesh.merge}[method.lower()](item)
-            if commit:
-                sesh.commit()
 
         try:
             print('Insert', getattr(item, item_attr_name))
@@ -67,6 +65,8 @@ def insert():
                     do_it()
             else:
                 do_it()
+            if commit:
+                sesh.commit()
         except IntegrityError as e:
             print('>> ', e.__class__.__name__)
             if rollback:
