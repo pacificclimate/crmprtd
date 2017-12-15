@@ -57,27 +57,9 @@ def test_several_items(
     ('C', 'test1 test2 test2 test3'.split()),
 ])
 def test_sqlalchemy_doc(
-        test_session_factory,
+        generic_test_sqlalchemy_doc,
+        test_session,
         names_name, names,
 ):
-    session = test_session_factory()
-
     items = (SimpleItem(name=name) for name in names)
-
-    for item in items:
-        try:
-            with session.begin_nested():
-                session.merge(item)
-            print("Inserted {}".format(item))
-        except Exception as e:
-            print("Skipped {} ({})".format(item, e.__class__.__name__))
-        session.commit()
-    session.close()
-
-    sesh2 = test_session_factory()
-    q = sesh2.query(SimpleItem)
-    count = q.count()
-    print(count, 'Items in database')
-    for item in q.all():
-        print(item.name)
-    sesh2.close()
+    generic_test_sqlalchemy_doc(test_session, SimpleItem, items)

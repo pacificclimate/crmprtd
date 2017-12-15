@@ -69,4 +69,5 @@ def test_session_with_moti_brandywine(
         test_session, moti, brandy_hist, brandy_stn, moti_air_temp
 ):
     test_session.add_all([moti, brandy_hist, brandy_stn, moti_air_temp])
+    test_session.commit()
     yield test_session

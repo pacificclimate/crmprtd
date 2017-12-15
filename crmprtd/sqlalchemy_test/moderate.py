@@ -17,6 +17,9 @@ class History(Base):
     # Relationships
     observations = relationship("Obs", backref=backref('meta_history', order_by=id))
 
+    def __repr__(self):
+        return "<History(id={})>".format(self.id)
+
 
 class Obs(Base):
     __tablename__ = 'obs_raw'
@@ -33,4 +36,5 @@ class Obs(Base):
                          name='time_place_unique'),
     )
 
-
+    def __repr__(self):
+        return "<Obs(time={}, history_id={})>".format(self.time, self.history_id)

@@ -95,24 +95,11 @@ def test_insert(
     ]),
 ])
 def test_sqlalchemy_doc(
-        test_session_factory,
+        generic_test_sqlalchemy_doc,
+        test_session_with_moti_brandywine,
         moti_air_temp, brandy_hist,
         obs_args_name, obs_args_list,
 ):
-    def print_items():
-        sesh2 = test_session_factory()
-        q = sesh2.query(Obs)
-        count = q.count()
-        print()
-        print(count, 'Items in database')
-        for item in q.all():
-            print(item.time)
-        sesh2.close()
-
-    print_items()
-
-    session = test_session_factory()
-
     items = (
         Obs(
             variable=moti_air_temp,
@@ -122,16 +109,4 @@ def test_sqlalchemy_doc(
         )
         for obs_args in obs_args_list
     )
-
-    print()
-    for item in items:
-        try:
-            with session.begin_nested():
-                session.merge(item)
-            print("Inserted {}: {}, id={}".format(item, item.time, item.id))
-        except Exception as e:
-            print("Skipped {}: {}, id={} ({})".format(item, item.time, item.id, e.__class__.__name__))
-        session.commit()
-    session.close()
-
-    print_items()
+    generic_test_sqlalchemy_doc(test_session_with_moti_brandywine, Obs, items)

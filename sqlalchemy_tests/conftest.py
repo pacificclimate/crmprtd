@@ -51,6 +51,42 @@ def test_session(test_session_factory):
     session.close()
 
 
+@pytest.fixture(scope='function')
+def generic_test_sqlalchemy_doc(test_session_factory):
+    def test_sqlalchemy_doc(
+            prepared_session,  # session prepared with any necessary adjunct objects for insertion of items
+            OrmItem,  # ORM class of items to be inserted
+            items,  # iterable of items to be inserted
+    ):
+
+        def print_items(tag):
+            print_sesh = test_session_factory()
+            q = print_sesh.query(OrmItem)
+            count = q.count()
+            print()
+            print(count, 'Items in database: {}'.format(tag))
+            for item in q.all():
+                print(item)
+            print_sesh.close()
+
+        print_items('Before inserts')
+
+        print()
+        for item in items:
+            try:
+                with prepared_session.begin_nested():
+                    prepared_session.merge(item)
+                print("Inserted {}".format(item))
+            except Exception as e:
+                print("Skipped {} ({})".format(item, e.__class__.__name__))
+            prepared_session.commit()
+        prepared_session.close()
+
+        print_items('After inserts')
+
+    yield test_sqlalchemy_doc
+
+
 @pytest.fixture(scope='module')
 def insert():
     def f(sesh, item, item_attr_name, nested=False, method='add', commit=False, rollback=False):

@@ -19,3 +19,6 @@ class SimpleItem(Base):
     __table_args__ = (
         UniqueConstraint('name', name='item_name_unique'),
     )
+
+    def __repr__(self):
+        return "<SimpleItem(name='{}')>".format(self.name)
