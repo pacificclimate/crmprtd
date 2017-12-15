@@ -1,9 +1,8 @@
 from datetime import datetime
 
 import pytest
-from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
-from crmprtd.sqlalchemy_test.moderate import History, Obs
+from crmprtd.sqlalchemy_test.moderate_rel import Obs
 
 
 @pytest.mark.parametrize('rollback', [

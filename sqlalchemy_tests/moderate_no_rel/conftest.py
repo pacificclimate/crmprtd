@@ -1,6 +1,6 @@
 import pytest
 
-from crmprtd.sqlalchemy_test.moderate import Base, History, Obs
+from crmprtd.sqlalchemy_test.moderate_no_rel import Base, History
 from sqlalchemy.schema import CreateSchema
 
 
