@@ -1,10 +1,9 @@
 from datetime import datetime
-from collections import OrderedDict
 
 import pytest
 from sqlalchemy.exc import IntegrityError, InvalidRequestError
 
-from pycds import Network, Station, History, Variable, Obs
+from crmprtd.sqlalchemy_test.moderate import History, Obs
 
 
 @pytest.mark.parametrize('rollback', [
@@ -38,35 +37,24 @@ from pycds import Network, Station, History, Variable, Obs
         ('2017-01-03T00:00:00', 3.0),
     ]),
 ])
-
 def test_insert(
         test_session_factory,
-        test_session_with_moti_brandywine,
-        moti_air_temp, brandy_hist,
+        history,
         insert, final_commit, args, add_result,
         obs_args_name, obs_args_list,
         nested, method, commit, rollback,
 ):
-    """
-    Test the pattern in scripts/moti_infill_insert.py that fails.
-    """
-    print()
     keys = args(obs_args_name, nested, method, commit, rollback)
     print('Test params:', ' | '.join('{}: {}'.format(*key) for key in keys))
     print()
 
-    sesh = test_session_with_moti_brandywine
-    sesh.commit()
-
-    # Insert some observations
+    sesh = test_session_factory()
     for obs_args in obs_args_list:
-        obs = Obs(
-            variable=moti_air_temp,
-            history=brandy_hist,
+        item = Obs(
             time=datetime.strptime(obs_args[0], '%Y-%m-%dT%H:%M:%S'),
-            datum=obs_args[1]
+            history=history,
         )
-        insert(sesh, obs, 'time', nested=nested, method=method, commit=commit, rollback=rollback)
+        insert(sesh, item, 'name', nested=nested, method=method, commit=commit, rollback=rollback)
 
     final_commit(sesh)
     sesh.close()
@@ -75,7 +63,7 @@ def test_insert(
     q = sesh2.query(Obs)
     count = q.count()
     add_result(keys, count)
-    # assert q.count() == len(set(obs[0] for obs in obs_args))
+    # assert count == len(set(names))
     sesh2.close()
 
 
@@ -96,7 +84,7 @@ def test_insert(
 ])
 def test_sqlalchemy_doc(
         test_session_factory,
-        moti_air_temp, brandy_hist,
+        history,
         obs_args_name, obs_args_list,
 ):
     def print_items():
@@ -112,25 +100,23 @@ def test_sqlalchemy_doc(
     print_items()
 
     session = test_session_factory()
+    session.add(history)
 
     items = (
         Obs(
-            variable=moti_air_temp,
-            history=brandy_hist,
             time=datetime.strptime(obs_args[0], '%Y-%m-%dT%H:%M:%S'),
-            datum=obs_args[1]
+            history=history,
         )
         for obs_args in obs_args_list
     )
 
-    print()
     for item in items:
         try:
             with session.begin_nested():
                 session.merge(item)
-            print("Inserted {}: {}, id={}".format(item, item.time, item.id))
+            print("Inserted {}".format(item))
         except Exception as e:
-            print("Skipped {}: {}, id={} ({})".format(item, item.time, item.id, e.__class__.__name__))
+            print("Skipped {} ({})".format(item, e.__class__.__name__))
         session.commit()
     session.close()
 

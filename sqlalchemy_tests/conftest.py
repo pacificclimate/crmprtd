@@ -73,6 +73,8 @@ def insert():
                 sesh.rollback()
         except InvalidRequestError as e:
             print('>> ', e.__class__.__name__)
+            if rollback:
+                sesh.rollback()
         # print('\tInsert end')
 
     yield f

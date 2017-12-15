@@ -1,6 +1,6 @@
 import pytest
 
-import crmprtd.sqlalchemy_test
+import crmprtd.sqlalchemy_test.simple
 from sqlalchemy.schema import CreateSchema
 
 
@@ -8,5 +8,5 @@ from sqlalchemy.schema import CreateSchema
 def create_test_database():
     def create(engine):
         engine.execute(CreateSchema('simple'))
-        crmprtd.sqlalchemy_test.Base.metadata.create_all(bind=engine)
+        crmprtd.sqlalchemy_test.simple.Base.metadata.create_all(bind=engine)
     yield create
