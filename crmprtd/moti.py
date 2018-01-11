@@ -98,10 +98,13 @@ def process_observation_series(sesh, os):
 
             o = Obs(time=t, datum=float(value), variable=var, history=hist)
 
+            # Regarding the following non-canonical but working code, see
+            # https://github.com/pacificclimate/crmprtd/issues/9#issuecomment-348042673
             try:
                 with sesh.begin_nested():
                     sesh.add(o)
                 successes += 1
+                sesh.commit()
                 log.debug("Inserted {}".format(o))
             except IntegrityError as e:
                 log.debug("Skipped, already exists: {} {}".format(o, e))
@@ -109,6 +112,7 @@ def process_observation_series(sesh, os):
                 skips += 1
             except:
                 log.error("Failed to insert {}".format(o), exc_info=True)
+                sesh.rollback()
                 failures += 1
 
     return {'successes': successes, 'skips': skips, 'failures': failures}
@@ -143,7 +147,7 @@ def check_history(stn_id, sesh):
         with sesh.begin_nested():
             hist = History(station = stn)
             sesh.add(hist)
-    except Excetion as e:
+    except Exception as e:
         log.error('History_id could not be found or created for native_id {}'.format(stn_id), exc_info=True)
         raise e
     log.debug('Created history_id {}'.format(hist.id))

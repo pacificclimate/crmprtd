@@ -442,7 +442,7 @@ def test_insert_duplicate_obs(ec_session, et, hid, vname, vid):
 
 def test_process_xml(ec_session, caplog):
     import logging
-    caplog.setLevel(logging.INFO)
+    caplog.set_level(logging.INFO)
 
     from ec_data import hourly_bc_2016061115, hourly_bc_2016061116
 

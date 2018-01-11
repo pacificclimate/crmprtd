@@ -5,7 +5,7 @@ import pytz
 from lxml.etree import fromstring, parse, XSLT
 import pytest
 
-from pycds import Obs
+from pycds import Obs, Station, History
 from crmprtd.moti import process, url_generator, slice_timesteps
 
 bctz = pytz.timezone('America/Vancouver')
@@ -22,12 +22,41 @@ def test_data(test_session, moti_sawr7110_xml):
     assert len(obs) - c1 == 2
 
 def test_catch_duplicates(test_session, moti_sawr7110_xml):
-    print('test_catch_duplicates')
+    """Original test of duplicates that didn't check what actually got
+    committed to the database."""
     rv = process(test_session, moti_sawr7110_xml)
     assert rv == {'failures': 0, 'successes': 2, 'skips': 2}
-    test_session.commit()
     rv = process(test_session, moti_sawr7110_xml)
     assert rv == {'failures': 0, 'successes': 0, 'skips': 4}
+
+
+def test_duplicates(test_session, moti_sawr7110_xml_2a, moti_sawr7110_xml_2b):
+    """Test that duplicates are skipped, and that skipping them does not
+    cause preceding or following non-duplicate inserts to be abandoned."""
+
+    # Insert initial observation set, no duplicates
+    rv = process(test_session, moti_sawr7110_xml_2a)
+    assert rv == {'failures': 0, 'successes': 1, 'skips': 0}
+
+    # Insert next observation set, with duplicate of first bracketed by
+    # non-duplicates before and after
+    rv = process(test_session, moti_sawr7110_xml_2b)
+    assert rv == {'failures': 0, 'successes': 2, 'skips': 1}
+
+    # Check that all non-duplicates actually got commited
+    # to the database and not rolled back due to the duplicate
+    test_session.commit()
+    q = (
+        test_session.query(Obs)
+        .join(History)
+        .join(Station)
+        .filter(Station.native_id == '11091')
+    )
+    print('Commited observations')
+    for obs in q.all():
+        print(obs.time)
+    assert q.count() == 3
+
 
 xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
@@ -252,6 +281,6 @@ def test_unknown_var(test_session, caplog):
     assert n_obs_before == n_obs_after
 
     t = 'Could not find variable temperature, tree-temperature, celsius in the database. Skipping this observation.'
-    assert t in caplog.text()
+    assert t in caplog.text
 
     # TODO: need to actually check log warning
