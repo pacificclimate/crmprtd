@@ -12,15 +12,13 @@ from sqlalchemy.orm import sessionmaker
 # Local
 from crmprtd.moti import process
 
-# debug
 
-
-def moti_normalize(args, log, xml_file):
+def moti_normalize(args, log, infile):
     Session = sessionmaker(create_engine(args.connection_string))
     sesh = Session()
     sesh.begin_nested()
     try:
-        et = parse(xml_file)
+        et = parse(infile)
         r = process(sesh, et)
         log.info(r)
         if args.diag:

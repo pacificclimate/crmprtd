@@ -8,13 +8,9 @@ import requests
 
 # Installed libraries
 import yaml
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 # Local
 from crmprtd.moti_dir.normalize import moti_normalize
-
-# debug
 
 
 def moti_download(args):
@@ -49,13 +45,14 @@ def moti_download(args):
             fname = args.filename
             xml_file = open(args.filename, 'r')
             log.debug("File opened sucessfully")
+            moti_normalize(args, log, xml_file)
 
         else:
             if args.start_time and args.end_time:
                 args.start_time = datetime.strptime(args.start_time, '%Y/%m/%d %H:%M:%S')
                 args.end_time = datetime.strptime(args.end_time, '%Y/%m/%d %H:%M:%S')
                 log.info("Starting manual run using timestamps {0} {1}".format(args.start_time, args.end_time))
-                assert args.end_time - args.start_time <= timedelta(7) # Requests of longer than 7 days not allowed by MoTI
+                assert args.end_time - args.start_time <= timedelta(7)  # Requests of longer than 7 days not allowed by MoTI
                 auto = False
             else:
                 deltat = timedelta(1) # go back a day
@@ -84,8 +81,9 @@ def moti_download(args):
                 raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
             with open(fname, 'wb') as f:
                 f.write(req.content)
+
+            moti_normalize(args, log, fname)
+
     except IOError:
         log.exception("Unable to download or open xml data")
         sys.exit(1)
-
-    moti_normalize(args, log, xml_file)
