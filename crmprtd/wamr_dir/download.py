@@ -12,23 +12,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Local
-from crmprtd.wamr import setup_logging, rows2db
+from crmprtd.wamr import setup_logging
 from crmprtd.wamr import file2rows, ftp2rows
+from crmprtd.wamr_dir.normalize import wamr_normalize
 
 
 def wamr_download(args):
     # Logging
     log = setup_logging(args.log_level, args.log, args.error_email)
     log.info('Starting WAMR rtd')
-
-    # Database connection
-    try:
-        engine = create_engine(args.connection_string)
-        Session = sessionmaker(engine)
-        sesh = Session()
-    except Exception as e:
-        log.critical('Error with Database connection', exc_info=True)
-        sys.exit(1)
 
     # Output files
     if args.error_file:
@@ -52,8 +44,7 @@ def wamr_download(args):
 
     log.info('{0} observations read into memory'.format(len(rows)))
 
-    # Hand the row off to the database processings/insertion part of the script
-    rows2db(sesh, rows, error_file, log, args.diag)
+    wamr_normalize(rows, error_file, log, args)
 
 
 def cache_rows(file_, rows, fieldnames):
