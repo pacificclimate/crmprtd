@@ -12,19 +12,18 @@ from sqlalchemy.orm import sessionmaker
 from crmprtd.ec import ObsProcessor, parse_xml
 
 
-def ec_normalize(args, log, fname):
+def ec_normalize(args, log, infile):
     # Wrap critical secion
     try:
         log.info("Parsing input xml")
-        et = parse_xml(fname)   # is this part of normalize or align?
-
-        # there should be no database code in -NORMALIZE- portion of pipeline
+        et = parse_xml(infile)
+        
         log.info("Creating database session")
         Session = sessionmaker(create_engine(args.connection_string))
         sesh = Session()
 
     except Exception as e:
-        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, fname), exc_info=True)
+        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, infile), exc_info=True)
         sys.exit(1)
 
     try:
@@ -44,7 +43,7 @@ def ec_normalize(args, log, fname):
 
     except Exception as e:
         sesh.rollback()
-        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, fname), exc_info=True)
+        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, infile), exc_info=True)
         sys.exit(1)
 
     finally:

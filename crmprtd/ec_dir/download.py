@@ -35,8 +35,9 @@ def ec_download(args):
             fname = args.filename
             xml_file = open(args.filename, 'r') # Do not catch exception here
             log.debug("File opened sucessfully")
-        else:
 
+            ec_normalize(args, log, xml_file)
+        else:
             # Determine time parameter
             if args.time:
                 args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
@@ -64,8 +65,8 @@ def ec_download(args):
             with open(fname, 'wb') as f:
                 f.write(req.content)
 
+            ec_normalize(args, log, fname)
+
     except IOError:
         log.exception("Unable to download or open xml data")
         sys.exit(1)
-
-    ec_normalize(args, log, fname)
