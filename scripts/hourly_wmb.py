@@ -10,11 +10,11 @@ from pkg_resources import resource_stream
 from argparse import ArgumentParser
 
 # Local
-from crmprtd.wmb_dir.download import wmb_download
+from crmprtd.wmb_dir.download import run
 
 
 def main(args):
-    wmb_download(args)
+    run(args)
 
 if __name__ == '__main__':
 
