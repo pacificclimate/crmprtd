@@ -9,7 +9,7 @@ import yaml
 
 # Local
 from crmprtd.ec import makeurl, extract_fname_from_url
-from crmprtd.ec_dir.normalize import normalize
+from crmprtd.ec_dir.normalize import prepare
 
 
 def logging_setup(log_conf, log, error_email, log_level):

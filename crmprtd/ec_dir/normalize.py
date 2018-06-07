@@ -12,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 from crmprtd.ec import ObsProcessor, parse_xml
 
 
-def normalize(args, log, infile):
+def prepare(args, log, infile):
     # Wrap critical secion
     try:
         log.info("Parsing input xml")
