@@ -17,7 +17,7 @@ from crmprtd.wamr import file2rows, ftp2rows
 from crmprtd.wamr_dir.normalize import prepare
 
 
-def wamr_download(args):
+def run(args):
     # Logging
     log = setup_logging(args.log_level, args.log, args.error_email)
     log.info('Starting WAMR rtd')

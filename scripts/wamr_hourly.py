@@ -24,7 +24,7 @@ from sqlalchemy.orm import sessionmaker
 # Local
 from crmprtd.wamr import setup_logging, rows2db
 from crmprtd.wamr import file2rows, ftp2rows
-from crmprtd.wamr_dir.download import wamr_download
+from crmprtd.wamr_dir.download import run
 
 def main():
     # Process the command line arguments
@@ -81,7 +81,7 @@ def main():
 
     args = parser.parse_args()
 
-    wamr_download(args)
+    run(args)
 
 if __name__ == '__main__':
     main()
