@@ -20,10 +20,10 @@ import yaml
 from crmprtd import retry
 from crmprtd.ec import makeurl, ObsProcessor, parse_xml, extract_fname_from_url
 # needs import for ec_download
-from crmprtd.ec_dir.download import ec_download
+from crmprtd.ec_dir.download import run
 
 def main(args):
-    ec_download(args)
+    run(args)
 
 if __name__ == '__main__':
 

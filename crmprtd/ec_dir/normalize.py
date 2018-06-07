@@ -12,12 +12,12 @@ from sqlalchemy.orm import sessionmaker
 from crmprtd.ec import ObsProcessor, parse_xml
 
 
-def ec_normalize(args, log, infile):
+def normalize(args, log, infile):
     # Wrap critical secion
     try:
         log.info("Parsing input xml")
         et = parse_xml(infile)
-        
+
         log.info("Creating database session")
         Session = sessionmaker(create_engine(args.connection_string))
         sesh = Session()
