@@ -73,7 +73,7 @@ def run(args):
                 log.info("Starting automatic run using timestamp {0}".format(args.time))
 
             fname = download(log, args.frequency, args.province, args.language, args.time, args.cache_dir)
-            ec_normalize(args, log, fname)
+            prepare(args, log, fname)
 
     except IOError:
         log.exception("Unable to download or open xml data")
