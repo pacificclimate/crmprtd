@@ -11,27 +11,82 @@ from datetime import datetime
 from pkg_resources import resource_stream
 # Local
 from crmprtd import retry
-from crmprtd.wmb_dir.normalize import wmb_normalize
+from crmprtd.wmb_dir.normalize import prepare
 
 # Installed libraries
 import yaml
 
-def wmb_download(args):
-    # Setup logging
-    log_conf = yaml.load(resource_stream('crmprtd', '/data/logging.yaml'))
-    if args.log:
-        log_conf['handlers']['file']['filename'] = args.log
-    else:
-        args.log = log_conf['handlers']['file']['filename']
-    if args.error_email:
-        log_conf['handlers']['mail']['toaddrs'] = args.error_email
-    logging.config.dictConfig(log_conf)
-    log = logging.getLogger('crmprtd.wmb')
-    if args.log_level:
-        log.setLevel(args.log_level)
 
-    log.info('Starting WMB rtd')
+def logging_setup(log, error_email, log_level):
+    log_c = yaml.load(resource_stream('crmprtd', '/data/logging.yaml'))
+    if log:
+        log_c['handlers']['file']['filename'] = log
+    else:
+        log = log_c['handlers']['file']['filename']
+    if error_email:
+        log_c['handlers']['mail']['toaddrs'] = error_email
+    logging.config.dictConfig(log_c)
+    log = logging.getLogger('crmprtd.wmb')
+    if log_level:
+        log.setLevel(log_level)
+
+    return log
+
+
+def local_file_search(archive_file, archive_dir, log):
+    # adjust to full path
+    path = args.archive_file
+    if args.archive_file[0] != '/':
+        path = os.path.join(args.archive_dir, args.archive_file)
+    log.info('Loading local file {0}'.format(path))
+
+    # open and read into data
     data = []
+    try:
+        with open(path) as f:
+            log.debug('opened the local file')
+            reader = csv.DictReader(f)
+            for row in reader:
+                data.append(row)
+            return data
+    except IOError as e:
+        log.exception('Unable to load data from local file')
+        sys.exit(1)
+
+
+def ftp_file_search(ftp_server, ftp_file, log, auth, cache_dir):
+    # Fetch file from FTP and read into memory
+    log.info('Fetching file from FTP')
+    log.info('Downloading {}/{}'.format(ftp_server, ftp_file))
+
+    data = []
+    try:
+        ftpreader = FTPReader(ftp_server, auth['u'], auth['p'], ftp_file, log)
+        log.info('Opened a connection to {}'.format(ftp_server))
+        reader = ftpreader.csv_reader()
+        for row in reader:
+            data.append(row)
+        log.info('instantiated the reader and processed all rows')
+        save_file(reader, cache_dir, data)
+        return data
+    except ftplib.all_errors as e:
+        log.critical('Unable to load data from ftp source', exc_info=True)
+        sys.exit(1)
+
+
+def save_file(reader, cache_dir, data):
+    # save the downloaded file
+    fname_out = os.path.join(cache_dir, 'wmb_download' + datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
+    with open(fname_out, 'w') as f_out:
+        copier = csv.DictWriter(f_out, fieldnames = reader.fieldnames)
+        copier.writeheader()
+        copier.writerows(data)
+
+
+def run(args):
+    # Setup logging
+    log = logging_setup(args.log, args.error_email, args.log_level)
+    log.info('Starting WMB rtd')
 
     # Pull auth from file or command line
     if args.username or args.password:
@@ -44,49 +99,14 @@ def wmb_download(args):
 
     # Check for local file source
     if args.archive_file:
-        # adjust to full path
-        path = args.archive_file
-        if args.archive_file[0] != '/':
-            path = os.path.join(args.archive_dir, args.archive_file)
-        log.info('Loading local file {0}'.format(path))
-
-        # open and read into data
-        try:
-            with open(path) as f:
-                log.debug('opened the local file')
-                reader = csv.DictReader(f)
-                for row in reader:
-                    data.append(row)
-        except IOError as e:
-            log.exception('Unable to load data from local file')
-            sys.exit(1)
-
+        data = local_file_search(args.archive_file, args.archive_dir, log)
     # Or use FTP source
     else:
-        # Fetch file from FTP and read into memory
-        log.info('Fetching file from FTP')
-
-        log.info('Downloading {}/{}'.format(args.ftp_server, args.ftp_file))
-        try:
-            ftpreader = FTPReader(args.ftp_server, auth['u'], auth['p'], args.ftp_file, log)
-            log.info('Opened a connection to {}'.format(args.ftp_server))
-            reader = ftpreader.csv_reader()
-            for row in reader:
-                data.append(row)
-            log.info('instantiated the reader and processed all rows')
-        except ftplib.all_errors as e:
-            log.critical('Unable to load data from ftp source', exc_info=True)
-            sys.exit(1)
-
-        # save the downloaded file
-        fname_out = os.path.join(args.cache_dir, 'wmb_download' + datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
-        with open(fname_out, 'w') as f_out:
-            copier = csv.DictWriter(f_out, fieldnames = reader.fieldnames)
-            copier.writeheader()
-            copier.writerows(data)  # is this part of normalize?
+        data = ftp_file_search(args.ftp_server, args.ftp_file, log, auth, args.cache_dir)
 
     log.info('{0} observations read into memory'.format(len(data)))
-    wmb_normalize(args, log, data)
+    prepare(args, log, data)
+
 
 class FTPReader(object):
     '''Glue between the FTP_TLS class methods (which are callback based)

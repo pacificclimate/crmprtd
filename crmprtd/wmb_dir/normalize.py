@@ -11,7 +11,7 @@ from crmprtd.wmb import ObsProcessor, DataLogger
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-def wmb_normalize(args, log, data):
+def prepare(args, log, data):
     dl = DataLogger()
 
     # Open database connection
