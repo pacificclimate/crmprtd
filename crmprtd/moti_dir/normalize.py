@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 from crmprtd.moti import process
 
 
-def moti_normalize(args, log, infile):
+def prepare(args, log, infile):
     Session = sessionmaker(create_engine(args.connection_string))
     sesh = Session()
     sesh.begin_nested()

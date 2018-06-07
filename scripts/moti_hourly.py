@@ -19,14 +19,14 @@ from sqlalchemy.orm import sessionmaker
 # Local
 from crmprtd import retry
 from crmprtd.moti import makeurl, process
-from crmprtd.moti_dir.download import moti_download
+from crmprtd.moti_dir.download import run
 
 # debug
 from pdb import set_trace
 
 
 def main(args):
-    moti_download(args)
+    run(args)
 
 if __name__ == '__main__':
 

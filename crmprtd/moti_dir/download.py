@@ -10,22 +10,44 @@ import requests
 import yaml
 
 # Local
-from crmprtd.moti_dir.normalize import moti_normalize
+from crmprtd.moti_dir.normalize import prepare
 
 
-def moti_download(args):
-    # Setup logging
-    log_conf = yaml.load(args.log_conf)
-    if args.log:
-        log_conf['handlers']['file']['filename'] = args.log
+def logging_setup(log_conf, log, error_email, log_level):
+    log_c = yaml.load(log_conf)
+    if log:
+        log_c['handlers']['file']['filename'] = log
     else:
-        args.log = log_conf['handlers']['file']['filename']
-    if args.error_email:
-        log_conf['handlers']['mail']['toaddrs'] = args.error_email
-    logging.config.dictConfig(log_conf)
+        log = log_c['handlers']['file']['filename']
+    if error_email:
+        log_c['handlers']['mail']['toaddrs'] = error_email
+    logging.config.dictConfig(log_c)
     log = logging.getLogger('crmprtd.moti')
-    if args.log_level:
-        log.setLevel(args.log_level)
+    if log_level:
+        log.setLevel(log_level)
+
+    return log
+
+
+def download(payload, auth, fname, log):
+    # Configure requests to use retry
+    s = requests.Session()
+    a = requests.adapters.HTTPAdapter(max_retries=3)
+    s.mount('https://', a)
+    req = s.get('https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110', params=payload, auth=auth)
+
+    log.info('{}: {}'.format(req.status_code, req.url))
+    if req.status_code != 200:
+        raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
+    with open(fname, 'wb') as f:
+        f.write(req.content)
+
+    return fname
+
+
+def run(args):
+    # Setup logging
+    log = logging_setup(args.log_conf, args.log, args.error_email, args.log_level)
     log.info('Starting MOTIe rtd')
 
     # Pull auth from file or command line
@@ -69,20 +91,8 @@ def moti_download(args):
                 payload = {}
 
             fname = xml_file = os.path.join(args.cache_dir, 'moti-sawr7110_' + datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.xml')
-
-            # Configure requests to use retry
-            s = requests.Session()
-            a = requests.adapters.HTTPAdapter(max_retries=3)
-            s.mount('https://', a)
-            req = s.get('https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110', params=payload, auth=auth)
-
-            log.info('{}: {}'.format(req.status_code, req.url))
-            if req.status_code != 200:
-                raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
-            with open(fname, 'wb') as f:
-                f.write(req.content)
-
-            moti_normalize(args, log, fname)
+            fname = download(payload, auth, fname, log)
+            prepare(args, log, fname)
 
     except IOError:
         log.exception("Unable to download or open xml data")
