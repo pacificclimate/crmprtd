@@ -19,20 +19,18 @@ def test_insert_obs(test_session, val, hid, d, vars_id, expected):
     q = test_session.query(Obs)
     assert q.count() == expected
 
-    q = test_session.query(Obs.datum).filter(Obs.history_id == hid, Obs.time == d, Obs.vars_id == vars_id)
-    result = next(iter(q[0]))
+    result, = test_session.query(Obs.datum).filter(Obs.history_id == hid, Obs.time == d, Obs.vars_id == vars_id).first()
     assert result == val
 
 
 def test_check_and_insert_stations(test_session, test_data):
     o = ObsProcessor(test_session, test_data, 1000)
 
+    # Create a set of stations where one of them already exists in the table
     stations = set()
-    id = 0
-    q = test_session.query(Station.native_id).join(Network).filter(Network.id == o.network_id).first()
-    id = q[0]
-    stations.add(id)
-    for i in range(3):
+    id, = test_session.query(Station.native_id).join(Network).filter(Network.id == o.network_id).first()
+    stations.add(id)    # Existing station
+    for i in range(3):  # New stations
         id += str(i)
         stations.add(id)
 
@@ -45,7 +43,7 @@ def test_check_and_insert_stations(test_session, test_data):
     assert q.count() == count + 3
 
     for station in stations:
-        q = test_session.query(Station).join(Network).filter(and_(Station.native_id == station, Network.id == o.network_id))
+        q = test_session.query(Station).join(Network).filter(Station.native_id == station, Network.id == o.network_id)
         assert q.count() == 1
 
 
