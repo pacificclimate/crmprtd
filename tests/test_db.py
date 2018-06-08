@@ -3,8 +3,8 @@ from datetime import datetime
 import pytest
 import pytz
 
-from pycds import History, Obs
-from crmprtd.db import mass_insert_obs
+from pycds import Network, Variable, History, Station, Obs
+from crmprtd.db import mass_insert_obs, split
 
 
 @pytest.mark.parametrize(('label', 'days', 'expected'), [
@@ -46,3 +46,14 @@ def test_mass_insert_obs_weird(test_session):
     assert mass_insert_obs(test_session, []) == 0
     assert mass_insert_obs(test_session, [x]) == 1
     assert mass_insert_obs(test_session, [y]) == 0
+
+
+@pytest.mark.parametrize(('tuple', 'expected_a', 'expected_b'), [
+    ((), (), ()),
+    ((1,), 1, ()),
+    ((1, 2, 3, 4), (1, 2), (3, 4))
+])
+def test_split(tuple, expected_a, expected_b):
+    test_a, test_b = split(tuple)
+    assert test_a == expected_a
+    assert test_b == expected_b
