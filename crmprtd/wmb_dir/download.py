@@ -40,47 +40,30 @@ def local_file_search(archive_file, archive_dir, log):
         path = os.path.join(args.archive_dir, args.archive_file)
     log.info('Loading local file {0}'.format(path))
 
-    # open and read into data
-    data = []
     try:
         with open(path) as f:
             log.debug('opened the local file')
             reader = csv.DictReader(f)
-            for row in reader:
-                data.append(row)
-            return data
+            return reader
     except IOError as e:
         log.exception('Unable to load data from local file')
         sys.exit(1)
 
 
-def ftp_file_search(ftp_server, ftp_file, log, auth, cache_dir):
+def ftp_file_read(ftp_server, ftp_file, log, auth):
     # Fetch file from FTP and read into memory
     log.info('Fetching file from FTP')
     log.info('Downloading {}/{}'.format(ftp_server, ftp_file))
 
-    data = []
     try:
         ftpreader = FTPReader(ftp_server, auth['u'], auth['p'], ftp_file, log)
         log.info('Opened a connection to {}'.format(ftp_server))
         reader = ftpreader.csv_reader()
-        for row in reader:
-            data.append(row)
-        log.info('instantiated the reader and processed all rows')
-        save_file(reader, cache_dir, data)
-        return data
+        log.info('instantiated the reader')
+        return reader
     except ftplib.all_errors as e:
         log.critical('Unable to load data from ftp source', exc_info=True)
         sys.exit(1)
-
-
-def save_file(reader, cache_dir, data):
-    # save the downloaded file
-    fname_out = os.path.join(cache_dir, 'wmb_download' + datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
-    with open(fname_out, 'w') as f_out:
-        copier = csv.DictWriter(f_out, fieldnames = reader.fieldnames)
-        copier.writeheader()
-        copier.writerows(data)
 
 
 def run(args):
@@ -99,13 +82,12 @@ def run(args):
 
     # Check for local file source
     if args.archive_file:
-        data = local_file_search(args.archive_file, args.archive_dir, log)
+        reader = local_file_search(args.archive_file, args.archive_dir, log)
     # Or use FTP source
     else:
-        data = ftp_file_search(args.ftp_server, args.ftp_file, log, auth, args.cache_dir)
+        reader = ftp_file_read(args.ftp_server, args.ftp_file, log, auth)
 
-    log.info('{0} observations read into memory'.format(len(data)))
-    prepare(args, log, data)
+    prepare(args, log, reader)
 
 
 class FTPReader(object):

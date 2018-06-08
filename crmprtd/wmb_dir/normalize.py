@@ -1,8 +1,10 @@
 # Standard module
 import sys
+import os
 import logging
+import csv
 
-# debug
+from datetime import datetime
 
 # Local
 from crmprtd.wmb import ObsProcessor, DataLogger
@@ -11,7 +13,29 @@ from crmprtd.wmb import ObsProcessor, DataLogger
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-def prepare(args, log, data):
+
+def save_file(reader, cache_dir, data):
+    # save the downloaded file
+    fname_out = os.path.join(cache_dir, 'wmb_download' + datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
+    with open(fname_out, 'w') as f_out:
+        copier = csv.DictWriter(f_out, fieldnames = reader.fieldnames)
+        copier.writeheader()
+        copier.writerows(data)
+
+
+def reader2data(reader, cache_dir):
+    data = []
+    for row in reader:
+        data.append(row)
+    save_file(reader, cache_dir, data)
+    return data
+
+
+def prepare(args, log, reader):
+    data = reader2data(reader, args.cache_dir)
+    log.info('processed all rows from reader')
+    log.info('{0} observations read into memory'.format(len(data)))
+
     dl = DataLogger()
 
     # Open database connection
