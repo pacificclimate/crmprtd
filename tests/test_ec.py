@@ -444,7 +444,7 @@ def test_process_xml(ec_session, caplog):
     import logging
     caplog.set_level(logging.INFO)
 
-    from ec_data import hourly_bc_2016061115, hourly_bc_2016061116
+    from tests.ec_data import hourly_bc_2016061115, hourly_bc_2016061116
 
     obs_count = ec_session.query(Obs).count()
 
