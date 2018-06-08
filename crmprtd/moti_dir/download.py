@@ -67,7 +67,7 @@ def run(args):
             fname = args.filename
             xml_file = open(args.filename, 'r')
             log.debug("File opened sucessfully")
-            moti_normalize(args, log, xml_file)
+            prepare(args, log, xml_file)
 
         else:
             if args.start_time and args.end_time:
