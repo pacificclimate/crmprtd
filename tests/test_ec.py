@@ -1,7 +1,9 @@
 from pkg_resources import resource_filename
 from datetime import datetime
 
-from lxml.etree import fromstring, parse, XSLT
+from io import StringIO, BytesIO
+import pytz
+from lxml.etree import tostring, fromstring, parse, XSLT
 import pytest
 
 from crmprtd.ec import makeurl, extract_fname_from_url, ns, \
@@ -10,7 +12,7 @@ from crmprtd.ec import makeurl, extract_fname_from_url, ns, \
 from pycds import Obs
 
 
-@pytest.mark.parametrize(('label', 'args', 'expected'), [
+@pytest.mark.parametrize(('label', 'args','expected'), [
     ('daily-BC-EN',
      {'freq': 'daily',
       'province': 'BC',
@@ -58,6 +60,7 @@ def test_makeurl_no_time_hourly():
                    'hourly/hourly_bc_{}_e.xml').format(t.strftime(fmt))
 
 
+
 def test_makeurl_no_time_daily():
     url = makeurl()
     fmt = '%Y%m%d'
@@ -65,6 +68,7 @@ def test_makeurl_no_time_daily():
 
     assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
                    'yesterday/yesterday_bc_{}_e.xml').format(t.strftime(fmt))
+
 
 
 @pytest.mark.parametrize(('url', 'fname'), [
@@ -479,3 +483,48 @@ def test_process_xml(ec_session, caplog):
     op = ObsProcessor(hourly_bc_2016061116, ec_session, 1000)
     op.process()
     assert ec_session.query(Obs).count() == obs_count + 260
+
+
+@pytest.mark.parametrize(('et'), [
+    (b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <om:member>
+    <om:Observation>
+      <om:metadata>
+        <set>
+          <general>
+            <dataset name="mscobservation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/"/>
+          </general>
+          <identification-elements>
+            <element name="station_name" uom="unitless" value="Sechelt"/>
+            <element name="climate_station_number" uom="unitless" value="1047172"/>
+          </identification-elements>
+        </set>
+      </om:metadata>
+      <om:samplingTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2012-09-28T02:00:00.000Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:samplingTime>
+      <om:featureOfInterest>
+        <gml:FeatureCollection>
+          <gml:location>
+            <gml:Point>
+              <gml:pos>49.45 -123.7</gml:pos>
+            </gml:Point>
+          </gml:location>
+        </gml:FeatureCollection>
+      </om:featureOfInterest>
+    </om:Observation>
+  </om:member>
+</om:ObservationCollection>''')
+])
+def test_parse_xml(et):
+    test = BytesIO(et)
+    transformed = parse_xml(test)
+    for a,b in zip(et.decode("utf-8").splitlines(), transformed.__str__().splitlines()):
+        if '<?xml' in a:
+            # special case for first line
+            assert a[:18] == b[:18]
+        else:
+            assert a == b
