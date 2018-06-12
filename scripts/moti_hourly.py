@@ -19,17 +19,13 @@ from sqlalchemy.orm import sessionmaker
 # Local
 from crmprtd import retry
 from crmprtd.moti import makeurl, process
-from crmprtd.moti_dir.download import run
+from crmprtd.moti.download import run
 
 # debug
 from pdb import set_trace
 
 
-def main(args):
-    run(args)
-
 if __name__ == '__main__':
-
     parser = ArgumentParser()
     parser.add_argument('-c', '--connection_string',
                         help='PostgreSQL connection string of form:\n\tdialect+driver://username:password@host:port/database\nExamples:\n\tpostgresql://scott:tiger@localhost/mydatabase\n\tpostgresql+psycopg2://scott:tiger@localhost/mydatabase\n\tpostgresql+pg8000://scott:tiger@localhost/mydatabase')
@@ -61,4 +57,4 @@ if __name__ == '__main__':
     # parser.add_argument('-o', '--output_dir', dest='output_dir', help='directory in which to put the downloaded file')
 
     args = parser.parse_args()
-    main(args)
+    run(args)
