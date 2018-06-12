@@ -1,4 +1,4 @@
-from crmprtd.wmb_dir.download import logging_setup
+from crmprtd.wmb.download import logging_setup
 
 def test_logging_setup():
     log = logging_setup('mof.log', 'test@mail.com', 'INFO')
