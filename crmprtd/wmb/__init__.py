@@ -15,13 +15,11 @@ from crmprtd.wmb_exceptions import InsertionError, UniquenessError
 log = logging.getLogger(__name__)
 
 class ObsProcessor:
-    network_id = 12
 
     def __init__(self, sesh, data, prefs):
         """
         Take a list of dictionary based observations and do everything to
         insert into crmp database
-
         data - list of dictionaries given by csv.DictReader with keys
             "station_code",
             "weather_date",
@@ -46,7 +44,6 @@ class ObsProcessor:
             precip_rgt,
             solar_radiation_LICOR,
             solar_radiation_CM3
-
         prefs - an object of type optparse.Values with attributes:
             connection_string, log,
             cache_dir, error_email
@@ -65,6 +62,7 @@ class ObsProcessor:
         self.datalogger = DataLogger()
         self.data = self._parse_times(data)
         self.data_vars = set(self.data[0].keys())
+        self.network_id = self.sesh.query(Network.id).filter(Network.name == 'FLNRO-WMB')
         self.network = self.sesh.query(Network).filter(Network.id == self.network_id).first()
 
     def _parse_times(self, data):
@@ -112,7 +110,6 @@ class ObsProcessor:
         """
         This function handles inserting all valid observations into
         the database.
-
         In order to avoid any fkey constraints, it starts by validating
         all the stations present in the data with those in the database
         and inserting if necessary.
@@ -179,7 +176,6 @@ class ObsProcessor:
         """
         This will take a single observation, parse the measurements, and
         attempt to insert into database.
-
         psycopg2 errors caught in caller:
             InterfaceError
             DatabaseError
@@ -188,7 +184,6 @@ class ObsProcessor:
             ->    IntegrityError
             ->    InternalError
             ->    ProgrammingError
-
         InserationErrors and UniquenessErrors are handled
         """
 
@@ -278,7 +273,6 @@ class ObsProcessor:
         """
         This looks at what variables are provided in the download
         and compares it to what the database is able to accept.
-
         Returns a dictionary mapping dl vars to acceptable db vars
         """
         q = self.sesh.query(Variable.name, Variable.id).filter(Variable.network == self.network)
@@ -293,7 +287,6 @@ def check_history(obs, network, sesh):
     """
     Checks to see if an active history_id exists for this observation or
     it not adds one.
-
     Returns the history_id if successful or None if not
     """
 
@@ -335,13 +328,10 @@ def insert_obs(val, hid, d, vars_id, sesh):
     """
     This takes an individual observation and inserts
     into obs_raw using the provided history_id, datetime, and variable id.
-
     We also need to differentiate between and error violating uniqueness
     and other errors that will require archiving the data.
     Uniqueness constrained by: history_id , vars_id , obs_time
-
     psycopg2.IntegrityError handles uniqueness, fkey,...
-
     Returns obs_raw_id on success, UniquenessError if already exists,
     or InsertionError on failure.
     """
@@ -432,7 +422,6 @@ class DataLogger:
         """
         Archive the unsuccessfull additions in a manner that allows
         easy re-insertion attempts.
-
         Returns full path of output csv
         """
         import csv
