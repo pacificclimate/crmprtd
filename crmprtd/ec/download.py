@@ -9,7 +9,7 @@ import yaml
 
 # Local
 from crmprtd.ec import makeurl, extract_fname_from_url
-from crmprtd.ec_dir.normalize import prepare
+from crmprtd.ec.normalize import prepare
 
 
 def logging_setup(log_conf, log, error_email, log_level):
@@ -27,6 +27,7 @@ def logging_setup(log_conf, log, error_email, log_level):
         log.setLevel(log_level)
 
     return log
+
 
 def download(log, frequency, province, language, time, cache_dir):
     # Configure requests to use retry
@@ -49,6 +50,7 @@ def download(log, frequency, province, language, time, cache_dir):
 
     return fname
 
+
 def run(args):
     # Setup logging
     log = logging_setup(args.log_conf, args.log, args.error_email, args.log_level)
@@ -58,7 +60,7 @@ def run(args):
         if args.filename:
             log.debug("Opening local xml file {0} for reading".format(args.filename))
             fname = args.filename
-            xml_file = open(args.filename, 'r') # Do not catch exception here
+            xml_file = open(args.filename, 'r')  # Do not catch exception here
             log.debug("File opened sucessfully")
 
             ec_normalize(args, log, xml_file)
