@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 # Local
 from crmprtd.wamr import setup_logging
 from crmprtd.wamr import file2rows, ftp2rows
-from crmprtd.wamr_dir.normalize import prepare
+from crmprtd.wamr.normalize import prepare
 
 
 def run(args):

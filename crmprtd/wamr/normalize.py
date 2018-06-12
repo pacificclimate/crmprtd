@@ -22,6 +22,7 @@ def input_file_prepare(args, error_file, log):
     log.info('{0} observations read into memory'.format(len(rows)))
     prepare(rows, error_file, log, args)
 
+
 def prepare(rows, error_file, log, args):
     # Database connection
     try:
