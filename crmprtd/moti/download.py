@@ -10,7 +10,7 @@ import requests
 import yaml
 
 # Local
-from crmprtd.moti_dir.normalize import prepare
+from crmprtd.moti.normalize import prepare
 
 
 def logging_setup(log_conf, log, error_email, log_level):
