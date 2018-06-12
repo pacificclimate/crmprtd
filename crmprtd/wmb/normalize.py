@@ -23,15 +23,8 @@ def save_file(reader, cache_dir, data):
         copier.writerows(data)
 
 
-def reader2data(reader):
-    data = []
-    for row in reader:
-        data.append(row)
-    return data
-
-
 def prepare(args, log, reader):
-    data = reader2data(reader)
+    data = list(reader)
     save_file(reader, args.cache_dir, data)
     log.info('processed all rows from reader')
     log.info('{0} observations read into memory'.format(len(data)))
