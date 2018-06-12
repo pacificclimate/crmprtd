@@ -32,7 +32,7 @@ def reader2data(reader):
 
 def prepare(args, log, reader):
     data = reader2data(reader)
-    save_file(reader, cache_dir, data)
+    save_file(reader, args.cache_dir, data)
     log.info('processed all rows from reader')
     log.info('{0} observations read into memory'.format(len(data)))
 

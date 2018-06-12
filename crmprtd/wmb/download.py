@@ -11,7 +11,7 @@ from datetime import datetime
 from pkg_resources import resource_stream
 # Local
 from crmprtd import retry
-from crmprtd.wmb_dir.normalize import prepare
+from crmprtd.wmb.normalize import prepare
 
 # Installed libraries
 import yaml

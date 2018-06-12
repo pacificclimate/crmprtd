@@ -10,14 +10,10 @@ from pkg_resources import resource_stream
 from argparse import ArgumentParser
 
 # Local
-from crmprtd.wmb_dir.download import run
+from crmprtd.wmb.download import run
 
-
-def main(args):
-    run(args)
 
 if __name__ == '__main__':
-
     parser = ArgumentParser()
     parser.add_argument('-c', '--connection_string',
                         help='PostgreSQL connection string')
@@ -53,5 +49,6 @@ if __name__ == '__main__':
     parser.add_argument('-D', '--diag',
                         default=False, action="store_true",
                         help="Turn on diagnostic mode (no commits)")
+
     args = parser.parse_args()
-    main(args)
+    run(args)
