@@ -19,14 +19,10 @@ import yaml
 # Local
 from crmprtd import retry
 from crmprtd.ec import makeurl, ObsProcessor, parse_xml, extract_fname_from_url
-# needs import for ec_download
-from crmprtd.ec_dir.download import run
+from crmprtd.ec.download import run
 
-def main(args):
-    run(args)
 
 if __name__ == '__main__':
-
     parser = ArgumentParser()
     parser.add_argument('-c', '--connection_string', required=True,
                          help='PostgreSQL connection string of form:\n\tdialect+driver://username:password@host:port/database\nExamples:\n\tpostgresql://scott:tiger@localhost/mydatabase\n\tpostgresql+psycopg2://scott:tiger@localhost/mydatabase\n\tpostgresql+pg8000://scott:tiger@localhost/mydatabase')
@@ -60,4 +56,4 @@ if __name__ == '__main__':
                         help="Turn on diagnostic mode (no commits)")
 
     args = parser.parse_args()
-    main(args)
+    run(args)
