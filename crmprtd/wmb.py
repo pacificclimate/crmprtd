@@ -7,7 +7,7 @@ from decimal import Decimal
 
 from sqlalchemy import and_, or_
 
-from pycds import Network, Station, Variable, datalogger, History, Obs
+from pycds import Network, Station, Variable, History, Obs
 from crmprtd.wmb_exceptions import InsertionError, UniquenessError
 
 log = logging.getLogger(__name__)
