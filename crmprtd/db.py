@@ -31,7 +31,7 @@ def mass_insert_obs(sesh, obs, log=None):
         log = logging.getLogger(__name__)
 
     log.debug("mass_insert_obs() called with %d obs", len(obs))
-        
+
     # Base cases
     if len(obs) < 1:
         return 0
