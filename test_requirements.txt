@@ -2,3 +2,4 @@ pytest
 pytest-cov
 pytest-catchlog
 testing.postgresql
+flake8
