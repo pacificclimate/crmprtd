@@ -1,4 +1,3 @@
-import psycopg2
 import logging
 
 from datetime import datetime
@@ -7,12 +6,12 @@ from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
 from sqlalchemy import and_, or_
-from sqlalchemy.sql import exists
 
-from pycds import *
+from pycds import Network, Station, Variable, datalogger, History, Obs
 from crmprtd.wmb_exceptions import InsertionError, UniquenessError
 
 log = logging.getLogger(__name__)
+
 
 class ObsProcessor:
 
@@ -64,8 +63,10 @@ class ObsProcessor:
         self.datalogger = DataLogger()
         self.data = self._parse_times(data)
         self.data_vars = set(self.data[0].keys())
-        self.network_id = self.sesh.query(Network.id).filter(Network.name == 'FLNRO-WMB')
-        self.network = self.sesh.query(Network).filter(Network.id == self.network_id).first()
+        self.network_id = self.sesh.query(
+            Network.id).filter(Network.name == 'FLNRO-WMB')
+        self.network = self.sesh.query(Network).filter(
+            Network.id == self.network_id).first()
 
     def _parse_times(self, data):
         """
@@ -84,11 +85,12 @@ class ObsProcessor:
                 dt = parse(d) + relativedelta(hours=+int(t))
                 obs['weather_date'] = dt
             except ValueError as e:
-                log.error('Unexpected values when parsing date: {0}'.format(obs['weather_date']))
+                log.error('Unexpected values when parsing date: {0}'.format(
+                    obs['weather_date']))
                 self._line_errors += 1
                 self._unhandled_errors += 1
                 unparsable_times.append(obs)
-                ## remove observations from data later to keep loop indices
+                # remove observations from data later to keep loop indices
                 continue
 
         # now is later...
@@ -96,11 +98,14 @@ class ObsProcessor:
         for obs in unparsable_times:
             data.remove(obs)
 
-        log.info('Sucessfully parsed station dates'.format(len(unparsable_times)))
+        log.info('Sucessfully parsed station dates'.format(
+            len(unparsable_times)))
         return data
 
     def print_data(self):
-        order = ['station_code','weather_date','precipitation','temperature','relative_humidity','wind_speed','wind_direction']
+        order = ['station_code', 'weather_date', 'precipitation',
+                 'temperature', 'relative_humidity', 'wind_speed',
+                 'wind_direction']
         for k in order:
             print(k + '\t|\t'),
         for obs in self.data:
@@ -136,18 +141,18 @@ class ObsProcessor:
         for row in self.data:
             try:
                 log.debug('Processing observation at station {s} '
-                    'timestamp {t}'.format(s=row['station_code'],
-                                           t=row['weather_date']
-                                           ))
+                          'timestamp {t}'.format(s=row['station_code'],
+                                                 t=row['weather_date']
+                                                 ))
 
                 self.process_row(row)
 
             except Exception as e:
                 log.error('Error inserting observation at station '
-                        '{s} timestamp {t} -> {e}'.format(s=row['station_code'],
-                                                          t=row['weather_date'],
-                                                           e=e
-                                                           ))
+                          '{s} timestamp {t} -> {e}'
+                          .format(s=row['station_code'],
+                                  t=row['weather_date'],
+                                  e=e))
                 self.datalogger.add_row(row, reason='Database/Interface Error')
             self._lines += 1
 
@@ -196,10 +201,11 @@ class ObsProcessor:
         hid = check_history(row, self.network, self.sesh)
         log.debug('\tHistory id {0}'.format(hid))
 
-        if hid == None:
+        if hid is None:
             self._line_errors += 1
             self._unhandled_errors += 1
-            self.datalogger.add_row(row, reason='Cannot find or create history_id')
+            self.datalogger.add_row(
+                row, reason='Cannot find or create history_id')
             return None
 
         # insert the observation by variable
@@ -210,13 +216,14 @@ class ObsProcessor:
                 if var not in row.keys():
                     continue
 
-                if not row[var]: # avoid possibly empty values
+                if not row[var]:  # avoid possibly empty values
                     continue
                 self._total_obs += 1
 
                 insert_obs(row[var], hid, d, self.db_vars[var], self.sesh)
                 self._inserted_obs += 1
-                log.debug('\tInserted {0} with value {1}'.format(var, row[var]))
+                log.debug(
+                    '\tInserted {0} with value {1}'.format(var, row[var]))
 
             except UniquenessError as e:
                 log.debug(e)
@@ -224,7 +231,9 @@ class ObsProcessor:
                 continue
 
             except InsertionError as e:
-                log.debug('Error inserting observation, rolling back: {e}'.format(e=e))
+                log.debug(
+                    'Error inserting observation, rolling back: {e}'.format(
+                        e=e))
                 self._insert_errors += 1
                 self.datalogger.add_obs(row, var, reason='InserationError')
 
@@ -238,7 +247,8 @@ class ObsProcessor:
         dl = set(stations)
 
         # query existing stations in database
-        q = self.sesh.query(Station.native_id).filter(Station.network == self.network)
+        q = self.sesh.query(Station.native_id).filter(
+            Station.network == self.network)
         db = set([record[0] for record in q])
 
         # determine new stations and add to db
@@ -246,25 +256,30 @@ class ObsProcessor:
         new_stations = dl.difference(db)
         log.info('New stations with native_ids: {}'.format(new_stations))
         for station in new_stations:
-            log.debug('Station id {native_id} not in db'.format(native_id = station))
+            log.debug('Station id {native_id} not in db'.format(
+                native_id=station))
             self.sesh.begin_nested()
             try:
-                stn = Station(native_id = station, network = self.network)
+                stn = Station(native_id=station, network=self.network)
                 self.sesh.add(stn)
             except Exception as e:
                 self.sesh.rollback()
-                log.error('Could not add station {native_id}, archiving data'.format(native_id = station), e)
+                log.error(
+                    'Could not add station {native_id}, archiving data'.format(
+                        native_id=station), e)
                 self._unhandled_errors += 1
                 self._archive_station(station)
             else:
                 self.sesh.commit()
-                log.debug('Added native id {native_id}'.format(native_id = station))
+                log.debug('Added native id {native_id}'.format(
+                    native_id=station))
 
         return new_stations
 
     def _archive_station(self, station):
         """
-        This takes a station native_id and removes and archives all associated data
+        This takes a station native_id and removes and archives all associated
+        data
         """
 
         archive_data = query_by_attribute('station_code', station)
@@ -281,13 +296,15 @@ class ObsProcessor:
 
         Returns a dictionary mapping dl vars to acceptable db vars
         """
-        q = self.sesh.query(Variable.name, Variable.id).filter(Variable.network == self.network)
+        q = self.sesh.query(Variable.name, Variable.id).filter(
+            Variable.network == self.network)
         d = {}
         for net_var_name, vars_id in q:
             if net_var_name in self.data_vars:
                 d[net_var_name] = vars_id
 
         return d
+
 
 def check_history(obs, network, sesh):
     """
@@ -297,13 +314,21 @@ def check_history(obs, network, sesh):
     Returns the history_id if successful or None if not
     """
 
-    ## Search for history_id entries which match this station
+    # Search for history_id entries which match this station
     native_id = obs['station_code']
-    hist = sesh.query(History.id).join(Station).filter(Station.native_id == native_id, Station.network == network).filter(and_(or_(History.sdate <= obs['weather_date'], History.sdate.is_(None)), or_(History.edate >= obs['weather_date'], History.edate.is_(None))))
+    hist = sesh.query(History.id).join(Station)\
+                                 .filter(Station.native_id == native_id,
+                                         Station.network == network)\
+                                 .filter(and_(
+                                    or_(History.sdate <= obs['weather_date'],
+                                        History.sdate.is_(None)),
+                                    or_(History.edate >= obs['weather_date'],
+                                        History.edate.is_(None))))
 
     # If multiple results, handle error
     if hist.count() > 1:
-        log.error('Multiple valid history ids for station {0}'.format(native_id))
+        log.error(
+            'Multiple valid history ids for station {0}'.format(native_id))
         return None
 
     record = hist.first()
@@ -315,14 +340,17 @@ def check_history(obs, network, sesh):
     log.debug('Creating meta_history entry for {}'.format(native_id))
     sesh.begin_nested()
     try:
-        stn = sesh.query(Station).filter(Station.native_id == native_id, Station.network == network)
-        if stn.count() != 1: return None
+        stn = sesh.query(Station).filter(Station.native_id ==
+                                         native_id, Station.network == network)
+        if stn.count() != 1:
+            return None
         stn = stn.first()
-        hist = History(station = stn)
+        hist = History(station=stn)
         sesh.add(hist)
     except Exception as e:
         sesh.rollback()
-        log.error('Could not add meta_history entry for {}: {}'.format(native_id, e))
+        log.error(
+            'Could not add meta_history entry for {}: {}'.format(native_id, e))
     else:
         sesh.commit()
         log.debug('Added meta_history entry {}'.format(hist.id))
@@ -330,6 +358,7 @@ def check_history(obs, network, sesh):
 
     # If we get this far, something has gone wrong
     return None
+
 
 def insert_obs(val, hid, d, vars_id, sesh):
     """
@@ -350,11 +379,13 @@ def insert_obs(val, hid, d, vars_id, sesh):
         val = Decimal(val)
     except Exception as e:
         log.error('Unable to convert value to Decimal: {0}'.format(e))
-        raise InsertionError(obs_time = d, datum = val, vars_id = vars_id, hid = hid, e = e)
+        raise InsertionError(obs_time=d, datum=val,
+                             vars_id=vars_id, hid=hid, e=e)
 
     # Check to see if this entry will be unique
     try:
-        q = sesh.query(Obs.id).filter(and_(Obs.history_id == hid, Obs.vars_id == vars_id, Obs.time == d))
+        q = sesh.query(Obs.id).filter(
+            and_(Obs.history_id == hid, Obs.vars_id == vars_id, Obs.time == d))
         if q.count() > 0:
             raise UniquenessError(q.first())
     except UniquenessError as e:
@@ -362,7 +393,8 @@ def insert_obs(val, hid, d, vars_id, sesh):
         raise e
     except Exception as e:
         log.debug(e)
-        raise InsertionError(obs_time = d, datum = val, vars_id = vars_id, hid = hid, e = e)
+        raise InsertionError(obs_time=d, datum=val,
+                             vars_id=vars_id, hid=hid, e=e)
 
     # value does not exist in obs_raw, continue with insertion
     try:
@@ -371,11 +403,13 @@ def insert_obs(val, hid, d, vars_id, sesh):
         return
     except Exception as e:
         log.debug(e)
-        raise InsertionError(obs_time = d, datum = val, vars_id = vars_id, hid = hid, e = e)
+        raise InsertionError(obs_time=d, datum=val,
+                             vars_id=vars_id, hid=hid, e=e)
 
     # Should have already returned success, failure, or exception by now...
     log.debug('Unknown Error')
-    raise InsertionError(obs_time = d, datum = val, vars_id = vars_id, hid = hid)
+    raise InsertionError(obs_time=d, datum=val, vars_id=vars_id, hid=hid)
+
 
 def query_by_attribute(data, key, value):
     """
@@ -390,13 +424,16 @@ def query_by_attribute(data, key, value):
             results.append(row)
     return results
 
+
 class DataLogger:
     """
-    The datalogger is used to keep track of 2 types of unsuccessful observations
-    with their associated data:
-        -bad observations: used when unable to find or create a station_id or history_id, or parse observation time
+    The datalogger is used to keep track of 2 types of unsuccessful
+    observations with their associated data:
+        -bad observations: used when unable to find or create a station_id or
+                           history_id, or parse observation time
         -bad values: when an individual value cannot be inserted into obs_raw
     """
+
     def __init__(self):
         self.bad_rows = []
         self.bad_obs = []
@@ -405,16 +442,20 @@ class DataLogger:
         # handle single observations
         if type(data) == dict:
             data['reason'] = reason
-            if type(data['weather_date']) == datetime: # convert dt back to original format
-                data['weather_date'] = datetime.strftime(data['weather_date'], '%Y%m%d%H')
+            # convert dt back to original format
+            if type(data['weather_date']) == datetime:
+                data['weather_date'] = datetime.strftime(
+                    data['weather_date'], '%Y%m%d%H')
             self.bad_rows.append(data)
 
         # handle multiple observations as a list
         if type(data) == list:
             for row in data:
                 row['reason'] = reason
-                if type(row['weather_date']) == datetime: # convert dt back to original format
-                    row['weather_date'] = datetime.strftime(row['weather_date'], '%Y%m%d%H')
+                # convert dt back to original format
+                if type(row['weather_date']) == datetime:
+                    row['weather_date'] = datetime.strftime(
+                        row['weather_date'], '%Y%m%d%H')
                 self.bad_rows.append(row)
 
     def add_obs(self, obs, var, reason=None):
@@ -422,11 +463,13 @@ class DataLogger:
         Recreate dictionary entry using only applicable variable
         """
 
-        self.bad_obs.append({'station_code':obs['station_code'],
-                                'weather_date':datetime.strftime(obs['weather_date'], '%Y%m%d%H'),
-                                var:obs[var],
-                                'reason':reason
-                                })
+        self.bad_obs.append({'station_code': obs['station_code'],
+                             'weather_date': datetime.strftime(
+                                obs['weather_date'],
+                                '%Y%m%d%H'),
+                             var: obs[var],
+                             'reason': reason
+                             })
 
     def archive(self, out_dir):
         """
@@ -439,34 +482,34 @@ class DataLogger:
         import os.path
 
         outcsv = os.path.join(out_dir, 'wmb_data_errors_' +
-                      datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') +
-                              '.csv')
+                              datetime.strftime(
+                                datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
 
         order = ['reason',
-            'station_code',
-            'weather_date',
-            'precipitation',
-            'temperature',
-            'relative_humidity',
-            'wind_speed',
-            'wind_direction',
-            'ffmc',
-            'isi',
-            'fwi',
-            'rn_1_pluvio1',
-            'snow_depth',
-            'snow_depth_quality',
-            'precip_pluvio1_status',
-            'precip_pluvio1_total',
-            'rn_1_pluvio2',
-            'precip_pluvio2_status',
-            'precip_pluvio2_total',
-            'rn_1_RIT',
-            'precip_RIT_Status',
-            'precip_RIT_total',
-            'precip_rgt',
-            'solar_radiation_LICOR',
-            'solar_radiation_CM3']
+                 'station_code',
+                 'weather_date',
+                 'precipitation',
+                 'temperature',
+                 'relative_humidity',
+                 'wind_speed',
+                 'wind_direction',
+                 'ffmc',
+                 'isi',
+                 'fwi',
+                 'rn_1_pluvio1',
+                 'snow_depth',
+                 'snow_depth_quality',
+                 'precip_pluvio1_status',
+                 'precip_pluvio1_total',
+                 'rn_1_pluvio2',
+                 'precip_pluvio2_status',
+                 'precip_pluvio2_total',
+                 'rn_1_RIT',
+                 'precip_RIT_Status',
+                 'precip_RIT_total',
+                 'precip_rgt',
+                 'solar_radiation_LICOR',
+                 'solar_radiation_CM3']
 
         with open(outcsv, 'wb') as f:
             w = csv.writer(f)

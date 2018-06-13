@@ -25,6 +25,7 @@ for def_ in (
 ):
     ureg.define(def_)
 
+
 def create_station_mapping(sesh, rows):
     '''Create a names -> history object map for the set of stations that are
        contained in the rows
@@ -78,7 +79,6 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
     else:
         hist = histories[row['EMS_ID']]
 
-
     # This variable is actually named wrong in WAMR's files
     row['PARAMETER'] = re.sub('WSPD_VECT', 'WSPD_SCLR', row['PARAMETER'])
 
@@ -96,8 +96,8 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
     src_unit = row['UNIT']
     dst_unit = var.unit
 
-    # Hack the units. We shouldn't have to do this, but our units library (pint) is
-    # kind of a pain when it comes to processing the % sign.
+    # Hack the units. We shouldn't have to do this, but our units library
+    # (pint) is kind of a pain when it comes to processing the % sign.
     # Let's just do a simple string replace and move on with our lives
     src_unit = re.sub('% RH', 'percent', row['UNIT'])
     dst_unit = re.sub('%', 'percent', dst_unit)
@@ -105,8 +105,8 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
     if src_unit != dst_unit:
         log.debug("Source %f %s", val, src_unit)
         try:
-            val = Q_(val, ureg.parse_expression(src_unit)) # src
-            val = val.to(dst_unit).magnitude # dest
+            val = Q_(val, ureg.parse_expression(src_unit))  # src
+            val = val.to(dst_unit).magnitude  # dest
         except:
             raise Exception(
                 "Can't convert source unit {} to destination unit {}".format(
@@ -205,7 +205,9 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
             log.info('Commiting the sesh')
             sesh.commit()
 
-    except Exception as e:  # FIXME: sqlalchemy.exc.OperationalError? (cannot connect to db) sqlalchemy.exc.InternalError (read-only transaction)
+    # FIXME: sqlalchemy.exc.OperationalError? (cannot connect to db)
+    # sqlalchemy.exc.InternalError (read-only transaction)
+    except Exception as e:
         dl.add_row(rows, 'preproc error')
         sesh.rollback()
         data_archive = dl.archive(error_file)
