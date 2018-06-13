@@ -62,8 +62,9 @@ def test_rows2db(test_session, diagnostic, expected):
         assert header_line in output
         assert error_line in output
 
-    # Check that some obs were or were not inserted (depending on diagnostic mode)
-    q = test_session.query(Obs).join(History).filter(History.station_name == 'Warfield Elementary')
+    # Check that some obs were or were not inserted (depending on diagnostic)
+    q = test_session.query(Obs).join(History).filter(
+        History.station_name == 'Warfield Elementary')
     assert q.count() == expected
 
 
@@ -95,11 +96,12 @@ def test_rows2db_units_conversion(test_session):
     with TemporaryFile('w+t') as error_file:
         rows2db(sesh, rows, error_file, log, diagnostic=False)
 
-    q = sesh.query(Obs).join(History).filter(History.station_name == 'Warfield Elementary')
+    q = sesh.query(Obs).join(History).filter(
+        History.station_name == 'Warfield Elementary')
 
     obs = q.all()
 
-    assert len(obs) == 4 # The not_convertable obs was not included
+    assert len(obs) == 4  # The not_convertable obs was not included
 
     for ob in q.all():
         assert ob.datum == pytest.approx(0, abs=1.0e-6)

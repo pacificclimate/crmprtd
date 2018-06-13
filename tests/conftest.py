@@ -1,11 +1,10 @@
-from collections import namedtuple
-from pkg_resources import resource_stream, resource_filename
+from pkg_resources import resource_filename
 from datetime import datetime
 from io import StringIO
 
-import logging, logging.config
+import logging
+import logging.config
 
-import yaml
 import pytest
 import sqlalchemy
 from sqlalchemy.schema import DDL, CreateSchema
@@ -19,15 +18,18 @@ import pycds
 from pycds import Network, Station, Contact, History, Variable, Obs
 import sys
 
+
 def pytest_runtest_setup():
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
+
 
 @pytest.yield_fixture(scope='function')
 def postgis_session():
     '''
     Yields a blank PostGIS session with no tables or data
     '''
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
+    logging.getLogger('sqlalchemy.engine').setLevel(
+        logging.ERROR)  # Let's not log all the db setup stuff...
 
     with testing.postgresql.Postgresql() as pg:
         engine = sqlalchemy.create_engine(pg.url())
@@ -39,12 +41,14 @@ def postgis_session():
         sesh.execute('SET search_path TO crmp,public')
         yield sesh
 
+
 @pytest.yield_fixture(scope='function')
 def crmp_session(postgis_session):
     '''
     Yields a PostGIS enabled session with CRMP schema but no data
     '''
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.ERROR) # Let's not log all the db setup stuff...
+    logging.getLogger('sqlalchemy.engine').setLevel(
+        logging.ERROR)  # Let's not log all the db setup stuff...
 
     # Add needed functions
     sqlalchemy.event.listen(
@@ -79,6 +83,7 @@ SECURITY DEFINER;''')
     logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     yield postgis_session
 
+
 @pytest.yield_fixture(scope='function')
 def test_session(crmp_session, caplog):
     '''
@@ -101,10 +106,12 @@ def test_session(crmp_session, caplog):
     five_mile_hist = History(station_name='FIVE MILE')
     beaver_air_hist = History(id=12345,
                               station_name='Beaver Creek Airport',
-                              the_geom='SRID=4326;POINT(-140.866667 62.416667)')
+                              the_geom=('SRID=4326;POINT(-140.866667 '
+                                        '62.416667)'))
     stewart_air_hist = History(id=10,
                                station_name='Stewart Airport',
-                               the_geom='SRID=4326;POINT(-129.985 55.9361111111111)')
+                               the_geom=('SRID=4326;POINT(-129.985 '
+                                         '55.9361111111111)'))
     sechelt1 = History(id=20,
                        station_name='Sechelt',
                        sdate='2012-09-24',
@@ -113,24 +120,27 @@ def test_session(crmp_session, caplog):
     sechelt2 = History(id=21,
                        station_name='Sechelt',
                        sdate='2012-09-26',
-                       the_geom='SRID=4326;POINT(-123.7152625 49.4579966666667)')
+                       the_geom=('SRID=4326;POINT(-123.7152625 '
+                                 '49.4579966666667)'))
     warfield = History(station_name='Warfield Elementary',
                        sdate='2005-01-12')
-
 
     stations = [
         Station(native_id='11091', network=moti, histories=[brandy_hist]),
         Station(native_id='1029', network=wmb, histories=[five_mile_hist]),
         Station(native_id='2100160', network=ec, histories=[beaver_air_hist]),
         Station(native_id='1067742', network=ec, histories=[stewart_air_hist]),
-        Station(native_id='1047172', network=ec, histories=[sechelt1, sechelt2]),
+        Station(native_id='1047172', network=ec,
+                histories=[sechelt1, sechelt2]),
         Station(native_id='0260011', network=wamr, histories=[warfield]),
     ]
     crmp_session.add_all(stations)
 
-    moti_air_temp = Variable(name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti)
+    moti_air_temp = Variable(
+        name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti)
     ec_precip = Variable(name='precipitation', unit='mm', network=ec)
-    wmb_humitidy = Variable(name='relative_humidity', unit='percent', network=wmb)
+    wmb_humitidy = Variable(name='relative_humidity',
+                            unit='percent', network=wmb)
     wamr_temp = Variable(name='TEMP_MEAN', unit='celsius', network=wamr)
 
     crmp_session.add_all([moti_air_temp, ec_precip, wmb_humitidy, wamr_temp])
@@ -147,6 +157,7 @@ def test_session(crmp_session, caplog):
     crmp_session.commit()
 
     yield crmp_session
+
 
 @pytest.fixture(scope='function')
 def test_data():
@@ -165,6 +176,7 @@ def test_data():
 
     return data
 
+
 @pytest.yield_fixture(scope='function')
 def ec_session(crmp_session, caplog):
     '''
@@ -180,10 +192,12 @@ def ec_session(crmp_session, caplog):
 
     beaver_air_hist = History(id=10000,
                               station_name='Beaver Creek Airport',
-                              the_geom='SRID=4326;POINT(-140.866667 62.416667)')
+                              the_geom=('SRID=4326;POINT(-140.866667 '
+                                        '62.416667)'))
     stewart_air_hist = History(id=10001,
                                station_name='Stewart Airport',
-                               the_geom='SRID=4326;POINT(-129.985 55.9361111111111)')
+                               the_geom=('SRID=4326;POINT(-129.985 '
+                                         '55.9361111111111)'))
     sechelt1 = History(id=20000,
                        station_name='Sechelt',
                        freq='1-hourly',
@@ -194,17 +208,21 @@ def ec_session(crmp_session, caplog):
                        station_name='Sechelt',
                        freq='1-hourly',
                        sdate='2012-09-26',
-                       the_geom='SRID=4326;POINT(-123.7152625 49.4579966666667)')
+                       the_geom=('SRID=4326;POINT(-123.7152625 '
+                                 '49.4579966666667)'))
 
     stations = [
         Station(native_id='2100160', network=ec, histories=[beaver_air_hist]),
         Station(native_id='1067742', network=ec, histories=[stewart_air_hist]),
-        Station(native_id='1047172', network=ec, histories=[sechelt1, sechelt2]),
+        Station(native_id='1047172', network=ec,
+                histories=[sechelt1, sechelt2]),
     ]
     crmp_session.add_all(stations)
 
-    ec_precip = Variable(id = 100, name='total_precipitation', unit='mm', network=ec)
-    ec_precip = Variable(id = 101, name='air_temperature', unit='Celsius', network=ec)
+    ec_precip = Variable(
+        id=100, name='total_precipitation', unit='mm', network=ec)
+    ec_precip = Variable(id=101, name='air_temperature',
+                         unit='Celsius', network=ec)
     crmp_session.add(ec_precip)
 
     obs = [
@@ -219,6 +237,7 @@ def ec_session(crmp_session, caplog):
     crmp_session.commit()
 
     yield crmp_session
+
 
 @pytest.fixture(scope='module')
 def moti_sawr7110_xml():
@@ -263,6 +282,7 @@ def moti_sawr7110_xml():
   </data>
 </cmml>''')
 
+
 @pytest.fixture(scope='module')
 def moti_sawr7110_xml_2a():
     """No duplicates"""
@@ -295,6 +315,7 @@ def moti_sawr7110_xml_2a():
     </observation-series>
   </data>
 </cmml>''')
+
 
 @pytest.fixture(scope='module')
 def moti_sawr7110_xml_2b():
@@ -340,6 +361,7 @@ def moti_sawr7110_xml_2b():
   </data>
 </cmml>''')
 
+
 @pytest.fixture(scope='module')
 def moti_sawr7110_new_station():
     return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -352,6 +374,7 @@ def moti_sawr7110_new_station():
     </observation-series>
   </data>
 </cmml>''')
+
 
 @pytest.fixture(scope='module')
 def moti_sawr7100_large():
@@ -435,6 +458,7 @@ def moti_sawr7100_large():
   </data>
 </cmml>
 ''')
+
 
 @pytest.fixture(scope='module')
 def ec_xml_single_obs():
