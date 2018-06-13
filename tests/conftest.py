@@ -1,6 +1,7 @@
 from collections import namedtuple
 from pkg_resources import resource_stream, resource_filename
 from datetime import datetime
+from io import StringIO
 
 import logging, logging.config
 
@@ -12,6 +13,7 @@ from sqlalchemy.orm import sessionmaker
 from lxml.etree import parse, fromstring, XSLT
 import testing.postgresql
 import pytz
+import csv
 
 import pycds
 from pycds import Network, Station, Contact, History, Variable, Obs
@@ -51,7 +53,6 @@ def crmp_session(postgis_session):
         DDL('''CREATE OR REPLACE FUNCTION closest_stns_within_threshold(X numeric, Y numeric, thres integer)
 RETURNS TABLE(history_id integer, lat numeric, lon numeric, dist double precision) AS
 $BODY$
-
 DECLARE
     mystr TEXT;
 BEGIN
@@ -146,6 +147,23 @@ def test_session(crmp_session, caplog):
 
     yield crmp_session
 
+@pytest.fixture(scope='function')
+def test_data():
+    lines = '''station_code,weather_date,precipitation,temperature,relative_humidity,wind_speed,wind_direction,ffmc,isi,fwi,rn_1_pluvio1,snow_depth,snow_depth_quality,precip_pluvio1_status,precip_pluvio1_total,rn_1_pluvio2,precip_pluvio2_status,precip_pluvio2_total,rn_1_RIT,precip_RIT_Status,precip_RIT_total,precip_rgt,solar_radiation_LICOR,solar_radiation_CM3
+11,2018052711,.00,14.2,55,10.4,167,81.160995,2.1806495,5.5260615,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
+11,2018052712,.00,16.4,57,9.1,152,81.667679,2.166688,5.4912086,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
+11,2018052713,.00,16.9,54,11.3,185,82.228363,2.5902824,6.5181026,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
+11,2018052714,.00,17.8,53,10.5,185,82.773972,2.6630962,6.9062028,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
+11,2018052715,.00,17.4,50,8.2,161,83.291313,2.5341561,6.5958676,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0
+'''
+    data = []
+    f = StringIO(lines)
+    reader = csv.DictReader(f)
+    for row in reader:
+        data.append(row)
+
+    return data
+
 @pytest.yield_fixture(scope='function')
 def ec_session(crmp_session, caplog):
     '''
@@ -236,7 +254,7 @@ def moti_sawr7110_xml():
         <temperature index="1" type="air-temperature">
           <value units="degC">-2.417</value>
         </temperature>
-        <temperature index="1" type="dew-point"> 
+        <temperature index="1" type="dew-point">
           <value units="degC">-4</value>
         </temperature>
       </observation>

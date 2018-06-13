@@ -58,7 +58,7 @@ def process_observation_series(sesh, os):
     members = os.xpath('./observation', namespaces=ns)
     log.debug("Found {} members for station {}".format(len(members), stn_id))
 
-    successes, failures, skips = 0, 0, 0            
+    successes, failures, skips = 0, 0, 0
     for member in members:
         t = member.get('valid-time')
         if not t:
@@ -78,7 +78,7 @@ def process_observation_series(sesh, os):
                 log.warn("Could not find the actual value for observation {}/{}. xpath search './value' returned no results".format(varname, vartype))
                 skips += 1
                 continue
-            
+
             units = value_element.get('units')
             try:
                 value = float(value_element.text)
@@ -86,7 +86,7 @@ def process_observation_series(sesh, os):
                 log.warn("Could not convert value '{}' to a number. Skipping this observation.".format(value))
                 skips += 1
                 continue
-                
+
             var = find_var(sesh, varname, vartype, units)
             if not var:
                 # Test for known unwanted vars, only warn when unknown
@@ -127,7 +127,7 @@ def check_history(stn_id, sesh):
     hist = sesh.query(History).join(Station).join(Network).filter(Station.native_id == stn_id).filter(Network.name == 'MoTIe').first()
     if hist:
         return hist
-    
+
     # No history id, check if station_id exists
     log.debug("History_id not found")
     stn = sesh.query(Station).join(Network).filter(Station.native_id == stn_id).filter(Network.name == 'MoTIe').first()
@@ -164,11 +164,11 @@ def url_generator(station, from_, to, report='7110', request='historic'):
     # The MoTI app seems to accept its parameters in localtime
     from_ = from_.astimezone(tz)
     to = to.astimezone(tz)
-    
+
     # Truncate to nearest hour
     from_ = from_.replace(minute=0, second=0, microsecond=0)
     to = to.replace(minute=0, second=0, microsecond=0)
-    
+
     max_span = timedelta(days=6)
     timestep = timedelta(hours=1)
     t = from_

@@ -19,102 +19,10 @@ import yaml
 # Local
 from crmprtd import retry
 from crmprtd.ec import makeurl, ObsProcessor, parse_xml, extract_fname_from_url
+from crmprtd.ec.download import run
 
-def main(args):
-    # Setup logging
-    with open(args.log_conf, 'rb') as f:
-        log_conf = yaml.load(f)
-    if args.log:
-        log_conf['handlers']['file']['filename'] = args.log
-    else:
-        args.log = log_conf['handlers']['file']['filename']
-    if args.error_email:
-        log_conf['handlers']['mail']['toaddrs'] = args.error_email
-    logging.config.dictConfig(log_conf)
-    log = logging.getLogger('crmprtd.ec')
-    if args.log_level:
-        log.setLevel(args.log_level)
-
-    log.info('Starting EC rtd')
-
-    try:
-        if args.filename:
-            log.debug("Opening local xml file {0} for reading".format(args.filename))
-            fname = args.filename
-            xml_file = open(args.filename, 'r') # Do not catch exception here
-            log.debug("File opened sucessfully")
-        else:
-
-            # Determine time parameter
-            if args.time:
-                args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
-                log.info("Starting manual run using timestamp {0}".format(args.time))
-            else:
-                deltat = timedelta(1/24.) if args.frequency == 'hourly' else timedelta(1) # go back a day
-                args.time = datetime.utcnow() - deltat
-                log.info("Starting automatic run using timestamp {0}".format(args.time))
-
-            # Configure requests to use retry
-            s = requests.Session()
-            a = requests.adapters.HTTPAdapter(max_retries=3)
-            s.mount('https://', a)
-
-            # Construct and download the xml
-            url = makeurl(args.frequency, args.province, args.language, args.time)
-            fname = os.path.join(args.cache_dir, extract_fname_from_url(url))
-
-            log.info("Downloading {0}".format(url))
-            req = s.get(url)
-            if req.status_code != 200:
-                raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
-
-            log.info("Saving data to {0}".format(fname))
-            with open(fname, 'wb') as f:
-                f.write(req.content)
-
-    except IOError:
-        log.exception("Unable to download or open xml data")
-        sys.exit(1)
-
-    # Wrap critical secion
-    try:
-        log.info("Parsing input xml")
-        et = parse_xml(fname)
-
-        log.info("Creating database session")
-        Session = sessionmaker(create_engine(args.connection_string))
-        sesh = Session()
-
-    except Exception as e:
-        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, fname), exc_info=True)
-        sys.exit(1)
-
-    try:
-        ### BEGIN NESTED ###
-        sesh.begin_nested()
-        log.info("Starting observation processing")
-        op = ObsProcessor(et, sesh, args.threshold)
-        op.process()
-        log.info("Done processing observations")
-        if args.diag:
-            log.info('Diagnostic mode, rolling back all transactions')
-            sesh.rollback()
-        else:
-            log.info('Commiting the session')
-            sesh.commit()
-        ### END BEGIN NESTED ###
-
-    except Exception as e:
-        sesh.rollback()
-        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, fname), exc_info=True)
-        sys.exit(1)
-
-    finally:
-        sesh.commit()
-        sesh.close()
 
 if __name__ == '__main__':
-
     parser = ArgumentParser()
     parser.add_argument('-c', '--connection_string', required=True,
                          help='PostgreSQL connection string of form:\n\tdialect+driver://username:password@host:port/database\nExamples:\n\tpostgresql://scott:tiger@localhost/mydatabase\n\tpostgresql+psycopg2://scott:tiger@localhost/mydatabase\n\tpostgresql+pg8000://scott:tiger@localhost/mydatabase')
@@ -148,4 +56,4 @@ if __name__ == '__main__':
                         help="Turn on diagnostic mode (no commits)")
 
     args = parser.parse_args()
-    main(args)
+    run(args)

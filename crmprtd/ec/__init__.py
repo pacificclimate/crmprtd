@@ -143,7 +143,7 @@ def check_history(member, sesh, threshold):
     # Select all history entries that match this station
     log.debug("Searching for matching meta_history entries")
 
-    q = sesh.execute('SELECT history_id from closest_stns_within_threshold(:lon, :lat, :threshold)', 
+    q = sesh.execute('SELECT history_id from closest_stns_within_threshold(:lon, :lat, :threshold)',
         {'lon': lon, 'lat': lat, 'threshold': threshold})
     valid_hid = set([x[0] for x in q.fetchall()])
     log.debug("history_ids in threshold %s" % valid_hid)
@@ -151,7 +151,7 @@ def check_history(member, sesh, threshold):
     q = sesh.query(History.id, History.freq).join(Station).join(Network)\
         .filter(Station.native_id == native_id).filter(Network.name == 'EC_raw')\
         .filter(and_(
-            or_(History.sdate <= obs_time, History.sdate.is_(None)), 
+            or_(History.sdate <= obs_time, History.sdate.is_(None)),
             or_(History.edate >= obs_time, History.edate.is_(None))
         ))\
         .filter(History.station_name == stn_name)
