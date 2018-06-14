@@ -30,10 +30,10 @@ def makeurl(freq='daily', province='BC', language='e', time=datetime.utcnow()):
     """
     fmt = '%Y%m%d%H' if freq == 'hourly' else '%Y%m%d'
     freq = 'yesterday' if freq == 'daily' else freq
-    fname = '%s_%s_%s_%s.xml' % (
+    fname = '{}_{}_{}_{}.xml'.format(
         freq, province.lower(), time.strftime(fmt), language)
     str = 'http://dd.weatheroffice.ec.gc.ca/observations/xml/'
-    return str + '%s/%s/%s' % (province.upper(), freq, fname)
+    return str + '{}/{}/{}'.format(province.upper(), freq, fname)
 
 
 def extract_fname_from_url(url):
