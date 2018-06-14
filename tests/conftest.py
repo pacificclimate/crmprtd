@@ -57,7 +57,6 @@ def crmp_session(postgis_session):
         DDL('''CREATE OR REPLACE FUNCTION closest_stns_within_threshold(X numeric, Y numeric, thres integer)
 RETURNS TABLE(history_id integer, lat numeric, lon numeric, dist double precision) AS
 $BODY$
-
 DECLARE
     mystr TEXT;
 BEGIN
@@ -158,7 +157,6 @@ def test_session(crmp_session, caplog):
 
     yield crmp_session
 
-
 @pytest.fixture(scope='function')
 def test_data():
     lines = '''station_code,weather_date,precipitation,temperature,relative_humidity,wind_speed,wind_direction,ffmc,isi,fwi,rn_1_pluvio1,snow_depth,snow_depth_quality,precip_pluvio1_status,precip_pluvio1_total,rn_1_pluvio2,precip_pluvio2_status,precip_pluvio2_total,rn_1_RIT,precip_RIT_Status,precip_RIT_total,precip_rgt,solar_radiation_LICOR,solar_radiation_CM3
@@ -167,7 +165,7 @@ def test_data():
 11,2018052713,.00,16.9,54,11.3,185,82.228363,2.5902824,6.5181026,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
 11,2018052714,.00,17.8,53,10.5,185,82.773972,2.6630962,6.9062028,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
 11,2018052715,.00,17.4,50,8.2,161,83.291313,2.5341561,6.5958676,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0
-''' # noqa
+'''
     data = []
     f = StringIO(lines)
     reader = csv.DictReader(f)
@@ -175,7 +173,6 @@ def test_data():
         data.append(row)
 
     return data
-
 
 @pytest.yield_fixture(scope='function')
 def ec_session(crmp_session, caplog):

@@ -19,7 +19,6 @@ class ObsProcessor:
         """
         Take a list of dictionary based observations and do everything to
         insert into crmp database
-
         data - list of dictionaries given by csv.DictReader with keys
             "station_code",
             "weather_date",
@@ -44,7 +43,6 @@ class ObsProcessor:
             precip_rgt,
             solar_radiation_LICOR,
             solar_radiation_CM3
-
         prefs - an object of type optparse.Values with attributes:
             connection_string, log,
             cache_dir, error_email
