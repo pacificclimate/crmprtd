@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 import pytz
 
-from pycds import Network, Variable, History, Station, Obs
+from pycds import History, Obs
 from crmprtd.db import mass_insert_obs
 
 
@@ -12,7 +12,7 @@ from crmprtd.db import mass_insert_obs
     # All should be inserted
     ('unique', range(7), 7),
     # Create 5 observations that are exactly the same
-    # Repeat insertions will fail the unique contraint on history/time/variable
+    # Repeat insertions will fail unique contraint on history/time/variable
     ('duplicates', [0 for _ in range(5)], 1),
     # None
     ('none', [], 0)

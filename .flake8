@@ -1,0 +1,4 @@
+[flake8]
+exclude =
+    # Does not contain python code
+    tests/ec_data.py
