@@ -63,7 +63,7 @@ def mass_insert_obs(sesh, obs, log=None):
             a, b = split(obs)
             log.debug("Split to (%s, %s)", a, b)
             a, b = mass_insert_obs(sesh, a, log), mass_insert_obs(sesh, b, log)
-            log.debug("Returning combined %d + %d = %d", a, b, a+b)
+            log.debug("Returning combined %d + %d = %d", a, b, a + b)
             return a + b
         else:
             log.debug("Success for %s obs", len(obs))
