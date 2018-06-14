@@ -73,7 +73,7 @@ ORDER BY dist';
 END;
 $BODY$
 LANGUAGE plpgsql
-SECURITY DEFINER;''')
+SECURITY DEFINER;''') # noqa
     )
 
     engine = postgis_session.get_bind()
@@ -167,7 +167,7 @@ def test_data():
 11,2018052713,.00,16.9,54,11.3,185,82.228363,2.5902824,6.5181026,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
 11,2018052714,.00,17.8,53,10.5,185,82.773972,2.6630962,6.9062028,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
 11,2018052715,.00,17.4,50,8.2,161,83.291313,2.5341561,6.5958676,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0
-'''
+''' # noqa
     data = []
     f = StringIO(lines)
     reader = csv.DictReader(f)
@@ -280,7 +280,7 @@ def moti_sawr7110_xml():
       </observation>
     </observation-series>
   </data>
-</cmml>''')
+</cmml>''') # noqa
 
 
 @pytest.fixture(scope='module')
@@ -314,7 +314,7 @@ def moti_sawr7110_xml_2a():
       </observation>
     </observation-series>
   </data>
-</cmml>''')
+</cmml>''') # noqa
 
 
 @pytest.fixture(scope='module')
@@ -359,7 +359,7 @@ def moti_sawr7110_xml_2b():
       </observation>
     </observation-series>
   </data>
-</cmml>''')
+</cmml>''') # noqa
 
 
 @pytest.fixture(scope='module')
@@ -373,7 +373,7 @@ def moti_sawr7110_new_station():
       </origin>
     </observation-series>
   </data>
-</cmml>''')
+</cmml>''') # noqa
 
 
 @pytest.fixture(scope='module')
@@ -457,7 +457,7 @@ def moti_sawr7100_large():
     </observation-series>
   </data>
 </cmml>
-''')
+''') # noqa
 
 
 @pytest.fixture(scope='module')
@@ -528,7 +528,7 @@ def ec_xml_single_obs():
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>''')
+</om:ObservationCollection>''') # noqa
     xsl = resource_filename('crmprtd', 'data/ec_xform.xsl')
     transform = XSLT(parse(xsl))
     return transform(x)

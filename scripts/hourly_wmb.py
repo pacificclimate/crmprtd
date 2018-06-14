@@ -118,10 +118,11 @@ def main(args):
         sesh.begin_nested()
     except Exception as e:
         dl.add_row(data, 'db-connection error')
+        data_archive = dl.archive(args.archive_dir)
         log.critical('''Error with Database connection
-                     See logfile at {l}
+                     See logfile at {log}
                      Data saved at {d}
-                     '''.format(l=args.log, d=data_archive), exc_info=True)
+                     '''.format(log=args.log, d=data_archive), exc_info=True)
         sys.exit(1)
 
     try:
@@ -139,9 +140,9 @@ def main(args):
         sesh.rollback()
         data_archive = dl.archive(args.archive_dir)
         log.critical('''Error data preprocessing.
-                     See logfile at {l}
+                     See logfile at {log}
                      Data saved at {d}
-                     '''.format(l=args.log, d=data_archive), exc_info=True)
+                     '''.format(log=args.log, d=data_archive), exc_info=True)
         sys.exit(1)
     finally:
         sesh.commit()
@@ -178,7 +179,7 @@ class FTPReader(object):
     def __del__(self):
         try:
             self.connection.quit()
-        except:
+        except Exception:
             self.connection.close()
 
 

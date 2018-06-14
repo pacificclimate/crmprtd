@@ -107,7 +107,7 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
         try:
             val = Q_(val, ureg.parse_expression(src_unit))  # src
             val = val.to(dst_unit).magnitude  # dest
-        except:
+        except Exception:
             raise Exception(
                 "Can't convert source unit {} to destination unit {}".format(
                     src_unit, dst_unit)
@@ -265,7 +265,7 @@ class FTPReader(object):
     def __del__(self):
         try:
             self.connection.quit()
-        except:
+        except Exception:
             self.connection.close()
 
 

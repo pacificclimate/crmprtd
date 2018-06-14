@@ -47,12 +47,10 @@ def main(args):
         auth = (config[args.auth_key]['username'],
                 config[args.auth_key]['password'])
 
-    auto = True
     try:
         if args.filename:
             log.debug(
                 "Opening local xml file {0} for reading".format(args.filename))
-            auto = False
             fname = args.filename
             xml_file = open(args.filename, 'r')
             log.debug("File opened sucessfully")
@@ -67,7 +65,6 @@ def main(args):
                     args.start_time, args.end_time))
                 # Requests of longer than 7 days not allowed by MoTI
                 assert args.end_time - args.start_time <= timedelta(7)
-                auto = False
             else:
                 deltat = timedelta(1)  # go back a day
                 args.start_time = datetime.utcnow() - deltat
@@ -76,9 +73,6 @@ def main(args):
                           "{0} {1}").format(args.start_time, args.end_time))
 
             if args.station_id:
-                fmt = '%Y-%m-%d/%H'
-                from_ = from_.strftime(fmt)
-                to = to.strftime(fmt)
                 payload = {'request': 'historic', 'station': args.station_id,
                            'from': args.start_time, 'to': args.end_time}
             else:

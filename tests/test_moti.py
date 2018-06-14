@@ -12,8 +12,6 @@ bctz = pytz.timezone('America/Vancouver')
 
 
 def test_data(test_session, moti_sawr7110_xml):
-    tz = pytz.timezone('America/Vancouver')
-
     c1 = test_session.query(Obs).count()
 
     process(test_session, moti_sawr7110_xml)
@@ -69,7 +67,7 @@ xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
       </origin>
     </observation-series>
   </data>
-</cmml>''',
+</cmml>''', # noqa
        'no_valid_time': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
@@ -85,7 +83,7 @@ xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
       </observation>
     </observation-series>
   </data>
-       </cmml>''',
+       </cmml>''', # noqa
        'bad_value': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
@@ -100,7 +98,7 @@ xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
       </observation>
     </observation-series>
   </data>
-       </cmml>''',
+       </cmml>''', # noqa
        'no_value': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
@@ -114,7 +112,7 @@ xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
       </observation>
     </observation-series>
   </data>
-       </cmml>''',
+       </cmml>''', # noqa
        'no_units': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
@@ -129,7 +127,7 @@ xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
       </observation>
     </observation-series>
   </data>
- </cmml>'''}
+ </cmml>'''} # noqa
 
 
 @pytest.mark.parametrize(('xml'), xml.values(), ids=list(xml.keys()))
@@ -151,10 +149,11 @@ def test_missing_client_id(test_session):
       <origin type="station" />
     </observation-series>
   </data>
-</cmml>''')
+</cmml>''') # noqa
     e = pytest.raises(Exception, process, test_session, et)
-    assert "Could not detect the station id: xpath search '//observation-series/origin/id[@type='client']' return no results" in str(
-        e)
+    assert ("Could not detect the station id: xpath search "
+            "'//observation-series/origin/id[@type='client']' "
+            "return no results") in str(e)
 
 
 def test_url_generator():
@@ -186,7 +185,8 @@ def test_url_generator():
 
 def test_url_generator_truncates():
     urls = url_generator('1', bctz.localize(
-        datetime(2010, 1, 1, 1, 1)), bctz.localize(datetime(2010, 1, 1, 23, 55)))
+        datetime(2010, 1, 1, 1, 1)),
+        bctz.localize(datetime(2010, 1, 1, 23, 55)))
     actual = [url for url in urls]
     expected = [('https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110?request='
                  'historic&station=1&from=2010-01-01/01&to=2010-01-01/23')]
@@ -287,7 +287,7 @@ def test_skipped_vars(test_session):
       </observation>
     </observation-series>
   </data>
-</cmml>''')
+</cmml>''') # noqa
     n_obs_before = test_session.query(Obs).count()
     r = process(test_session, xml)
     assert r == {'failures': 0, 'successes': 0, 'skips': 6}
@@ -314,7 +314,7 @@ def test_unknown_var(test_session, caplog):
       </observation>
     </observation-series>
   </data>
-</cmml>''')
+</cmml>''') # noqa
     n_obs_before = test_session.query(Obs).count()
     r = process(test_session, xml)
     assert r == {'failures': 0, 'successes': 0, 'skips': 1}

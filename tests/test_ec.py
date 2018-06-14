@@ -16,28 +16,33 @@ from pycds import Obs
       'province': 'BC',
       'language': 'e',
       'time': datetime(2016, 1, 15, 21)},
-     'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/yesterday_bc_20160115_e.xml'
+     ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/'
+      'yesterday_bc_20160115_e.xml')
      ), ('hourly-BC-EN',
          {'freq': 'hourly',
           'province': 'BC',
           'language': 'e',
           'time': datetime(2016, 1, 15, 21)},
-         'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml'
+         ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/'
+          'hourly_bc_2016011521_e.xml')
          ), ('nofreq-BC-EN',
              {'province': 'BC',
               'language': 'e',
               'time': datetime(2016, 1, 15, 21)},
-             'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/yesterday_bc_20160115_e.xml'
+             ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/'
+              'yesterday_bc_20160115_e.xml')
              ), ('hourly-noprov-EN',
                  {'freq': 'hourly',
                   'language': 'e',
                   'time': datetime(2016, 1, 15, 21)},
-                 'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml'
+                 ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                  'hourly/hourly_bc_2016011521_e.xml')
                  ), ('hourly-BC-nolang',
                      {'freq': 'hourly',
                       'province': 'BC',
                       'time': datetime(2016, 1, 15, 21)},
-                     'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml'
+                     ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                      'hourly/hourly_bc_2016011521_e.xml')
                      )
 ])
 def test_makeurl(label, args, expected):
@@ -49,8 +54,8 @@ def test_makeurl_no_time_hourly():
     fmt = '%Y%m%d%H'
     t = datetime.utcnow()
 
-    assert url == 'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/hourly_bc_{}_e.xml'.format(
-        t.strftime(fmt))
+    assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                   'hourly/hourly_bc_{}_e.xml').format(t.strftime(fmt))
 
 
 def test_makeurl_no_time_daily():
@@ -58,12 +63,13 @@ def test_makeurl_no_time_daily():
     fmt = '%Y%m%d'
     t = datetime.utcnow()
 
-    assert url == 'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/yesterday_bc_{}_e.xml'.format(
-        t.strftime(fmt))
+    assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                   'yesterday/yesterday_bc_{}_e.xml').format(t.strftime(fmt))
 
 
 @pytest.mark.parametrize(('url', 'fname'), [
-    ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml',
+    (('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/'
+      'hourly_bc_2016011521_e.xml'),
      'hourly_bc_2016011521_e.xml'),
     ('http://pacificclimate.org/directory/of/files.zip', 'files.zip'),
     ('http://this.com/it/a/filename.extension', 'filename.extension')
@@ -85,7 +91,7 @@ def test_url_to_fname(url, fname):
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), '-0.12'),
+</om:ObservationCollection>'''), '-0.12'), # noqa
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
@@ -98,7 +104,7 @@ def test_url_to_fname(url, fname):
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), '0.12')
+</om:ObservationCollection>'''), '0.12') # noqa
 ])
 def test_xsl_transform_tendency_amount(x, expected):
     # Apply the transform
@@ -125,7 +131,7 @@ def test_xsl_transform_tendency_amount(x, expected):
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), '270'),
+</om:ObservationCollection>'''), '270'), # noqa
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
@@ -137,7 +143,7 @@ def test_xsl_transform_tendency_amount(x, expected):
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), '135')
+</om:ObservationCollection>'''), '135') # noqa
 ])
 def test_xsl_transform_wind_direction(x, expected):
     # Apply the transform
@@ -163,7 +169,7 @@ def test_xsl_transform_wind_direction(x, expected):
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), '8')
+</om:ObservationCollection>'''), '8') # noqa
 ])
 def test_xsl_transform_cloud_cover(x, expected):
     # Apply the transform
@@ -210,7 +216,7 @@ def test_xsl_transform_cloud_cover(x, expected):
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), 10000),
+</om:ObservationCollection>'''), 10000), # noqa
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
@@ -242,7 +248,7 @@ def test_xsl_transform_cloud_cover(x, expected):
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), 10001)
+</om:ObservationCollection>'''), 10001) # noqa
 ])
 def test_check_valid_history_id(ec_session, et, expected):
     members = et.xpath('//om:member', namespaces=ns)
@@ -282,7 +288,7 @@ def test_check_valid_history_id(ec_session, et, expected):
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''))
+</om:ObservationCollection>''')) # noqa
 ])
 def test_station_movement(ec_session, et):
     members = et.xpath('//om:member', namespaces=ns)
@@ -320,7 +326,7 @@ def test_new_station(ec_session):
       </gml:FeatureCollection>
     </om:featureOfInterest>
   </om:Observation>
-</om:member>''')
+</om:member>''') # noqa
     stn2 = fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:member xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:Observation>
@@ -350,7 +356,7 @@ def test_new_station(ec_session):
       </gml:FeatureCollection>
     </om:featureOfInterest>
   </om:Observation>
-</om:member>''')
+</om:member>''') # noqa
 
     hid1 = check_history(stn1, ec_session, 1000)
     assert hid1 == 1
@@ -442,7 +448,7 @@ def test_db_unit(ec_session, net_var_name, unit):
       </elements>
     </om:result>
   </om:Observation>
-</om:member>'''), 10001, 'air_temperature', 101)
+</om:member>'''), 10001, 'air_temperature', 101) # noqa
 ])
 def test_insert_duplicate_obs(ec_session, et, hid, vname, vid):
     from copy import deepcopy

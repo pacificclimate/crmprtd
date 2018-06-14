@@ -173,7 +173,7 @@ class ObsProcessor:
             data_archive = None
             try:
                 data_archive = self.datalogger.archive(self.prefs.archive_dir)
-            except:
+            except Exception:
                 log.exception('Unable to save error archive')
             log.critical('''Errors occured in WMB real time daemon that require a human touch.
             Please consult the log file at {1}.

@@ -291,7 +291,7 @@ def insert_obs(sesh, om, hid, vname, vid):
 
     try:
         assert db_unit(sesh, vname) == om.member_unit(vname)
-    except:
+    except Exception:
         # UnitsError
         raise Exception("reported units '%s' does not match the database units"
                         " '%s' for variable %s" % (om.member_unit(vname),

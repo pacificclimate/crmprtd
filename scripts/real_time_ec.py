@@ -41,7 +41,6 @@ def main(args):
             log.debug(
                 "Opening local xml file {0} for reading".format(args.filename))
             fname = args.filename
-            xml_file = open(args.filename, 'r')  # Do not catch exception here
             log.debug("File opened sucessfully")
         else:
 

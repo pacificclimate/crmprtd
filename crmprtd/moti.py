@@ -130,7 +130,7 @@ def process_observation_series(sesh, os):
                 log.debug("Skipped, already exists: {} {}".format(o, e))
                 sesh.rollback()
                 skips += 1
-            except:
+            except Exception:
                 log.error("Failed to insert {}".format(o), exc_info=True)
                 sesh.rollback()
                 failures += 1

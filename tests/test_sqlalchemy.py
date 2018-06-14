@@ -31,7 +31,7 @@ def test_nested_transactions_3(crmp_session):
     try:
         crmp_session.begin_nested()
         crmp_session.add(fake_network)
-    except:
+    except Exception:
         crmp_session.rollback()
     else:
         crmp_session.commit()
