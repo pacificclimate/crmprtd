@@ -1,0 +1,9 @@
+[flake8]
+ignore =
+    E722,  # bare exception
+    E741,  # ambiguous variable
+    F821,  # undefined name
+    F841,  # assigned but not used
+
+exclude =
+    tests/*  # test strings formatted specifically
