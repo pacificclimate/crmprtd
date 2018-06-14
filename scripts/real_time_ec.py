@@ -54,7 +54,7 @@ def main(args):
             else:
                 # go back a day
                 deltat = timedelta(
-                    1/24.) if args.frequency == 'hourly' else timedelta(1)
+                    1 / 24.) if args.frequency == 'hourly' else timedelta(1)
                 args.time = datetime.utcnow() - deltat
                 log.info(("Starting automatic run using timestamp "
                           "{0}").format(args.time))
@@ -160,7 +160,7 @@ if __name__ == '__main__':
                               'in the event of a post-download error'))
     parser.add_argument('-f', '--filename',
                         help='MPO-XML file to process')
-    parser.add_argument('-p', '--province',  required=True,
+    parser.add_argument('-p', '--province', required=True,
                         help='2 letter province code')
     parser.add_argument('-L', '--language', default='e',
                         choices=['e', 'f'],

@@ -285,7 +285,8 @@ class ObsProcessor:
         archive_data = query_by_attribute('station_code', station)
         for obs in archive_data:
             self.data.remove(obs)
-        datalogger.add_row(archive_data, reason='Unable to add entire station')
+        self.datalogger.add_row(archive_data,
+                                reason='Unable to add entire station')
 
         return len(archive_data)
 
@@ -319,11 +320,12 @@ def check_history(obs, network, sesh):
     hist = sesh.query(History.id).join(Station)\
                                  .filter(Station.native_id == native_id,
                                          Station.network == network)\
-                                 .filter(and_(
-                                    or_(History.sdate <= obs['weather_date'],
-                                        History.sdate.is_(None)),
-                                    or_(History.edate >= obs['weather_date'],
-                                        History.edate.is_(None))))
+                                 .filter(and_(or_(
+                                         History.sdate <= obs['weather_date'],
+                                         History.sdate.is_(None)),
+                                     or_(
+                                         History.edate >= obs['weather_date'],
+                                         History.edate.is_(None))))
 
     # If multiple results, handle error
     if hist.count() > 1:
@@ -465,10 +467,8 @@ class DataLogger:
 
         self.bad_obs.append({'station_code': obs['station_code'],
                              'weather_date': datetime.strftime(
-                                obs['weather_date'],
-                                '%Y%m%d%H'),
-                             var: obs[var],
-                             'reason': reason
+                             obs['weather_date'], '%Y%m%d%H'),
+                             var: obs[var], 'reason': reason
                              })
 
     def archive(self, out_dir):
@@ -482,8 +482,8 @@ class DataLogger:
         import os.path
 
         outcsv = os.path.join(out_dir, 'wmb_data_errors_' +
-                              datetime.strftime(
-                                datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
+                              datetime.strftime(datetime.now(),
+                                                '%Y-%m-%dT%H-%M-%S') + '.csv')
 
         order = ['reason',
                  'station_code',

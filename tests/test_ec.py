@@ -5,8 +5,8 @@ from lxml.etree import fromstring, parse, XSLT
 import pytest
 
 from crmprtd.ec import makeurl, extract_fname_from_url, ns, \
-                       ObsProcessor, check_history, insert_obs, \
-                       recordable_vars, db_unit, OmMember
+    ObsProcessor, check_history, insert_obs, \
+    recordable_vars, db_unit, OmMember
 from pycds import Obs
 
 

@@ -100,8 +100,8 @@ def main(args):
         fname_out = os.path.join(args.cache_dir,
                                  'wmb_download' +
                                  datetime.strftime(datetime.now(),
-                                                   '%Y-%m-%dT%H-%M-%S')
-                                 + '.csv')
+                                                   '%Y-%m-%dT%H-%M-%S') +
+                                 '.csv')
         with open(fname_out, 'w') as f_out:
             copier = csv.DictWriter(f_out, fieldnames=reader.fieldnames)
             copier.writeheader()

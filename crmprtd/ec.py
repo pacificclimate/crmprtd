@@ -3,7 +3,7 @@ from datetime import datetime
 import re
 import logging
 from pkg_resources import resource_stream
-from crmprtd.compat import urlparse
+from urllib.parse import urlparse
 
 from pycds import History, Station, Network, Obs, Variable
 from sqlalchemy import and_, or_
