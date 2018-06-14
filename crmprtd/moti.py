@@ -36,8 +36,8 @@ def makeurl(report='7110', request='historic',
     from_ = from_.strftime(fmt)
     to = to.strftime(fmt)
     url = ('https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr{report}?'
-            'request={request}&station={station}&from={from_}'
-            '&to={to}').format(**locals())
+           'request={request}&station={station}&from={from_}'
+           '&to={to}').format(**locals())
     return url
 
 
