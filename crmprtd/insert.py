@@ -8,6 +8,7 @@ failures. This phase needs to manage the database transactions for
 speed and reliability. This phase is common to all networks.
 """
 
+
 def insert(sesh, observations):
     successes, skips, failures = 0, 0, 0
     return {

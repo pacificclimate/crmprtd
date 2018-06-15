@@ -1,14 +1,14 @@
 # Standard module
 import sys
 import csv
-import logging, logging.config
+import logging
+import logging.config
 import os
 import ftplib
 
-from datetime import datetime
-
 # debug
 from pkg_resources import resource_stream
+
 # Local
 from crmprtd import retry
 from crmprtd.wmb.normalize import prepare
@@ -35,9 +35,9 @@ def logging_setup(log, error_email, log_level):
 
 def local_file_search(archive_file, archive_dir, log):
     # adjust to full path
-    path = args.archive_file
-    if args.archive_file[0] != '/':
-        path = os.path.join(args.archive_dir, args.archive_file)
+    path = archive_file
+    if archive_file[0] != '/':
+        path = os.path.join(archive_dir, archive_file)
     log.info('Loading local file {0}'.format(path))
 
     try:
@@ -73,12 +73,15 @@ def run(args):
 
     # Pull auth from file or command line
     if args.username or args.password:
-        auth = {'u':args.username, 'p':args.password}
+        auth = {'u': args.username, 'p': args.password}
     else:
-        assert args.auth and args.auth_key, "Must provide both the auth file and the key to use for this script (--auth_key)"
+        assert args.auth and args.auth_key, ("Must provide both the auth file "
+                                             "and the key to use for this "
+                                             "script (--auth_key)")
         with open(args.auth, 'r') as f:
             config = yaml.load(f)
-        auth = {'u':config[args.auth_key]['username'], 'p':config[args.auth_key]['password']}
+        auth = {'u': config[args.auth_key]['username'],
+                'p': config[args.auth_key]['password']}
 
     # Check for local file source
     if args.archive_file:
@@ -94,6 +97,7 @@ class FTPReader(object):
     '''Glue between the FTP_TLS class methods (which are callback based)
        and the csv.DictReader class (which is iteration based)
     '''
+
     def __init__(self, host, user, password, filename, log=None):
         self.filename = filename
 
@@ -107,6 +111,7 @@ class FTPReader(object):
         # Just store the lines in memory
         # It's non-ideal but neither classes support coroutine send/yield
         lines = []
+
         def callback(line):
             lines.append(line)
 
@@ -118,5 +123,5 @@ class FTPReader(object):
     def __del__(self):
         try:
             self.connection.quit()
-        except:
+        except Exception:
             self.connection.close()

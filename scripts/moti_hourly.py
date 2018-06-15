@@ -1,27 +1,11 @@
 #!/usr/bin/env python
 
 # Standard module
-import os
-import sys
-import logging
-import logging.config
-from datetime import datetime, timedelta
 from argparse import ArgumentParser
-import requests
 from pkg_resources import resource_stream
 
-# Installed libraries
-from lxml.etree import parse
-import yaml
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 # Local
-from crmprtd import retry
-from crmprtd.moti import makeurl, process
 from crmprtd.moti.download import run
-
-
 
 
 if __name__ == '__main__':

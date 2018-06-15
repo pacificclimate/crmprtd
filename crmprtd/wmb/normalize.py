@@ -1,7 +1,6 @@
 # Standard module
 import sys
 import os
-import logging
 import csv
 
 from datetime import datetime
@@ -16,9 +15,13 @@ from sqlalchemy.orm import sessionmaker
 
 def save_file(reader, cache_dir, data):
     # save the downloaded file
-    fname_out = os.path.join(cache_dir, 'wmb_download' + datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') + '.csv')
+    fname_out = os.path.join(cache_dir,
+                             'wmb_download' +
+                             datetime.strftime(datetime.now(),
+                                               '%Y-%m-%dT%H-%M-%S') +
+                             '.csv')
     with open(fname_out, 'w') as f_out:
-        copier = csv.DictWriter(f_out, fieldnames = reader.fieldnames)
+        copier = csv.DictWriter(f_out, fieldnames=reader.fieldnames)
         copier.writeheader()
         copier.writerows(data)
 
@@ -40,10 +43,11 @@ def prepare(args, log, reader):
         sesh.begin_nested()
     except Exception as e:
         dl.add_row(data, 'db-connection error')
+        data_archive = dl.archive(args.archive_dir)
         log.critical('''Error with Database connection
-                            See logfile at {l}
-                            Data saved at {d}
-                            '''.format(l = args.log, d = data_archive), exc_info=True)
+                        See logfile at {log}
+                        Data saved at {d}
+                     '''.format(log=args.log, d=data_archive), exc_info=True)
         sys.exit(1)
 
     try:
@@ -61,9 +65,9 @@ def prepare(args, log, reader):
         sesh.rollback()
         data_archive = dl.archive(args.archive_dir)
         log.critical('''Error data preprocessing.
-                            See logfile at {l}
-                            Data saved at {d}
-                            '''.format(l = args.log, d = data_archive), exc_info=True)
+                        See logfile at {log}
+                        Data saved at {d}
+                     '''.format(log=args.log, d=data_archive), exc_info=True)
         sys.exit(1)
     finally:
         sesh.commit()

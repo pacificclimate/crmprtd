@@ -1,24 +1,11 @@
 #!/usr/bin/env python
 
 # Standard module
-import os
-import sys
-import logging
-import logging.config
-from datetime import datetime, timedelta
 from argparse import ArgumentParser
 from pkg_resources import resource_filename
 
-# Installed libraries
-import requests
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-import yaml
-
 # Local
-from crmprtd.ec import makeurl, ObsProcessor, parse_xml, extract_fname_from_url
 from crmprtd.ec.download import run
-
 
 
 if __name__ == '__main__':

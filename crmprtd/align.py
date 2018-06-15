@@ -10,8 +10,10 @@ pycds.Obs objects. This phase is common to all networks.
 
 from pycds import Obs
 
+
 def align(sesh, obs_tuples):
-    for time, val, var_name, network_name, station_name, lat, lon in obs_tuples:
+    for time, val, var_name, network_name, station_name, lat, lon \
+     in obs_tuples:
         # Do checks and make station/variable insertions if necessary/possible
         # Create and yield pycds.Obs object
         yield Obs()

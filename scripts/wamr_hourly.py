@@ -8,22 +8,11 @@ Water and Air Monitoring and Reporting? (WAMR)
 This is largely lifted and modified from the hourly_wmb.py script
 '''
 
-# Standard library module
-import sys
-import csv
-import os
 
-from datetime import datetime
 from argparse import ArgumentParser
 from pkg_resources import resource_stream
 
-# Installed libraries
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 # Local
-from crmprtd.wamr import setup_logging, rows2db
-from crmprtd.wamr import file2rows, ftp2rows
 from crmprtd.wamr.download import run
 
 

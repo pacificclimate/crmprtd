@@ -1,20 +1,12 @@
-import sys
 import csv
-import logging
 import os
 
 from datetime import datetime
-from argparse import ArgumentParser
-from pkg_resources import resource_stream
-
-# Installed libraries
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 # Local
 from crmprtd.wamr import setup_logging
-from crmprtd.wamr import file2rows, ftp2rows
-from crmprtd.wamr.normalize import prepare
+from crmprtd.wamr import ftp2rows
+from crmprtd.wamr.normalize import prepare, input_file_prepare
 
 
 def run(args):
@@ -27,7 +19,7 @@ def run(args):
         error_file = open(args.error_file, 'a')
     else:
         error_filename = 'wamr_errors_{}.csv'.format(datetime.strftime(
-                datetime.now(), '%Y-%m-%dT%H-%M-%S'))
+            datetime.now(), '%Y-%m-%dT%H-%M-%S'))
         error_file = open(os.path.join(args.cache_dir, error_filename), 'a')
 
     if args.input_file:

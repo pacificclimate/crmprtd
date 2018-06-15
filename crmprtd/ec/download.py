@@ -1,6 +1,8 @@
 # Standard module
-import os, sys
-import logging, logging.config
+import os
+import sys
+import logging
+import logging.config
 from datetime import datetime, timedelta
 
 # Installed libraries
@@ -53,28 +55,35 @@ def download(log, frequency, province, language, time, cache_dir):
 
 def run(args):
     # Setup logging
-    log = logging_setup(args.log_conf, args.log, args.error_email, args.log_level)
+    log = logging_setup(args.log_conf, args.log,
+                        args.error_email, args.log_level)
     log.info('Starting EC rtd')
 
     try:
         if args.filename:
-            log.debug("Opening local xml file {0} for reading".format(args.filename))
+            log.debug(
+                "Opening local xml file {0} for reading".format(args.filename))
             fname = args.filename
             xml_file = open(args.filename, 'r')  # Do not catch exception here
             log.debug("File opened sucessfully")
 
-            ec_normalize(args, log, xml_file)
+            prepare(args, log, xml_file)
         else:
             # Determine time parameter
             if args.time:
                 args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
-                log.info("Starting manual run using timestamp {0}".format(args.time))
+                log.info("Starting manual run "
+                         "using timestamp {0}".format(args.time))
             else:
-                deltat = timedelta(1/24.) if args.frequency == 'hourly' else timedelta(1) # go back a day
+                # go back a day
+                deltat = timedelta(
+                    1 / 24.) if args.frequency == 'hourly' else timedelta(1)
                 args.time = datetime.utcnow() - deltat
-                log.info("Starting automatic run using timestamp {0}".format(args.time))
+                log.info("Starting automatic run "
+                         "using timestamp {0}".format(args.time))
 
-            fname = download(log, args.frequency, args.province, args.language, args.time, args.cache_dir)
+            fname = download(log, args.frequency, args.province,
+                             args.language, args.time, args.cache_dir)
             prepare(args, log, fname)
 
     except IOError:

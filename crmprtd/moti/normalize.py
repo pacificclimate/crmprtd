@@ -2,7 +2,6 @@
 
 # Standard module
 import sys
-import logging
 
 # Installed libraries
 from lxml.etree import parse
@@ -29,7 +28,8 @@ def prepare(args, log, infile):
             sesh.commit()
     except Exception as e:
         sesh.rollback()
-        log.critical('Serious errors with MOTIe rtd, see logs at {}'.format(args.log), exc_info=True)
+        log.critical('Serious errors with MOTIe rtd, see logs at {}'.format(
+            args.log), exc_info=True)
         sys.exit(1)
     finally:
         sesh.commit()

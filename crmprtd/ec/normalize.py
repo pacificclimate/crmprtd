@@ -2,7 +2,6 @@
 
 # Standard module
 import sys
-import logging
 
 # Installed libraries
 from sqlalchemy import create_engine
@@ -23,11 +22,13 @@ def prepare(args, log, infile):
         sesh = Session()
 
     except Exception as e:
-        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, infile), exc_info=True)
+        log.critical("Critical errors have occured in the EC real time "
+                     "downloader. Log file {}. Data archive {}"
+                     .format(args.log, infile), exc_info=True)
         sys.exit(1)
 
     try:
-        ### BEGIN NESTED ###
+        # BEGIN NESTED #
         sesh.begin_nested()
         log.info("Starting observation processing")
         op = ObsProcessor(et, sesh, args.threshold)
@@ -39,11 +40,13 @@ def prepare(args, log, infile):
         else:
             log.info('Commiting the session')
             sesh.commit()
-        ### END BEGIN NESTED ###
+        # END BEGIN NESTED #
 
     except Exception as e:
         sesh.rollback()
-        log.critical("Critical errors have occured in the EC real time downloader. Log file %s. Data archive %s" % (args.log, infile), exc_info=True)
+        log.critical("Critical errors have occured in the EC real time "
+                     "downloader. Log file {}. Data archive {}"
+                     .format(args.log, infile), exc_info=True)
         sys.exit(1)
 
     finally:

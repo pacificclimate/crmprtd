@@ -1,11 +1,5 @@
 import sys
-import csv
-import logging
-import os
 
-from datetime import datetime
-from argparse import ArgumentParser
-from pkg_resources import resource_stream
 
 # Installed libraries
 from sqlalchemy import create_engine
@@ -13,7 +7,7 @@ from sqlalchemy.orm import sessionmaker
 
 # Local
 from crmprtd.wamr import rows2db
-from crmprtd.wamr import file2rows, ftp2rows
+from crmprtd.wamr import file2rows
 
 
 def input_file_prepare(args, error_file, log):
