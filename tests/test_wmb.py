@@ -1,7 +1,6 @@
 import pytest
 import pytz
 import csv
-from sqlalchemy import and_
 
 from datetime import datetime
 from io import StringIO
@@ -19,7 +18,8 @@ def test_insert_obs(test_session, val, hid, d, vars_id, expected):
     q = test_session.query(Obs)
     assert q.count() == expected
 
-    result, = test_session.query(Obs.datum).filter(Obs.history_id == hid, Obs.time == d, Obs.vars_id == vars_id).first()
+    result, = test_session.query(Obs.datum).filter(
+        Obs.history_id == hid, Obs.time == d, Obs.vars_id == vars_id).first()
     assert result == val
 
 
@@ -28,7 +28,8 @@ def test_check_and_insert_stations(test_session, test_data):
 
     # Create a set of stations where one of them already exists in the table
     stations = set()
-    id, = test_session.query(Station.native_id).join(Network).filter(Network.id == o.network_id).first()
+    id, = test_session.query(Station.native_id).join(
+        Network).filter(Network.id == o.network_id).first()
     stations.add(id)    # Existing station
     for i in range(3):  # New stations
         id += str(i)
@@ -43,7 +44,8 @@ def test_check_and_insert_stations(test_session, test_data):
     assert q.count() == count + 3
 
     for station in stations:
-        q = test_session.query(Station).join(Network).filter(Station.native_id == station, Network.id == o.network_id)
+        q = test_session.query(Station).join(Network).filter(
+            Station.native_id == station, Network.id == o.network_id)
         assert q.count() == 1
 
 
@@ -66,7 +68,9 @@ def test_check_history(test_session):
                             sdate='2012-09-02',
                             edate='2012-09-06')
     test_session.add(arkham_asylum)
-    test_session.add(Station(native_id='81974', network=o.network, histories=[arkham_asylum]))
+    test_session.add(Station(native_id='81974',
+                             network=o.network,
+                             histories=[arkham_asylum]))
 
     q = test_session.query(History)
     count = q.count()
@@ -79,7 +83,8 @@ def test_check_history(test_session):
     q = test_session.query(History)
     assert q.count() == count + 1
 
-    q = test_session.query(History).join(Station).filter(Station.native_id == native_id)
+    q = test_session.query(History).join(
+        Station).filter(Station.native_id == native_id)
     assert q.count() == 2
 
 

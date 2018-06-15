@@ -1,26 +1,23 @@
 #!/usr/bin/env python
 
 # Standard module
-import os, sys
+import os
 import glob
-import logging, logging.config
-from datetime import datetime, timedelta
+import logging
+import logging.config
 from argparse import ArgumentParser
-import requests
-from traceback import print_exc
 from pkg_resources import resource_stream
 from shutil import move
 
 # Installed libraries
-from lxml.etree import LxmlSyntaxError
 from lxml.etree import parse
 import yaml
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Local
-from crmprtd import retry
-from crmprtd.moti import makeurl, process
+from crmprtd.moti import process
+
 
 def main(args):
     # Setup logging
@@ -65,7 +62,8 @@ def main(args):
                 sesh.commit()
         except Exception as e:
             sesh.rollback()
-            log.critical('Serious errors with MOTIe rtd, see logs at {}'.format(args.log), exc_info=True)
+            log.critical(('Serious errors with MOTIe rtd, see logs at '
+                          '{}').format(args.log), exc_info=True)
             continue
         else:
             move(fname, os.path.join(args.output_dir, os.path.basename(fname)))
@@ -73,28 +71,44 @@ def main(args):
             sesh.commit()
             sesh.close()
 
+
 if __name__ == '__main__':
 
     parser = ArgumentParser()
-    parser.add_argument('-c', '--connection_string', 
-                        help='PostgreSQL connection string of form:\n\tdialect+driver://username:password@host:port/database\nExamples:\n\tpostgresql://scott:tiger@localhost/mydatabase\n\tpostgresql+psycopg2://scott:tiger@localhost/mydatabase\n\tpostgresql+pg8000://scott:tiger@localhost/mydatabase')
+    parser.add_argument('-c', '--connection_string', required=True,
+                        help=('PostgreSQL connection string of form:'
+                              '\n\tdialect+driver://username:password@host:'
+                              'port/database\n'
+                              'Examples:'
+                              '\n\tpostgresql://scott:tiger@localhost/'
+                              'mydatabase'
+                              '\n\tpostgresql+psycopg2://scott:tiger@'
+                              'localhost/mydatabase'
+                              '\n\tpostgresql+pg8000://scott:tiger@localhost'
+                              '/mydatabase'))
     parser.add_argument('-y', '--log_conf',
-                        default = resource_stream('crmprtd', '/data/logging.yaml'),
-                        help='YAML file to use to override the default logging configuration')
+                        default=resource_stream(
+                            'crmprtd', '/data/logging.yaml'),
+                        help=('YAML file to use to override the default '
+                              'logging configuration'))
     parser.add_argument('-l', '--log', help="log filename")
-    parser.add_argument('-e', '--error_email', 
-                        help='e-mail address to which the program should report error which require human intervention')
+    parser.add_argument('-e', '--error_email',
+                        help=('e-mail address to which the program should '
+                              'report error which require human intervention'))
     parser.add_argument('--log_level',
-                        choices=['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL'],
-                        help='Set log level: DEBUG, INFO, WARNING, ERROR, CRITICAL.  Note that debug output by default goes directly to file')
+                        choices=['DEBUG', 'INFO',
+                                 'WARNING', 'ERROR', 'CRITICAL'],
+                        help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
+                              'CRITICAL.  Note that debug output by default '
+                              'goes directly to file'))
     parser.add_argument('-p', '--file_pattern', default=None,
                         help='directory to process for xml files')
-    parser.add_argument('-f', '--filename', default = None,
+    parser.add_argument('-f', '--filename', default=None,
                         help='MPO-XML file to process')
     parser.add_argument('-o', '--output_dir', required=True,
                         help='directory to move successfully imported files')
 
-    parser.add_argument('-D', '--diag', action="store_true", default = False,
+    parser.add_argument('-D', '--diag', action="store_true", default=False,
                         help="Turn on diagnostic mode (no commits)")
 
     args = parser.parse_args()

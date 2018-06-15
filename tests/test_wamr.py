@@ -48,7 +48,7 @@ def test_rows2db(test_session, diagnostic, expected):
 2017-05-21 16:00,0260011,Warfield Elementary Met_60,TEMP_MEAN,TEMP_MEAN,TEMP 10M,26.65,°C,1,n/a,Data Ok,26.7
 2017-05-21 15:00,0260011,Warfield Elementary Met_60,TEMP_MEAN,TEMP_MEAN,TEMP 10M,26.38,°C,1,n/a,Data Ok,26.4
 2017-05-21 15:00,XXXX,Does not exist,TEMP_MEAN,TEMP_MEAN,TEMP 10M,26.38,°C,1,n/a,Data Ok,26.4
-'''
+''' # noqa
     header_line, error_line = lines.splitlines()[0], lines.splitlines()[-1]
 
     with maybe_fake_file(lines) as f:
@@ -62,8 +62,9 @@ def test_rows2db(test_session, diagnostic, expected):
         assert header_line in output
         assert error_line in output
 
-    # Check that some obs were or were not inserted (depending on diagnostic mode)
-    q = test_session.query(Obs).join(History).filter(History.station_name == 'Warfield Elementary')
+    # Check that some obs were or were not inserted (depending on diagnostic)
+    q = test_session.query(Obs).join(History).filter(
+        History.station_name == 'Warfield Elementary')
     assert q.count() == expected
 
 
@@ -86,8 +87,7 @@ def test_rows2db_units_conversion(test_session):
 2017-05-21 15:00,0260011,Warfield Elementary Met_60,TEMP_CELSIUS,TEMP_MEAN,TEMP 10M,273.15,°K,1,n/a,Data Ok,273.15
 2017-05-21 15:00,0260011,Warfield Elementary Met_60,TEMP_CELSIUS,TEMP_MEAN,TEMP 10M,273.15,not_convertable,1,n/a,Data Ok,273.15
 2017-09-20 09:00,0260011,Warfield Elementary Met_60,HUMIDITY,HUMIDITY,HUMIDITY,0,% RH,1,n/a,Data Ok,0
-'''
-    header_line, error_line = lines.splitlines()[0], lines.splitlines()[-1]
+''' # noqa
 
     with maybe_fake_file(lines) as f:
         rows, fieldnames = file2rows(f, log)
@@ -95,11 +95,12 @@ def test_rows2db_units_conversion(test_session):
     with TemporaryFile('w+t') as error_file:
         rows2db(sesh, rows, error_file, log, diagnostic=False)
 
-    q = sesh.query(Obs).join(History).filter(History.station_name == 'Warfield Elementary')
+    q = sesh.query(Obs).join(History).filter(
+        History.station_name == 'Warfield Elementary')
 
     obs = q.all()
 
-    assert len(obs) == 4 # The not_convertable obs was not included
+    assert len(obs) == 4  # The not_convertable obs was not included
 
     for ob in q.all():
         assert ob.datum == pytest.approx(0, abs=1.0e-6)

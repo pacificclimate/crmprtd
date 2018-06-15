@@ -1,9 +1,8 @@
-import sys
-
-from sqlalchemy import create_engine
-import logging, logging.config
+import logging
+import logging.config
 
 from pycds import Network
+
 
 def test_nested_transactions_1(crmp_session):
     fake_network = Network(name='Fake Network')
@@ -18,6 +17,7 @@ def test_nested_transactions_1(crmp_session):
         logging.info('caught exception, raising')
         raise e
 
+
 def test_nested_transactions_2(crmp_session):
     fake_network = Network(name='Fake Network')
     with crmp_session.begin_nested():
@@ -25,12 +25,13 @@ def test_nested_transactions_2(crmp_session):
         crmp_session.add(fake_network)
         logging.info('added moti network')
 
+
 def test_nested_transactions_3(crmp_session):
     fake_network = Network(name='Fake Network')
     try:
         crmp_session.begin_nested()
         crmp_session.add(fake_network)
-    except:
+    except Exception:
         crmp_session.rollback()
     else:
         crmp_session.commit()

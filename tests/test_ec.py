@@ -1,67 +1,82 @@
 from pkg_resources import resource_filename
 from datetime import datetime
 
-import pytz
-from lxml.etree import tostring, fromstring, parse, XSLT
+from lxml.etree import fromstring, parse, XSLT
 import pytest
 
-from crmprtd.ec import makeurl, extract_fname_from_url, parse_xml, ns, ObsProcessor, check_history, insert_obs, recordable_vars, db_unit, OmMember
-from pycds import History, Station, Obs, Network
+from crmprtd.ec import makeurl, extract_fname_from_url, ns, \
+    ObsProcessor, check_history, insert_obs, \
+    recordable_vars, db_unit, OmMember
+from pycds import Obs
 
-@pytest.mark.parametrize(('label', 'args','expected'), [
+
+@pytest.mark.parametrize(('label', 'args', 'expected'), [
     ('daily-BC-EN',
-     {'freq':'daily',
+     {'freq': 'daily',
       'province': 'BC',
       'language': 'e',
       'time': datetime(2016, 1, 15, 21)},
-     'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/yesterday_bc_20160115_e.xml'
-    ), ('hourly-BC-EN',
-     {'freq':'hourly',
-      'province': 'BC',
-      'language': 'e',
-      'time': datetime(2016, 1, 15, 21)},
-     'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml'
-    ), ('nofreq-BC-EN',
-     {'province': 'BC',
-      'language': 'e',
-      'time': datetime(2016, 1, 15, 21)},
-     'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/yesterday_bc_20160115_e.xml'
-    ), ('hourly-noprov-EN',
-     {'freq':'hourly',
-      'language': 'e',
-      'time': datetime(2016, 1, 15, 21)},
-     'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml'
-    ), ('hourly-BC-nolang',
-     {'freq':'hourly',
-      'province': 'BC',
-      'time': datetime(2016, 1, 15, 21)},
-     'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml'
-    )
+     ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/'
+      'yesterday_bc_20160115_e.xml')
+     ), ('hourly-BC-EN',
+         {'freq': 'hourly',
+          'province': 'BC',
+          'language': 'e',
+          'time': datetime(2016, 1, 15, 21)},
+         ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/'
+          'hourly_bc_2016011521_e.xml')
+         ), ('nofreq-BC-EN',
+             {'province': 'BC',
+              'language': 'e',
+              'time': datetime(2016, 1, 15, 21)},
+             ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/'
+              'yesterday_bc_20160115_e.xml')
+             ), ('hourly-noprov-EN',
+                 {'freq': 'hourly',
+                  'language': 'e',
+                  'time': datetime(2016, 1, 15, 21)},
+                 ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                  'hourly/hourly_bc_2016011521_e.xml')
+                 ), ('hourly-BC-nolang',
+                     {'freq': 'hourly',
+                      'province': 'BC',
+                      'time': datetime(2016, 1, 15, 21)},
+                     ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                      'hourly/hourly_bc_2016011521_e.xml')
+                     )
 ])
 def test_makeurl(label, args, expected):
     assert makeurl(**args) == expected
+
 
 def test_makeurl_no_time_hourly():
     url = makeurl(freq='hourly')
     fmt = '%Y%m%d%H'
     t = datetime.utcnow()
 
-    assert url == 'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/hourly_bc_{}_e.xml'.format(t.strftime(fmt))
+    assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                   'hourly/hourly_bc_{}_e.xml').format(t.strftime(fmt))
+
 
 def test_makeurl_no_time_daily():
     url = makeurl()
     fmt = '%Y%m%d'
     t = datetime.utcnow()
 
-    assert url == 'http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/yesterday_bc_{}_e.xml'.format(t.strftime(fmt))
+    assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                   'yesterday/yesterday_bc_{}_e.xml').format(t.strftime(fmt))
+
 
 @pytest.mark.parametrize(('url', 'fname'), [
-    ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml', 'hourly_bc_2016011521_e.xml'),
+    (('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/'
+      'hourly_bc_2016011521_e.xml'),
+     'hourly_bc_2016011521_e.xml'),
     ('http://pacificclimate.org/directory/of/files.zip', 'files.zip'),
     ('http://this.com/it/a/filename.extension', 'filename.extension')
 ])
 def test_url_to_fname(url, fname):
     assert extract_fname_from_url(url) == fname
+
 
 @pytest.mark.parametrize(('x', 'expected'), [
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -76,7 +91,7 @@ def test_url_to_fname(url, fname):
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), '-0.12'),
+</om:ObservationCollection>'''), '-0.12'), # noqa
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
@@ -89,7 +104,7 @@ def test_url_to_fname(url, fname):
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), '0.12')
+</om:ObservationCollection>'''), '0.12') # noqa
 ])
 def test_xsl_transform_tendency_amount(x, expected):
     # Apply the transform
@@ -103,6 +118,7 @@ def test_xsl_transform_tendency_amount(x, expected):
     assert len(e) == 1
     assert e[0].attrib['value'] == expected
 
+
 @pytest.mark.parametrize(('x', 'expected'), [
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -115,7 +131,7 @@ def test_xsl_transform_tendency_amount(x, expected):
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), '270'),
+</om:ObservationCollection>'''), '270'), # noqa
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
@@ -127,7 +143,7 @@ def test_xsl_transform_tendency_amount(x, expected):
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), '135')
+</om:ObservationCollection>'''), '135') # noqa
 ])
 def test_xsl_transform_wind_direction(x, expected):
     # Apply the transform
@@ -139,6 +155,7 @@ def test_xsl_transform_wind_direction(x, expected):
     e = et.xpath(".//mpo:element", namespaces=ns)
 
     assert e[0].attrib['value'] == expected
+
 
 @pytest.mark.parametrize(('x', 'expected'), [
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -152,7 +169,7 @@ def test_xsl_transform_wind_direction(x, expected):
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), '8')
+</om:ObservationCollection>'''), '8') # noqa
 ])
 def test_xsl_transform_cloud_cover(x, expected):
     # Apply the transform
@@ -165,6 +182,7 @@ def test_xsl_transform_cloud_cover(x, expected):
 
     assert e[0].attrib['uom'] == 'percent'
     assert e[0].attrib['value'] == expected
+
 
 @pytest.mark.parametrize(('et', 'expected'), [
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -198,7 +216,7 @@ def test_xsl_transform_cloud_cover(x, expected):
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), 10000),
+</om:ObservationCollection>'''), 10000), # noqa
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
@@ -230,12 +248,13 @@ def test_xsl_transform_cloud_cover(x, expected):
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''), 10001)
+</om:ObservationCollection>'''), 10001) # noqa
 ])
 def test_check_valid_history_id(ec_session, et, expected):
     members = et.xpath('//om:member', namespaces=ns)
     hid = check_history(members[0], ec_session, 1000)
     assert hid == expected
+
 
 @pytest.mark.parametrize(('et'), [
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -269,12 +288,13 @@ def test_check_valid_history_id(ec_session, et, expected):
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''))
+</om:ObservationCollection>''')) # noqa
 ])
 def test_station_movement(ec_session, et):
     members = et.xpath('//om:member', namespaces=ns)
     hid = check_history(members[0], ec_session, 1000)
     assert hid
+
 
 def test_new_station(ec_session):
     stn1 = fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -306,7 +326,7 @@ def test_new_station(ec_session):
       </gml:FeatureCollection>
     </om:featureOfInterest>
   </om:Observation>
-</om:member>''')
+</om:member>''') # noqa
     stn2 = fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:member xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:Observation>
@@ -336,7 +356,7 @@ def test_new_station(ec_session):
       </gml:FeatureCollection>
     </om:featureOfInterest>
   </om:Observation>
-</om:member>''')
+</om:member>''') # noqa
 
     hid1 = check_history(stn1, ec_session, 1000)
     assert hid1 == 1
@@ -347,10 +367,12 @@ def test_new_station(ec_session):
     hid3 = check_history(stn1, ec_session, 1000)
     assert hid3 == 1
 
+
 def test_get_recordable_vars(ec_session):
     rv = recordable_vars(ec_session)
     assert rv['total_precipitation'] == 100
     assert rv['air_temperature'] == 101
+
 
 @pytest.mark.parametrize(('net_var_name', 'unit'), [
     ('total_precipitation', 'mm'),
@@ -359,6 +381,7 @@ def test_get_recordable_vars(ec_session):
 def test_db_unit(ec_session, net_var_name, unit):
     dbu = db_unit(ec_session, net_var_name)
     assert dbu == unit
+
 
 @pytest.mark.parametrize(('et', 'hid', 'vname', 'vid'), [
     (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -425,7 +448,7 @@ def test_db_unit(ec_session, net_var_name, unit):
       </elements>
     </om:result>
   </om:Observation>
-</om:member>'''), 10001, 'air_temperature', 101)
+</om:member>'''), 10001, 'air_temperature', 101) # noqa
 ])
 def test_insert_duplicate_obs(ec_session, et, hid, vname, vid):
     from copy import deepcopy
@@ -440,11 +463,12 @@ def test_insert_duplicate_obs(ec_session, et, hid, vname, vid):
     count3 = ec_session.query(Obs).count()
     assert count3 == count2
 
+
 def test_process_xml(ec_session, caplog):
     import logging
     caplog.set_level(logging.INFO)
 
-    from ec_data import hourly_bc_2016061115, hourly_bc_2016061116
+    from tests.ec_data import hourly_bc_2016061115, hourly_bc_2016061116
 
     obs_count = ec_session.query(Obs).count()
 
