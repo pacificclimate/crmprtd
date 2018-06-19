@@ -100,7 +100,6 @@ class ObsProcessor:
             len(unparsable_times)))
         return data
 
-
     def process(self):
         """
         This function handles inserting all valid observations into

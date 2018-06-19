@@ -157,6 +157,7 @@ def test_session(crmp_session, caplog):
 
     yield crmp_session
 
+
 @pytest.fixture(scope='function')
 def test_data():
     lines = '''station_code,weather_date,precipitation,temperature,relative_humidity,wind_speed,wind_direction,ffmc,isi,fwi,rn_1_pluvio1,snow_depth,snow_depth_quality,precip_pluvio1_status,precip_pluvio1_total,rn_1_pluvio2,precip_pluvio2_status,precip_pluvio2_total,rn_1_RIT,precip_RIT_Status,precip_RIT_total,precip_rgt,solar_radiation_LICOR,solar_radiation_CM3
@@ -173,6 +174,7 @@ def test_data():
         data.append(row)
 
     return data
+
 
 @pytest.yield_fixture(scope='function')
 def ec_session(crmp_session, caplog):

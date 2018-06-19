@@ -3,12 +3,13 @@ import pytz
 import csv
 import logging
 
-from datetime import datetime, date
+from datetime import datetime
 from io import StringIO
 from testfixtures import LogCapture
 
 from pycds import Obs, History, Network, Station
-from crmprtd.wmb import ObsProcessor, insert_obs, check_history, query_by_attribute
+from crmprtd.wmb import ObsProcessor, insert_obs, check_history, \
+    query_by_attribute
 from crmprtd.wmb_exceptions import UniquenessError, InsertionError
 
 
@@ -21,7 +22,8 @@ def test_insert_obs(test_session, val, hid, d, vars_id, expected):
     q = test_session.query(Obs)
     assert q.count() == expected
 
-    result, = test_session.query(Obs.datum).filter(Obs.history_id == hid, Obs.time == d, Obs.vars_id == vars_id).first()
+    result, = test_session.query(Obs.datum).filter(
+        Obs.history_id == hid, Obs.time == d, Obs.vars_id == vars_id).first()
     assert result == val
 
     with pytest.raises(UniquenessError):
@@ -36,7 +38,8 @@ def test_check_and_insert_stations(test_session, test_data):
 
     # Create a set of stations where one of them already exists in the table
     stations = set()
-    id, = test_session.query(Station.native_id).join(Network).filter(Network.id == o.network_id).first()
+    id, = test_session.query(Station.native_id).join(
+        Network).filter(Network.id == o.network_id).first()
     stations.add(id)    # Existing station
     for i in range(3):  # New stations
         id += str(i)
@@ -51,7 +54,8 @@ def test_check_and_insert_stations(test_session, test_data):
     assert q.count() == count + 3
 
     for station in stations:
-        q = test_session.query(Station).join(Network).filter(Station.native_id == station, Network.id == o.network_id)
+        q = test_session.query(Station).join(Network).filter(
+            Station.native_id == station, Network.id == o.network_id)
         assert q.count() == 1
 
 
@@ -74,7 +78,10 @@ def test_check_history(test_session):
                             sdate='2012-09-02',
                             edate='2012-09-06')
     test_session.add(arkham_asylum)
-    test_session.add(Station(native_id='81974', network=o.network, histories=[arkham_asylum]))
+    test_session.add(
+        Station(native_id='81974',
+                network=o.network,
+                histories=[arkham_asylum]))
 
     q = test_session.query(History)
     count = q.count()
@@ -87,7 +94,8 @@ def test_check_history(test_session):
     q = test_session.query(History)
     assert q.count() == count + 1
 
-    q = test_session.query(History).join(Station).filter(Station.native_id == native_id)
+    q = test_session.query(History).join(
+        Station).filter(Station.native_id == native_id)
     assert q.count() == 2
 
     # test error handle
@@ -102,12 +110,13 @@ def test_check_history(test_session):
 
     copy_hist = History(station_name='FIVE MILE')
     test_session.add(copy_hist)
-    test_session.add(Station(native_id='1029', network=o.network, histories=[copy_hist]))
+    test_session.add(
+        Station(native_id='1029', network=o.network, histories=[copy_hist]))
     o = ObsProcessor(test_session, err_data, 1000)
     for row in o.data:
         check = o.process_row(row)
 
-    assert check == None
+    assert check is None
 
 
 def test_process(test_session, test_data):
@@ -151,7 +160,8 @@ def test_datalogger(test_session, test_data, tmpdir):
     o.datalogger.add_row(test_data, reason='Add five rows')
     assert len(o.datalogger.bad_rows) == 6
 
-    row = {'station_code': '1234567', 'weather_date': datetime.now(), 'ec_precip': 4}
+    row = {'station_code': '1234567', 'weather_date': datetime.now(),
+           'ec_precip': 4}
     var = 'ec_precip'
     o.datalogger.add_obs(row, var, reason='Can this handle obs')
     assert len(o.datalogger.bad_obs) == 1
@@ -187,12 +197,17 @@ def test_process_unhandled_errors(test_session, test_data):
     o = ObsProcessor(test_session, test_data, args)
     o._unhandled_errors = 1
 
-    expected = [('crmprtd.wmb', 'ERROR', 'Unable to save error archive'),
-                ('crmprtd.wmb', 'CRITICAL', 'Errors occured in WMB real time daemon that require a human touch.')]
+    expected = [('crmprtd.wmb',
+                 'ERROR',
+                 'Unable to save error archive'),
+                ('crmprtd.wmb',
+                 'CRITICAL',
+                 'Errors occured in WMB real time daemon that require a human '
+                 'touch.')]
 
-    with LogCapture(level=logging.ERROR) as l:
+    with LogCapture(level=logging.ERROR) as log:
         o.process()
-        err, crit = l.actual()
+        err, crit = log.actual()
         assert expected[0] == err
         for exp, test in zip(expected[1], crit):
             assert exp in test
@@ -201,6 +216,7 @@ def test_process_unhandled_errors(test_session, test_data):
 class ArgsForTest:
     '''Used by test_process_unhandled_errors to mimic arguments
     '''
+
     def __init__(self, archive_dir=None):
         self.archive_dir = archive_dir
         self.log = logging.getLogger(__name__)

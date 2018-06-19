@@ -3,7 +3,7 @@ from datetime import datetime
 import pytest
 import pytz
 
-from pycds import Network, Variable, History, Station, Obs
+from pycds import History, Obs
 from crmprtd.db import mass_insert_obs, split
 
 

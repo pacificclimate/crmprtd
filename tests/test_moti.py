@@ -17,9 +17,8 @@ def test_check_history(test_session):
     q = test_session.query(History)
     assert q.count() == 8
 
-def test_data(test_session, moti_sawr7110_xml):
-    tz = pytz.timezone('America/Vancouver')
 
+def test_data(test_session, moti_sawr7110_xml):
     c1 = test_session.query(Obs).count()
 
     process(test_session, moti_sawr7110_xml)
@@ -145,6 +144,7 @@ def test_broken_obs(test_session, xml):
     process(test_session, xml)
     n_obs_after = test_session.query(Obs).count()
     assert n_obs_before == n_obs_after
+
 
 def test_missing_client_id(test_session):
     et = fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>

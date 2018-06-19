@@ -2,18 +2,17 @@ from pkg_resources import resource_filename
 from datetime import datetime
 from lxml.etree import LxmlError
 
-from io import StringIO, BytesIO
-import pytz
-from lxml.etree import tostring, fromstring, parse, XSLT
+from io import BytesIO
+from lxml.etree import fromstring, parse, XSLT
 import pytest
 
 from crmprtd.ec import makeurl, extract_fname_from_url, ns, \
     ObsProcessor, check_history, insert_obs, \
-    recordable_vars, db_unit, OmMember
+    recordable_vars, db_unit, OmMember, parse_xml
 from pycds import Obs
 
 
-@pytest.mark.parametrize(('label', 'args','expected'), [
+@pytest.mark.parametrize(('label', 'args', 'expected'), [
     ('daily-BC-EN',
      {'freq': 'daily',
       'province': 'BC',
@@ -61,7 +60,6 @@ def test_makeurl_no_time_hourly():
                    'hourly/hourly_bc_{}_e.xml').format(t.strftime(fmt))
 
 
-
 def test_makeurl_no_time_daily():
     url = makeurl()
     fmt = '%Y%m%d'
@@ -69,7 +67,6 @@ def test_makeurl_no_time_daily():
 
     assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
                    'yesterday/yesterday_bc_{}_e.xml').format(t.strftime(fmt))
-
 
 
 @pytest.mark.parametrize(('url', 'fname'), [
@@ -518,9 +515,10 @@ def test_parse_xml():
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''
+</om:ObservationCollection>''' # noqa
     transformed = parse_xml(BytesIO(et))
-    for a,b in zip(et.decode("utf-8").splitlines(), transformed.__str__().splitlines()):
+    for a, b in zip(et.decode("utf-8").splitlines(),
+                    transformed.__str__().splitlines()):
         if '<?xml' in a:
             # special case for first line
             assert a[:18] == b[:18]
@@ -560,7 +558,7 @@ def test_process_error_handle():
       </om:featureOfInterest>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''
+</om:ObservationCollection>''' # noqa
     with pytest.raises(Exception):
         transformed = parse_xml(BytesIO(et))
         o = ObsProcessor(transformed, 'incorrect', 'values')
@@ -632,7 +630,7 @@ def test_OmMember_index_error_handle(ec_session):
       </elements>
     </om:result>
   </om:Observation>
-</om:member>''')
+</om:member>''') # noqa
     o = OmMember(et)
     with pytest.raises(LxmlError):
         o.member_unit('test')
@@ -640,4 +638,4 @@ def test_OmMember_index_error_handle(ec_session):
 
 def test_db_unit_error_handle(ec_session):
     test_val = db_unit(ec_session, 'not_a_var')
-    assert test_val == None
+    assert test_val is None
