@@ -136,7 +136,7 @@ def test_ftp2rows(tmpdir):
         rows, fieldnames = ftp2rows('nohost', 'some/path', log)
 
 
-def test_datalogger():
+def test_datalogger_no_args():
     dl = DataLogger(None)
     assert dl.log is not None
 
