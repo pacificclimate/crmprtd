@@ -272,30 +272,3 @@ class FTPReader(object):  # pragma: no cover
             self.connection.quit()
         except Exception:
             self.connection.close()
-
-
-def file2rows(file_, log):
-    try:
-        reader = csv.DictReader(file_)
-    except csv.Error as e:
-        log.critical('Unable to load data from local file', exc_info=True)
-        sys.exit(1)
-
-    return [row for row in reader], reader.fieldnames
-
-
-def ftp2rows(host, path, log):  # pragma: no cover
-    log.info('Fetching file from FTP')
-    log.info('Listing', extra={'host': host, 'path': path})
-
-    try:
-        ftpreader = FTPReader(host, None,
-                              None, path, log)
-        log.info('Opened a connection', extra={'host': host})
-        reader = ftpreader.csv_reader(log)
-        log.info('instantiated the reader and downloaded all of the data')
-    except ftplib.all_errors as e:
-        log.critical('Unable to load data from ftp source', exc_info=True)
-        sys.exit(1)
-
-    return [row for row in reader], reader.fieldnames
