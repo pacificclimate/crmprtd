@@ -1,11 +1,13 @@
 import csv
 import os
+import ftplib
 
 from datetime import datetime
 
 # Local
-from crmprtd.wamr import setup_logging, FTPReader
-from crmprtd.wamr.normalize import prepare, normalize_file, normalize_ftp
+from crmprtd import retry
+from crmprtd.wamr import setup_logging
+from crmprtd.wamr.normalize import normalize_file, normalize_ftp
 
 
 def run(args):
@@ -22,28 +24,13 @@ def run(args):
         error_file = open(os.path.join(args.cache_dir, error_filename), 'a')
 
     if args.input_file:
-        log.info('Nomalizing File Data')
-        normalize_file(args, error_file, log)
+        # File
+        with open(args.input_file) as f:
+            normalize_file(f, args, error_file, log)
     else:
         # FTP
-        # rows, fieldnames = ftp2rows(args.ftp_server, args.ftp_dir, log)
         ftpreader = ftp2rows(args.ftp_server, args.ftp_dir, log)
         normalize_ftp(ftpreader, error_file, args, log)
-
-        # if not args.cache_file:
-        #     args.cache_file = 'wamr_download_{}.csv'.format(datetime.strftime(
-        #         datetime.now(), '%Y-%m-%dT%H-%M-%S'))
-        # with open(args.cache_file, 'w') as cache_file:
-        #     cache_rows(cache_file, rows, fieldnames)
-
-    # log.info('observations read into memory', extra={'num_obs': len(rows)})
-    # prepare(rows, error_file, log, args)
-
-
-def cache_rows(file_, rows, fieldnames):
-    copier = csv.DictWriter(file_, fieldnames=fieldnames)
-    copier.writeheader()
-    copier.writerows(rows)
 
 
 def ftp2rows(host, path, log):
@@ -54,11 +41,54 @@ def ftp2rows(host, path, log):
         ftpreader = FTPReader(host, None,
                               None, path, log)
         log.info('Opened a connection to {}'.format(host))
-        # reader = ftpreader.csv_reader(log)
-        # log.info('instantiated the reader and downloaded all of the data')
     except ftplib.all_errors as e:
         log.critical('Unable to load data from ftp source', exc_info=True)
         sys.exit(1)
 
-    # return [row for row in reader], reader.fieldnames
     return ftpreader
+
+
+class FTPReader(object):
+    '''Glue between the FTP class methods (which are callback based)
+       and the csv.DictReader class (which is iteration based)
+    '''
+
+    def __init__(self, host, user, password, data_path, log=None):
+        self.filenames = []
+
+        @retry(ftplib.error_temp, tries=4, delay=3, backoff=2, logger=log)
+        def ftp_connect_with_retry(host, user, password):
+            con = ftplib.FTP(host)
+            con.login(user, password)
+            return con
+
+        self.connection = ftp_connect_with_retry(host, user, password)
+
+        def callback(line):
+            self.filenames.append(line)
+
+        self.connection.retrlines('NLST ' + data_path, callback)
+
+    def csv_reader(self, log=None):
+        # Just store the lines in memory
+        # It's non-ideal but neither classes support coroutine send/yield
+        if not log:
+            log = logging.getLogger('__name__')
+        lines = []
+
+        def callback(line):
+            lines.append(line)
+
+        for filename in self.filenames:
+            log.info("Downloading %s", filename)
+            # FIXME: This line has some kind of race condition with this
+            self.connection.retrlines('RETR {}'.format(filename), callback)
+
+        r = csv.DictReader(lines)
+        return r
+
+    def __del__(self):
+        try:
+            self.connection.quit()
+        except Exception:
+            self.connection.close()
