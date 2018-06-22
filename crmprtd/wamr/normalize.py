@@ -6,80 +6,33 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 from collections import namedtuple
+import pytz
+from dateutil.parser import parse
 
 # Local
 from crmprtd.wamr import rows2db
+from crmprtd.wamr import setup_logging
 
 
-def normalize_ftp(ftpreader, error_file, args, log=None):
-    # Just store the lines in memory
-    # It's non-ideal but neither classes support coroutine send/yield
-    if not log:
-        log = logging.getLogger('__name__')
-    lines = []
+# TODO: store_file needs to be changed to store rows
+def normalize(file_stream):
+    Row = namedtuple('Row', "date native_id station_name parameter unit data")
+    tz = pytz.timezone('Canada/Pacific')
 
-    def callback(line):
-        lines.append(line)
+    log =setup_logging('INFO')
+    for row in file_stream:
+        cleaned = row.strip().split(',')
 
-    for filename in ftpreader.filenames:
-        log.info("Downloading %s", filename)
-        # FIXME: This line has some kind of race condition with this
-        ftpreader.connection.retrlines('RETR {}'.format(filename), callback)
-
-    r = csv.DictReader(lines)
-
-    unnamed_rows = [tuple(line.split(',')) for index, line in enumerate(lines) if index != 0]
-    named_rows = unnamed2named(unnamed_rows)
-
-    store_file(args, r, len(unnamed_rows), log)
-
-    for i, row in enumerate(named_rows):
-        if i == 10:
-            break
-        print(row)
-    # return named_rows???
-
-
-def normalize_file(f, args, error_file, log):
-    try:
-        reader = csv.DictReader(f)
-        unnamed_rows = [tuple(line.strip().split(',')) for index, line in enumerate(f) if index != 0]
-    except csv.Error as e:
-        log.critical('Unable to load data from local file', exc_info=True)
-        sys.exit(1)
-    except Exception as e:
-        log.error('An error has occured while converting file to rows')
-        raise e
-
-    named_rows = unnamed2named(unnamed_rows)
-
-    log.info('{0} observations read into memory'.format(len(named_rows)))
-
-    for i, row in enumerate(named_rows):
-        if i == 10:
-            break
-        print(row)
-    # return named_rows???
-
-
-def unnamed2named(unnamed_rows):
-    Row = namedtuple('Row', "date_pst ems_id station_name parameter air_parameter instrument raw_value unit status aircodestatus status_description reported_value")
-
-    # named tuple
-    named_rows = [Row(date_pst=line[0],
-                      ems_id=line[1],
-                      station_name=line[2],
-                      parameter=line[3],
-                      air_parameter=line[4],
-                      instrument=line[5],
-                      raw_value=line[6],
-                      unit=line[7],
-                      status=line[8],
-                      aircodestatus=line[9],
-                      status_description=line[10],
-                      reported_value=line[11]) for line in unnamed_rows]
-
-    return named_rows
+        try:
+            named_row = Row(date=parse(cleaned[0]).replace(tzinfo=tz),
+                      	    native_id=cleaned[1],
+                      		station_name=cleaned[2],
+                      		parameter=cleaned[3],
+                      		unit=cleaned[7],
+                      		data=float(cleaned[11]))
+            yield named_row
+        except Exception as e:
+            log.warning('Unable to process row: {}'.format(row))
 
 
 def store_file(args, dict, rows_len, log):

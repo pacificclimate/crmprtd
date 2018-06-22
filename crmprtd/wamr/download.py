@@ -7,10 +7,9 @@ from datetime import datetime
 # Local
 from crmprtd import retry
 from crmprtd.wamr import setup_logging
-from crmprtd.wamr.normalize import normalize_file, normalize_ftp
 
 
-def run(args):
+def download(args):
     # Logging
     log = setup_logging(args.log_level, args.log, args.error_email)
     log.info('Starting WAMR rtd')
@@ -26,14 +25,35 @@ def run(args):
     if args.input_file:
         # File
         with open(args.input_file) as f:
-            normalize_file(f, args, error_file, log)
+            is_first = True
+            while True:
+                data = f.readline()
+                if is_first:
+                    is_first = False
+                    continue
+                elif not data:
+                    break
+
+                yield data
     else:
         # FTP
-        ftpreader = ftp2rows(args.ftp_server, args.ftp_dir, log)
-        normalize_ftp(ftpreader, error_file, args, log)
+        ftpreader = ftp_connect(args.ftp_server, args.ftp_dir, log)
+        if not log:
+            log = logging.getLogger('__name__')
+
+        lines = []
+        def callback(line):
+            lines.append(line)
+
+        for filename in ftpreader.filenames:
+            log.info("Downloading %s", filename)
+            # FIXME: This line has some kind of race condition with this
+            ftpreader.connection.retrlines('RETR {}'.format(filename), callback)
+            for line in lines:
+                yield line
 
 
-def ftp2rows(host, path, log):
+def ftp_connect(host, path, log):
     log.info('Fetching file from FTP')
     log.info('Listing {}/{}'.format(host, path))
 
