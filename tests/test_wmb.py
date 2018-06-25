@@ -13,25 +13,20 @@ from crmprtd.wmb import ObsProcessor, insert_obs, check_history, \
 from crmprtd.wmb_exceptions import UniquenessError, InsertionError
 
 
-def test_process_unhandled_errors(test_session, test_data):
+def test_process_unhandled_errors(test_session, test_data, caplog):
     args = ArgsForTest()
     o = ObsProcessor(test_session, test_data, args)
     o._unhandled_errors = 1
 
-    expected = [('crmprtd.wmb',
-                 'ERROR',
-                 'Unable to save error archive'),
-                ('crmprtd.wmb',
-                 'CRITICAL',
-                 'Errors occured in WMB real time daemon that require a human '
-                 'touch.')]
+    expected = ('Errors occured in WMB real time daemon that require a human '
+                'touch.')
 
-    with LogCapture(level=logging.ERROR) as log:
-        o.process()
-        err, crit = log.actual()
-        assert expected[0] == err
-        for exp, test in zip(expected[1], crit):
-            assert exp in test
+    caplog.set_level(logging.CRITICAL)
+
+    o.process()
+
+    record = str(caplog.records)
+    assert expected in record
 
 
 @pytest.mark.parametrize(('val', 'hid', 'd', 'vars_id', 'expected'), [
