@@ -2,7 +2,7 @@ from pkg_resources import resource_filename
 from datetime import datetime
 from lxml.etree import LxmlError
 
-from io import BytesIO
+from io import BytesIO, StringIO
 from lxml.etree import fromstring, parse, XSLT
 import pytest
 
@@ -483,47 +483,73 @@ def test_process_xml(ec_session, caplog):
     assert ec_session.query(Obs).count() == obs_count + 260
 
 
-def test_parse_xml():
-    et = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+def test_parse_xml(test_session):
+    et = '''<?xml version="1.0" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
       <om:metadata>
         <set>
           <general>
+            <author build="build.4063" name="MSC-DMS-PG-WXO-Summary" version="2.4"/>
             <dataset name="mscobservation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/"/>
+            <phase name="product-wxo_xml-1.0/"/>
+            <id xlink:href="/data/msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
+            <parent xlink:href="/data/msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
           </general>
           <identification-elements>
-            <element name="station_name" uom="unitless" value="Sechelt"/>
-            <element name="climate_station_number" uom="unitless" value="1047172"/>
+            <element name="station_name" uom="unitless" value="Beaver Creek Airport"/>
+            <element name="latitude" uom="degree" value="62.416667"/>
+            <element name="longitude" uom="degree" value="-140.866667"/>
+            <element name="transport_canada_id" uom="unitless" value="YXX"/>
+            <element name="observation_date_utc" uom="unitless" value="2016-05-28T02:00:00.000Z"/>
+            <element name="observation_date_local_time" uom="unitless" value="2016-05-27T19:00:00.000 PDT"/>
+            <element name="climate_station_number" uom="unitless" value="2100160"/>
+            <element name="wmo_station_number" uom="unitless" value="10000"/>
           </identification-elements>
         </set>
       </om:metadata>
       <om:samplingTime>
         <gml:TimeInstant>
-          <gml:timePosition>2012-09-28T02:00:00.000Z</gml:timePosition>
+          <gml:timePosition>2016-05-28T02:00:00.000Z</gml:timePosition>
         </gml:TimeInstant>
       </om:samplingTime>
+      <om:resultTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2016-05-28T02:00:00.000Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:resultTime>
+      <om:procedure xlink:href="msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
+      <om:observedProperty gml:remoteSchema="/schema/point-observation/2.0.xsd"/>
       <om:featureOfInterest>
         <gml:FeatureCollection>
           <gml:location>
             <gml:Point>
-              <gml:pos>49.45 -123.7</gml:pos>
+              <gml:pos>49.025278 -122.36</gml:pos>
             </gml:Point>
           </gml:location>
         </gml:FeatureCollection>
       </om:featureOfInterest>
+      <om:result>
+        <elements>
+          <element name="precipitation" uom="mm" value="55"/>
+        </elements>
+      </om:result>
     </om:Observation>
   </om:member>
 </om:ObservationCollection>''' # noqa
-    transformed = parse_xml(BytesIO(et))
-    for a, b in zip(et.decode("utf-8").splitlines(),
-                    transformed.__str__().splitlines()):
-        if '<?xml' in a:
-            # special case for first line
-            assert a[:18] == b[:18]
-        else:
-            assert a == b
+    et = StringIO(et)
+    transformed = parse_xml(et)
+
+    o = ObsProcessor(transformed, test_session, 1000)
+
+    q = test_session.query(Obs)
+    assert q.count() == 3
+
+    o.process()
+
+    q = test_session.query(Obs)
+    assert q.count() == 4
 
 
 def test_process_error_handle():
