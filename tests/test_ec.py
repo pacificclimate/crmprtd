@@ -585,9 +585,9 @@ def test_process_error_handle():
     </om:Observation>
   </om:member>
 </om:ObservationCollection>''' # noqa
+    transformed = parse_xml(BytesIO(et))
+    o = ObsProcessor(transformed, 'incorrect', 'values')
     with pytest.raises(Exception):
-        transformed = parse_xml(BytesIO(et))
-        o = ObsProcessor(transformed, 'incorrect', 'values')
         o.process()
 
 
@@ -659,7 +659,7 @@ def test_OmMember_index_error_handle(ec_session):
 </om:member>''') # noqa
     o = OmMember(et)
     with pytest.raises(LxmlError):
-        o.member_unit('test')
+        o.member_unit('doese_not_exist')
 
 
 def test_db_unit_error_handle(ec_session):
