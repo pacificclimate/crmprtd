@@ -7,7 +7,7 @@ from io import StringIO
 import pytest
 
 from crmprtd.wamr import rows2db, process_obs, setup_logging, file2rows, \
-    ftp2rows, DataLogger, create_station_mapping, create_variable_mapping
+    DataLogger, create_station_mapping, create_variable_mapping
 from pycds import Obs, History, Network, Variable
 
 # def test_insert(crmp_session):

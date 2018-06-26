@@ -5,7 +5,6 @@ import logging
 
 from datetime import datetime
 from io import StringIO
-from testfixtures import LogCapture
 
 from pycds import Obs, History, Network, Station
 from crmprtd.wmb import ObsProcessor, insert_obs, check_history, \
