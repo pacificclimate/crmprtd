@@ -20,9 +20,12 @@ def test_process_unhandled_errors(test_session, test_data, caplog):
     expected = ('Errors occured in WMB real time daemon that require a human '
                 'touch.')
 
-    caplog.set_level(logging.CRITICAL)
-
     o.process()
+
+    records = caplog.records
+    for record in records:
+        if record.levelno == 50:
+            assert expected in record.msg
 
     record = str(caplog.records)
     assert expected in record
