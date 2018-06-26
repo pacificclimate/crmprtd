@@ -19,15 +19,12 @@ def test_process_unhandled_errors(test_session, test_data, caplog):
 
     expected = ('Errors occured in WMB real time daemon that require a human '
                 'touch.')
-    caplog.set_level('INFO')
+
     o.process()
 
     for record in caplog.records:
         if record.levelno == 50:
             assert expected in record.msg
-
-    record = str(caplog.records)
-    assert expected in record
 
 
 @pytest.mark.parametrize(('val', 'hid', 'd', 'vars_id', 'expected'), [
