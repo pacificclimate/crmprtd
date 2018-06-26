@@ -42,11 +42,25 @@ def test_insert_obs(test_session, val, hid, d, vars_id, expected):
         Obs.history_id == hid, Obs.time == d, Obs.vars_id == vars_id).first()
     assert result == val
 
+
+def test_insert_obs_uniqness_error(test_session):
+    val = 3.0
+    hid = 21
+    d = datetime(2017, 6, 17, 6, tzinfo=pytz.utc)
+    vars_id = 1
+
+    insert_obs(val, hid, d, vars_id, test_session)
     with pytest.raises(UniquenessError):
         insert_obs(val, hid, d, vars_id, test_session)
 
+
+def test_insert_obs_insertion_errror(test_session):
+    val = 'not_a_val'
+    hid = 20
+    d = datetime(2016, 9, 13, 6, tzinfo=pytz.utc)
+    vars_id = 1
     with pytest.raises(InsertionError):
-        insert_obs('test', hid, d, vars_id, test_session)
+        insert_obs(val, hid, d, vars_id, test_session)
 
 
 def test_check_and_insert_stations(test_session, test_data):
@@ -114,6 +128,8 @@ def test_check_history(test_session):
         Station).filter(Station.native_id == native_id)
     assert q.count() == 2
 
+
+def test_check_history_error_handle(test_session):
     # test error handle
     err_lines = '''station_code,weather_date,precipitation
 1029,2012090312,12
@@ -124,10 +140,15 @@ def test_check_history(test_session):
     for row in reader:
         err_data.append(row)
 
+    network_id = test_session.query(
+        Network.id).filter(Network.name == 'FLNRO-WMB')
+    network = test_session.query(Network).filter(
+        Network.id == network_id).first()
+
     copy_hist = History(station_name='FIVE MILE')
     test_session.add(copy_hist)
     test_session.add(
-        Station(native_id='1029', network=o.network, histories=[copy_hist]))
+        Station(native_id='1029', network=network, histories=[copy_hist]))
     o = ObsProcessor(test_session, err_data, 1000)
     for row in o.data:
         check = o.process_row(row)
@@ -142,8 +163,13 @@ def test_process(test_session, test_data):
     q = test_session.query(Obs)
     assert q.count() == 8
 
+
+def test_process_uniquness_error(test_session, test_data):
     # test UniquenessError handle
+    o = ObsProcessor(test_session, test_data, 1000)
     o.process()
+    o.process()
+
     assert o._obs_in_db == 5
 
 
@@ -208,7 +234,7 @@ def test_archive_station(test_session, test_data):
     assert check == 5
 
 
-class ArgsForTest:
+class ArgsForTest(object):
     '''Used by test_process_unhandled_errors to mimic arguments
     '''
 

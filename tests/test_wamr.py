@@ -107,45 +107,18 @@ def test_rows2db_units_conversion(test_session):
         assert ob.datum == pytest.approx(0, abs=1.0e-6)
 
 
-def test_ftp2rows(tmpdir):
-    expected_fieldnames = ['DATE_PST',
-                           'EMS_ID',
-                           'STATION_NAME',
-                           'PARAMETER',
-                           'AIR_PARAMETER',
-                           'INSTRUMENT',
-                           'RAW_VALUE',
-                           'UNIT',
-                           'STATUS',
-                           'AIRCODESTATUS',
-                           'STATUS_DESCRIPTION',
-                           'REPORTED_VALUE']
-    log = setup_logging('INFO', 'mof.log', 'error@email.mail')
-    rows, fieldnames = ftp2rows('ftp.env.gov.bc.ca',
-                                'pub/outgoing/AIR/Hourly_Raw_Air_Data/'
-                                'Meteorological/',
-                                log)
-
-    for expected, name in zip(expected_fieldnames, fieldnames):
-        assert expected == name
-
-    assert rows is not None
-
-    # test error handle
-    with pytest.raises(SystemExit):
-        rows, fieldnames = ftp2rows('nohost', 'some/path', log)
-
-
 def test_datalogger_no_args():
     dl = DataLogger(None)
     assert dl.log is not None
 
 
 def test_process_obs_error_handle(test_session):
+    # lines contains a 'BAD_VAR' which does not exist and will cause an error
+    # in wamr --> process_obs()
     lines = '''DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE
-2017-05-21 17:00,0260011,Warfield Elementary Met_60,TEMP_CELSIUS,TEMP_MEAN,TEMP 10M,32.0,°F,1,n/a,Data Ok,32.0
+2017-05-21 17:00,0260011,Warfield Elementary Met_60,BAD_VAR,TEMP_MEAN,TEMP 10M,32.0,°F,1,n/a,Data Ok,32.0
 ''' # noqa
-    log = setup_logging('DEBUG')
+    log = setup_logging('DEBUG', 'mof.log', 'error_file')
     f = StringIO(lines)
     rows, fieldnames = file2rows(f, log)
 
