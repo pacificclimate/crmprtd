@@ -498,7 +498,7 @@ class DataLogger:
                  'solar_radiation_LICOR',
                  'solar_radiation_CM3']
 
-        with open(outcsv, 'w') as f:
+        with open(outcsv, 'wb') as f:
             w = csv.writer(f)
             w.writerow(order)
             for row in self.data:

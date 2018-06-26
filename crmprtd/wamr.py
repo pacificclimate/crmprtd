@@ -223,7 +223,7 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
     dl.archive(error_file)
 
 
-class FTPReader(object): # pragma: no cover
+class FTPReader(object):  # pragma: no cover
     '''Glue between the FTP class methods (which are callback based)
        and the csv.DictReader class (which is iteration based)
     '''
@@ -279,7 +279,7 @@ def file2rows(file_, log):
     return [row for row in reader], reader.fieldnames
 
 
-def ftp2rows(host, path, log): # pragma: no cover
+def ftp2rows(host, path, log):  # pragma: no cover
     log.info('Fetching file from FTP')
     log.info('Listing {}/{}'.format(host, path))
 
