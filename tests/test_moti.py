@@ -329,8 +329,9 @@ def test_unknown_var(test_session, caplog):
     n_obs_after = test_session.query(Obs).count()
     assert n_obs_before == n_obs_after
 
-    t = ('Could not find variable temperature, tree-temperature, celsius in '
-         'the database. Skipping this observation.')
-    assert t in caplog.text
+    t = ('Could not find variable in the database. Skipping this observation.')
+    record, = caplog.records
+    print(record.msg)
+    assert t == record.msg
 
     # TODO: need to actually check log warning

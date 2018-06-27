@@ -151,11 +151,11 @@ def check_history(member, sesh, threshold):
         obs_time = member.xpath(
             './om:Observation/om:samplingTime//gml:timePosition',
             namespaces=ns)[0].text
-        log.info('Found station info', extra={'name': stn_name,
-                                              'id': native_id,
-                                              'lon': lon,
-                                              'lat': lat,
-                                              'time': obs_time})
+        log.debug('Found station info', extra={'name': stn_name,
+                                               'id': native_id,
+                                               'lon': lon,
+                                               'lat': lat,
+                                               'time': obs_time})
     # An IndexError here means that the member has no station_name or
     # climate_station_number (or identification-elements), lat/lon, or obs_time
     # in which case we don't need to process this item
