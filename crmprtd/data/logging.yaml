@@ -1,3 +1,11 @@
+# Log level standard usage
+#   debug - Used to relay detailed information, only use for testing
+#   info - Used to output information that is useful while running application
+#   warning - Used when handling exceptions
+#   error - Used for unhandled exceptions
+#   exception - Used like the error level, but outputs a stack trace
+#   critical - Used for outlying cases where program may be unable to continue
+
 version: 1
 disable_existing_loggers: False
 formatters:
@@ -28,7 +36,7 @@ handlers:
     level: DEBUG
     formatter: simple
     backupCount: 10
-    maxBytes: 10000000 
+    maxBytes: 10000000
     filename: 'crmprtd_log.txt'
 loggers:
   crmprtd:

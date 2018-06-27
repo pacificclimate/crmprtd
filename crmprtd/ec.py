@@ -70,22 +70,21 @@ class ObsProcessor:
         self.threshold = threshold
 
     def process(self):
+        log.info('Processing data')
         members = self.et.xpath('//om:member', namespaces=ns)
         self._members = len(members)
         log.info("Found members in the xml", extra={'num_members': self._members})
 
         for member in members:
             try:
-                log.debug("Processing next member")
+                log.info("Processing next member")
                 self.process_member(member)
                 self._members_processed += 1
             except Exception as e:  # FIXME: More specific exception handling
                 self._member_errors += 1
-                log.exception(
-                    "Error processing member.  Member has been saved in logs")
-                # FIXME: how to format this log
-                log.debug("Error processing member:\n{0}".format(
-                    tostring(member, pretty_print=True)))
+                log.exception("Error processing member, saved in logs")
+                log.error('Error processing member',
+                          extra={'member': tostring(member, pretty_print=True)})
 
         log.info("Finished processing", extra{'num_members': self._members,
                                               'num_members_processed': self._members_processed,
@@ -99,17 +98,17 @@ class ObsProcessor:
 
     def process_member(self, member):
         hid = check_history(member, self.sesh, self.threshold)
-        log.debug("Found history id", extra={'hid': hid})
+        log.info("Found history id", extra={'hid': hid})
         if hid is None:
             # This is not a station
             return
 
         om = OmMember(member)
-        log.debug("Member unit initialized")
+        log.info("Member unit initialized")
 
         rec_vars = recordable_vars(self.sesh)
         insert_vars = set(om.observed_vars()).intersection(rec_vars.keys())
-        log.debug("Insertable variables", extra={'variables': insert_vars})
+        log.info("Insertable variables", extra={'variables': insert_vars})
 
         for vname in insert_vars:
             vid = rec_vars[vname]
@@ -139,7 +138,7 @@ def check_history(member, sesh, threshold):
     attrs = ['station_name', 'climate_station_number']
     # Select critical information from XML
     try:
-        log.debug("Finding Station attributes")
+        log.info("Finding Station attributes")
         stn_name, native_id = map(lambda x: member.xpath(
             ".//mpo:identification-elements/mpo:element[@name='%s']" %
             x, namespaces=ns)[0].get('value'), attrs)
@@ -148,7 +147,7 @@ def check_history(member, sesh, threshold):
         obs_time = member.xpath(
             './om:Observation/om:samplingTime//gml:timePosition',
             namespaces=ns)[0].text
-        log.debug('Found station info', extra={'name': stn_name,
+        log.info('Found station info', extra={'name': stn_name,
                                                'id': native_id,
                                                'lon': lon,
                                                'lat': lat,
@@ -157,11 +156,11 @@ def check_history(member, sesh, threshold):
     # climate_station_number (or identification-elements), lat/lon, or obs_time
     # in which case we don't need to process this item
     except IndexError:
-        log.debug("This member does not appear to be a station")
+        log.warning("This member does not appear to be a station")
         return None
 
     # Determine the frequency for this station
-    log.debug("Finding station frequency")
+    log.info("Finding station frequency")
     dataset = member.xpath('.//mpo:dataset', namespaces=ns)[0].get('name')
     if(re.search('product-hourly', dataset) or
        re.search('hour_summary', dataset)):
@@ -174,16 +173,16 @@ def check_history(member, sesh, threshold):
         raise Exception(
             "Could not determine frequency for a meta_history insertion. "
             "Unexpected product: %s", dataset)
-    log.debug("Found frequency", extra={'frequency': freq})
+    log.info("Found frequency", extra={'frequency': freq})
 
     # Select all history entries that match this station
-    log.debug("Searching for matching meta_history entries")
+    log.info("Searching for matching meta_history entries")
 
     q = sesh.execute('SELECT history_id from '
                      'closest_stns_within_threshold(:lon, :lat, :threshold)',
                      {'lon': lon, 'lat': lat, 'threshold': threshold})
     valid_hid = set([x[0] for x in q.fetchall()])
-    log.debug("history_ids in threshold", extra={'hid': valid_hid})
+    log.info("history_ids in threshold", extra={'hid': valid_hid})
 
     q = sesh.query(History.id, History.freq).join(Station).join(Network)\
         .filter(Station.native_id == native_id)\
@@ -194,7 +193,7 @@ def check_history(member, sesh, threshold):
         ))\
         .filter(History.station_name == stn_name)
     r = q.all()
-    log.debug("history_ids based on native_id, station_name, and data "
+    log.info("history_ids based on native_id, station_name, and data "
               "sdate/edate", extra={'query': r})
 
     # log.info(histories)
@@ -206,7 +205,7 @@ def check_history(member, sesh, threshold):
         hist = possible_hist[0]
         # db_freq = hist.freq
         hid = hist.id
-        log.debug('Found hid', extra={'hid': hid})
+        log.info('Found hid', extra={'hid': hid})
 
         # 'Upgrade' the frequency if we're receiving hourly results for a
         # station marked as daily
@@ -219,7 +218,7 @@ def check_history(member, sesh, threshold):
         return hid
 
     if len(possible_hist) < 1:
-        log.debug("No matching open history_id found")
+        log.info("No matching open history_id found")
         # Stuff may not match because:
         #   -This a new station/native_id
         #   -A station as moved but kept old identifying information
@@ -237,7 +236,7 @@ def check_history(member, sesh, threshold):
 
         if len(r) > 1:
             # TODO: handle possible case of multple records
-            log.debug("Multiple open records found for this member")
+            log.warning("Multiple open records found for this member")
             raise Exception("Multiple open records with same native_id {0} "
                             "found in member".format(native_id))
 
@@ -260,7 +259,7 @@ def check_history(member, sesh, threshold):
             stn = Station(native_id=native_id, network=ec)
             with sesh.begin_nested():
                 sesh.add(stn)
-            log.debug("Created new station_id", extra={'station_id': stn.id})
+            log.info("Created new station_id", extra={'station_id': stn.id})
 
         elif len(r) > 1:
             raise Exception(
@@ -325,18 +324,18 @@ def insert_obs(sesh, om, hid, vname, vid):
     except IntegrityError as e:
         # Use psycopg2 wrapped 'orig' pgcode attribute
         if e.orig.pgcode == '23505':
-            log.debug('Obs already exists')
+            log.warning('Obs already exists')
             return False
         else:
             raise e
     else:
-        log.debug("Added observation", extra={'value': o.datum,
+        log.info("Added observation", extra={'value': o.datum,
                                               'variable': o.vars_id,
                                               'hid': o.history_id,
                                               'timestamp': o.time})
         # Remove element from XML "processing queue"
         ele.getparent().remove(ele)
-        log.debug("Element removed from processing queue")
+        log.info("Element removed from processing queue")
 
     return True
 

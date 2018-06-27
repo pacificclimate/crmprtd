@@ -40,7 +40,7 @@ def mass_insert_obs(sesh, obs, log=None):
         logHandler.setFormatter(formatter)
         log.addHandler(logHandler)
 
-    log.debug("Mass obs insertion", extra={'num_obs': len(obs)})
+    log.info("Begin mass observation insertion", extra={'num_obs': len(obs)})
 
     # Base cases
     if len(obs) < 1:
@@ -49,16 +49,16 @@ def mass_insert_obs(sesh, obs, log=None):
         try:
             # Create a nested SAVEPOINT context manager to rollback to in the
             # event of unique constraint errors
-            log.debug("New SAVEPOINT for 1 obs")
+            log.info("New savepoimt for singe observation")
             with sesh.begin_nested():
                 sesh.add(obs[0])
         except IntegrityError as e:
-            log.debug("Failure, obs already exists", extra={'obs': obs,
-                                                            'exception': e})
+            log.warning("Failure, observation already exists",
+                        extra={'obs': obs, 'exception': e})
             sesh.rollback()
             return 0
         else:
-            log.debug("Success for 1 obs")
+            log.info("Success for single observation")
             sesh.commit()
             return 1
 
@@ -66,21 +66,22 @@ def mass_insert_obs(sesh, obs, log=None):
     else:
         try:
             with sesh.begin_nested():
-                log.debug("New SAVEPOINT", extra={'num_obs': len(obs)})
+                log.info("New savepoint", extra={'num_obs': len(obs)})
                 sesh.add_all(obs)
         except IntegrityError:
-            log.debug("Failure. Splitting.")
+            log.warning("Failed to insert. Splitting observations.")
             sesh.rollback()
             a, b = split(obs)
-            log.debug("Splitings obs", extra={'a_split': a, 'b_split': b})
+            log.info("Splitings observations into a, b", extra={'a_split': a, 'b_split': b})
             a, b = mass_insert_obs(sesh, a, log), mass_insert_obs(sesh, b, log)
             combined = a + b
-            log.debug("Returning from split call", extra={'a_split': a,
+            log.info("Returning from split call", extra={'a_split': a,
                                                           'b_split': b,
                                                           'both': combined})
             return a + b
         else:
-            log.debug("Success", extra={'num_obs': len(obs)})
+            log.info("Successfully inserted observations",
+                     extra={'num_obs': len(obs)})
             sesh.commit()
             return len(obs)
     return 0

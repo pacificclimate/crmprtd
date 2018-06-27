@@ -79,7 +79,7 @@ class ObsProcessor:
         into a datetime instance
         """
 
-        log.debug('parsing all dates')
+        log.info('Parsing all dates')
         unparsable_times = []
 
         for obs in data:
@@ -134,7 +134,7 @@ class ObsProcessor:
         log.info('Processing lines...', extra={'processed': len(self.data)})
         for row in self.data:
             try:
-                log.debug('Processing observation',
+                log.info('Processing observation',
                           extra={'station': row['station_code'],
                                  'timestamp': row['weather_date']})
 
@@ -161,8 +161,10 @@ class ObsProcessor:
                 data_archive = self.datalogger.archive(self.prefs.archive_dir)
             except Exception:
                 log.exception('Unable to save error archive')
-            log.critical('''Errors occured in WMB real time daemon that require a human touch.
-            ''', extra={'archive': data_archive, 'log_file': self.prefs.log})
+            log.critical('Errors occured in WMB real time daemon that '
+                         'requires a human touch.',
+                         extra={'archive': data_archive,
+                                'log_file': self.prefs.log})
 
     def process_row(self, row):
         """
@@ -183,7 +185,7 @@ class ObsProcessor:
 
         # get history_id
         hid = check_history(row, self.network, self.sesh)
-        log.debug('\tHistory id', extra={'hid': hid})
+        log.info('\tHistory id', extra={'hid': hid})
 
         if hid is None:
             self._line_errors += 1
@@ -206,17 +208,17 @@ class ObsProcessor:
 
                 insert_obs(row[var], hid, d, self.db_vars[var], self.sesh)
                 self._inserted_obs += 1
-                log.debug('\tInserted', extra={'variable': var,
+                log.info('\tInserted', extra={'variable': var,
                                                'value': row[var]})
 
             except UniquenessError as e:
-                log.debug(e)
+                log.warning(e)
                 self._obs_in_db += 1
                 continue
 
             except InsertionError as e:
-                log.debug('Error inserting observation, rolling back',
-                          extra={'exception': e})
+                log.warning('Error inserting observation, rolling back',
+                            extra={'exception': e})
                 self._insert_errors += 1
                 self.datalogger.add_obs(row, var, reason='InserationError')
 
@@ -239,7 +241,7 @@ class ObsProcessor:
         new_stations = dl.difference(db)
         log.info('New stations', extra={'native_id': new_stations})
         for station in new_stations:
-            log.debug('Station id not in db', extra={'native_id': station})
+            log.info('Station id not in db', extra={'native_id': station})
             self.sesh.begin_nested()
             try:
                 stn = Station(native_id=station, network=self.network)
@@ -252,7 +254,7 @@ class ObsProcessor:
                 self._archive_station(station)
             else:
                 self.sesh.commit()
-                log.debug('Added native id', extra={'native_id': station})
+                log.info('Added native id', extra={'native_id': station})
 
         return new_stations
 
@@ -319,7 +321,7 @@ def check_history(obs, network, sesh):
         return record[0]
 
     # No record found, create new one.
-    log.debug('Creating meta_history entry', extra={'station': native_id})
+    log.info('Creating meta_history entry', extra={'station': native_id})
     sesh.begin_nested()
     try:
         stn = sesh.query(Station).filter(Station.native_id ==
@@ -335,7 +337,7 @@ def check_history(obs, network, sesh):
                   extra={'native_id': native_id, 'exception': e})
     else:
         sesh.commit()
-        log.debug('Added meta_history entry', extra={'hid': hist.id})
+        log.info('Added meta_history entry', extra={'hid': hist.id})
         return hist.id
 
     # If we get this far, something has gone wrong
@@ -371,10 +373,10 @@ def insert_obs(val, hid, d, vars_id, sesh):
         if q.count() > 0:
             raise UniquenessError(q.first())
     except UniquenessError as e:
-        log.debug(e)
+        log.warning(e)
         raise e
     except Exception as e:
-        log.debug(e)
+        log.error(e)
         raise InsertionError(obs_time=d, datum=val,
                              vars_id=vars_id, hid=hid, e=e)
 
@@ -384,12 +386,12 @@ def insert_obs(val, hid, d, vars_id, sesh):
         sesh.add(o)
         return
     except Exception as e:
-        log.debug(e)
+        log.error(e)
         raise InsertionError(obs_time=d, datum=val,
                              vars_id=vars_id, hid=hid, e=e)
 
     # Should have already returned success, failure, or exception by now...
-    log.debug('Unknown Error')
+    log.error('Unknown Error')
     raise InsertionError(obs_time=d, datum=val, vars_id=vars_id, hid=hid)
 
 
