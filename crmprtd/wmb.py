@@ -1,4 +1,5 @@
 import logging
+from pythonjsonlogger import jsonlogger
 
 from datetime import datetime
 from dateutil.parser import parse
@@ -11,6 +12,11 @@ from pycds import Network, Station, Variable, History, Obs
 from crmprtd.wmb_exceptions import InsertionError, UniquenessError
 
 log = logging.getLogger(__name__)
+# json logger
+logHandler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter()
+logHandler.setFormatter(formatter)
+log.addHandler(logHandler)
 
 
 class ObsProcessor:
@@ -83,8 +89,8 @@ class ObsProcessor:
                 dt = parse(d) + relativedelta(hours=+int(t))
                 obs['weather_date'] = dt
             except ValueError as e:
-                log.error('Unexpected values when parsing date: {0}'.format(
-                    obs['weather_date']))
+                log.error('Unexpected values when parsing date',
+                          extra={'date': obs['weather_date']})
                 self._line_errors += 1
                 self._unhandled_errors += 1
                 unparsable_times.append(obs)
@@ -96,8 +102,8 @@ class ObsProcessor:
         for obs in unparsable_times:
             data.remove(obs)
 
-        log.info('Sucessfully parsed station dates'.format(
-            len(unparsable_times)))
+        log.info('Sucessfully parsed station dates',
+                 extra={'unparsable_times': len(unparsable_times)})
         return data
 
     def process(self):
@@ -117,44 +123,37 @@ class ObsProcessor:
 
         log.info('Checked all stations')
         new_stations = self.check_and_insert_stations(self.stations)
-        log.info('Inserted new station_ids: {0}'.format(new_stations))
+        log.info('Inserted new station_ids',
+                 extra={'new_stations': new_stations})
 
         # determine valid csv vars -> valid db vars mapping
         self.db_vars = self._recordable_vars()
         log.info('Determined recordable variables')
 
         # Attempt to insert all observations, logging all errors
-        log.info('Processing {0} lines...'.format(len(self.data)))
+        log.info('Processing lines...', extra={'processed': len(self.data)})
         for row in self.data:
             try:
-                log.debug('Processing observation at station {s} '
-                          'timestamp {t}'.format(s=row['station_code'],
-                                                 t=row['weather_date']
-                                                 ))
+                log.debug('Processing observation',
+                          extra={'station': row['station_code'],
+                                 'timestamp': row['weather_date']})
 
                 self.process_row(row)
 
             except Exception as e:
-                log.error('Error inserting observation at station '
-                          '{s} timestamp {t} -> {e}'
-                          .format(s=row['station_code'],
-                                  t=row['weather_date'],
-                                  e=e))
+                log.error('Error inserting observation',
+                          extra={'station': row['station_code'],
+                                 'timestamp': row['weather_date'],
+                                 'exception': e})
+
                 self.datalogger.add_row(row, reason='Database/Interface Error')
             self._lines += 1
 
-        summary = """Processed {0} total lines with {5} having line errors resulting in
-                    {4} individual observations.
-                    {2} of these were already in the database,
-                    {3} had InserationErrors that will need to be handled, and
-                    {1} Observations were inserted successfully
-            """.format(self._lines,
-                       self._inserted_obs,
-                       self._obs_in_db,
-                       self._insert_errors,
-                       self._total_obs,
-                       self._line_errors)
-        log.info(summary)
+        log.info('Observations processed',
+                 extra={'observations': self._total_obs,
+                        'inserted': self._inserted_obs,
+                        'skipped': self._obs_in_db,
+                        'errors': self._insert_errors})
 
         if self._unhandled_errors:
             data_archive = None
@@ -163,9 +162,7 @@ class ObsProcessor:
             except Exception:
                 log.exception('Unable to save error archive')
             log.critical('''Errors occured in WMB real time daemon that require a human touch.
-            Please consult the log file at {1}.
-            Data has been archived at {0}
-            '''.format(data_archive, self.prefs.log))
+            ''', extra={'archive': data_archive, 'log_file': self.prefs.log})
 
     def process_row(self, row):
         """
@@ -186,7 +183,7 @@ class ObsProcessor:
 
         # get history_id
         hid = check_history(row, self.network, self.sesh)
-        log.debug('\tHistory id {0}'.format(hid))
+        log.debug('\tHistory id', extra={'hid': hid})
 
         if hid is None:
             self._line_errors += 1
@@ -209,8 +206,8 @@ class ObsProcessor:
 
                 insert_obs(row[var], hid, d, self.db_vars[var], self.sesh)
                 self._inserted_obs += 1
-                log.debug(
-                    '\tInserted {0} with value {1}'.format(var, row[var]))
+                log.debug('\tInserted', extra={'variable': var,
+                                               'value': row[var]})
 
             except UniquenessError as e:
                 log.debug(e)
@@ -218,9 +215,8 @@ class ObsProcessor:
                 continue
 
             except InsertionError as e:
-                log.debug(
-                    'Error inserting observation, rolling back: {e}'.format(
-                        e=e))
+                log.debug('Error inserting observation, rolling back',
+                          extra={'exception': e})
                 self._insert_errors += 1
                 self.datalogger.add_obs(row, var, reason='InserationError')
 
@@ -241,25 +237,22 @@ class ObsProcessor:
         # determine new stations and add to db
 
         new_stations = dl.difference(db)
-        log.info('New stations with native_ids: {}'.format(new_stations))
+        log.info('New stations', extra={'native_id': new_stations})
         for station in new_stations:
-            log.debug('Station id {native_id} not in db'.format(
-                native_id=station))
+            log.debug('Station id not in db', extra={'native_id': station})
             self.sesh.begin_nested()
             try:
                 stn = Station(native_id=station, network=self.network)
                 self.sesh.add(stn)
             except Exception as e:
                 self.sesh.rollback()
-                log.error(
-                    'Could not add station {native_id}, archiving data'.format(
-                        native_id=station), e)
+                log.error('Could not add station, archiving data',
+                          extra={'native_id': station, 'exception': e})
                 self._unhandled_errors += 1
                 self._archive_station(station)
             else:
                 self.sesh.commit()
-                log.debug('Added native id {native_id}'.format(
-                    native_id=station))
+                log.debug('Added native id', extra={'native_id': station})
 
         return new_stations
 
@@ -316,17 +309,17 @@ def check_history(obs, network, sesh):
 
     # If multiple results, handle error
     if hist.count() > 1:
-        log.error(
-            'Multiple valid history ids for station {0}'.format(native_id))
+        log.error('Multiple valid history ids for station',
+                  extra={'native_id': native_id})
         return None
 
     record = hist.first()
     if record:
-        log.debug('\tHistory ID found: {0}'.format(record[0]))
+        log.debug('\tHistory ID found', extra={'hid': record[0]})
         return record[0]
 
     # No record found, create new one.
-    log.debug('Creating meta_history entry for {}'.format(native_id))
+    log.debug('Creating meta_history entry', extra={'station': native_id})
     sesh.begin_nested()
     try:
         stn = sesh.query(Station).filter(Station.native_id ==
@@ -338,11 +331,11 @@ def check_history(obs, network, sesh):
         sesh.add(hist)
     except Exception as e:
         sesh.rollback()
-        log.error(
-            'Could not add meta_history entry for {}: {}'.format(native_id, e))
+        log.error('Could not add meta_history entry',
+                  extra={'native_id': native_id, 'exception': e})
     else:
         sesh.commit()
-        log.debug('Added meta_history entry {}'.format(hist.id))
+        log.debug('Added meta_history entry', extra={'hid': hist.id})
         return hist.id
 
     # If we get this far, something has gone wrong
@@ -367,7 +360,7 @@ def insert_obs(val, hid, d, vars_id, sesh):
     try:
         val = Decimal(val)
     except Exception as e:
-        log.error('Unable to convert value to Decimal: {0}'.format(e))
+        log.error('Unable to convert value to Decimal', extra={'exception': e})
         raise InsertionError(obs_time=d, datum=val,
                              vars_id=vars_id, hid=hid, e=e)
 
@@ -505,7 +498,7 @@ class DataLogger:
                 try:
                     w.writerow([row.get(k, '') for k in order])
                 except Exception as e:
-                    log.exception('Unable to archive row {0}'.format(row))
+                    log.exception('Unable to archive row', extra={'row': row})
                     continue
         return outcsv
 

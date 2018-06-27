@@ -3,6 +3,11 @@ import logging
 
 from sqlalchemy.exc import IntegrityError
 
+# globals for test
+insert = 0
+skip = 0
+error = 0
+
 
 def split(tuple_):
     if len(tuple_) < 1:
@@ -29,8 +34,13 @@ def mass_insert_obs(sesh, obs, log=None):
     '''
     if not log:
         log = logging.getLogger(__name__)
+        # json logger
+        logHandler = logging.StreamHandler()
+        formatter = jsonlogger.JsonFormatter()
+        logHandler.setFormatter(formatter)
+        log.addHandler(logHandler)
 
-    log.debug("mass_insert_obs() called with %d obs", len(obs))
+    log.debug("Mass obs insertion", extra={'num_obs': len(obs)})
 
     # Base cases
     if len(obs) < 1:
@@ -43,7 +53,8 @@ def mass_insert_obs(sesh, obs, log=None):
             with sesh.begin_nested():
                 sesh.add(obs[0])
         except IntegrityError as e:
-            log.debug("Failure: already exists: %s %s", obs, e)
+            log.debug("Failure, obs already exists", extra={'obs': obs,
+                                                            'exception': e})
             sesh.rollback()
             return 0
         else:
@@ -55,18 +66,21 @@ def mass_insert_obs(sesh, obs, log=None):
     else:
         try:
             with sesh.begin_nested():
-                log.debug("New SAVEPOINT for %s obs", len(obs))
+                log.debug("New SAVEPOINT", extra={'num_obs': len(obs)})
                 sesh.add_all(obs)
         except IntegrityError:
             log.debug("Failure. Splitting.")
             sesh.rollback()
             a, b = split(obs)
-            log.debug("Split to (%s, %s)", a, b)
+            log.debug("Splitings obs", extra={'a_split': a, 'b_split': b})
             a, b = mass_insert_obs(sesh, a, log), mass_insert_obs(sesh, b, log)
-            log.debug("Returning combined %d + %d = %d", a, b, a + b)
+            combined = a + b
+            log.debug("Returning from split call", extra={'a_split': a,
+                                                          'b_split': b,
+                                                          'both': combined})
             return a + b
         else:
-            log.debug("Success for %s obs", len(obs))
+            log.debug("Success", extra={'num_obs': len(obs)})
             sesh.commit()
             return len(obs)
     return 0

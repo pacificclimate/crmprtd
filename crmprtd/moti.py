@@ -10,6 +10,11 @@ from pycds import History, Network, Station, Variable, Obs
 
 
 log = logging.getLogger(__name__)
+# json logger
+logHandler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter()
+logHandler.setFormatter(formatter)
+log.addHandler(logHandler)
 
 xsl = resource_filename('crmprtd', 'data/moti.xsl')
 transform = XSLT(parse(xsl))
@@ -65,9 +70,9 @@ def process_observation_series(sesh, os):
             "results")
 
     hist = check_history(stn_id, sesh)
-    log.debug('Got history_id {}'.format(hist.id))
+    log.debug('Got history_id', extra={'hid': hist.id})
     members = os.xpath('./observation', namespaces=ns)
-    log.debug("Found {} members for station {}".format(len(members), stn_id))
+    log.debug("Found members for station", extra={'num_members': len(members), 'station': stn_id})
 
     successes, failures, skips = 0, 0, 0
     for member in members:
@@ -89,8 +94,9 @@ def process_observation_series(sesh, os):
                 value_element = obs.xpath('./value')[0]
             except IndexError as e:
                 log.warn("Could not find the actual value for observation "
-                         "{}/{}. xpath search './value' returned no results"
-                         .format(varname, vartype))
+                         "xpath search './value' returned no results",
+                         extra={'variable_name': varname,
+                                'variable_type': vartype})
                 skips += 1
                 continue
 
@@ -98,8 +104,8 @@ def process_observation_series(sesh, os):
             try:
                 value = float(value_element.text)
             except ValueError:
-                log.warn("Could not convert value '{}' to a number. Skipping "
-                         "this observation.".format(value))
+                log.warn("Could not convert value to a number. Skipping "
+                         "this observation.", extra={'value': value})
                 skips += 1
                 continue
 
@@ -107,14 +113,17 @@ def process_observation_series(sesh, os):
             if not var:
                 # Test for known unwanted vars, only warn when unknown
                 if (varname, vartype, units) not in unwanted_vars:
-                    log.warn(("Could not find variable {}, {}, {} in the "
-                             "database. Skipping this observation.")
-                             .format(varname,
-                                     vartype,
-                                     units))
+                    log.warn("Could not find variable {}, {}, {} in the "
+                             "database. Skipping this observation.",
+                             extra={'varible_name': varname,
+                                    'variable_type': vartype,
+                                    'unit': units})
                 skips += 1
                 continue
-            log.debug('{} {} {} {}'.format(varname, vartype, units, value))
+            log.debug('Variable info', extra={'variable_name': varname,
+                                              'variable_type': vartype,
+                                              'unit': units,
+                                              'value': value})
 
             o = Obs(time=t, datum=float(value), variable=var, history=hist)
 
@@ -125,13 +134,13 @@ def process_observation_series(sesh, os):
                     sesh.add(o)
                 successes += 1
                 sesh.commit()
-                log.debug("Inserted {}".format(o))
+                log.debug("Inserted", extra={'obs': o})
             except IntegrityError as e:
-                log.debug("Skipped, already exists: {} {}".format(o, e))
+                log.debug("Skipped, already exists", extra={'obs': o, 'exception': e})
                 sesh.rollback()
                 skips += 1
             except Exception:
-                log.error("Failed to insert {}".format(o), exc_info=True)
+                log.error("Failed to insert", extra={'obs': o})
                 sesh.rollback()
                 failures += 1
 
@@ -164,10 +173,10 @@ def check_history(stn_id, sesh):
                     Network).filter(Network.name == 'MoTIe').first())
                 sesh.add(stn)
         except Exception as e:
-            log.error("Station '{}' does not exist in the database and could "
-                      "not be added".format(stn_id), exc_info=True)
+            log.error("Station does not exist in the database and could "
+                      "not be added", extra={'station': stn_id})
             raise e
-        log.debug('Created station_id {}'.format(stn.id))
+        log.debug('Created station_id', extra={'station_id': stn.id})
 
     # Station_id added or exists, create history_id
     try:
@@ -175,11 +184,10 @@ def check_history(stn_id, sesh):
             hist = History(station=stn)
             sesh.add(hist)
     except Exception as e:
-        log.error(
-            'History_id could not be found or created for native_id {}'.format(
-                stn_id), exc_info=True)
+        log.error('History_id could not be found or created for native_id',
+                  extra={'native_id': stn_id})
         raise e
-    log.debug('Created history_id {}'.format(hist.id))
+    log.debug('Created history_id', extra={'hid': hist.id})
 
     return hist
 
