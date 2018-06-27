@@ -135,8 +135,8 @@ class ObsProcessor:
         for row in self.data:
             try:
                 log.info('Processing observation',
-                          extra={'station': row['station_code'],
-                                 'timestamp': row['weather_date']})
+                         extra={'station': row['station_code'],
+                                'timestamp': row['weather_date']})
 
                 self.process_row(row)
 
@@ -209,7 +209,7 @@ class ObsProcessor:
                 insert_obs(row[var], hid, d, self.db_vars[var], self.sesh)
                 self._inserted_obs += 1
                 log.info('\tInserted', extra={'variable': var,
-                                               'value': row[var]})
+                                              'value': row[var]})
 
             except UniquenessError as e:
                 log.warning(e)

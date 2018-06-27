@@ -1,6 +1,7 @@
 from pkg_resources import resource_filename
 from datetime import datetime, timedelta
 import logging
+from pythonjsonlogger import jsonlogger
 
 import pytz
 from lxml.etree import parse, XSLT
@@ -72,7 +73,8 @@ def process_observation_series(sesh, os):
     hist = check_history(stn_id, sesh)
     log.info('Got history_id', extra={'hid': hist.id})
     members = os.xpath('./observation', namespaces=ns)
-    log.info("Found members for station", extra={'num_members': len(members), 'station': stn_id})
+    log.info("Found members for station",
+             extra={'num_members': len(members), 'station': stn_id})
 
     successes, failures, skips = 0, 0, 0
     for member in members:
@@ -136,7 +138,8 @@ def process_observation_series(sesh, os):
                 sesh.commit()
                 log.info("Inserted observation", extra={'obs': o})
             except IntegrityError as e:
-                log.warning("Skipped observation, already exists", extra={'obs': o, 'exception': e})
+                log.warning("Skipped observation, already exists",
+                            extra={'obs': o, 'exception': e})
                 sesh.rollback()
                 skips += 1
             except Exception:

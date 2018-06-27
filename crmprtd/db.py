@@ -1,5 +1,6 @@
 from math import floor
 import logging
+from pythonjsonlogger import jsonlogger
 
 from sqlalchemy.exc import IntegrityError
 
@@ -72,12 +73,13 @@ def mass_insert_obs(sesh, obs, log=None):
             log.warning("Failed to insert. Splitting observations.")
             sesh.rollback()
             a, b = split(obs)
-            log.info("Splitings observations into a, b", extra={'a_split': a, 'b_split': b})
+            log.info("Splitings observations into a, b",
+                     extra={'a_split': a, 'b_split': b})
             a, b = mass_insert_obs(sesh, a, log), mass_insert_obs(sesh, b, log)
             combined = a + b
             log.info("Returning from split call", extra={'a_split': a,
-                                                          'b_split': b,
-                                                          'both': combined})
+                                                         'b_split': b,
+                                                         'both': combined})
             return a + b
         else:
             log.info("Successfully inserted observations",

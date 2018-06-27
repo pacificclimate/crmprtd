@@ -2,6 +2,7 @@ from lxml.etree import LxmlError, parse, tostring, XSLT
 from datetime import datetime
 import re
 import logging
+from pythonjsonlogger import jsonlogger
 from pkg_resources import resource_stream
 from urllib.parse import urlparse
 
@@ -73,7 +74,8 @@ class ObsProcessor:
         log.info('Processing data')
         members = self.et.xpath('//om:member', namespaces=ns)
         self._members = len(members)
-        log.info("Found members in the xml", extra={'num_members': self._members})
+        log.info("Found members in the xml",
+                 extra={'num_members': self._members})
 
         for member in members:
             try:
@@ -84,13 +86,15 @@ class ObsProcessor:
                 self._member_errors += 1
                 log.exception("Error processing member, saved in logs")
                 log.error('Error processing member',
-                          extra={'member': tostring(member, pretty_print=True)})
+                          extra={'member': tostring(member,
+                                                    pretty_print=True)})
 
-        log.info("Finished processing", extra{'num_members': self._members,
-                                              'num_members_processed': self._members_processed,
-                                              'inserted': self._obs_insertions,
-                                              'obs': self._obs,
-                                              'skipped': self._obs_existing})
+        log.info("Finished processing",
+                 extra={'num_members': self._members,
+                        'num_members_processed': self._members_processed,
+                        'inserted': self._obs_insertions,
+                        'obs': self._obs,
+                        'skipped': self._obs_existing})
         if self._member_errors or self._obs_errors:
             raise Exception('''Unable to parse {me} members,
             Unable to insert {oe} insertable obs'''.format(
@@ -148,10 +152,10 @@ def check_history(member, sesh, threshold):
             './om:Observation/om:samplingTime//gml:timePosition',
             namespaces=ns)[0].text
         log.info('Found station info', extra={'name': stn_name,
-                                               'id': native_id,
-                                               'lon': lon,
-                                               'lat': lat,
-                                               'time': obs_time})
+                                              'id': native_id,
+                                              'lon': lon,
+                                              'lat': lat,
+                                              'time': obs_time})
     # An IndexError here means that the member has no station_name or
     # climate_station_number (or identification-elements), lat/lon, or obs_time
     # in which case we don't need to process this item
@@ -194,7 +198,7 @@ def check_history(member, sesh, threshold):
         .filter(History.station_name == stn_name)
     r = q.all()
     log.info("history_ids based on native_id, station_name, and data "
-              "sdate/edate", extra={'query': r})
+             "sdate/edate", extra={'query': r})
 
     # log.info(histories)
 
@@ -330,9 +334,9 @@ def insert_obs(sesh, om, hid, vname, vid):
             raise e
     else:
         log.info("Added observation", extra={'value': o.datum,
-                                              'variable': o.vars_id,
-                                              'hid': o.history_id,
-                                              'timestamp': o.time})
+                                             'variable': o.vars_id,
+                                             'hid': o.history_id,
+                                             'timestamp': o.time})
         # Remove element from XML "processing queue"
         ele.getparent().remove(ele)
         log.info("Element removed from processing queue")
