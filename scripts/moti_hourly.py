@@ -54,11 +54,11 @@ def main(args):
 
     try:
         if args.filename:
-            log.debug("Opening local xml file for reading",
+            log.info("Opening local xml file for reading",
                       extra={'file': args.filename})
             fname = args.filename
             xml_file = open(args.filename, 'r')
-            log.debug("File opened sucessfully")
+            log.info("File opened sucessfully")
 
         else:
             if args.start_time and args.end_time:
