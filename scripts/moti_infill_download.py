@@ -3,6 +3,7 @@
 import os
 import logging
 import logging.config
+from pythonjsonlogger import jsonlogger
 from urllib.parse import urlparse, parse_qs
 from pkg_resources import resource_stream
 from datetime import datetime

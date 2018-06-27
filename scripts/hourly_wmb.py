@@ -13,6 +13,7 @@ import sys
 import csv
 import logging
 import logging.config
+from pythonjsonlogger import jsonlogger
 import os
 import ftplib
 

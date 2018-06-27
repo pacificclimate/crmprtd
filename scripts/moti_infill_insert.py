@@ -26,11 +26,6 @@ def main(opts, args):
     if opts.error_email:
         log_conf['handlers']['mail']['toaddrs'] = opts.error_email
     logging.config.dictConfig(log_conf)
-    # json logger
-    logHandler = logging.StreamHandler()
-    formatter = jsonlogger.JsonFormatter()
-    logHandler.setFormatter(formatter)
-    log.addHandler(logHandler)
 
     engine = create_engine(opts.connection_string)
     if opts.new_db:

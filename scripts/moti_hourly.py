@@ -5,6 +5,7 @@ import os
 import sys
 import logging
 import logging.config
+from pythonjsonlogger import jsonlogger
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 import requests
@@ -55,7 +56,7 @@ def main(args):
     try:
         if args.filename:
             log.info("Opening local xml file for reading",
-                      extra={'file': args.filename})
+                     extra={'file': args.filename})
             fname = args.filename
             xml_file = open(args.filename, 'r')
             log.info("File opened sucessfully")
@@ -123,7 +124,8 @@ def main(args):
             sesh.commit()
     except Exception as e:
         sesh.rollback()
-        log.critical('Serious errros with MOTIe rtd, see logs', extra={'log': args.log})
+        log.critical('Serious errros with MOTIe rtd, see logs',
+                     extra={'log': args.log})
         sys.exit(1)
     finally:
         sesh.commit()

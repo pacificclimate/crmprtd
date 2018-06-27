@@ -5,6 +5,7 @@ import os
 import sys
 import logging
 import logging.config
+from pythonjsonlogger import jsonlogger
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 from pkg_resources import resource_filename

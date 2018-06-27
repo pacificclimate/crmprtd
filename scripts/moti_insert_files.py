@@ -5,6 +5,7 @@ import os
 import glob
 import logging
 import logging.config
+from pythonjsonlogger import jsonlogger
 from argparse import ArgumentParser
 from pkg_resources import resource_stream
 from shutil import move
@@ -68,7 +69,8 @@ def main(args):
                 sesh.commit()
         except Exception as e:
             sesh.rollback()
-            log.critical('Serious errors with MOTIe rtd, see logs', extra={'log': args.log})
+            log.critical('Serious errors with MOTIe rtd, see logs',
+                         extra={'log': args.log})
             continue
         else:
             move(fname, os.path.join(args.output_dir, os.path.basename(fname)))
