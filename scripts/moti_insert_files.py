@@ -32,19 +32,25 @@ def main(args):
     log = logging.getLogger('crmprtd.moti')
     if args.log_level:
         log.setLevel(args.log_level)
+    # json logger
+    logHandler = logging.StreamHandler()
+    formatter = jsonlogger.JsonFormatter()
+    logHandler.setFormatter(formatter)
+    log.addHandler(logHandler)
     log.info('Starting MOTIe rtd')
 
     # Generate file list if necessary
     if args.file_pattern:
-        log.info('Using file pattern: {}'.format(args.file_pattern))
+        log.info('Using file pattern',
+                 extra={'file_pattern': args.file_patter})
         f_list = glob.glob(args.file_pattern)
     elif args.filename:
         f_list = [args.filename]
 
-    log.info('Processing {} files'.format(len(f_list)))
+    log.info('Processing files', extra={'num_files': len(f_list)})
 
     for fname in f_list:
-        log.info('Processing file {}'.format(fname))
+        log.info('Processing file', extra={'file': fname})
 
         Session = sessionmaker(create_engine(args.connection_string))
         sesh = Session()
@@ -62,8 +68,7 @@ def main(args):
                 sesh.commit()
         except Exception as e:
             sesh.rollback()
-            log.critical(('Serious errors with MOTIe rtd, see logs at '
-                          '{}').format(args.log), exc_info=True)
+            log.critical('Serious errors with MOTIe rtd, see logs', extra={'log': args.log})
             continue
         else:
             move(fname, os.path.join(args.output_dir, os.path.basename(fname)))

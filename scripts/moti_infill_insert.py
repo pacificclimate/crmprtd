@@ -26,6 +26,11 @@ def main(opts, args):
     if opts.error_email:
         log_conf['handlers']['mail']['toaddrs'] = opts.error_email
     logging.config.dictConfig(log_conf)
+    # json logger
+    logHandler = logging.StreamHandler()
+    formatter = jsonlogger.JsonFormatter()
+    logHandler.setFormatter(formatter)
+    log.addHandler(logHandler)
 
     engine = create_engine(opts.connection_string)
     if opts.new_db:
@@ -43,8 +48,8 @@ def main(opts, args):
         et = parse(file_)
         try:
             rv = process(sesh, et)
-            logging.info(
-                "Processed {} with the following results {}".format(file_, rv))
+            logging.info("Processed file",
+                         extra={'file': file_, 'results': rv})
         except Exception as e:
             logging.error(e)
 

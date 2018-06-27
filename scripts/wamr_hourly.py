@@ -103,6 +103,11 @@ def main():
 
     # Logging
     log = setup_logging(args.log_level, args.log, args.error_email)
+    # json logger
+    logHandler = logging.StreamHandler()
+    formatter = jsonlogger.JsonFormatter()
+    logHandler.setFormatter(formatter)
+    log.addHandler(logHandler)
     log.info('Starting WAMR rtd')
 
     # Database connection
@@ -133,8 +138,8 @@ def main():
                 datetime.now(), '%Y-%m-%dT%H-%M-%S'))
         with open(args.cache_file, 'w') as cache_file:
             cache_rows(cache_file, rows, fieldnames)
-
-    log.info('{0} observations read into memory'.format(len(rows)))
+            
+    log.info('observations read into memory', extra={'num_obs': len(rows)})
 
     # Hand the row off to the database processings/insertion part of the script
     rows2db(sesh, rows, error_file, log, args.diag)

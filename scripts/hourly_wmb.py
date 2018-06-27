@@ -43,8 +43,13 @@ def main(args):
     log = logging.getLogger('crmprtd.wmb')
     if args.log_level:
         log.setLevel(args.log_level)
-
+    # json logger
+    logHandler = logging.StreamHandler()
+    formatter = jsonlogger.JsonFormatter()
+    logHandler.setFormatter(formatter)
+    log.addHandler(logHandler)
     log.info('Starting WMB rtd')
+
     data = []
 
     # Pull auth from file or command line
@@ -65,7 +70,7 @@ def main(args):
         path = args.archive_file
         if args.archive_file[0] != '/':
             path = os.path.join(args.archive_dir, args.archive_file)
-        log.info('Loading local file {0}'.format(path))
+        log.info('Loading local file', extra={'path': path})
 
         # open and read into data
         try:
@@ -82,12 +87,13 @@ def main(args):
     else:
         # Fetch file from FTP and read into memory
         log.info('Fetching file from FTP')
-
-        log.info('Downloading {}/{}'.format(args.ftp_server, args.ftp_file))
+        log.info('Downloading FTP', extra={'server': args.ftp_server,
+                                           'file': args.ftp_file})
         try:
             ftpreader = FTPReader(
                 args.ftp_server, auth['u'], auth['p'], args.ftp_file, log)
-            log.info('Opened a connection to {}'.format(args.ftp_server))
+            log.info('Opened a connection to server',
+                     extra={'server': args.ftp_server})
             reader = ftpreader.csv_reader()
             for row in reader:
                 data.append(row)
@@ -107,7 +113,7 @@ def main(args):
             copier.writeheader()
             copier.writerows(data)
 
-    log.info('{0} observations read into memory'.format(len(data)))
+    log.info('Observations read into memory', extra={'num_obs': len(data)})
     dl = DataLogger()
 
     # Open database connection
@@ -119,10 +125,8 @@ def main(args):
     except Exception as e:
         dl.add_row(data, 'db-connection error')
         data_archive = dl.archive(args.archive_dir)
-        log.critical('''Error with Database connection
-                     See logfile at {log}
-                     Data saved at {d}
-                     '''.format(log=args.log, d=data_archive), exc_info=True)
+        log.critical('Error with database connection, see logfile, data saved',
+                     extra={'log': args.log, 'data_archive': data_archive})
         sys.exit(1)
 
     try:
@@ -139,10 +143,8 @@ def main(args):
         dl.add_row(data, 'preproc error')
         sesh.rollback()
         data_archive = dl.archive(args.archive_dir)
-        log.critical('''Error data preprocessing.
-                     See logfile at {log}
-                     Data saved at {d}
-                     '''.format(log=args.log, d=data_archive), exc_info=True)
+        log.critical('Error with database connection, see logfile, data saved',
+                     extra={'log': args.log, 'data_archive': data_archive})
         sys.exit(1)
     finally:
         sesh.commit()

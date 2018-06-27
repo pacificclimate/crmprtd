@@ -25,13 +25,13 @@ def download(url, auth, out, log):
     s.mount('https://', a)
     req = s.get(url, auth=auth)
 
-    log.info('{}: {}'.format(req.status_code, req.url))
+    log.info('Status', extra={'status_code': req.status_code, 'url': req.url})
     if req.status_code != 200:
         raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
 
     with open(out, 'wb') as f:
         f.write(req.content)
-        log.info('Saved file to: {}'.format(out))
+        log.info('Saved file', extra={'file': out})
 
 
 def url_to_from(url):
@@ -53,6 +53,11 @@ def main(args):
     log = logging.getLogger('crmprtd.moti')
     if args.log_level:
         log.setLevel(args.log_level)
+    # json logger
+    logHandler = logging.StreamHandler()
+    formatter = jsonlogger.JsonFormatter()
+    logHandler.setFormatter(formatter)
+    log.addHandler(logHandler)
     log.info('Starting MOTIe rtd')
 
     # Pull auth from file or command line
