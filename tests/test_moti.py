@@ -330,8 +330,6 @@ def test_unknown_var(test_session, caplog):
     assert n_obs_before == n_obs_after
 
     t = ('Could not find variable in the database. Skipping this observation.')
-    record, = caplog.records
-    print(record.msg)
-    assert t == record.msg
+    assert t == caplog.records[0].msg
 
     # TODO: need to actually check log warning
