@@ -3,7 +3,6 @@
 import sys
 from tempfile import TemporaryFile
 from io import StringIO
-import datetime
 
 import pytest
 
@@ -44,11 +43,6 @@ def maybe_fake_file(lines):
 def test_rows2db(test_session, diagnostic, expected):
 
     log = setup_logging('DEBUG')
-    # json logger
-    logHandler = logging.StreamHandler()
-    formatter = jsonlogger.JsonFormatter()
-    logHandler.setFormatter(formatter)
-    log.addHandler(logHandler)
 
     lines = '''DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE
 2017-05-21 17:00,0260011,Warfield Elementary Met_60,TEMP_MEAN,TEMP_MEAN,TEMP 10M,25.3,°C,1,n/a,Data Ok,25.3
@@ -81,11 +75,6 @@ def test_rows2db_units_conversion(test_session):
     '''
     sesh = test_session
     log = setup_logging('DEBUG')
-    # json logger
-    logHandler = logging.StreamHandler()
-    formatter = jsonlogger.JsonFormatter()
-    logHandler.setFormatter(formatter)
-    log.addHandler(logHandler)
 
     network = sesh.query(Network).filter(Network.name == 'ENV-AQN').first()
     # Define the units in the database to always be stored as degrees celsius
