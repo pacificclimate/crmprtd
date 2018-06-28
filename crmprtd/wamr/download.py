@@ -42,7 +42,8 @@ def download(args):
             # FIXME: This line has some kind of race condition with this
 
             with open(tempf.name, 'w+t') as fp:
-                ftpreader.connection.retrlines('RETR {}'.format(filename), callback)
+                ftpreader.connection.retrlines('RETR {}'.format(filename),
+                                               callback)
 
         with open(tempf.name, 'r') as fp:
             yield fp
