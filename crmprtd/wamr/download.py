@@ -24,17 +24,8 @@ def download(args):
 
     if args.input_file:
         # File
-        with open(args.input_file) as f:
-            is_first = True
-            while True:
-                data = f.readline()
-                if is_first:
-                    is_first = False
-                    continue
-                elif not data:
-                    break
-
-                yield data
+        with open(args.input_file) as file_stream:
+            yield file_stream
     else:
         # FTP
         ftpreader = ftp_connect(args.ftp_server, args.ftp_dir, log)

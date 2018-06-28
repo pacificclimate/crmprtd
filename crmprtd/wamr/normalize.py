@@ -18,21 +18,22 @@ from crmprtd.wamr import setup_logging
 def normalize(file_stream):
     Row = namedtuple('Row', "date native_id station_name parameter unit data")
     tz = pytz.timezone('Canada/Pacific')
+    log = setup_logging('INFO')
 
-    log =setup_logging('INFO')
-    for row in file_stream:
-        cleaned = row.strip().split(',')
+    for file in file_stream:
+        for row in file.readlines():
+            cleaned = row.strip().split(',')
 
-        try:
-            named_row = Row(date=parse(cleaned[0]).replace(tzinfo=tz),
-                      	    native_id=cleaned[1],
-                      		station_name=cleaned[2],
-                      		parameter=cleaned[3],
-                      		unit=cleaned[7],
-                      		data=float(cleaned[11]))
-            yield named_row
-        except Exception as e:
-            log.warning('Unable to process row: {}'.format(row))
+            try:
+                named_row = Row(date=parse(cleaned[0]).replace(tzinfo=tz),
+                          	    native_id=cleaned[1],
+                          		station_name=cleaned[2],
+                          		parameter=cleaned[3],
+                          		unit=cleaned[7],
+                          		data=float(cleaned[11]))
+                yield named_row
+            except Exception as e:
+                log.warning('Unable to process row: {}'.format(row))
 
 
 def store_file(args, dict, rows_len, log):

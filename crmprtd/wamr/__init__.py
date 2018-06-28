@@ -2,6 +2,7 @@ import re
 import sys
 import logging
 import logging.config
+from pythonjsonlogger import jsonlogger
 import csv
 from pkg_resources import resource_stream
 
