@@ -3,6 +3,7 @@
 import sys
 from tempfile import TemporaryFile
 from io import StringIO
+import datetime
 
 import pytest
 

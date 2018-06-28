@@ -1,4 +1,5 @@
 import logging
+from pythonjsonlogger import jsonlogger
 
 from datetime import datetime
 from dateutil.parser import parse
@@ -13,6 +14,11 @@ from crmprtd.wmb_exceptions import InsertionError, UniquenessError
 from crmprtd import Timer
 
 log = logging.getLogger(__name__)
+# json logger
+logHandler = logging.StreamHandler()
+formatter = jsonlogger.JsonFormatter()
+logHandler.setFormatter(formatter)
+log.addHandler(logHandler)
 
 
 class ObsProcessor:
@@ -86,7 +92,7 @@ class ObsProcessor:
                 obs['weather_date'] = dt
             except ValueError as e:
                 log.error('Unexpected values when parsing date',
-                          extra={'date': obs['weather_date']})
+                          extra={'weather_date': obs['weather_date']})
                 self._line_errors += 1
                 self._unhandled_errors += 1
                 unparsable_times.append(obs)
