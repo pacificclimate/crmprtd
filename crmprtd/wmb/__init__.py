@@ -14,11 +14,6 @@ from crmprtd.wmb_exceptions import InsertionError, UniquenessError
 from crmprtd import Timer
 
 log = logging.getLogger(__name__)
-# json logger
-logHandler = logging.StreamHandler()
-formatter = jsonlogger.JsonFormatter()
-logHandler.setFormatter(formatter)
-log.addHandler(logHandler)
 
 
 class ObsProcessor:
