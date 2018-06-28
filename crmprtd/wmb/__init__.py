@@ -85,8 +85,8 @@ class ObsProcessor:
                 dt = parse(d) + relativedelta(hours=+int(t))
                 obs['weather_date'] = dt
             except ValueError as e:
-                log.error('Unexpected values when parsing date',
-                          extra={'weather_date': obs['weather_date']})
+                log.error('Unexpected values when parsing date: {0}'.format(
+                    obs['weather_date']))
                 self._line_errors += 1
                 self._unhandled_errors += 1
                 unparsable_times.append(obs)
@@ -106,7 +106,6 @@ class ObsProcessor:
         """
         This function handles inserting all valid observations into
         the database.
-
         In order to avoid any fkey constraints, it starts by validating
         all the stations present in the data with those in the database
         and inserting if necessary.
@@ -170,7 +169,6 @@ class ObsProcessor:
         """
         This will take a single observation, parse the measurements, and
         attempt to insert into database.
-
         psycopg2 errors caught in caller:
             InterfaceError
             DatabaseError
@@ -179,7 +177,6 @@ class ObsProcessor:
             ->    IntegrityError
             ->    InternalError
             ->    ProgrammingError
-
         InserationErrors and UniquenessErrors are handled
         """
 
@@ -276,7 +273,6 @@ class ObsProcessor:
         """
         This looks at what variables are provided in the download
         and compares it to what the database is able to accept.
-
         Returns a dictionary mapping dl vars to acceptable db vars
         """
         q = self.sesh.query(Variable.name, Variable.id).filter(
@@ -293,7 +289,6 @@ def check_history(obs, network, sesh):
     """
     Checks to see if an active history_id exists for this observation or
     it not adds one.
-
     Returns the history_id if successful or None if not
     """
 
@@ -348,13 +343,10 @@ def insert_obs(val, hid, d, vars_id, sesh):
     """
     This takes an individual observation and inserts
     into obs_raw using the provided history_id, datetime, and variable id.
-
     We also need to differentiate between and error violating uniqueness
     and other errors that will require archiving the data.
     Uniqueness constrained by: history_id , vars_id , obs_time
-
     psycopg2.IntegrityError handles uniqueness, fkey,...
-
     Returns obs_raw_id on success, UniquenessError if already exists,
     or InsertionError on failure.
     """
@@ -464,7 +456,6 @@ class DataLogger:
         """
         Archive the unsuccessfull additions in a manner that allows
         easy re-insertion attempts.
-
         Returns full path of output csv
         """
         import csv

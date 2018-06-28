@@ -17,24 +17,6 @@ from crmprtd.wamr.download import download
 from crmprtd.wamr.normalize import normalize
 
 
-def test_normalize(file_stream):
-    Row = namedtuple('Row', "date native_id station_name parameter unit data")
-    tz = pytz.timezone('Canada/Pacific')
-    for row in file_stream:
-        cleaned = row.strip().split(',')
-
-        try:
-            named_row = Row(date=parse(cleaned[0]).replace(tzinfo=tz),
-                      	    native_id=cleaned[1],
-                      		station_name=cleaned[2],
-                      		parameter=cleaned[3],
-                      		unit=cleaned[7],
-                      		data=float(cleaned[11]))
-            print(named_row)
-        except Exception as e:
-            print('Unable to process row: {}'.format(row))
-
-
 if __name__ == '__main__':
     # Process the command line arguments
     parser = ArgumentParser()
@@ -107,4 +89,3 @@ if __name__ == '__main__':
     # row_stream = normalize(file_stream)
     for line in normalize(file_stream):
         print(line)
-    

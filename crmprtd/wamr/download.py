@@ -1,8 +1,8 @@
 import csv
-import os
+import sys
 import ftplib
+import logging
 
-from datetime import datetime
 from tempfile import NamedTemporaryFile
 
 # Local
@@ -16,12 +16,12 @@ def download(args):
     log.info('Starting WAMR rtd')
 
     # Output files
-    if args.error_file:
-        error_file = open(args.error_file, 'a')
-    else:
-        error_filename = 'wamr_errors_{}.csv'.format(datetime.strftime(
-            datetime.now(), '%Y-%m-%dT%H-%M-%S'))
-        error_file = open(os.path.join(args.cache_dir, error_filename), 'a')
+    # if args.error_file:
+    #     error_file = open(args.error_file, 'a')
+    # else:
+    #     error_filename = 'wamr_errors_{}.csv'.format(datetime.strftime(
+    #         datetime.now(), '%Y-%m-%dT%H-%M-%S'))
+    #     error_file = open(os.path.join(args.cache_dir, error_filename), 'a')
 
     if args.input_file:
         # File

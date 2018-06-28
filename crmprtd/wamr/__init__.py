@@ -3,6 +3,7 @@ import sys
 import logging
 import logging.config
 import csv
+import ftplib
 from pkg_resources import resource_stream
 
 import pytz
@@ -12,7 +13,7 @@ from pint import UnitRegistry
 
 from crmprtd.db import mass_insert_obs
 from pycds import Network, Station, History, Obs, Variable
-from crmprtd import Timer
+from crmprtd import retry, Timer
 
 tz = pytz.timezone('Canada/Pacific')
 ureg = UnitRegistry()
@@ -270,6 +271,7 @@ class FTPReader(object):  # pragma: no cover
             self.connection.quit()
         except Exception:
             self.connection.close()
+
 
 def file2rows(file_, log):
     try:
