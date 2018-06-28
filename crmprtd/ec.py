@@ -55,6 +55,13 @@ def parse_xml(fname):
     return transform(et)
 
 
+def timer(start_time=None):
+    if start_time:
+        return (time.time() - start_time)
+    else:
+        return time.time()
+
+
 class ObsProcessor:
     def __init__(self, et, sesh, threshold):
         # set variables for summary information
@@ -77,6 +84,7 @@ class ObsProcessor:
         log.info("Found members in the xml",
                  extra={'num_members': self._members})
 
+        start_time = timer()
         for member in members:
             try:
                 log.info("Processing next member")
@@ -88,6 +96,9 @@ class ObsProcessor:
                 log.error('Error processing member',
                           extra={'member': tostring(member,
                                                     pretty_print=True)})
+
+        run_time = timer(start_time)
+        log.info('Members processed', extra={'insertions_sec': (self._obs_insertions/run_time)})
 
         log.info("Finished processing",
                  extra={'num_members': self._members,

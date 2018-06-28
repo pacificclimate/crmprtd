@@ -27,6 +27,13 @@ for def_ in (
     ureg.define(def_)
 
 
+def timer(start_time=None):
+    if start_time:
+        return (time.time() - start_time)
+    else:
+        return time.time()
+
+
 def create_station_mapping(sesh, rows):
     '''Create a names -> history object map for the set of stations that are
        contained in the rows
@@ -211,8 +218,11 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
                 dl.add_row(row, e.args[0])
 
         log.info("Starting a mass insertion", extra={'num_obs': len(obs)})
+        start_time = timer()
         n_insertions = mass_insert_obs(sesh, obs, log)
-        log.info("Inserted", extra={'num_insertions': n_insertions})
+        run_time = timer(start_time)
+        log.info("Inserted", extra={'num_insertions': n_insertions,
+                                    'insertions_sec:' (n_insertions/run_time)})
 
         if diagnostic:
             log.info('Diagnostic mode, rolling back all transactions')

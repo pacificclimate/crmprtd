@@ -5,6 +5,7 @@ from datetime import datetime
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
+import time
 
 from sqlalchemy import and_, or_
 
@@ -132,6 +133,7 @@ class ObsProcessor:
 
         # Attempt to insert all observations, logging all errors
         log.info('Processing lines...', extra={'processed': len(self.data)})
+        start_time = timer()
         for row in self.data:
             try:
                 log.info('Processing observation',
@@ -149,11 +151,13 @@ class ObsProcessor:
                 self.datalogger.add_row(row, reason='Database/Interface Error')
             self._lines += 1
 
+        run_time = timer(start_time)
         log.info('Observations processed',
                  extra={'observations': self._total_obs,
                         'inserted': self._inserted_obs,
                         'skipped': self._obs_in_db,
-                        'errors': self._insert_errors})
+                        'errors': self._insert_errors,
+                        'inserted_sec': (self._inserted_obs/run_time)})
 
         if self._unhandled_errors:
             data_archive = None
@@ -407,6 +411,13 @@ def query_by_attribute(data, key, value):
         if row[key] == value:
             results.append(row)
     return results
+
+
+def timer(start_time=None):
+    if start_time:
+        return (time.time() - start_time)
+    else:
+        return time.time()
 
 
 class DataLogger:
