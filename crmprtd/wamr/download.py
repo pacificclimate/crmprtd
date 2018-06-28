@@ -3,6 +3,7 @@ import os
 import ftplib
 
 from datetime import datetime
+from tempfile import NamedTemporaryFile
 
 # Local
 from crmprtd import retry
@@ -29,19 +30,25 @@ def download(args):
     else:
         # FTP
         ftpreader = ftp_connect(args.ftp_server, args.ftp_dir, log)
-        if not log:
-            log = logging.getLogger('__name__')
 
-        lines = []
+        log.debug('Create temporary file')
+        tempf = NamedTemporaryFile()
+
         def callback(line):
-            lines.append(line)
+            fp.write('{}\n'.format(line))
 
         for filename in ftpreader.filenames:
             log.info("Downloading %s", filename)
             # FIXME: This line has some kind of race condition with this
-            ftpreader.connection.retrlines('RETR {}'.format(filename), callback)
-            for line in lines:
-                yield line
+
+            with open(tempf.name, 'w+t') as fp:
+                ftpreader.connection.retrlines('RETR {}'.format(filename), callback)
+
+        with open(tempf.name, 'r') as fp:
+            yield fp
+
+        log.debug('Temp file closed')
+        tempf.close()
 
 
 def ftp_connect(host, path, log):

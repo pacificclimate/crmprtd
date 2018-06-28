@@ -14,7 +14,6 @@ from crmprtd.wamr import rows2db
 from crmprtd.wamr import setup_logging
 
 
-# TODO: store_file needs to be changed to store rows
 def normalize(file_stream):
     Row = namedtuple('Row', "date native_id station_name parameter unit data")
     tz = pytz.timezone('Canada/Pacific')
