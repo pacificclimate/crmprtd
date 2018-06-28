@@ -1,5 +1,4 @@
 import logging
-from pythonjsonlogger import jsonlogger
 
 from datetime import datetime
 from dateutil.parser import parse
