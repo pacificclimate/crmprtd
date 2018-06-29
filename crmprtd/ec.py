@@ -337,9 +337,9 @@ def insert_obs(sesh, om, hid, vname, vid):
             raise e
     else:
         log.debug("Added observation", extra={'value': o.datum,
-                                             'variable': o.vars_id,
-                                             'hid': o.history_id,
-                                             'timestamp': o.time})
+                                              'variable': o.vars_id,
+                                              'hid': o.history_id,
+                                              'timestamp': o.time})
         # Remove element from XML "processing queue"
         ele.getparent().remove(ele)
         log.debug("Element removed from processing queue")

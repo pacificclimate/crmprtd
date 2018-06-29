@@ -126,9 +126,9 @@ def process_observation_series(sesh, os):
                 skips += 1
                 continue
             log.debug('Variable info', extra={'variable_name': varname,
-                                             'variable_type': vartype,
-                                             'unit': units,
-                                             'value': value})
+                                              'variable_type': vartype,
+                                              'unit': units,
+                                              'value': value})
 
             o = Obs(time=t, datum=float(value), variable=var, history=hist)
 
@@ -152,9 +152,9 @@ def process_observation_series(sesh, os):
 
     run_time = timer(start_time)
     log.info('Processing and insertions completed',
-             extra={'inserted': successes
-                    'skipped': skips
-                    'errors': failures
+             extra={'inserted': successes,
+                    'skipped': skips,
+                    'errors': failures,
                     'insertions_sec': (successes/run_time)})
 
     return {'successes': successes, 'skips': skips, 'failures': failures}

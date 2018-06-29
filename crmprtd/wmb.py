@@ -13,6 +13,7 @@ from crmprtd.wmb_exceptions import InsertionError, UniquenessError
 
 log = logging.getLogger(__name__)
 
+
 class ObsProcessor:
 
     def __init__(self, sesh, data, prefs):
@@ -182,7 +183,7 @@ class ObsProcessor:
 
         # get history_id
         hid = check_history(row, self.network, self.sesh)
-        log.debug('\tHistory id', extra={'hid': hid})
+        log.debug('History id', extra={'hid': hid})
 
         if hid is None:
             self._line_errors += 1
@@ -205,8 +206,8 @@ class ObsProcessor:
 
                 insert_obs(row[var], hid, d, self.db_vars[var], self.sesh)
                 self._inserted_obs += 1
-                log.debug('\tInserted', extra={'variable': var,
-                                              'value': row[var]})
+                log.debug('Inserted', extra={'variable': var,
+                                             'value': row[var]})
 
             except UniquenessError as e:
                 log.warning(e)
@@ -314,7 +315,7 @@ def check_history(obs, network, sesh):
 
     record = hist.first()
     if record:
-        log.debug('\tHistory ID found', extra={'hid': record[0]})
+        log.debug('History ID found', extra={'hid': record[0]})
         return record[0]
 
     # No record found, create new one.
