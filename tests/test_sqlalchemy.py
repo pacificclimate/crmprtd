@@ -8,22 +8,22 @@ def test_nested_transactions_1(crmp_session):
     fake_network = Network(name='Fake Network')
 
     try:
-        logging.info('in try')
+        logging.debug('in try')
         with crmp_session.begin_nested():
-            logging.info('in with')
+            logging.debug('in with')
             crmp_session.merge(fake_network)
-            logging.info('added network')
+            logging.debug('added network')
     except Exception as e:
-        logging.info('caught exception, raising')
+        logging.debug('caught exception, raising')
         raise e
 
 
 def test_nested_transactions_2(crmp_session):
     fake_network = Network(name='Fake Network')
     with crmp_session.begin_nested():
-        logging.info('in with')
+        logging.debug('in with')
         crmp_session.add(fake_network)
-        logging.info('added moti network')
+        logging.debug('added moti network')
 
 
 def test_nested_transactions_3(crmp_session):
