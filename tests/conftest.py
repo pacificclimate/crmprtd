@@ -57,7 +57,6 @@ def crmp_session(postgis_session):
         DDL('''CREATE OR REPLACE FUNCTION closest_stns_within_threshold(X numeric, Y numeric, thres integer)
 RETURNS TABLE(history_id integer, lat numeric, lon numeric, dist double precision) AS
 $BODY$
-
 DECLARE
     mystr TEXT;
 BEGIN
@@ -167,7 +166,7 @@ def test_data():
 11,2018052713,.00,16.9,54,11.3,185,82.228363,2.5902824,6.5181026,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
 11,2018052714,.00,17.8,53,10.5,185,82.773972,2.6630962,6.9062028,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
 11,2018052715,.00,17.4,50,8.2,161,83.291313,2.5341561,6.5958676,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0
-''' # noqa
+'''
     data = []
     f = StringIO(lines)
     reader = csv.DictReader(f)

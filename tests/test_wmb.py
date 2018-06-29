@@ -1,12 +1,30 @@
 import pytest
 import pytz
 import csv
+import logging
 
 from datetime import datetime
 from io import StringIO
 
 from pycds import Obs, History, Network, Station
-from crmprtd.wmb import ObsProcessor, insert_obs, check_history
+from crmprtd.wmb import ObsProcessor, insert_obs, check_history, \
+    query_by_attribute
+from crmprtd.wmb_exceptions import UniquenessError, InsertionError
+
+
+def test_process_unhandled_errors(test_session, test_data, caplog):
+    args = ArgsForTest()
+    o = ObsProcessor(test_session, test_data, args)
+    o._unhandled_errors = 1
+
+    expected = ('Errors occured in WMB real time daemon that require a human '
+                'touch.')
+
+    o.process()
+
+    for record in caplog.records:
+        if record.levelno == 50:
+            assert expected in record.msg
 
 
 @pytest.mark.parametrize(('val', 'hid', 'd', 'vars_id', 'expected'), [
@@ -21,6 +39,26 @@ def test_insert_obs(test_session, val, hid, d, vars_id, expected):
     result, = test_session.query(Obs.datum).filter(
         Obs.history_id == hid, Obs.time == d, Obs.vars_id == vars_id).first()
     assert result == val
+
+
+def test_insert_obs_uniqness_error(test_session):
+    val = 3.0
+    hid = 21
+    d = datetime(2017, 6, 17, 6, tzinfo=pytz.utc)
+    vars_id = 1
+
+    insert_obs(val, hid, d, vars_id, test_session)
+    with pytest.raises(UniquenessError):
+        insert_obs(val, hid, d, vars_id, test_session)
+
+
+def test_insert_obs_insertion_errror(test_session):
+    val = 'not_a_val'
+    hid = 20
+    d = datetime(2016, 9, 13, 6, tzinfo=pytz.utc)
+    vars_id = 1
+    with pytest.raises(InsertionError):
+        insert_obs(val, hid, d, vars_id, test_session)
 
 
 def test_check_and_insert_stations(test_session, test_data):
@@ -68,9 +106,10 @@ def test_check_history(test_session):
                             sdate='2012-09-02',
                             edate='2012-09-06')
     test_session.add(arkham_asylum)
-    test_session.add(Station(native_id='81974',
-                             network=o.network,
-                             histories=[arkham_asylum]))
+    test_session.add(
+        Station(native_id='81974',
+                network=o.network,
+                histories=[arkham_asylum]))
 
     q = test_session.query(History)
     count = q.count()
@@ -88,9 +127,115 @@ def test_check_history(test_session):
     assert q.count() == 2
 
 
+def test_check_history_error_handle(test_session):
+    # test error handle
+    err_lines = '''station_code,weather_date,precipitation
+1029,2012090312,12
+'''
+    err_data = []
+    f = StringIO(err_lines)
+    reader = csv.DictReader(f)
+    for row in reader:
+        err_data.append(row)
+
+    network_id = test_session.query(
+        Network.id).filter(Network.name == 'FLNRO-WMB')
+    network = test_session.query(Network).filter(
+        Network.id == network_id).first()
+
+    copy_hist = History(station_name='FIVE MILE')
+    test_session.add(copy_hist)
+    test_session.add(
+        Station(native_id='1029', network=network, histories=[copy_hist]))
+    o = ObsProcessor(test_session, err_data, 1000)
+    for row in o.data:
+        check = o.process_row(row)
+
+    assert check is None
+
+
 def test_process(test_session, test_data):
     o = ObsProcessor(test_session, test_data, 1000)
     o.process()
 
     q = test_session.query(Obs)
     assert q.count() == 8
+
+
+def test_process_uniquness_error(test_session, test_data):
+    # test UniquenessError handle
+    o = ObsProcessor(test_session, test_data, 1000)
+    o.process()
+    o.process()
+
+    assert o._obs_in_db == 5
+
+
+def test_parse_time_error_handle(test_session, test_data):
+    lines = '''station_code,weather_date,precipitation,
+81974,2018060612,12,
+81974,xbadvaluex,10,
+81974,xbadvaluex,8
+'''
+    data = []
+    f = StringIO(lines)
+    reader = csv.DictReader(f)
+    for row in reader:
+        data.append(row)
+
+    o = ObsProcessor(test_session, data, 1000)
+
+    assert o._line_errors == 2
+    assert o._unhandled_errors == 2
+
+
+def test_datalogger(test_session, test_data, tmpdir):
+    o = ObsProcessor(test_session, test_data, 1000)
+    data = {'weather_date': datetime.now()}
+    assert len(o.datalogger.bad_rows) == 0
+
+    o.datalogger.add_row(data, reason='Add single row')
+    assert len(o.datalogger.bad_rows) == 1
+
+    o.datalogger.add_row(test_data, reason='Add five rows')
+    assert len(o.datalogger.bad_rows) == 6
+
+    row = {'station_code': '1234567', 'weather_date': datetime.now(),
+           'ec_precip': 4}
+    var = 'ec_precip'
+    o.datalogger.add_obs(row, var, reason='Can this handle obs')
+    assert len(o.datalogger.bad_obs) == 1
+
+    # fresh obs
+    fresh_o = ObsProcessor(test_session, test_data, 1000)
+    fresh_o.datalogger.add_row(test_data, reason='Observation')
+    dir = tmpdir.mkdir("testing")
+    data_archive = o.datalogger.archive(str(dir))
+    with open(data_archive, 'r') as f:
+        row_count = 0
+        for row in f:
+            row_count += 1
+        assert row_count == 8
+
+
+def test_query_by_attribute(test_data):
+    result_multiple = query_by_attribute(test_data, 'station_code', '11')
+    assert len(result_multiple) == 5
+
+    result_single = query_by_attribute(test_data, 'weather_date', '2018052711')
+    assert len(result_single) == 1
+
+
+def test_archive_station(test_session, test_data):
+    o = ObsProcessor(test_session, test_data, 1000)
+    check = o._archive_station('11')
+    assert check == 5
+
+
+class ArgsForTest(object):
+    '''Used by test_process_unhandled_errors to mimic arguments
+    '''
+
+    def __init__(self, archive_dir=None):
+        self.archive_dir = archive_dir
+        self.log = logging.getLogger(__name__)

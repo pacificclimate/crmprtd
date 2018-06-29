@@ -19,7 +19,6 @@ class ObsProcessor:
         """
         Take a list of dictionary based observations and do everything to
         insert into crmp database
-
         data - list of dictionaries given by csv.DictReader with keys
             "station_code",
             "weather_date",
@@ -44,7 +43,6 @@ class ObsProcessor:
             precip_rgt,
             solar_radiation_LICOR,
             solar_radiation_CM3
-
         prefs - an object of type optparse.Values with attributes:
             connection_string, log,
             cache_dir, error_email
@@ -101,17 +99,6 @@ class ObsProcessor:
         log.info('Sucessfully parsed station dates'.format(
             len(unparsable_times)))
         return data
-
-    def print_data(self):
-        order = ['station_code', 'weather_date', 'precipitation',
-                 'temperature', 'relative_humidity', 'wind_speed',
-                 'wind_direction']
-        for k in order:
-            print(k + '\t|\t'),
-        for obs in self.data:
-            print('')
-            for k in order:
-                print(str(obs[k]) + '\t|\t')
 
     def process(self):
         """
@@ -282,7 +269,7 @@ class ObsProcessor:
         data
         """
 
-        archive_data = query_by_attribute('station_code', station)
+        archive_data = query_by_attribute(self.data, 'station_code', station)
         for obs in archive_data:
             self.data.remove(obs)
         self.datalogger.add_row(archive_data,
@@ -511,7 +498,7 @@ class DataLogger:
                  'solar_radiation_LICOR',
                  'solar_radiation_CM3']
 
-        with open(outcsv, 'wb') as f:
+        with open(outcsv, 'w') as f:
             w = csv.writer(f)
             w.writerow(order)
             for row in self.data:

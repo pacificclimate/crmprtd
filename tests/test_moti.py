@@ -6,9 +6,16 @@ import pytest
 import pytz
 
 from pycds import Obs, Station, History
-from crmprtd.moti import process, url_generator, slice_timesteps
+from crmprtd.moti import process, url_generator, slice_timesteps, check_history
 
 bctz = pytz.timezone('America/Vancouver')
+
+
+def test_check_history(test_session):
+    stn_id = '666'
+    check_history(stn_id, test_session)
+    q = test_session.query(History)
+    assert q.count() == 8
 
 
 def test_data(test_session, moti_sawr7110_xml):
