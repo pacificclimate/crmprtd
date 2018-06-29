@@ -1,6 +1,8 @@
 # .coveragerc to control coverage.py
 [run]
     source = crmprtd
+    omit =
+        crmprtd/wmb_excptions
 
 [report]
     fail_under = 50
