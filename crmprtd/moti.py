@@ -33,6 +33,13 @@ unwanted_vars = [
 ]
 
 
+def timer(start_time=None):
+    if start_time:
+        return (time.time() - start_time)
+    else:
+        return time.time()
+
+
 def makeurl(report='7110', request='historic',
             station=None, from_=None, to=None):
     '''
@@ -77,6 +84,7 @@ def process_observation_series(sesh, os):
              extra={'num_members': len(members), 'station': stn_id})
 
     successes, failures, skips = 0, 0, 0
+    start_time = timer()
     for member in members:
         t = member.get('valid-time')
         if not t:
@@ -146,6 +154,13 @@ def process_observation_series(sesh, os):
                 log.error("Failed to insert", extra={'obs': o})
                 sesh.rollback()
                 failures += 1
+
+    run_time = timer(start_time)
+    log.info('Processing and insertions completed',
+             extra={'inserted': successes
+                    'skipped': skips
+                    'errors': failures
+                    'insertions_sec': (successes/run_time)})
 
     return {'successes': successes, 'skips': skips, 'failures': failures}
 

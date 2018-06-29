@@ -221,8 +221,9 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
         start_time = timer()
         n_insertions = mass_insert_obs(sesh, obs, log)
         run_time = timer(start_time)
-        log.info("Inserted", extra={'num_insertions': n_insertions,
-                                    'insertions_sec:' (n_insertions/run_time)})
+        log.info("Data processed and inserted",
+                 extra={'num_insertions': n_insertions,
+                        'insertions_sec:' (n_insertions/run_time)})
 
         if diagnostic:
             log.info('Diagnostic mode, rolling back all transactions')

@@ -4,11 +4,6 @@ from pythonjsonlogger import jsonlogger
 
 from sqlalchemy.exc import IntegrityError
 
-# globals for test
-insert = 0
-skip = 0
-error = 0
-
 
 def split(tuple_):
     if len(tuple_) < 1:
@@ -70,7 +65,7 @@ def mass_insert_obs(sesh, obs, log=None):
                 log.info("New savepoint", extra={'num_obs': len(obs)})
                 sesh.add_all(obs)
         except IntegrityError:
-            log.warning("Failed to insert. Splitting observations.")
+            log.warning("Failed, splitting observations.")
             sesh.rollback()
             a, b = split(obs)
             log.info("Splitings observations into a, b",

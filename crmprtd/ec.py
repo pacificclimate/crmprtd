@@ -98,14 +98,13 @@ class ObsProcessor:
                                                     pretty_print=True)})
 
         run_time = timer(start_time)
-        log.info('Members processed', extra={'insertions_sec': (self._obs_insertions/run_time)})
-
         log.info("Finished processing",
                  extra={'num_members': self._members,
                         'num_members_processed': self._members_processed,
                         'inserted': self._obs_insertions,
                         'obs': self._obs,
-                        'skipped': self._obs_existing})
+                        'skipped': self._obs_existing,
+                        'insertions_sec': (self._obs_insertions/run_time)})
         if self._member_errors or self._obs_errors:
             raise Exception('''Unable to parse {me} members,
             Unable to insert {oe} insertable obs'''.format(
