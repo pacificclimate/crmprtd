@@ -116,7 +116,7 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
     dst_unit = re.sub('%', 'percent', dst_unit)
 
     if src_unit != dst_unit:
-        log.info("Source", extra={'value': val, 'unit': src_unit})
+        log.debug("Source", extra={'value': val, 'unit': src_unit})
         try:
             val = Q_(val, ureg.parse_expression(src_unit))  # src
             val = val.to(dst_unit).magnitude  # dest
@@ -125,7 +125,7 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
                 "Can't convert source unit {} to destination unit {}".format(
                     src_unit, dst_unit)
             )
-        log.info("Converted", extra={'value': val, 'unit': dst_unit})
+        log.debug("Converted", extra={'value': val, 'unit': dst_unit})
 
     # Create and return the object
     return Obs(time=d, variable=var, history=hist, datum=val)

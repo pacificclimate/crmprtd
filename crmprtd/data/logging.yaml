@@ -1,5 +1,5 @@
 # Log level standard usage
-#   debug - Used to relay detailed information, only use for testing
+#   debug - Used to relay detailed information during testing
 #   info - Used to output information that is useful while running application
 #   warning - Used when handling exceptions
 #   error - Used for unhandled exceptions

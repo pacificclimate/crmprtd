@@ -78,10 +78,10 @@ def process_observation_series(sesh, os):
             "results")
 
     hist = check_history(stn_id, sesh)
-    log.info('Got history_id', extra={'hid': hist.id})
+    log.debug('Got history_id', extra={'hid': hist.id})
     members = os.xpath('./observation', namespaces=ns)
-    log.info("Found members for station",
-             extra={'num_members': len(members), 'station': stn_id})
+    log.debug("Found members for station",
+              extra={'num_members': len(members), 'station': stn_id})
 
     successes, failures, skips = 0, 0, 0
     start_time = timer()
@@ -130,7 +130,7 @@ def process_observation_series(sesh, os):
                                        'unit': units})
                 skips += 1
                 continue
-            log.info('Variable info', extra={'variable_name': varname,
+            log.debug('Variable info', extra={'variable_name': varname,
                                              'variable_type': vartype,
                                              'unit': units,
                                              'value': value})
@@ -144,7 +144,7 @@ def process_observation_series(sesh, os):
                     sesh.add(o)
                 successes += 1
                 sesh.commit()
-                log.info("Inserted observation", extra={'obs': o})
+                log.debug("Inserted observation", extra={'obs': o})
             except IntegrityError as e:
                 log.warning("Skipped observation, already exists",
                             extra={'obs': o, 'exception': e})
@@ -173,18 +173,18 @@ def find_var(sesh, varname, vartype, units):
 
 
 def check_history(stn_id, sesh):
-    log.info('Lookup up history_id')
+    log.debug('Lookup up history_id')
     hist = sesh.query(History).join(Station).join(Network).filter(
         Station.native_id == stn_id).filter(Network.name == 'MoTIe').first()
     if hist:
         return hist
 
     # No history id, check if station_id exists
-    log.info("History_id not found")
+    log.debug("History_id not found")
     stn = sesh.query(Station).join(Network).filter(
         Station.native_id == stn_id).filter(Network.name == 'MoTIe').first()
     if not stn:
-        log.info("Station_id not found")
+        log.debug("Station_id not found")
         try:
             with sesh.begin_nested():
                 stn = Station(native_id=stn_id, network=sesh.query(
@@ -194,7 +194,7 @@ def check_history(stn_id, sesh):
             log.error("Station does not exist in the database and could "
                       "not be added", extra={'station': stn_id})
             raise e
-        log.info('Created station_id', extra={'station_id': stn.id})
+        log.debug('Created station_id', extra={'station_id': stn.id})
 
     # Station_id added or exists, create history_id
     try:
@@ -205,7 +205,7 @@ def check_history(stn_id, sesh):
         log.error('History_id could not be found or created for native_id',
                   extra={'native_id': stn_id})
         raise e
-    log.info('Created history_id', extra={'hid': hist.id})
+    log.debug('Created history_id', extra={'hid': hist.id})
 
     return hist
 

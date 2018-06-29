@@ -80,7 +80,7 @@ class ObsProcessor:
         into a datetime instance
         """
 
-        log.info('Parsing all dates')
+        log.debug('Parsing all dates')
         unparsable_times = []
 
         for obs in data:
@@ -103,8 +103,8 @@ class ObsProcessor:
         for obs in unparsable_times:
             data.remove(obs)
 
-        log.info('Sucessfully parsed station dates',
-                 extra={'unparsable_times': len(unparsable_times)})
+        log.debug('Sucessfully parsed station dates',
+                  extra={'unparsable_times': len(unparsable_times)})
         return data
 
     def process(self):
@@ -122,23 +122,23 @@ class ObsProcessor:
         for obs in self.data:
             self.stations.add(obs['station_code'])
 
-        log.info('Checked all stations')
+        log.debug('Checked all stations')
         new_stations = self.check_and_insert_stations(self.stations)
-        log.info('Inserted new station_ids',
-                 extra={'new_stations': new_stations})
+        log.debug('Inserted new station_ids',
+                  extra={'new_stations': new_stations})
 
         # determine valid csv vars -> valid db vars mapping
         self.db_vars = self._recordable_vars()
-        log.info('Determined recordable variables')
+        log.debug('Determined recordable variables')
 
         # Attempt to insert all observations, logging all errors
-        log.info('Processing lines...', extra={'processed': len(self.data)})
+        log.debug('Processing lines...', extra={'processed': len(self.data)})
         start_time = timer()
         for row in self.data:
             try:
-                log.info('Processing observation',
-                         extra={'station': row['station_code'],
-                                'timestamp': row['weather_date']})
+                log.debug('Processing observation',
+                          extra={'station': row['station_code'],
+                                 'timestamp': row['weather_date']})
 
                 self.process_row(row)
 
@@ -189,7 +189,7 @@ class ObsProcessor:
 
         # get history_id
         hid = check_history(row, self.network, self.sesh)
-        log.info('\tHistory id', extra={'hid': hid})
+        log.debug('\tHistory id', extra={'hid': hid})
 
         if hid is None:
             self._line_errors += 1
@@ -212,7 +212,7 @@ class ObsProcessor:
 
                 insert_obs(row[var], hid, d, self.db_vars[var], self.sesh)
                 self._inserted_obs += 1
-                log.info('\tInserted', extra={'variable': var,
+                log.debug('\tInserted', extra={'variable': var,
                                               'value': row[var]})
 
             except UniquenessError as e:
@@ -243,9 +243,9 @@ class ObsProcessor:
         # determine new stations and add to db
 
         new_stations = dl.difference(db)
-        log.info('New stations', extra={'native_id': new_stations})
+        log.debug('New stations', extra={'native_id': new_stations})
         for station in new_stations:
-            log.info('Station id not in db', extra={'native_id': station})
+            log.debug('Station id not in db', extra={'native_id': station})
             self.sesh.begin_nested()
             try:
                 stn = Station(native_id=station, network=self.network)
@@ -258,7 +258,7 @@ class ObsProcessor:
                 self._archive_station(station)
             else:
                 self.sesh.commit()
-                log.info('Added native id', extra={'native_id': station})
+                log.debug('Added native id', extra={'native_id': station})
 
         return new_stations
 
@@ -325,7 +325,7 @@ def check_history(obs, network, sesh):
         return record[0]
 
     # No record found, create new one.
-    log.info('Creating meta_history entry', extra={'station': native_id})
+    log.debug('Creating meta_history entry', extra={'station': native_id})
     sesh.begin_nested()
     try:
         stn = sesh.query(Station).filter(Station.native_id ==
@@ -341,7 +341,7 @@ def check_history(obs, network, sesh):
                   extra={'native_id': native_id, 'exception': e})
     else:
         sesh.commit()
-        log.info('Added meta_history entry', extra={'hid': hist.id})
+        log.debug('Added meta_history entry', extra={'hid': hist.id})
         return hist.id
 
     # If we get this far, something has gone wrong

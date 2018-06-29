@@ -81,13 +81,13 @@ class ObsProcessor:
         log.info('Processing data')
         members = self.et.xpath('//om:member', namespaces=ns)
         self._members = len(members)
-        log.info("Found members in the xml",
-                 extra={'num_members': self._members})
+        log.debug("Found members in the xml",
+                  extra={'num_members': self._members})
 
         start_time = timer()
         for member in members:
             try:
-                log.info("Processing next member")
+                log.debug("Processing next member")
                 self.process_member(member)
                 self._members_processed += 1
             except Exception as e:  # FIXME: More specific exception handling
@@ -112,17 +112,17 @@ class ObsProcessor:
 
     def process_member(self, member):
         hid = check_history(member, self.sesh, self.threshold)
-        log.info("Found history id", extra={'hid': hid})
+        log.debug("Found history id", extra={'hid': hid})
         if hid is None:
             # This is not a station
             return
 
         om = OmMember(member)
-        log.info("Member unit initialized")
+        log.debug("Member unit initialized")
 
         rec_vars = recordable_vars(self.sesh)
         insert_vars = set(om.observed_vars()).intersection(rec_vars.keys())
-        log.info("Insertable variables", extra={'variables': insert_vars})
+        log.debug("Insertable variables", extra={'variables': insert_vars})
 
         for vname in insert_vars:
             vid = rec_vars[vname]
@@ -152,7 +152,7 @@ def check_history(member, sesh, threshold):
     attrs = ['station_name', 'climate_station_number']
     # Select critical information from XML
     try:
-        log.info("Finding Station attributes")
+        log.debug("Finding Station attributes")
         stn_name, native_id = map(lambda x: member.xpath(
             ".//mpo:identification-elements/mpo:element[@name='%s']" %
             x, namespaces=ns)[0].get('value'), attrs)
@@ -174,7 +174,7 @@ def check_history(member, sesh, threshold):
         return None
 
     # Determine the frequency for this station
-    log.info("Finding station frequency")
+    log.debug("Finding station frequency")
     dataset = member.xpath('.//mpo:dataset', namespaces=ns)[0].get('name')
     if(re.search('product-hourly', dataset) or
        re.search('hour_summary', dataset)):
@@ -187,16 +187,16 @@ def check_history(member, sesh, threshold):
         raise Exception(
             "Could not determine frequency for a meta_history insertion. "
             "Unexpected product: %s", dataset)
-    log.info("Found frequency", extra={'frequency': freq})
+    log.debug("Found frequency", extra={'frequency': freq})
 
     # Select all history entries that match this station
-    log.info("Searching for matching meta_history entries")
+    log.debug("Searching for matching meta_history entries")
 
     q = sesh.execute('SELECT history_id from '
                      'closest_stns_within_threshold(:lon, :lat, :threshold)',
                      {'lon': lon, 'lat': lat, 'threshold': threshold})
     valid_hid = set([x[0] for x in q.fetchall()])
-    log.info("history_ids in threshold", extra={'hid': valid_hid})
+    log.debug("history_ids in threshold", extra={'hid': valid_hid})
 
     q = sesh.query(History.id, History.freq).join(Station).join(Network)\
         .filter(Station.native_id == native_id)\
@@ -207,10 +207,8 @@ def check_history(member, sesh, threshold):
         ))\
         .filter(History.station_name == stn_name)
     r = q.all()
-    log.info("history_ids based on native_id, station_name, and data "
-             "sdate/edate", extra={'query': r})
-
-    # log.info(histories)
+    log.debug("history_ids based on native_id, station_name, and data "
+              "sdate/edate", extra={'query': r})
 
     possible_hist = [hist for hist in r if hist.id in valid_hid]
 
@@ -219,7 +217,7 @@ def check_history(member, sesh, threshold):
         hist = possible_hist[0]
         # db_freq = hist.freq
         hid = hist.id
-        log.info('Found hid', extra={'hid': hid})
+        log.debug('Found hid', extra={'hid': hid})
 
         # 'Upgrade' the frequency if we're receiving hourly results for a
         # station marked as daily
@@ -232,7 +230,7 @@ def check_history(member, sesh, threshold):
         return hid
 
     if len(possible_hist) < 1:
-        log.info("No matching open history_id found")
+        log.debug("No matching open history_id found")
         # Stuff may not match because:
         #   -This a new station/native_id
         #   -A station as moved but kept old identifying information
@@ -273,7 +271,7 @@ def check_history(member, sesh, threshold):
             stn = Station(native_id=native_id, network=ec)
             with sesh.begin_nested():
                 sesh.add(stn)
-            log.info("Created new station_id", extra={'station_id': stn.id})
+            log.debug("Created new station_id", extra={'station_id': stn.id})
 
         elif len(r) > 1:
             raise Exception(
@@ -343,13 +341,13 @@ def insert_obs(sesh, om, hid, vname, vid):
         else:
             raise e
     else:
-        log.info("Added observation", extra={'value': o.datum,
+        log.debug("Added observation", extra={'value': o.datum,
                                              'variable': o.vars_id,
                                              'hid': o.history_id,
                                              'timestamp': o.time})
         # Remove element from XML "processing queue"
         ele.getparent().remove(ele)
-        log.info("Element removed from processing queue")
+        log.debug("Element removed from processing queue")
 
     return True
 
