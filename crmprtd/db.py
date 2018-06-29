@@ -1,6 +1,5 @@
 from math import floor
 import logging
-from pythonjsonlogger import jsonlogger
 
 from sqlalchemy.exc import IntegrityError
 
@@ -30,11 +29,6 @@ def mass_insert_obs(sesh, obs, log=None):
     '''
     if not log:
         log = logging.getLogger(__name__)
-        # json logger
-        logHandler = logging.StreamHandler()
-        formatter = jsonlogger.JsonFormatter()
-        logHandler.setFormatter(formatter)
-        log.addHandler(logHandler)
 
     log.info("Begin mass observation insertion", extra={'num_obs': len(obs)})
 

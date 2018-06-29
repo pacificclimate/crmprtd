@@ -5,7 +5,6 @@ import os
 import glob
 import logging
 import logging.config
-from pythonjsonlogger import jsonlogger
 from argparse import ArgumentParser
 from pkg_resources import resource_stream
 from shutil import move
@@ -33,12 +32,6 @@ def main(args):
     log = logging.getLogger('crmprtd.moti')
     if args.log_level:
         log.setLevel(args.log_level)
-    # json logger
-    logHandler = logging.StreamHandler()
-    formatter = jsonlogger.JsonFormatter()
-    logHandler.setFormatter(formatter)
-    log.addHandler(logHandler)
-    log.info('Starting MOTIe rtd')
 
     # Generate file list if necessary
     if args.file_pattern:

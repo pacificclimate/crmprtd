@@ -2,10 +2,10 @@ import re
 import sys
 import logging
 import logging.config
-from pythonjsonlogger import jsonlogger
 import csv
 from pkg_resources import resource_stream
 import ftplib
+import time
 
 import pytz
 from dateutil.parser import parse
@@ -80,11 +80,6 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
     """
     if not log:
         log = logging.getLogger(__name__)
-        # json logger
-        logHandler = logging.StreamHandler()
-        formatter = jsonlogger.JsonFormatter()
-        logHandler.setFormatter(formatter)
-        log.addHandler(logHandler)
 
     if row['EMS_ID'] not in histories:
         raise Exception('Could not find station {EMS_ID}/{STATION_NAME}'
@@ -137,11 +132,6 @@ class DataLogger(object):
         self.bad_obs = []
         if not log:
             self.log = logging.getLogger(__name__)
-            # json logger
-            logHandler = logging.StreamHandler()
-            formatter = jsonlogger.JsonFormatter()
-            logHandler.setFormatter(formatter)
-            self.log.addHandler(logHandler)
 
     def add_row(self, data=None, reason=None):
         # handle single observations
@@ -181,11 +171,7 @@ def setup_logging(level, filename=None, email=None):
         log_conf['handlers']['mail']['toaddrs'] = email
     logging.config.dictConfig(log_conf)
     log = logging.getLogger('crmprtd.wamr')
-    # json logger
-    logHandler = logging.StreamHandler()
-    formatter = jsonlogger.JsonFormatter()
-    logHandler.setFormatter(formatter)
-    log.addHandler(logHandler)
+
     if level:
         log.setLevel(level)
 
@@ -223,7 +209,7 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
         run_time = timer(start_time)
         log.info("Data processed and inserted",
                  extra={'num_insertions': n_insertions,
-                        'insertions_sec:' (n_insertions/run_time)})
+                        'insertions_sec': (n_insertions/run_time)})
 
         if diagnostic:
             log.info('Diagnostic mode, rolling back all transactions')
@@ -274,11 +260,6 @@ class FTPReader(object):  # pragma: no cover
         # It's non-ideal but neither classes support coroutine send/yield
         if not log:
             log = logging.getLogger('__name__')
-            # json logger
-            logHandler = logging.StreamHandler()
-            formatter = jsonlogger.JsonFormatter()
-            logHandler.setFormatter(formatter)
-            log.addHandler(logHandler)
 
         lines = []
 
@@ -286,7 +267,7 @@ class FTPReader(object):  # pragma: no cover
             lines.append(line)
 
         for filename in self.filenames:
-            log.info("Downloading from file", extra={'filename': filename})
+            log.info("Downloading from file", extra={'file': filename})
             # FIXME: This line has some kind of race condition with this
             self.connection.retrlines('RETR {}'.format(filename), callback)
 

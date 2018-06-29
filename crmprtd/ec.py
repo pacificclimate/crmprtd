@@ -2,7 +2,7 @@ from lxml.etree import LxmlError, parse, tostring, XSLT
 from datetime import datetime
 import re
 import logging
-from pythonjsonlogger import jsonlogger
+import time
 from pkg_resources import resource_stream
 from urllib.parse import urlparse
 
@@ -12,11 +12,6 @@ from sqlalchemy.sql import func
 from sqlalchemy.exc import IntegrityError
 
 log = logging.getLogger(__name__)
-# json logger
-logHandler = logging.StreamHandler()
-formatter = jsonlogger.JsonFormatter()
-logHandler.setFormatter(formatter)
-log.addHandler(logHandler)
 
 ns = {
     'om': 'http://www.opengis.net/om/1.0',

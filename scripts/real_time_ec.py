@@ -5,7 +5,6 @@ import os
 import sys
 import logging
 import logging.config
-from pythonjsonlogger import jsonlogger
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 from pkg_resources import resource_filename
@@ -34,12 +33,6 @@ def main(args):
     log = logging.getLogger('crmprtd.ec')
     if args.log_level:
         log.setLevel(args.log_level)
-    # json logger
-    logHandler = logging.StreamHandler()
-    formatter = jsonlogger.JsonFormatter()
-    logHandler.setFormatter(formatter)
-    log.addHandler(logHandler)
-    log.info('Starting EC rtd')
 
     try:
         if args.filename:

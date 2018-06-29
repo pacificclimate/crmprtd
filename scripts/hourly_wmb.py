@@ -13,7 +13,6 @@ import sys
 import csv
 import logging
 import logging.config
-from pythonjsonlogger import jsonlogger
 import os
 import ftplib
 
@@ -44,12 +43,6 @@ def main(args):
     log = logging.getLogger('crmprtd.wmb')
     if args.log_level:
         log.setLevel(args.log_level)
-    # json logger
-    logHandler = logging.StreamHandler()
-    formatter = jsonlogger.JsonFormatter()
-    logHandler.setFormatter(formatter)
-    log.addHandler(logHandler)
-    log.info('Starting WMB rtd')
 
     data = []
 

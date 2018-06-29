@@ -11,11 +11,14 @@ disable_existing_loggers: False
 formatters:
   simple:
     format: '%(asctime)s:%(levelname)s:%(name)s - %(message)s'
+  json:
+    format: '%(asctime)s:%(levelname)s:%(name)s - %(message)s'
+    class: pythonjsonlogger.jsonlogger.JsonFormatter
 handlers:
   console:
     class: logging.StreamHandler
     level: DEBUG
-    formatter: simple
+    formatter: json
     stream: ext://sys.stdout
   error:
     class: logging.StreamHandler

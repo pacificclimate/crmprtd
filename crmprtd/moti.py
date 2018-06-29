@@ -1,9 +1,9 @@
 from pkg_resources import resource_filename
 from datetime import datetime, timedelta
 import logging
-from pythonjsonlogger import jsonlogger
 
 import pytz
+import time
 from lxml.etree import parse, XSLT
 from sqlalchemy.exc import IntegrityError
 
@@ -11,11 +11,6 @@ from pycds import History, Network, Station, Variable, Obs
 
 
 log = logging.getLogger(__name__)
-# json logger
-logHandler = logging.StreamHandler()
-formatter = jsonlogger.JsonFormatter()
-logHandler.setFormatter(formatter)
-log.addHandler(logHandler)
 
 xsl = resource_filename('crmprtd', 'data/moti.xsl')
 transform = XSLT(parse(xsl))
