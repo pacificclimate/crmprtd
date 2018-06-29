@@ -98,7 +98,7 @@ def main(args):
             reader = ftpreader.csv_reader()
             for row in reader:
                 data.append(row)
-            log.info('instantiated the reader and processed all rows')
+            log.debug('instantiated the reader and processed all rows')
         except ftplib.all_errors as e:
             log.critical('Unable to load data from ftp source', exc_info=True)
             sys.exit(1)

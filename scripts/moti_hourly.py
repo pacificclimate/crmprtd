@@ -59,7 +59,7 @@ def main(args):
                      extra={'file': args.filename})
             fname = args.filename
             xml_file = open(args.filename, 'r')
-            log.info("File opened sucessfully")
+            log.debug("File opened sucessfully")
 
         else:
             if args.start_time and args.end_time:
