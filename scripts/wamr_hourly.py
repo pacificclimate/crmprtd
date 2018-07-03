@@ -88,5 +88,4 @@ if __name__ == '__main__':
     file_stream = download(args)
     for file in file_stream:
         for line in normalize(file):
-            yield align(line)
             print(line)

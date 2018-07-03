@@ -34,7 +34,7 @@ def normalize(file_stream):
                 data=float(cleaned[11]))
             yield named_row
         except Exception as e:
-            log.error('Unable to process row: {}'.format(row))
+            log.error('Unable to process row: [{}]'.format(row))
 
 
 
