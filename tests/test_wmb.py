@@ -17,7 +17,7 @@ def test_process_unhandled_errors(test_session, test_data, caplog):
     o = ObsProcessor(test_session, test_data, args)
     o._unhandled_errors = 1
 
-    expected = ('Errors occured in WMB real time daemon that require a human '
+    expected = ('Errors occured in WMB real time daemon that requires a human '
                 'touch.')
 
     o.process()
