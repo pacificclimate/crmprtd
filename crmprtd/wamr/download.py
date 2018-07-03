@@ -3,7 +3,8 @@ import sys
 import ftplib
 import logging
 
-from tempfile import NamedTemporaryFile
+from io import BytesIO
+from tempfile import NamedTemporaryFile, SpooledTemporaryFile
 
 # Local
 from crmprtd import retry
@@ -15,41 +16,20 @@ def download(args):
     log = setup_logging(args.log_level, args.log, args.error_email)
     log.info('Starting WAMR rtd')
 
-    # Output files
-    # if args.error_file:
-    #     error_file = open(args.error_file, 'a')
-    # else:
-    #     error_filename = 'wamr_errors_{}.csv'.format(datetime.strftime(
-    #         datetime.now(), '%Y-%m-%dT%H-%M-%S'))
-    #     error_file = open(os.path.join(args.cache_dir, error_filename), 'a')
+    # Connect FTP server and retrieve file
+    ftpreader = ftp_connect(args.ftp_server, args.ftp_dir, log)
 
-    if args.input_file:
-        # File
-        with open(args.input_file) as file_stream:
-            yield file_stream
-    else:
-        # FTP
-        ftpreader = ftp_connect(args.ftp_server, args.ftp_dir, log)
+    for filename in ftpreader.filenames:
+        with SpooledTemporaryFile(max_size=2048, mode='r+') as tempfile:
+            def callback(line):
+                tempfile.write('{}\n'.format(line))
 
-        log.debug('Create temporary file')
-        tempf = NamedTemporaryFile()
-
-        def callback(line):
-            fp.write('{}\n'.format(line))
-
-        for filename in ftpreader.filenames:
             log.info("Downloading %s", filename)
-            # FIXME: This line has some kind of race condition with this
+            ftpreader.connection.retrlines('RETR {}'.format(filename),
+                                           callback)
 
-            with open(tempf.name, 'w+t') as fp:
-                ftpreader.connection.retrlines('RETR {}'.format(filename),
-                                               callback)
-
-        with open(tempf.name, 'r') as fp:
-            yield fp
-
-        log.debug('Temp file closed')
-        tempf.close()
+            tempfile.seek(0)
+            yield tempfile
 
 
 def ftp_connect(host, path, log):

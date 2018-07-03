@@ -86,6 +86,7 @@ if __name__ == '__main__':
 
     # Pipeline
     file_stream = download(args)
-    # row_stream = normalize(file_stream)
-    for line in normalize(file_stream):
-        print(line)
+    for file in file_stream:
+        for line in normalize(file):
+            yield align(line)
+            print(line)
