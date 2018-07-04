@@ -29,7 +29,7 @@ transformations and extraction of information to the weather
 observations. This may include XML XSLT transformations, unit or
 variable name rewrites according to mapping rules, etc. The input to
 this phase is simply a file stream and the output is simply a stream
-of tuples (time, val, variable name, network name, station id, lat,
+of tuples (time, val, variable name, unit, network name, station id, lat,
 lon) in native types. The idea of this phase is that it requires no
 access to the database, just network specific knowledge.
 
@@ -48,6 +48,10 @@ speed and reliability. This phase is common to all networks.
 
 import time
 from functools import wraps
+from collections import namedtuple
+
+
+Row = namedtuple('Row', "time val variable_name unit network_name, station_id, lat, lon")
 
 
 class Timer(object):

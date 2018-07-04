@@ -3,20 +3,19 @@ import sys
 
 # Installed libraries
 from datetime import datetime
-from collections import namedtuple
 import pytz
+import logging
 from dateutil.parser import parse
 
 # Local
 from crmprtd.wamr import setup_logging
+from crmprtd import Row
 
 
 def normalize(file_stream):
-    Row = namedtuple('Row', "date native_id station_name parameter unit data")
+    log = logging.getLogger(__name__)
     tz = pytz.timezone('Canada/Pacific')
-    log = setup_logging('INFO')
 
-    error_count = 0
     is_first = True
     for row in file_stream.readlines():
         cleaned = row.strip().split(',')
@@ -25,44 +24,15 @@ def normalize(file_stream):
             continue
 
         try:
-            named_row = Row(date=parse(cleaned[0]).replace(
+            named_row = Row(time=parse(cleaned[0]).replace(
                 tzinfo=tz),
-                native_id=cleaned[1],
-                station_name=cleaned[2],
-                parameter=cleaned[3],
+                val=float(cleaned[11]),
+                variable_name=cleaned[3],
                 unit=cleaned[7],
-                data=float(cleaned[11]))
+                network_name='WAMR',
+                station_id=cleaned[1],
+                lat=None,
+                lon=None)
             yield named_row
         except Exception as e:
-            log.error('Unable to process row: [{}]'.format(row))
-
-
-
-def store_file(args, dict, rows_len, log):
-    if not args.cache_file:
-        args.cache_file = 'wamr_download_{}.csv'.format(datetime.strftime(
-            datetime.now(), '%Y-%m-%dT%H-%M-%S'))
-    with open(args.cache_file, 'w') as cache_file:
-        cache_rows(cache_file, dict, dict.fieldnames)
-
-    log.info('{0} observations read into memory'.format(rows_len))
-
-
-def cache_rows(file_, rows, fieldnames):
-    copier = csv.DictWriter(file_, fieldnames=fieldnames)
-    copier.writeheader()
-    copier.writerows(rows)
-
-# def prepare(rows, error_file, log, args):
-#     # Database connection
-#     try:
-#         engine = create_engine(args.connection_string)
-#         Session = sessionmaker(engine)
-#         sesh = Session()
-#     except Exception as e:
-#         log.critical('Error with Database connection', exc_info=True)
-#         sys.exit(1)
-#
-#
-#     # Hand the row off to the database processings/insertion
-#     rows2db(sesh, rows, error_file, log, args.diag)
+            log.error('Unable to process row: {}'.format(row))

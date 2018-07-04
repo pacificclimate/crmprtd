@@ -4,32 +4,34 @@ import ftplib
 import logging
 
 from io import BytesIO
-from tempfile import NamedTemporaryFile, SpooledTemporaryFile
+from tempfile import SpooledTemporaryFile
 
 # Local
 from crmprtd import retry
-from crmprtd.wamr import setup_logging
 
 
 def download(args):
-    # Logging
-    log = setup_logging(args.log_level, args.log, args.error_email)
+    log = logging.getLogger(__name__)
     log.info('Starting WAMR rtd')
 
-    # Connect FTP server and retrieve file
-    ftpreader = ftp_connect(args.ftp_server, args.ftp_dir, log)
+    try:
+        # Connect FTP server and retrieve file
+        ftpreader = ftp_connect(args.ftp_server, args.ftp_dir, log)
 
-    for filename in ftpreader.filenames:
-        with SpooledTemporaryFile(max_size=2048, mode='r+') as tempfile:
-            def callback(line):
-                tempfile.write('{}\n'.format(line))
+        for filename in ftpreader.filenames:
+            with SpooledTemporaryFile(max_size=2048, mode='r+') as tempfile:
+                def callback(line):
+                    tempfile.write('{}\n'.format(line))
 
-            log.info("Downloading %s", filename)
-            ftpreader.connection.retrlines('RETR {}'.format(filename),
-                                           callback)
+                log.info("Downloading %s", filename)
+                ftpreader.connection.retrlines('RETR {}'.format(filename),
+                                               callback)
 
-            tempfile.seek(0)
-            yield tempfile
+                tempfile.seek(0)
+                yield tempfile
+
+    except Exception:
+        log.critical("Unable to process ftp")
 
 
 def ftp_connect(host, path, log):
