@@ -5,9 +5,7 @@ import logging
 import logging.config
 import os
 import ftplib
-
-# debug
-from pkg_resources import resource_stream
+from tempfile import SpooledTemporaryFile
 
 # Local
 from crmprtd import retry
@@ -17,63 +15,11 @@ from crmprtd.wmb.normalize import prepare
 import yaml
 
 
-def logging_setup(log, error_email, log_level):
-    log_c = yaml.load(resource_stream('crmprtd', '/data/logging.yaml'))
-    if log:
-        log_c['handlers']['file']['filename'] = log
-    else:
-        log = log_c['handlers']['file']['filename']
-    if error_email:
-        log_c['handlers']['mail']['toaddrs'] = error_email
-    logging.config.dictConfig(log_c)
-    log = logging.getLogger('crmprtd.wmb')
-    if log_level:
-        log.setLevel(log_level)
-
-    return log
-
-
-def local_file_search(archive_file, archive_dir, log):
-    # adjust to full path
-    path = archive_file
-    if archive_file[0] != '/':
-        path = os.path.join(archive_dir, archive_file)
-    log.info('Loading local file', extra={'path': path})
-
-    try:
-        with open(path) as f:
-            log.debug('opened the local file')
-            reader = csv.DictReader(f)
-            return reader
-    except IOError as e:
-        log.exception('Unable to load data from local file')
-        sys.exit(1)
-
-
-def ftp_file_read(ftp_server, ftp_file, log, auth):
-    # Fetch file from FTP and read into memory
-    log.info('Fetching file from FTP')
-    log.info('Downloading FTP', extra={'server': ftp_server,
-                                       'file': ftp_file})
-
-    try:
-        ftpreader = FTPReader(ftp_server, auth['u'], auth['p'], ftp_file, log)
-        log.info('Opened a connection to server',
-                 extra={'server': ftp_server})
-        reader = ftpreader.csv_reader()
-        log.info('instantiated the reader')
-        return reader
-    except ftplib.all_errors as e:
-        log.critical('Unable to load data from ftp source', exc_info=True)
-        sys.exit(1)
-
-
-def run(args):
-    # Setup logging
-    log = logging_setup(args.log, args.error_email, args.log_level)
+def download(args):
+    log = logging.getLogger(__name__)
     log.info('Starting WMB rtd')
 
-    # Pull auth from file or command line
+    # Pull auth from args
     if args.username or args.password:
         auth = {'u': args.username, 'p': args.password}
     else:
@@ -85,14 +31,38 @@ def run(args):
         auth = {'u': config[args.auth_key]['username'],
                 'p': config[args.auth_key]['password']}
 
-    # Check for local file source
-    if args.archive_file:
-        reader = local_file_search(args.archive_file, args.archive_dir, log)
-    # Or use FTP source
-    else:
-        reader = ftp_file_read(args.ftp_server, args.ftp_file, log, auth)
+    try:
+        # Connect FTP server and retrieve file
+        ftpreader = ftp_connect(args.ftp_server, args.ftp_file, log, auth)
 
-    prepare(args, log, reader)
+        with SpooledTemporaryFile(max_size=2048, mode='r+') as tempfile:
+            def callback(line):
+                tempfile.write('{}\n'.format(line))
+
+            log.info("Downloading %s", ftpreader.filename)
+            ftpreader.connection.retrlines('RETR {}'.format(ftpreader.filename),
+                                           callback)
+
+            tempfile.seek(0)
+            yield tempfile
+
+    except Exception:
+        log.critical("Unable to process ftp")
+
+
+def ftp_connect(host, path, log, auth):
+    log.info('Fetching file from FTP')
+    log.info('Listing {}/{}'.format(host, path))
+
+    try:
+        ftpreader = FTPReader(host, auth['u'],
+                              auth['p'], path, log)
+        log.info('Opened a connection to {}'.format(host))
+    except ftplib.all_errors as e:
+        log.critical('Unable to load data from ftp source', exc_info=True)
+        sys.exit(1)
+
+    return ftpreader
 
 
 class FTPReader(object):

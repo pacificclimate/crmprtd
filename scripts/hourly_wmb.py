@@ -12,7 +12,9 @@ from pkg_resources import resource_stream
 from argparse import ArgumentParser
 
 # Local
-from crmprtd.wmb.download import run
+from crmprtd.wmb.download import download
+from crmprtd.wmb.normalize import normalize
+from crmprtd.wmb import setup_logging
 
 
 if __name__ == '__main__':
@@ -71,4 +73,10 @@ if __name__ == '__main__':
                         help="Turn on diagnostic mode (no commits)")
 
     args = parser.parse_args()
-    run(args)
+    log = setup_logging(args.log_level, args.log, args.error_email)
+
+    # Pipeline
+    file_stream = download(args)
+    for file in file_stream:
+        for line in normalize(file):
+            print(line)
