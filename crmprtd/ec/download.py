@@ -41,7 +41,7 @@ def download(log, frequency, province, language, time, cache_dir):
     url = makeurl(frequency, province, language, time)
     fname = os.path.join(cache_dir, extract_fname_from_url(url))
 
-    log.info("Downloading {0}".format(url))
+    log.info("Downloading ".format(url))
     req = s.get(url)
     if req.status_code != 200:
         raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
@@ -61,26 +61,24 @@ def run(args):
 
     try:
         if args.filename:
-            log.debug(
-                "Opening local xml file {0} for reading".format(args.filename))
+            log.debug("Opening local xml filefor reading",
+                      extra={'file': args.filename})
             fname = args.filename
-            xml_file = open(args.filename, 'r')  # Do not catch exception here
             log.debug("File opened sucessfully")
-
-            prepare(args, log, xml_file)
         else:
+
             # Determine time parameter
             if args.time:
                 args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
-                log.info("Starting manual run "
-                         "using timestamp {0}".format(args.time))
+                log.info("Starting manual run using timestamp",
+                         extra={'timestamp': args.time})
             else:
                 # go back a day
                 deltat = timedelta(
                     1 / 24.) if args.frequency == 'hourly' else timedelta(1)
                 args.time = datetime.utcnow() - deltat
-                log.info("Starting automatic run "
-                         "using timestamp {0}".format(args.time))
+                log.info("Starting automatic run using timestamp",
+                         extra={'timestamp': args.time})
 
             fname = download(log, args.frequency, args.province,
                              args.language, args.time, args.cache_dir)

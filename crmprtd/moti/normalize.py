@@ -17,7 +17,7 @@ def prepare(args, log, infile):
     sesh = Session()
     sesh.begin_nested()
     try:
-        et = parse(infile)
+        et = parse(xml_file)
         r = process(sesh, et)
         log.info(r)
         if args.diag:
@@ -28,9 +28,8 @@ def prepare(args, log, infile):
             sesh.commit()
     except Exception as e:
         sesh.rollback()
-        log.critical('Serious errors with MOTIe rtd, see logs at {}'.format(
-            args.log), exc_info=True)
+        log.critical('Serious errros with MOTIe rtd, see logs',
+                     extra={'log': args.log})
         sys.exit(1)
     finally:
         sesh.commit()
-        sesh.close()

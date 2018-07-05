@@ -44,10 +44,8 @@ def prepare(args, log, reader):
     except Exception as e:
         dl.add_row(data, 'db-connection error')
         data_archive = dl.archive(args.archive_dir)
-        log.critical('''Error with Database connection
-                        See logfile at {log}
-                        Data saved at {d}
-                     '''.format(log=args.log, d=data_archive), exc_info=True)
+        log.critical('Error with database connection, see logfile, data saved',
+                     extra={'log': args.log, 'data_archive': data_archive})
         sys.exit(1)
 
     try:
@@ -64,10 +62,8 @@ def prepare(args, log, reader):
         dl.add_row(data, 'preproc error')
         sesh.rollback()
         data_archive = dl.archive(args.archive_dir)
-        log.critical('''Error data preprocessing.
-                        See logfile at {log}
-                        Data saved at {d}
-                     '''.format(log=args.log, d=data_archive), exc_info=True)
+        log.critical('Error with database connection, see logfile, data saved',
+                     extra={'log': args.log, 'data_archive': data_archive})
         sys.exit(1)
     finally:
         sesh.commit()

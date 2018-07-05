@@ -22,9 +22,9 @@ def prepare(args, log, infile):
         sesh = Session()
 
     except Exception as e:
-        log.critical("Critical errors have occured in the EC real time "
-                     "downloader. Log file {}. Data archive {}"
-                     .format(args.log, infile), exc_info=True)
+        log.critical('Critical errors have occured in the EC real time '
+                     'downloader', extra={'log_file': args.log,
+                                          'data_archive': fname})
         sys.exit(1)
 
     try:
@@ -43,10 +43,9 @@ def prepare(args, log, infile):
         # END BEGIN NESTED #
 
     except Exception as e:
-        sesh.rollback()
-        log.critical("Critical errors have occured in the EC real time "
-                     "downloader. Log file {}. Data archive {}"
-                     .format(args.log, infile), exc_info=True)
+        log.critical('Critical errors have occured in the EC real time '
+                     'downloader', extra={'log_file': args.log,
+                                          'data_archive': fname})
         sys.exit(1)
 
     finally:

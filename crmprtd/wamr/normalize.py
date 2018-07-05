@@ -12,7 +12,7 @@ from crmprtd.wamr import file2rows
 def input_file_prepare(args, error_file, log):
     with open(args.input_file) as f:
         rows, fieldnames = file2rows(f, log)
-    log.info('{0} observations read into memory'.format(len(rows)))
+    log.info('observations read into memory', extra={'num_obs': len(rows)})
     prepare(rows, error_file, log, args)
 
 

@@ -34,7 +34,7 @@ def run(args):
         with open(args.cache_file, 'w') as cache_file:
             cache_rows(cache_file, rows, fieldnames)
 
-    log.info('{0} observations read into memory'.format(len(rows)))
+    log.info('observations read into memory', extra={'num_obs': len(rows)})
     prepare(rows, error_file, log, args)
 
 

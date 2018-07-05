@@ -68,12 +68,11 @@ def run(args):
 
     try:
         if args.filename:
-            log.debug(
-                "Opening local xml file {0} for reading".format(args.filename))
+            log.info("Opening local xml file for reading",
+                     extra={'file': args.filename})
             fname = args.filename
             xml_file = open(args.filename, 'r')
             log.debug("File opened sucessfully")
-            prepare(args, log, xml_file)
 
         else:
             if args.start_time and args.end_time:
@@ -81,17 +80,18 @@ def run(args):
                     args.start_time, '%Y/%m/%d %H:%M:%S')
                 args.end_time = datetime.strptime(
                     args.end_time, '%Y/%m/%d %H:%M:%S')
-                log.info("Starting manual run using timestamps {0} {1}".format(
-                    args.start_time, args.end_time))
+                log.info('Starting manual run using timestamps',
+                         extra={'start_time': args.start_time,
+                                'end_time': args.end_time})
                 # Requests of longer than 7 days not allowed by MoTI
                 assert args.end_time - args.start_time <= timedelta(7)
             else:
                 deltat = timedelta(1)  # go back a day
                 args.start_time = datetime.utcnow() - deltat
                 args.end_time = datetime.utcnow()
-                log.info("Starting automatic run "
-                         "using timestamps {0} {1}".format(args.start_time,
-                                                           args.end_time))
+                log.info('Starting automatic run using timestamps',
+                         extra={'start_time': args.start_time,
+                                'end_time': args.end_time})
 
             if args.station_id:
                 payload = {'request': 'historic', 'station': args.station_id,
