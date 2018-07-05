@@ -99,12 +99,10 @@ def main():
 
     args = parser.parse_args()
 
-    # Open up any resources that we need for the program
-
     # Logging
     log = setup_logging(args.log_level, args.log, args.error_email)
     log.info('Starting WAMR rtd')
-
+    
     # Database connection
     try:
         engine = create_engine(args.connection_string)
