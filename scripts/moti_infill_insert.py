@@ -43,8 +43,8 @@ def main(opts, args):
         et = parse(file_)
         try:
             rv = process(sesh, et)
-            logging.info(
-                "Processed {} with the following results {}".format(file_, rv))
+            logging.info("Processed file",
+                         extra={'file': file_, 'results': rv})
         except Exception as e:
             logging.error(e)
 
