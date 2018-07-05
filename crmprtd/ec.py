@@ -2,7 +2,6 @@ from lxml.etree import LxmlError, parse, tostring, XSLT
 from datetime import datetime
 import re
 import logging
-import time
 from pkg_resources import resource_stream
 from urllib.parse import urlparse
 
@@ -74,13 +73,14 @@ class ObsProcessor:
         log.debug("Found members in the xml",
                   extra={'num_members': self._members})
 
-        with Timer() as t:
+        with Timer() as tmr:
             for member in members:
                 try:
                     log.debug("Processing next member")
                     self.process_member(member)
                     self._members_processed += 1
-                except Exception as e:  # FIXME: More specific exception handling
+                # FIXME: More specific exception handling
+                except Exception as e:
                     self._member_errors += 1
                     log.exception("Error processing member, saved in logs")
                     log.error('Error processing member',
@@ -93,7 +93,8 @@ class ObsProcessor:
                         'inserted': self._obs_insertions,
                         'obs': self._obs,
                         'skipped': self._obs_existing,
-                        'insertions_per_sec': (self._obs_insertions/t.interval)})
+                        'insertions_per_sec': (self._obs_insertions /
+                                               tmr.run_time)})
 
         if self._member_errors or self._obs_errors:
             raise Exception('''Unable to parse {me} members,
@@ -141,6 +142,11 @@ def check_history(member, sesh, threshold):
 
     attrs = ['station_name', 'climate_station_number']
     # Select critical information from XML
+    stn_name = None
+    native_id = None
+    lat = None
+    lon = None
+    obs_time = None
     try:
         log.debug("Finding Station attributes")
         stn_name, native_id = map(lambda x: member.xpath(
@@ -151,8 +157,8 @@ def check_history(member, sesh, threshold):
         obs_time = member.xpath(
             './om:Observation/om:samplingTime//gml:timePosition',
             namespaces=ns)[0].text
-        log.debug('Found station info', extra={'name': stn_name,
-                                               'id': native_id,
+        log.debug('Found station info', extra={'station_name': stn_name,
+                                               'station_id': native_id,
                                                'lon': lon,
                                                'lat': lat,
                                                'time': obs_time})
@@ -161,8 +167,8 @@ def check_history(member, sesh, threshold):
     # in which case we don't need to process this item
     except IndexError:
         log.warning("This member does not appear to be a station",
-                    extra={'name': stn_name,
-                           'id': native_id,
+                    extra={'station_name': stn_name,
+                           'station_id': native_id,
                            'lon': lon,
                            'lat': lat})
         return None

@@ -5,7 +5,6 @@ import logging.config
 import csv
 from pkg_resources import resource_stream
 import ftplib
-import time
 
 import pytz
 from dateutil.parser import parse
@@ -198,12 +197,12 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
                 dl.add_row(row, e.args[0])
 
         log.info("Starting a mass insertion", extra={'num_obs': len(obs)})
-        with Timer() as t:
+        with Timer() as tmr:
             n_insertions = mass_insert_obs(sesh, obs, log)
 
         log.info("Data processed and inserted",
                  extra={'num_insertions': n_insertions,
-                        'insertions_per_sec': (n_insertions/t.interval)})
+                        'insertions_per_sec': (n_insertions/tmr.run_time)})
 
         if diagnostic:
             log.info('Diagnostic mode, rolling back all transactions')

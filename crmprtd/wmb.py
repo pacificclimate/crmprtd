@@ -128,7 +128,7 @@ class ObsProcessor:
 
         # Attempt to insert all observations, logging all errors
         log.debug('Processing lines...', extra={'processed': len(self.data)})
-        with Timer() as t:
+        with Timer() as tmr:
             for row in self.data:
                 try:
                     log.debug('Processing observation',
@@ -143,7 +143,8 @@ class ObsProcessor:
                                      'timestamp': row['weather_date'],
                                      'exception': e})
 
-                    self.datalogger.add_row(row, reason='Database/Interface Error')
+                    self.datalogger.add_row(row,
+                                            reason='Database/Interface Error')
                 self._lines += 1
 
         log.info('Observations processed',
@@ -151,7 +152,8 @@ class ObsProcessor:
                         'inserted': self._inserted_obs,
                         'skipped': self._obs_in_db,
                         'errors': self._insert_errors,
-                        'insertions_per_sec': (self._inserted_obs/t.interval)})
+                        'insertions_per_sec': (self._inserted_obs /
+                                               tmr.run_time)})
 
         if self._unhandled_errors:
             data_archive = None
@@ -216,7 +218,7 @@ class ObsProcessor:
 
             except InsertionError as e:
                 log.error('Error inserting observation, rolling back',
-                            extra={'exception': e})
+                          extra={'exception': e})
                 self._insert_errors += 1
                 self.datalogger.add_obs(row, var, reason='InserationError')
 

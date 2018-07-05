@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 import logging
 
 import pytz
-import time
 from lxml.etree import parse, XSLT
 from sqlalchemy.exc import IntegrityError
 
@@ -73,12 +72,12 @@ def process_observation_series(sesh, os):
               extra={'num_members': len(members), 'station': stn_id})
 
     successes, failures, skips = 0, 0, 0
-    with Timer() as t:
+    with Timer() as tmr:
         for member in members:
             t = member.get('valid-time')
             if not t:
-                log.warning(
-                    "Could not find a valid-time attribute for this observation")
+                log.warning("Could not find a valid-time attribute for this "
+                            "observation")
                 continue
             # strip the timezone
             # remove this until we have a timezone respecting database
@@ -92,10 +91,10 @@ def process_observation_series(sesh, os):
                 try:
                     value_element = obs.xpath('./value')[0]
                 except IndexError as e:
-                    log.warning("Could not find the actual value for observation "
-                                "xpath search './value' returned no results",
-                                extra={'variable_name': varname,
-                                       'variable_type': vartype})
+                    log.warning("Could not find the actual value for "
+                                "observation xpath search './value' returned "
+                                "no results", extra={'variable_name': varname,
+                                                     'variable_type': vartype})
                     skips += 1
                     continue
 
@@ -148,7 +147,7 @@ def process_observation_series(sesh, os):
              extra={'inserted': successes,
                     'skipped': skips,
                     'errors': failures,
-                    'insertions_per_sec': (successes/t.interval)})
+                    'insertions_per_sec': (successes/tmr.run_time)})
 
     return {'successes': successes, 'skips': skips, 'failures': failures}
 
