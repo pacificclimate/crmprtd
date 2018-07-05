@@ -5,6 +5,7 @@ import sys
 from datetime import datetime
 import pytz
 import logging
+import itertools
 from dateutil.parser import parse
 
 # Local
@@ -14,25 +15,30 @@ from crmprtd import Row
 
 def normalize(file_stream):
     log = logging.getLogger(__name__)
-    tz = pytz.timezone('Canada/Pacific')
 
-    is_first = True
-    for row in file_stream.readlines():
-        cleaned = row.strip().split(',')
-        if is_first:
-            is_first = False
+    for row in itertools.islice(file_stream, 1, None):
+        time, station_id, _, variable_name, _, _, _, unit, _, _, _, val  = row.strip().split(',')
+
+        try:
+            val = float(val)
+        except ValueError:
+            log.error('Unable to convert val: {} to float'.format(val))
             continue
 
         try:
-            named_row = Row(time=parse(cleaned[0]).replace(
-                tzinfo=tz),
-                val=float(cleaned[11]),
-                variable_name=cleaned[3],
-                unit=cleaned[7],
-                network_name='WAMR',
-                station_id=cleaned[1],
-                lat=None,
-                lon=None)
-            yield named_row
-        except Exception as e:
-            log.error('Unable to process row: {}'.format(row))
+            tz = pytz.timezone('Canada/Pacific')
+            time = parse(time).replace(tzinfo=tz)
+        except ValueError:
+            log.error('Unable to convert date string: {} to datetime'.format(time))
+            continue
+
+        named_row = Row(time=time,
+            val=val,
+            variable_name=variable_name,
+            unit=unit,
+            network_name='WAMR',
+            station_id=station_id,
+            lat=None,
+            lon=None)
+
+        yield named_row

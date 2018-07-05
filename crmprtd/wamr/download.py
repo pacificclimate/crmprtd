@@ -2,6 +2,7 @@ import csv
 import sys
 import ftplib
 import logging
+import os
 
 from io import BytesIO
 from tempfile import SpooledTemporaryFile
@@ -19,7 +20,7 @@ def download(args):
         ftpreader = ftp_connect(args.ftp_server, args.ftp_dir, log)
 
         for filename in ftpreader.filenames:
-            with SpooledTemporaryFile(max_size=2048, mode='r+') as tempfile:
+            with SpooledTemporaryFile(max_size=os.environ.get('CRMPRTD_MAX_CACHE', 2**20), mode='r+') as tempfile:
                 def callback(line):
                     tempfile.write('{}\n'.format(line))
 
