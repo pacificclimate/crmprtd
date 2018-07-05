@@ -5,7 +5,6 @@ import os
 import sys
 import logging
 import logging.config
-from pythonjsonlogger import jsonlogger
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 import requests
@@ -34,11 +33,6 @@ def main(args):
     log = logging.getLogger('crmprtd.moti')
     if args.log_level:
         log.setLevel(args.log_level)
-    # json logger
-    logHandler = logging.StreamHandler()
-    formatter = jsonlogger.JsonFormatter()
-    logHandler.setFormatter(formatter)
-    log.addHandler(logHandler)
     log.info('Starting MOTIe rtd')
 
     # Pull auth from file or command line
