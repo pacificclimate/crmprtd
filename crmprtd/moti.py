@@ -8,6 +8,7 @@ from lxml.etree import parse, XSLT
 from sqlalchemy.exc import IntegrityError
 
 from pycds import History, Network, Station, Variable, Obs
+from crmprtd import Timer
 
 
 log = logging.getLogger(__name__)
@@ -26,13 +27,6 @@ unwanted_vars = [
     ('subsurface', 'temperature', 'celsius'),
     ('extension', None, 'unitless')
 ]
-
-
-def timer(start_time=None):
-    if start_time:
-        return (time.time() - start_time)
-    else:
-        return time.time()
 
 
 def makeurl(report='7110', request='historic',
@@ -79,83 +73,82 @@ def process_observation_series(sesh, os):
               extra={'num_members': len(members), 'station': stn_id})
 
     successes, failures, skips = 0, 0, 0
-    start_time = timer()
-    for member in members:
-        t = member.get('valid-time')
-        if not t:
-            log.warning(
-                "Could not find a valid-time attribute for this observation")
-            continue
-        # strip the timezone
-        # remove this until we have a timezone respecting database
-        # tz = pytz.timezone('America/Vancouver')
-        # t = datetime.strptime(t[:-6], '%Y-%m-%dT%H:%M:%S')
-        # t = tz.localize(t).astimezone(pytz.utc)
-
-        for obs in member.iterchildren():
-            varname = obs.tag
-            vartype = obs.get('type')
-            try:
-                value_element = obs.xpath('./value')[0]
-            except IndexError as e:
-                log.warning("Could not find the actual value for observation "
-                            "xpath search './value' returned no results",
-                            extra={'variable_name': varname,
-                                   'variable_type': vartype})
-                skips += 1
+    with Timer() as t:
+        for member in members:
+            t = member.get('valid-time')
+            if not t:
+                log.warning(
+                    "Could not find a valid-time attribute for this observation")
                 continue
+            # strip the timezone
+            # remove this until we have a timezone respecting database
+            # tz = pytz.timezone('America/Vancouver')
+            # t = datetime.strptime(t[:-6], '%Y-%m-%dT%H:%M:%S')
+            # t = tz.localize(t).astimezone(pytz.utc)
 
-            units = value_element.get('units')
-            try:
-                value = float(value_element.text)
-            except ValueError:
-                log.warning("Could not convert value to a number. Skipping "
-                            "this observation.", extra={'value': value})
-                skips += 1
-                continue
+            for obs in member.iterchildren():
+                varname = obs.tag
+                vartype = obs.get('type')
+                try:
+                    value_element = obs.xpath('./value')[0]
+                except IndexError as e:
+                    log.warning("Could not find the actual value for observation "
+                                "xpath search './value' returned no results",
+                                extra={'variable_name': varname,
+                                       'variable_type': vartype})
+                    skips += 1
+                    continue
 
-            var = find_var(sesh, varname, vartype, units)
-            if not var:
-                # Test for known unwanted vars, only warn when unknown
-                if (varname, vartype, units) not in unwanted_vars:
-                    log.warning("Could not find variable in the "
-                                "database. Skipping this observation.",
-                                extra={'varible_name': varname,
-                                       'variable_type': vartype,
-                                       'unit': units})
-                skips += 1
-                continue
-            log.debug('Variable info', extra={'variable_name': varname,
-                                              'variable_type': vartype,
-                                              'unit': units,
-                                              'value': value})
+                units = value_element.get('units')
+                try:
+                    value = float(value_element.text)
+                except ValueError:
+                    log.error("Could not convert value to a number. Skipping "
+                              "this observation.", extra={'value': value})
+                    skips += 1
+                    continue
 
-            o = Obs(time=t, datum=float(value), variable=var, history=hist)
+                var = find_var(sesh, varname, vartype, units)
+                if not var:
+                    # Test for known unwanted vars, only warn when unknown
+                    if (varname, vartype, units) not in unwanted_vars:
+                        log.warning("Could not find variable in the "
+                                    "database. Skipping this observation.",
+                                    extra={'varible_name': varname,
+                                           'variable_type': vartype,
+                                           'unit': units})
+                    skips += 1
+                    continue
+                log.debug('Variable info', extra={'variable_name': varname,
+                                                  'variable_type': vartype,
+                                                  'unit': units,
+                                                  'value': value})
 
-            # Regarding the following non-canonical but working code, see
-            # https://github.com/pacificclimate/crmprtd/issues/9#issuecomment-348042673
-            try:
-                with sesh.begin_nested():
-                    sesh.add(o)
-                successes += 1
-                sesh.commit()
-                log.debug("Inserted observation", extra={'obs': o})
-            except IntegrityError as e:
-                log.warning("Skipped observation, already exists",
-                            extra={'obs': o, 'exception': e})
-                sesh.rollback()
-                skips += 1
-            except Exception:
-                log.error("Failed to insert", extra={'obs': o})
-                sesh.rollback()
-                failures += 1
+                o = Obs(time=t, datum=float(value), variable=var, history=hist)
 
-    run_time = timer(start_time)
+                # Regarding the following non-canonical but working code, see
+                # https://github.com/pacificclimate/crmprtd/issues/9#issuecomment-348042673
+                try:
+                    with sesh.begin_nested():
+                        sesh.add(o)
+                    successes += 1
+                    sesh.commit()
+                    log.debug("Inserted observation", extra={'obs': o})
+                except IntegrityError as e:
+                    log.warning("Skipped observation, already exists",
+                                extra={'obs': o, 'exception': e})
+                    sesh.rollback()
+                    skips += 1
+                except Exception:
+                    log.error("Failed to insert", extra={'obs': o})
+                    sesh.rollback()
+                    failures += 1
+
     log.info('Processing and insertions completed',
              extra={'inserted': successes,
                     'skipped': skips,
                     'errors': failures,
-                    'insertions_sec': (successes/run_time)})
+                    'insertions_per_sec': (successes/t.interval)})
 
     return {'successes': successes, 'skips': skips, 'failures': failures}
 
@@ -189,7 +182,7 @@ def check_history(stn_id, sesh):
             log.error("Station does not exist in the database and could "
                       "not be added", extra={'station': stn_id})
             raise e
-        log.debug('Created station_id', extra={'station_id': stn.id})
+        log.info('Created station_id', extra={'station_id': stn.id})
 
     # Station_id added or exists, create history_id
     try:

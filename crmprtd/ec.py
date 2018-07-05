@@ -10,6 +10,8 @@ from pycds import History, Station, Network, Obs, Variable
 from sqlalchemy import and_, or_
 from sqlalchemy.sql import func
 from sqlalchemy.exc import IntegrityError
+from crmprtd import Timer
+
 
 log = logging.getLogger(__name__)
 
@@ -50,13 +52,6 @@ def parse_xml(fname):
     return transform(et)
 
 
-def timer(start_time=None):
-    if start_time:
-        return (time.time() - start_time)
-    else:
-        return time.time()
-
-
 class ObsProcessor:
     def __init__(self, et, sesh, threshold):
         # set variables for summary information
@@ -79,27 +74,27 @@ class ObsProcessor:
         log.debug("Found members in the xml",
                   extra={'num_members': self._members})
 
-        start_time = timer()
-        for member in members:
-            try:
-                log.debug("Processing next member")
-                self.process_member(member)
-                self._members_processed += 1
-            except Exception as e:  # FIXME: More specific exception handling
-                self._member_errors += 1
-                log.exception("Error processing member, saved in logs")
-                log.error('Error processing member',
-                          extra={'member': tostring(member,
-                                                    pretty_print=True)})
+        with Timer() as t:
+            for member in members:
+                try:
+                    log.debug("Processing next member")
+                    self.process_member(member)
+                    self._members_processed += 1
+                except Exception as e:  # FIXME: More specific exception handling
+                    self._member_errors += 1
+                    log.exception("Error processing member, saved in logs")
+                    log.error('Error processing member',
+                              extra={'member': tostring(member,
+                                                        pretty_print=True)})
 
-        run_time = timer(start_time)
         log.info("Finished processing",
                  extra={'num_members': self._members,
                         'num_members_processed': self._members_processed,
                         'inserted': self._obs_insertions,
                         'obs': self._obs,
                         'skipped': self._obs_existing,
-                        'insertions_sec': (self._obs_insertions/run_time)})
+                        'insertions_per_sec': (self._obs_insertions/t.interval)})
+
         if self._member_errors or self._obs_errors:
             raise Exception('''Unable to parse {me} members,
             Unable to insert {oe} insertable obs'''.format(
@@ -165,7 +160,11 @@ def check_history(member, sesh, threshold):
     # climate_station_number (or identification-elements), lat/lon, or obs_time
     # in which case we don't need to process this item
     except IndexError:
-        log.warning("This member does not appear to be a station")
+        log.warning("This member does not appear to be a station",
+                    extra={'name': stn_name,
+                           'id': native_id,
+                           'lon': lon,
+                           'lat': lat})
         return None
 
     # Determine the frequency for this station
@@ -331,7 +330,7 @@ def insert_obs(sesh, om, hid, vname, vid):
     except IntegrityError as e:
         # Use psycopg2 wrapped 'orig' pgcode attribute
         if e.orig.pgcode == '23505':
-            log.warning('Obs already exists')
+            log.debug('Obs already exists')
             return False
         else:
             raise e

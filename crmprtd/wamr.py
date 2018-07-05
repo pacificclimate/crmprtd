@@ -15,6 +15,7 @@ from pint import UnitRegistry
 from crmprtd import retry
 from crmprtd.db import mass_insert_obs
 from pycds import Network, Station, History, Obs, Variable
+from crmprtd import Timer
 
 tz = pytz.timezone('Canada/Pacific')
 ureg = UnitRegistry()
@@ -25,13 +26,6 @@ for def_ in (
         "degreeK = degK; offset: 0"
 ):
     ureg.define(def_)
-
-
-def timer(start_time=None):
-    if start_time:
-        return (time.time() - start_time)
-    else:
-        return time.time()
 
 
 def create_station_mapping(sesh, rows):
@@ -204,12 +198,12 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
                 dl.add_row(row, e.args[0])
 
         log.info("Starting a mass insertion", extra={'num_obs': len(obs)})
-        start_time = timer()
-        n_insertions = mass_insert_obs(sesh, obs, log)
-        run_time = timer(start_time)
+        with Timer() as t:
+            n_insertions = mass_insert_obs(sesh, obs, log)
+
         log.info("Data processed and inserted",
                  extra={'num_insertions': n_insertions,
-                        'insertions_sec': (n_insertions/run_time)})
+                        'insertions_per_sec': (n_insertions/t.interval)})
 
         if diagnostic:
             log.info('Diagnostic mode, rolling back all transactions')

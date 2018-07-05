@@ -10,6 +10,7 @@ from sqlalchemy import and_, or_
 
 from pycds import Network, Station, Variable, History, Obs
 from crmprtd.wmb_exceptions import InsertionError, UniquenessError
+from crmprtd import Timer
 
 log = logging.getLogger(__name__)
 
@@ -127,31 +128,30 @@ class ObsProcessor:
 
         # Attempt to insert all observations, logging all errors
         log.debug('Processing lines...', extra={'processed': len(self.data)})
-        start_time = timer()
-        for row in self.data:
-            try:
-                log.debug('Processing observation',
-                          extra={'station': row['station_code'],
-                                 'timestamp': row['weather_date']})
+        with Timer() as t:
+            for row in self.data:
+                try:
+                    log.debug('Processing observation',
+                              extra={'station': row['station_code'],
+                                     'timestamp': row['weather_date']})
 
-                self.process_row(row)
+                    self.process_row(row)
 
-            except Exception as e:
-                log.error('Error inserting observation',
-                          extra={'station': row['station_code'],
-                                 'timestamp': row['weather_date'],
-                                 'exception': e})
+                except Exception as e:
+                    log.error('Error inserting observation',
+                              extra={'station': row['station_code'],
+                                     'timestamp': row['weather_date'],
+                                     'exception': e})
 
-                self.datalogger.add_row(row, reason='Database/Interface Error')
-            self._lines += 1
+                    self.datalogger.add_row(row, reason='Database/Interface Error')
+                self._lines += 1
 
-        run_time = timer(start_time)
         log.info('Observations processed',
                  extra={'observations': self._total_obs,
                         'inserted': self._inserted_obs,
                         'skipped': self._obs_in_db,
                         'errors': self._insert_errors,
-                        'inserted_sec': (self._inserted_obs/run_time)})
+                        'insertions_per_sec': (self._inserted_obs/t.interval)})
 
         if self._unhandled_errors:
             data_archive = None
@@ -160,7 +160,7 @@ class ObsProcessor:
             except Exception:
                 log.exception('Unable to save error archive')
             log.critical('Errors occured in WMB real time daemon that '
-                         'requires a human touch.',
+                         'require a human touch.',
                          extra={'archive': data_archive,
                                 'log_file': self.prefs.log})
 
@@ -210,12 +210,12 @@ class ObsProcessor:
                                              'value': row[var]})
 
             except UniquenessError as e:
-                log.warning(e)
+                log.debug(e)
                 self._obs_in_db += 1
                 continue
 
             except InsertionError as e:
-                log.warning('Error inserting observation, rolling back',
+                log.error('Error inserting observation, rolling back',
                             extra={'exception': e})
                 self._insert_errors += 1
                 self.datalogger.add_obs(row, var, reason='InserationError')
@@ -237,7 +237,7 @@ class ObsProcessor:
         # determine new stations and add to db
 
         new_stations = dl.difference(db)
-        log.debug('New stations', extra={'native_id': new_stations})
+        log.info('New stations', extra={'native_id': new_stations})
         for station in new_stations:
             log.debug('Station id not in db', extra={'native_id': station})
             self.sesh.begin_nested()
@@ -319,7 +319,7 @@ def check_history(obs, network, sesh):
         return record[0]
 
     # No record found, create new one.
-    log.debug('Creating meta_history entry', extra={'station': native_id})
+    log.info('Creating meta_history entry', extra={'station': native_id})
     sesh.begin_nested()
     try:
         stn = sesh.query(Station).filter(Station.native_id ==
@@ -371,7 +371,7 @@ def insert_obs(val, hid, d, vars_id, sesh):
         if q.count() > 0:
             raise UniquenessError(q.first())
     except UniquenessError as e:
-        log.warning(e)
+        log.debug(e)
         raise e
     except Exception as e:
         log.error(e)

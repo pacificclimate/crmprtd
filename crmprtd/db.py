@@ -39,7 +39,7 @@ def mass_insert_obs(sesh, obs, log=None):
         try:
             # Create a nested SAVEPOINT context manager to rollback to in the
             # event of unique constraint errors
-            log.debug("New savepoimt for singe observation")
+            log.debug("New SAVEPOINT for single observation")
             with sesh.begin_nested():
                 sesh.add(obs[0])
         except IntegrityError as e:
@@ -56,10 +56,10 @@ def mass_insert_obs(sesh, obs, log=None):
     else:
         try:
             with sesh.begin_nested():
-                log.debug("New savepoint", extra={'num_obs': len(obs)})
+                log.debug("New SAVEPOINT", extra={'num_obs': len(obs)})
                 sesh.add_all(obs)
         except IntegrityError:
-            log.warning("Failed, splitting observations.")
+            log.debug("Failed, splitting observations.")
             sesh.rollback()
             a, b = split(obs)
             log.debug("Splitings observations into a, b",
