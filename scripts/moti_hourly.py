@@ -49,8 +49,8 @@ def main(args):
 
     try:
         if args.filename:
-            log.debug(
-                "Opening local xml file {0} for reading".format(args.filename))
+            log.info("Opening local xml file for reading",
+                     extra={'file': args.filename})
             fname = args.filename
             xml_file = open(args.filename, 'r')
             log.debug("File opened sucessfully")
@@ -61,16 +61,18 @@ def main(args):
                     args.start_time, '%Y/%m/%d %H:%M:%S')
                 args.end_time = datetime.strptime(
                     args.end_time, '%Y/%m/%d %H:%M:%S')
-                log.info("Starting manual run using timestamps {0} {1}".format(
-                    args.start_time, args.end_time))
+                log.info('Starting manual run using timestamps',
+                         extra={'start_time': args.start_time,
+                                'end_time': args.end_time})
                 # Requests of longer than 7 days not allowed by MoTI
                 assert args.end_time - args.start_time <= timedelta(7)
             else:
                 deltat = timedelta(1)  # go back a day
                 args.start_time = datetime.utcnow() - deltat
                 args.end_time = datetime.utcnow()
-                log.info(("Starting automatic run using timestamps "
-                          "{0} {1}").format(args.start_time, args.end_time))
+                log.info('Starting automatic run using timestamps',
+                         extra={'start_time': args.start_time,
+                                'end_time': args.end_time})
 
             if args.station_id:
                 payload = {'request': 'historic', 'station': args.station_id,
@@ -90,7 +92,8 @@ def main(args):
             req = s.get('https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110',
                         params=payload, auth=auth)
 
-            log.info('{}: {}'.format(req.status_code, req.url))
+            log.info('Status', extra={'status_code': req.status_code,
+                                      'url': req.url})
             if req.status_code != 200:
                 raise IOError("HTTP {} error for {}".format(
                     req.status_code, req.url))
@@ -115,8 +118,8 @@ def main(args):
             sesh.commit()
     except Exception as e:
         sesh.rollback()
-        log.critical('Serious errors with MOTIe rtd, see logs at {}'.format(
-            args.log), exc_info=True)
+        log.critical('Serious errros with MOTIe rtd, see logs',
+                     extra={'log': args.log})
         sys.exit(1)
     finally:
         sesh.commit()

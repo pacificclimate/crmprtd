@@ -1,13 +1,37 @@
+# Log level standard usage
+#   -- debug --
+#       Used to relay detailed information during testing. For the purposes
+#       of this application any postgresql UniquenessError should be logged
+#       using this level.
+#
+#   -- info --
+#       Used to output information that is useful while running application.
+#
+#   --warning --
+#       Used when handling exceptions.
+#
+#   -- error --
+#       Used for unhandled exceptions.
+#
+#   -- exception --
+#       Used like the error level, but will also output a stack trace.
+#
+#   -- critical --
+#       Used for outlying cases where program may be unable to continue.
+
 version: 1
 disable_existing_loggers: False
 formatters:
   simple:
     format: '%(asctime)s:%(levelname)s:%(name)s - %(message)s'
+  json:
+    format: '%(asctime)s:%(levelname)s:%(name)s - %(message)s'
+    class: pythonjsonlogger.jsonlogger.JsonFormatter
 handlers:
   console:
     class: logging.StreamHandler
     level: DEBUG
-    formatter: simple
+    formatter: json
     stream: ext://sys.stdout
   error:
     class: logging.StreamHandler
@@ -28,7 +52,7 @@ handlers:
     level: DEBUG
     formatter: simple
     backupCount: 10
-    maxBytes: 10000000 
+    maxBytes: 10000000
     filename: 'crmprtd_log.txt'
 loggers:
   crmprtd:

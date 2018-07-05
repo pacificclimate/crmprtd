@@ -34,12 +34,10 @@ def main(args):
     if args.log_level:
         log.setLevel(args.log_level)
 
-    log.info('Starting EC rtd')
-
     try:
         if args.filename:
-            log.debug(
-                "Opening local xml file {0} for reading".format(args.filename))
+            log.debug("Opening local xml filefor reading",
+                      extra={'file': args.filename})
             fname = args.filename
             log.debug("File opened sucessfully")
         else:
@@ -47,16 +45,15 @@ def main(args):
             # Determine time parameter
             if args.time:
                 args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
-                log.info(
-                    ("Starting manual run using timestamp "
-                     "{0}").format(args.time))
+                log.info("Starting manual run using timestamp",
+                         extra={'timestamp': args.time})
             else:
                 # go back a day
                 deltat = timedelta(
                     1 / 24.) if args.frequency == 'hourly' else timedelta(1)
                 args.time = datetime.utcnow() - deltat
-                log.info(("Starting automatic run using timestamp "
-                          "{0}").format(args.time))
+                log.info("Starting automatic run using timestamp",
+                         extra={'timestamp': args.time})
 
             # Configure requests to use retry
             s = requests.Session()
@@ -68,13 +65,13 @@ def main(args):
                           args.language, args.time)
             fname = os.path.join(args.cache_dir, extract_fname_from_url(url))
 
-            log.info("Downloading {0}".format(url))
+            log.info("Downloading", extra={'url': url})
             req = s.get(url)
             if req.status_code != 200:
                 raise IOError("HTTP {} error for {}".format(
                     req.status_code, req.url))
 
-            log.info("Saving data to {0}".format(fname))
+            log.info("Saving data file", extra={'filename': fname})
             with open(fname, 'wb') as f:
                 f.write(req.content)
 
@@ -92,9 +89,9 @@ def main(args):
         sesh = Session()
 
     except Exception as e:
-        log.critical(("Critical errors have occured in the EC real time "
-                      "downloader. Log file %s. Data archive %s") % (
-            args.log, fname), exc_info=True)
+        log.critical('Critical errors have occured in the EC real time '
+                     'downloader', extra={'log_file': args.log,
+                                          'data_archive': fname})
         sys.exit(1)
 
     try:
@@ -114,9 +111,9 @@ def main(args):
 
     except Exception as e:
         sesh.rollback()
-        log.critical(("Critical errors have occured in the EC real time "
-                      "downloader. Log file %s. Data archive %s") % (
-            args.log, fname), exc_info=True)
+        log.critical('Critical errors have occured in the EC real time '
+                     'downloader', extra={'log_file': args.log,
+                                          'data_archive': fname})
         sys.exit(1)
 
     finally:

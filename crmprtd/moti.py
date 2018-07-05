@@ -7,6 +7,7 @@ from lxml.etree import parse, XSLT
 from sqlalchemy.exc import IntegrityError
 
 from pycds import History, Network, Station, Variable, Obs
+from crmprtd import Timer
 
 
 log = logging.getLogger(__name__)
@@ -65,75 +66,88 @@ def process_observation_series(sesh, os):
             "results")
 
     hist = check_history(stn_id, sesh)
-    log.debug('Got history_id {}'.format(hist.id))
+    log.debug('Got history_id', extra={'hid': hist.id})
     members = os.xpath('./observation', namespaces=ns)
-    log.debug("Found {} members for station {}".format(len(members), stn_id))
+    log.debug("Found members for station",
+              extra={'num_members': len(members), 'station': stn_id})
 
     successes, failures, skips = 0, 0, 0
-    for member in members:
-        t = member.get('valid-time')
-        if not t:
-            log.warn(
-                "Could not find a valid-time attribute for this observation")
-            continue
-        # strip the timezone
-        # remove this until we have a timezone respecting database
-        # tz = pytz.timezone('America/Vancouver')
-        # t = datetime.strptime(t[:-6], '%Y-%m-%dT%H:%M:%S')
-        # t = tz.localize(t).astimezone(pytz.utc)
-
-        for obs in member.iterchildren():
-            varname = obs.tag
-            vartype = obs.get('type')
-            try:
-                value_element = obs.xpath('./value')[0]
-            except IndexError as e:
-                log.warn("Could not find the actual value for observation "
-                         "{}/{}. xpath search './value' returned no results"
-                         .format(varname, vartype))
-                skips += 1
+    with Timer() as tmr:
+        for member in members:
+            t = member.get('valid-time')
+            if not t:
+                log.warning("Could not find a valid-time attribute for this "
+                            "observation")
                 continue
+            # strip the timezone
+            # remove this until we have a timezone respecting database
+            # tz = pytz.timezone('America/Vancouver')
+            # t = datetime.strptime(t[:-6], '%Y-%m-%dT%H:%M:%S')
+            # t = tz.localize(t).astimezone(pytz.utc)
 
-            units = value_element.get('units')
-            try:
-                value = float(value_element.text)
-            except ValueError:
-                log.warn("Could not convert value '{}' to a number. Skipping "
-                         "this observation.".format(value))
-                skips += 1
-                continue
+            for obs in member.iterchildren():
+                varname = obs.tag
+                vartype = obs.get('type')
+                try:
+                    value_element = obs.xpath('./value')[0]
+                except IndexError as e:
+                    log.warning("Could not find the actual value for "
+                                "observation xpath search './value' returned "
+                                "no results", extra={'variable_name': varname,
+                                                     'variable_type': vartype})
+                    skips += 1
+                    continue
 
-            var = find_var(sesh, varname, vartype, units)
-            if not var:
-                # Test for known unwanted vars, only warn when unknown
-                if (varname, vartype, units) not in unwanted_vars:
-                    log.warn(("Could not find variable {}, {}, {} in the "
-                             "database. Skipping this observation.")
-                             .format(varname,
-                                     vartype,
-                                     units))
-                skips += 1
-                continue
-            log.debug('{} {} {} {}'.format(varname, vartype, units, value))
+                units = value_element.get('units')
+                try:
+                    value = float(value_element.text)
+                except ValueError:
+                    log.error("Could not convert value to a number. Skipping "
+                              "this observation.", extra={'value': value})
+                    skips += 1
+                    continue
 
-            o = Obs(time=t, datum=float(value), variable=var, history=hist)
+                var = find_var(sesh, varname, vartype, units)
+                if not var:
+                    # Test for known unwanted vars, only warn when unknown
+                    if (varname, vartype, units) not in unwanted_vars:
+                        log.warning("Could not find variable in the "
+                                    "database. Skipping this observation.",
+                                    extra={'varible_name': varname,
+                                           'variable_type': vartype,
+                                           'unit': units})
+                    skips += 1
+                    continue
+                log.debug('Variable info', extra={'variable_name': varname,
+                                                  'variable_type': vartype,
+                                                  'unit': units,
+                                                  'value': value})
 
-            # Regarding the following non-canonical but working code, see
-            # https://github.com/pacificclimate/crmprtd/issues/9#issuecomment-348042673
-            try:
-                with sesh.begin_nested():
-                    sesh.add(o)
-                successes += 1
-                sesh.commit()
-                log.debug("Inserted {}".format(o))
-            except IntegrityError as e:
-                log.debug("Skipped, already exists: {} {}".format(o, e))
-                sesh.rollback()
-                skips += 1
-            except Exception:
-                log.error("Failed to insert {}".format(o), exc_info=True)
-                sesh.rollback()
-                failures += 1
+                o = Obs(time=t, datum=float(value), variable=var, history=hist)
+
+                # Regarding the following non-canonical but working code, see
+                # https://github.com/pacificclimate/crmprtd/issues/9#issuecomment-348042673
+                try:
+                    with sesh.begin_nested():
+                        sesh.add(o)
+                    successes += 1
+                    sesh.commit()
+                    log.debug("Inserted observation", extra={'obs': o})
+                except IntegrityError as e:
+                    log.warning("Skipped observation, already exists",
+                                extra={'obs': o, 'exception': e})
+                    sesh.rollback()
+                    skips += 1
+                except Exception:
+                    log.error("Failed to insert", extra={'obs': o})
+                    sesh.rollback()
+                    failures += 1
+
+    log.info('Processing and insertions completed',
+             extra={'inserted': successes,
+                    'skipped': skips,
+                    'errors': failures,
+                    'insertions_per_sec': (successes/tmr.run_time)})
 
     return {'successes': successes, 'skips': skips, 'failures': failures}
 
@@ -164,10 +178,10 @@ def check_history(stn_id, sesh):
                     Network).filter(Network.name == 'MoTIe').first())
                 sesh.add(stn)
         except Exception as e:
-            log.error("Station '{}' does not exist in the database and could "
-                      "not be added".format(stn_id), exc_info=True)
+            log.error("Station does not exist in the database and could "
+                      "not be added", extra={'station': stn_id})
             raise e
-        log.debug('Created station_id {}'.format(stn.id))
+        log.info('Created station_id', extra={'station_id': stn.id})
 
     # Station_id added or exists, create history_id
     try:
@@ -175,11 +189,10 @@ def check_history(stn_id, sesh):
             hist = History(station=stn)
             sesh.add(hist)
     except Exception as e:
-        log.error(
-            'History_id could not be found or created for native_id {}'.format(
-                stn_id), exc_info=True)
+        log.error('History_id could not be found or created for native_id',
+                  extra={'native_id': stn_id})
         raise e
-    log.debug('Created history_id {}'.format(hist.id))
+    log.debug('Created history_id', extra={'hid': hist.id})
 
     return hist
 

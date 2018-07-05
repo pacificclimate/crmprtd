@@ -2,6 +2,16 @@ import time
 from functools import wraps
 
 
+class Timer(object):
+    def __enter__(self):
+        self.start = time.time()
+        return self
+
+    def __exit__(self, *args):
+        self.end = time.time()
+        self.run_time = self.end - self.start
+
+
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     """Retry calling the decorated function using an exponential backoff.
 

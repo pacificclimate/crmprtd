@@ -14,6 +14,7 @@ from pint import UnitRegistry
 from crmprtd import retry
 from crmprtd.db import mass_insert_obs
 from pycds import Network, Station, History, Obs, Variable
+from crmprtd import Timer
 
 tz = pytz.timezone('Canada/Pacific')
 ureg = UnitRegistry()
@@ -103,7 +104,7 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
     dst_unit = re.sub('%', 'percent', dst_unit)
 
     if src_unit != dst_unit:
-        log.debug("Source %f %s", val, src_unit)
+        log.debug("Source", extra={'value': val, 'unit': src_unit})
         try:
             val = Q_(val, ureg.parse_expression(src_unit))  # src
             val = val.to(dst_unit).magnitude  # dest
@@ -112,7 +113,7 @@ def process_obs(sesh, row, log=None, histories={}, variables={}):
                 "Can't convert source unit {} to destination unit {}".format(
                     src_unit, dst_unit)
             )
-        log.debug("Converted to %f %s", val, dst_unit)
+        log.debug("Converted", extra={'value': val, 'unit': dst_unit})
 
     # Create and return the object
     return Obs(time=d, variable=var, history=hist, datum=val)
@@ -163,6 +164,7 @@ def setup_logging(level, filename=None, email=None):
         log_conf['handlers']['mail']['toaddrs'] = email
     logging.config.dictConfig(log_conf)
     log = logging.getLogger('crmprtd.wamr')
+
     if level:
         log.setLevel(level)
 
@@ -183,7 +185,7 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
     sesh.begin_nested()
 
     try:
-        log.debug('Processing observations')
+        log.info('Processing observations')
         histories = create_station_mapping(sesh, rows)
         variables = create_variable_mapping(sesh, rows)
 
@@ -194,9 +196,13 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
             except Exception as e:
                 dl.add_row(row, e.args[0])
 
-        log.info("Starting a mass insertion of %d obs", len(obs))
-        n_insertions = mass_insert_obs(sesh, obs, log)
-        log.info("Inserted %d obs", n_insertions)
+        log.info("Starting a mass insertion", extra={'num_obs': len(obs)})
+        with Timer() as tmr:
+            n_insertions = mass_insert_obs(sesh, obs, log)
+
+        log.info("Data processed and inserted",
+                 extra={'num_insertions': n_insertions,
+                        'insertions_per_sec': (n_insertions/tmr.run_time)})
 
         if diagnostic:
             log.info('Diagnostic mode, rolling back all transactions')
@@ -211,10 +217,8 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
         dl.add_row(rows, 'preproc error')
         sesh.rollback()
         data_archive = dl.archive(error_file)
-        log.critical('''Error data preprocessing.
-                            See logfile
-                            Data saved at {d}
-                            '''.format(d=data_archive), exc_info=True)
+        log.critical('Error data preprocessing. See logfile.',
+                     extra={'data_archive': data_archive})
         sys.exit(1)
     finally:
         sesh.commit()
@@ -249,13 +253,14 @@ class FTPReader(object):  # pragma: no cover
         # It's non-ideal but neither classes support coroutine send/yield
         if not log:
             log = logging.getLogger('__name__')
+
         lines = []
 
         def callback(line):
             lines.append(line)
 
         for filename in self.filenames:
-            log.info("Downloading %s", filename)
+            log.info("Downloading from file", extra={'file': filename})
             # FIXME: This line has some kind of race condition with this
             self.connection.retrlines('RETR {}'.format(filename), callback)
 
@@ -281,12 +286,12 @@ def file2rows(file_, log):
 
 def ftp2rows(host, path, log):  # pragma: no cover
     log.info('Fetching file from FTP')
-    log.info('Listing {}/{}'.format(host, path))
+    log.info('Listing', extra={'host': host, 'path': path})
 
     try:
         ftpreader = FTPReader(host, None,
                               None, path, log)
-        log.info('Opened a connection to {}'.format(host))
+        log.info('Opened a connection', extra={'host': host})
         reader = ftpreader.csv_reader(log)
         log.info('instantiated the reader and downloaded all of the data')
     except ftplib.all_errors as e:
