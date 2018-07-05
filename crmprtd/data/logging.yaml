@@ -1,10 +1,23 @@
 # Log level standard usage
-#   debug - Used to relay detailed information during testing
-#   info - Used to output information that is useful while running application
-#   warning - Used when handling exceptions
-#   error - Used for unhandled exceptions
-#   exception - Used like the error level, but outputs a stack trace
-#   critical - Used for outlying cases where program may be unable to continue
+#   -- debug --
+#       Used to relay detailed information during testing. For the purposes
+#       of this application any postgresql UniquenessError should be logged
+#       using this level.
+#
+#   -- info --
+#       Used to output information that is useful while running application.
+#
+#   --warning --
+#       Used when handling exceptions.
+#
+#   -- error --
+#       Used for unhandled exceptions.
+#
+#   -- exception --
+#       Used like the error level, but will also output a stack trace.
+#
+#   -- critical --
+#       Used for outlying cases where program may be unable to continue.
 
 version: 1
 disable_existing_loggers: False
