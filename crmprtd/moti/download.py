@@ -71,7 +71,6 @@ def run(args):
             log.info("Opening local xml file for reading",
                      extra={'file': args.filename})
             fname = args.filename
-            xml_file = open(args.filename, 'r')
             log.debug("File opened sucessfully")
 
         else:
@@ -99,10 +98,10 @@ def run(args):
             else:
                 payload = {}
 
-            fname = xml_file = os.path.join(
-                args.cache_dir, 'moti-sawr7110_' +
-                datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') +
-                '.xml')
+            fname = os.path.join(
+                    args.cache_dir, 'moti-sawr7110_' +
+                    datetime.strftime(datetime.now(), '%Y-%m-%dT%H-%M-%S') +
+                    '.xml')
             fname = download(payload, auth, fname, log)
             prepare(args, log, fname)
 

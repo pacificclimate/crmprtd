@@ -38,7 +38,7 @@ def local_file_search(archive_file, archive_dir, log):
     path = archive_file
     if archive_file[0] != '/':
         path = os.path.join(archive_dir, archive_file)
-    log.info('Loading local file', extra={'path':path})
+    log.info('Loading local file', extra={'path': path})
 
     try:
         with open(path) as f:
@@ -53,13 +53,13 @@ def local_file_search(archive_file, archive_dir, log):
 def ftp_file_read(ftp_server, ftp_file, log, auth):
     # Fetch file from FTP and read into memory
     log.info('Fetching file from FTP')
-    log.info('Downloading FTP', extra={'server': args.ftp_server,
-                                       'file': args.ftp_file})
+    log.info('Downloading FTP', extra={'server': ftp_server,
+                                       'file': ftp_file})
 
     try:
         ftpreader = FTPReader(ftp_server, auth['u'], auth['p'], ftp_file, log)
         log.info('Opened a connection to server',
-                     extra={'server': args.ftp_server})
+                 extra={'server': ftp_server})
         reader = ftpreader.csv_reader()
         log.info('instantiated the reader')
         return reader

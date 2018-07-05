@@ -17,7 +17,7 @@ def prepare(args, log, infile):
     sesh = Session()
     sesh.begin_nested()
     try:
-        et = parse(xml_file)
+        et = parse(infile)
         r = process(sesh, et)
         log.info(r)
         if args.diag:

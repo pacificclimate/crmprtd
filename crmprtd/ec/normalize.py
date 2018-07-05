@@ -24,7 +24,7 @@ def prepare(args, log, infile):
     except Exception as e:
         log.critical('Critical errors have occured in the EC real time '
                      'downloader', extra={'log_file': args.log,
-                                          'data_archive': fname})
+                                          'data_archive': infile})
         sys.exit(1)
 
     try:
@@ -45,7 +45,7 @@ def prepare(args, log, infile):
     except Exception as e:
         log.critical('Critical errors have occured in the EC real time '
                      'downloader', extra={'log_file': args.log,
-                                          'data_archive': fname})
+                                          'data_archive': infile})
         sys.exit(1)
 
     finally:
