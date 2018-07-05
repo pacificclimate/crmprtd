@@ -5,7 +5,9 @@ from argparse import ArgumentParser
 from pkg_resources import resource_stream
 
 # Local
-from crmprtd.moti.download import run
+from crmprtd.moti.download import download
+from crmprtd.moti.normalize import normalize
+from crmprtd.moti import logging_setup
 
 
 if __name__ == '__main__':
@@ -68,4 +70,9 @@ if __name__ == '__main__':
     #                     help='directory in which to put the downloaded file')
 
     args = parser.parse_args()
-    run(args)
+    log = logging_setup(args.log_conf, args.log,
+                        args.error_email, args.log_level)
+
+    file_stream = download(args)
+    for file in file_stream:
+        normalize(file)
