@@ -5,6 +5,7 @@ import sys
 from datetime import datetime
 import pytz
 import logging
+import itertools
 from dateutil.parser import parse
 
 # Local
@@ -16,40 +17,102 @@ def normalize(file_stream):
     log = logging.getLogger(__name__)
     tz = pytz.timezone('Canada/Pacific')
 
-    is_first = True
-    var_row = None
-    for row in file_stream.readlines():
-        cleaned = row.strip().replace('"', '').split(',')
+    var_names = ['station_code',
+                'weather_date',
+                'precipitation',
+                'temperature',
+                'relative_humidity',
+                'wind_speed',
+                'wind_direction',
+                'ffmc',
+                'isi',
+                'fwi',
+                'rn_1_pluvio1',
+                'snow_depth',
+                'snow_depth_quality',
+                'precip_pluvio1_status',
+                'precip_pluvio1_total',
+                'rn_1_pluvio2',
+                'precip_pluvio2_status',
+                'precip_pluvio2_total',
+                'rn_1_RIT',
+                'precip_RIT_Status',
+                'precip_RIT_total',
+                'precip_rgt',
+                'solar_radiation_LICOR',
+                'solar_radiation_CM3']
 
-        if is_first:
-            is_first = False
-            var_row = cleaned[2:]
-            continue
+    for row in itertools.islice(file_stream, 1, None):
+        d = {val:item for val,item in zip(var_names, row.strip().replace('"', '').split(','))}
 
-        # loop through all variables
-        for i,var in enumerate(var_row, 2):
-            # check if var has value
-            if len(cleaned[i]) == 0:
+        for key, value in d.items():
+            # check values to ensure valid row
+            if key == 'station_id' or key == 'weather_date':
+                continue
+
+            elif len(value) == 0:
                 continue
 
             # parse date
-            date = cleaned[1]
-            parsed_date = date[0:4] + '-' + date[4:6] + '-' + date[6:8] + ' '
+            date = d['weather_date']
+            parsed_date = '{}-{}-{} '.format(date[:4], date[4:6], date[6:8])
             if date[8:10] == '24':
-                parsed_date = parsed_date + '00'
+                parsed_date += '00:00'
             else:
-                parsed_date = parsed_date + date[8:10]
-            cleaned_date = parse(parsed_date).replace(tzinfo=tz)
+                parsed_date += '{}:00'.format(date[8:10])
+
+            # convert types where necessary
+            try:
+                cleaned_date = parse(parsed_date).replace(tzinfo=tz)
+            except ValueError:
+                log.error('Unable to parse date {}'.format(date))
+                continue
 
             try:
-                named_row = Row(time=cleaned_date,
-                    val=float(cleaned[i]),
-                    variable_name=var,
-                    unit=None,
-                    network_name='WMB',
-                    station_id=cleaned[0],
-                    lat=None,
-                    lon=None)
-                yield named_row
-            except Exception as e:
-                log.error('Unable to process row: {}'.format(row))
+                val = float(value)
+            except ValueError:
+                log.error('Unable to convert val: {} to float'.format(value))
+                continue
+
+            # create namedTuple
+            named_row = Row(time=parsed_date,
+                val=val,
+                variable_name=key,
+                unit=None,
+                network_name='WMB',
+                station_id=d['station_code'],
+                lat=None,
+                lon=None)
+
+            yield named_row
+
+    #
+    # for row in file_stream.readlines():
+    #     cleaned = row.strip().replace('"', '').split(',')
+    #     # loop through all variables
+    #     for i,var in enumerate(var_row, 2):
+    #         # check if var has value
+    #         if len(cleaned[i]) == 0:
+    #             continue
+    #
+    #         # parse date
+    #         date = cleaned[1]
+    #         parsed_date = date[0:4] + '-' + date[4:6] + '-' + date[6:8] + ' '
+    #         if date[8:10] == '24':
+    #             parsed_date = parsed_date + '00'
+    #         else:
+    #             parsed_date = parsed_date + date[8:10]
+    #         cleaned_date = parse(parsed_date).replace(tzinfo=tz)
+    #
+    #         try:
+    #             named_row = Row(time=cleaned_date,
+    #                 val=float(cleaned[i]),
+    #                 variable_name=var,
+    #                 unit=None,
+    #                 network_name='WMB',
+    #                 station_id=cleaned[0],
+    #                 lat=None,
+    #                 lon=None)
+    #             yield named_row
+    #         except Exception as e:
+    #             log.error('Unable to process row: {}'.format(row))

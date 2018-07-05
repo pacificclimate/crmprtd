@@ -9,7 +9,6 @@ from tempfile import SpooledTemporaryFile
 
 # Local
 from crmprtd import retry
-from crmprtd.wmb.normalize import prepare
 
 # Installed libraries
 import yaml
