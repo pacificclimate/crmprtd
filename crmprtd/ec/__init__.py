@@ -1,6 +1,7 @@
 from lxml.etree import LxmlError, parse, tostring, XSLT
 from datetime import datetime
 import re
+import yaml
 import logging
 from pkg_resources import resource_stream
 from urllib.parse import urlparse
@@ -12,15 +13,25 @@ from sqlalchemy.exc import IntegrityError
 from crmprtd import Timer
 
 
+
 log = logging.getLogger(__name__)
 
-ns = {
-    'om': 'http://www.opengis.net/om/1.0',
-    'mpo': "http://dms.ec.gc.ca/schema/point-observation/2.1",
-    'gml': "http://www.opengis.net/gml",
-    'xlink': "http://www.w3.org/1999/xlink",
-    'xsi': "http://www.w3.org/2001/XMLSchema-instance"
-}
+
+def logging_setup(log_conf, log, error_email, log_level):
+    with open(log_conf, 'rb') as f:
+        log_conf = yaml.load(f)
+    if log:
+        log_conf['handlers']['file']['filename'] = log
+    else:
+        log = log_conf['handlers']['file']['filename']
+    if error_email:
+        log_conf['handlers']['mail']['toaddrs'] = error_email
+    logging.config.dictConfig(log_conf)
+    log = logging.getLogger('crmprtd.ec')
+    if log_level:
+        log.setLevel(log_level)
+
+    return log
 
 
 def makeurl(freq='daily', province='BC', language='e', time=datetime.utcnow()):
@@ -41,14 +52,6 @@ def makeurl(freq='daily', province='BC', language='e', time=datetime.utcnow()):
 def extract_fname_from_url(url):
     p = urlparse(url).path
     return p.split('/')[-1]
-
-
-def parse_xml(fname):
-    # Parse and transform the xml
-    et = parse(fname)
-    xsl = resource_stream('crmprtd', 'data/ec_xform.xsl')
-    transform = XSLT(parse(xsl))
-    return transform(et)
 
 
 class ObsProcessor:
@@ -367,27 +370,3 @@ def db_unit(sesh, var_name):
         return r[0][0]
     except IndexError:  # zero rows
         return None
-
-
-class OmMember:
-    def __init__(self, member):
-        self.member = member
-
-    def member_unit(self, v):
-        '''Returns the unit of the element measuring the quantity v
-           If v is not one of the elements, raises LxmlError
-        '''
-        try:
-            return self.member.xpath("./om:Observation/om:result/mpo:elements"
-                                     "/mpo:element[@name='%s']" %
-                                     v, namespaces=ns)[0].get('uom')
-        except IndexError:
-            raise LxmlError(
-                "%s is not one of the mpo:elements in this om:member" % v)
-
-    def observed_vars(self):
-        '''Returns the names of all quantities specified by this member
-        '''
-        return [e.get('name') for e in self.member.xpath(
-                ".//om:result/mpo:elements/mpo:element[@name!=''][@value!='']",
-                namespaces=ns)]

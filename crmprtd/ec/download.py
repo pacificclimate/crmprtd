@@ -4,85 +4,53 @@ import sys
 import logging
 import logging.config
 from datetime import datetime, timedelta
+from tempfile import SpooledTemporaryFile
 
 # Installed libraries
 import requests
 import yaml
+import logging
 
 # Local
 from crmprtd.ec import makeurl, extract_fname_from_url
-from crmprtd.ec.normalize import prepare
 
-
-def logging_setup(log_conf, log, error_email, log_level):
-    with open(log_conf, 'rb') as f:
-        log_conf = yaml.load(f)
-    if log:
-        log_conf['handlers']['file']['filename'] = log
-    else:
-        log = log_conf['handlers']['file']['filename']
-    if error_email:
-        log_conf['handlers']['mail']['toaddrs'] = error_email
-    logging.config.dictConfig(log_conf)
-    log = logging.getLogger('crmprtd.ec')
-    if log_level:
-        log.setLevel(log_level)
-
-    return log
-
-
-def download(log, frequency, province, language, time, cache_dir):
-    # Configure requests to use retry
-    s = requests.Session()
-    a = requests.adapters.HTTPAdapter(max_retries=3)
-    s.mount('https://', a)
-
-    # Construct and download the xml
-    url = makeurl(frequency, province, language, time)
-    fname = os.path.join(cache_dir, extract_fname_from_url(url))
-
-    log.info("Downloading ".format(url))
-    req = s.get(url)
-    if req.status_code != 200:
-        raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
-
-    log.info("Saving data to {0}".format(fname))
-    with open(fname, 'wb') as f:
-        f.write(req.content)
-
-    return fname
-
-
-def run(args):
+def download(args):
     # Setup logging
-    log = logging_setup(args.log_conf, args.log,
-                        args.error_email, args.log_level)
+    log = logging.getLogger(__name__)
     log.info('Starting EC rtd')
 
     try:
-        if args.filename:
-            log.debug("Opening local xml filefor reading",
-                      extra={'file': args.filename})
-            fname = args.filename
-            log.debug("File opened sucessfully")
+        # Determine time parameter
+        if args.time:
+            args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
+            log.info("Starting manual run "
+                     "using timestamp {0}".format(args.time))
         else:
+            # go back a day
+            deltat = timedelta(
+                1 / 24.) if args.frequency == 'hourly' else timedelta(1)
+            args.time = datetime.utcnow() - deltat
+            log.info("Starting automatic run "
+                     "using timestamp {0}".format(args.time))
 
-            # Determine time parameter
-            if args.time:
-                args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
-                log.info("Starting manual run using timestamp",
-                         extra={'timestamp': args.time})
-            else:
-                # go back a day
-                deltat = timedelta(
-                    1 / 24.) if args.frequency == 'hourly' else timedelta(1)
-                args.time = datetime.utcnow() - deltat
-                log.info("Starting automatic run using timestamp",
-                         extra={'timestamp': args.time})
+        # Configure requests to use retry
+        s = requests.Session()
+        a = requests.adapters.HTTPAdapter(max_retries=3)
+        s.mount('https://', a)
 
-            fname = download(log, args.frequency, args.province,
-                             args.language, args.time, args.cache_dir)
-            prepare(args, log, fname)
+        # Construct and download the xml
+        url = makeurl(args.frequency, args.province, args.language, args.time)
+
+        log.info("Downloading {0}".format(url))
+        req = s.get(url)
+        if req.status_code != 200:
+            raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
+
+        with SpooledTemporaryFile(max_size=2048, mode='r+b') as tempfile:
+            tempfile.write(req.content)
+
+            tempfile.seek(0)
+            yield tempfile
 
     except IOError:
         log.exception("Unable to download or open xml data")

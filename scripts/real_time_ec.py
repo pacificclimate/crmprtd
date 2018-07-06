@@ -5,7 +5,9 @@ from argparse import ArgumentParser
 from pkg_resources import resource_filename
 
 # Local
-from crmprtd.ec.download import run
+from crmprtd.ec import logging_setup
+from crmprtd.ec.download import download
+from crmprtd.ec.normalize import normalize
 
 
 if __name__ == '__main__':
@@ -63,4 +65,10 @@ if __name__ == '__main__':
                         help="Turn on diagnostic mode (no commits)")
 
     args = parser.parse_args()
-    run(args)
+    log = logging_setup(args.log_conf, args.log,
+                        args.error_email, args.log_level)
+
+    file_stream = download(args)
+    for file in file_stream:
+        for line in normalize(file):
+            print(line)
