@@ -3,7 +3,6 @@ import sys
 import csv
 import logging
 import logging.config
-import os
 import ftplib
 from tempfile import SpooledTemporaryFile
 
@@ -39,7 +38,8 @@ def download(args):
                 tempfile.write('{}\n'.format(line))
 
             log.info("Downloading %s", ftpreader.filename)
-            ftpreader.connection.retrlines('RETR {}'.format(ftpreader.filename),
+            ftpreader.connection.retrlines('RETR {}'
+                                           .format(ftpreader.filename),
                                            callback)
 
             tempfile.seek(0)

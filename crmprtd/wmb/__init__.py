@@ -18,6 +18,7 @@ from crmprtd import Timer
 
 log = logging.getLogger(__name__)
 
+
 def setup_logging(log, error_email, log_level):
     log_c = yaml.load(resource_stream('crmprtd', '/data/logging.yaml'))
     if log:

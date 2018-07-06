@@ -1,37 +1,35 @@
 #!/usr/bin/env python
 
 # Standard module
-import sys
 import pytz
-
+import logging
 
 # Installed libraries
-from lxml.etree import parse
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from pkg_resources import resource_filename
-from lxml.etree import parse, XSLT
-from dateutil.parser import parse as dateparse
+from lxml.etree import XSLT, parse as xmlparse
+from dateutilr import parse as dateparse
 
 # Local
-from crmprtd.moti import process
 from crmprtd import Row
 
 
 xsl = resource_filename('crmprtd', 'data/moti.xsl')
-transform = XSLT(parse(xsl))
+transform = XSLT(xmlparse(xsl))
 ns = {
     'xsi': "http://www.w3.org/2001/XMLSchema-instance"
 }
 
+
 def normalize(file_stream):
-    et = parse(file_stream)
+    log = logging.getLogger(__name__)
+    et = xmlparse(file_stream)
     et = transform(et)
 
     obs_series = et.xpath("//observation-series")
     for series in obs_series:
         try:
-            stn_id = series.xpath("./origin/id[@type='client']")[0].text.strip()
+            stn_id = series.xpath(
+                        "./origin/id[@type='client']")[0].text.strip()
         except IndexError as e:
             raise Exception(
                 "Could not detect the station id: xpath search "
@@ -43,15 +41,15 @@ def normalize(file_stream):
             # get time and convert to datetime
             time = member.get('valid-time')
             if not time:
-                log.warn("Could not find a valid-time attribute for this observation")
+                log.warn("Could not find a valid-time attribute for this "
+                         "observation")
                 continue
 
             tz = pytz.timezone('Canada/Pacific')
             try:
                 date = dateparse(time).replace(tzinfo=tz)
             except ValueError as e:
-                raise e # FIXME: handle to error with logging when its setup
-
+                raise e  # FIXME: handle to error with logging when its setup
 
             for obs in member.iterchildren():
                 variable_name = obs.get('type')
@@ -62,8 +60,8 @@ def normalize(file_stream):
                     value_element = obs.xpath('./value')[0]
                 except IndexError as e:
                     log.warn("Could not find the actual value for observation "
-                             "{}/{}. xpath search './value' returned no results"
-                             .format(varname, vartype))
+                             "{}. xpath search './value' returned no results"
+                             .format(variable_name))
                     continue
 
                 unit = value_element.get('units')
@@ -71,17 +69,17 @@ def normalize(file_stream):
                 try:
                     value = float(value_element.text)
                 except ValueError:
-                    log.warn("Could not convert value '{}' to a number. Skipping "
-                             "this observation.".format(value))
+                    log.warn("Could not convert value '{}' to a number. "
+                             "Skipping this observation.".format(value))
                     continue
 
                 named_row = Row(time=date,
-                    val = value,
-                    variable_name=variable_name,
-                    unit=unit,
-                    network_name='MOTI',
-                    station_id=stn_id,
-                    lat=None,
-                    lon=None)
+                                val=value,
+                                variable_name=variable_name,
+                                unit=unit,
+                                network_name='MOTI',
+                                station_id=stn_id,
+                                lat=None,
+                                lon=None)
 
                 yield named_row

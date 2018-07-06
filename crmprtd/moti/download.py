@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # Standard module
-import os
 import sys
 import logging
 import logging.config
@@ -23,9 +22,9 @@ def download(args):
         if args.bciduser or args.bcidpass:
             auth = (args.bciduser, args.bcidpass)
         else:
-            assert args.auth and args.auth_key, ("Must provide both the auth file "
-                                                 "and the key to use for this "
-                                                 "script (--auth_key)")
+            assert args.auth and args.auth_key, ("Must provide both the auth "
+                                                 "file and the key to use for "
+                                                 "this script (--auth_key)")
             with open(args.auth, 'r') as f:
                 config = yaml.load(f)
             auth = (config[args.auth_key]['username'],
@@ -63,7 +62,8 @@ def download(args):
 
         log.info('{}: {}'.format(req.status_code, req.url))
         if req.status_code != 200:
-            raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
+            raise IOError(
+                "HTTP {} error for {}".format(req.status_code, req.url))
 
         with SpooledTemporaryFile(max_size=2048, mode='r+b') as tempfile:
             tempfile.write(req.content)

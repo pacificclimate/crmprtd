@@ -10,8 +10,8 @@ from sqlalchemy.exc import IntegrityError
 from pycds import History, Network, Station, Variable, Obs
 from crmprtd import Timer
 
-
 log = logging.getLogger(__name__)
+
 
 def logging_setup(log_conf, log, error_email, log_level):
     log_c = yaml.load(log_conf)
@@ -27,6 +27,7 @@ def logging_setup(log_conf, log, error_email, log_level):
         log.setLevel(log_level)
 
     return log
+
 
 xsl = resource_filename('crmprtd', 'data/moti.xsl')
 transform = XSLT(parse(xsl))

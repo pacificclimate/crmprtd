@@ -1,5 +1,4 @@
 # Standard module
-import os
 import sys
 import logging
 import logging.config
@@ -8,11 +7,11 @@ from tempfile import SpooledTemporaryFile
 
 # Installed libraries
 import requests
-import yaml
 import logging
 
 # Local
-from crmprtd.ec import makeurl, extract_fname_from_url
+from crmprtd.ec import makeurl
+
 
 def download(args):
     # Setup logging
@@ -44,7 +43,8 @@ def download(args):
         log.info("Downloading {0}".format(url))
         req = s.get(url)
         if req.status_code != 200:
-            raise IOError("HTTP {} error for {}".format(req.status_code, req.url))
+            raise IOError(
+                "HTTP {} error for {}".format(req.status_code, req.url))
 
         with SpooledTemporaryFile(max_size=2048, mode='r+b') as tempfile:
             tempfile.write(req.content)

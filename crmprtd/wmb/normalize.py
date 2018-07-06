@@ -1,15 +1,10 @@
-import csv
-import sys
-
 # Installed libraries
-from datetime import datetime
 import pytz
 import logging
 import itertools
 from dateutil.parser import parse
 
 # Local
-from crmprtd.wmb import setup_logging
 from crmprtd import Row
 
 
@@ -17,32 +12,34 @@ def normalize(file_stream):
     log = logging.getLogger(__name__)
 
     var_names = ['station_code',
-                'weather_date',
-                'precipitation',
-                'temperature',
-                'relative_humidity',
-                'wind_speed',
-                'wind_direction',
-                'ffmc',
-                'isi',
-                'fwi',
-                'rn_1_pluvio1',
-                'snow_depth',
-                'snow_depth_quality',
-                'precip_pluvio1_status',
-                'precip_pluvio1_total',
-                'rn_1_pluvio2',
-                'precip_pluvio2_status',
-                'precip_pluvio2_total',
-                'rn_1_RIT',
-                'precip_RIT_Status',
-                'precip_RIT_total',
-                'precip_rgt',
-                'solar_radiation_LICOR',
-                'solar_radiation_CM3']
+                 'weather_date',
+                 'precipitation',
+                 'temperature',
+                 'relative_humidity',
+                 'wind_speed',
+                 'wind_direction',
+                 'ffmc',
+                 'isi',
+                 'fwi',
+                 'rn_1_pluvio1',
+                 'snow_depth',
+                 'snow_depth_quality',
+                 'precip_pluvio1_status',
+                 'precip_pluvio1_total',
+                 'rn_1_pluvio2',
+                 'precip_pluvio2_status',
+                 'precip_pluvio2_total',
+                 'rn_1_RIT',
+                 'precip_RIT_Status',
+                 'precip_RIT_total',
+                 'precip_rgt',
+                 'solar_radiation_LICOR',
+                 'solar_radiation_CM3']
 
     for row in itertools.islice(file_stream, 1, None):
-        d = {val:item for val,item in zip(var_names, row.strip().replace('"', '').split(','))}
+        d = {val: item
+             for val, item in zip(var_names,
+                                  row.strip().replace('"', '').split(','))}
 
         for key, value in d.items():
             # check values to ensure valid row
@@ -76,12 +73,12 @@ def normalize(file_stream):
 
             # create namedTuple
             named_row = Row(time=cleaned_date,
-                val=val,
-                variable_name=key,
-                unit=None,
-                network_name='WMB',
-                station_id=d['station_code'],
-                lat=None,
-                lon=None)
+                            val=val,
+                            variable_name=key,
+                            unit=None,
+                            network_name='WMB',
+                            station_id=d['station_code'],
+                            lat=None,
+                            lon=None)
 
             yield named_row

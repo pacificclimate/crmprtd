@@ -51,7 +51,8 @@ from functools import wraps
 from collections import namedtuple
 
 
-Row = namedtuple('Row', "time val variable_name unit network_name, station_id, lat, lon")
+Row = namedtuple('Row', "time val variable_name unit network_name station_id \
+                         lat lon")
 
 
 class Timer(object):
