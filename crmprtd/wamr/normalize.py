@@ -17,7 +17,11 @@ def normalize(file_stream):
     log = logging.getLogger(__name__)
 
     for row in itertools.islice(file_stream, 1, None):
-        time, station_id, _, variable_name, _, _, _, unit, _, _, _, val  = row.strip().split(',')
+        try:
+            time, station_id, _, variable_name, _, _, _, unit, _, _, _, val  = row.strip().split(',')
+        except ValueError as e:
+            log.error('Unable to retrieve items. e:{}\n\t[{}]'.format(e, row))
+            continue
 
         try:
             val = float(val)
