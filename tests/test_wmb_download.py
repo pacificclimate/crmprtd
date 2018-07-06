@@ -1,7 +1,7 @@
-from crmprtd.wmb.download import logging_setup
+from crmprtd.wmb import setup_logging
 
 
-def test_logging_setup():
-    log = logging_setup('mof.log', 'test@mail.com', 'INFO')
+def test_setup_logging():
+    log = setup_logging('mof.log', 'test@mail.com', 'INFO')
     assert log.name == 'crmprtd.wmb'
     assert log.level == 20
