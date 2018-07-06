@@ -2,6 +2,8 @@
 
 # Standard module
 import sys
+import pytz
+
 
 # Installed libraries
 from lxml.etree import parse
@@ -9,51 +11,77 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from pkg_resources import resource_filename
 from lxml.etree import parse, XSLT
+from dateutil.parser import parse as dateparse
 
 # Local
 from crmprtd.moti import process
 from crmprtd import Row
 
 
-def prepare(args, log, infile):
-    Session = sessionmaker(create_engine(args.connection_string))
-    sesh = Session()
-    sesh.begin_nested()
-    try:
-        et = parse(infile)
-        r = process(sesh, et)
-        log.info(r)
-        if args.diag:
-            log.info('Diagnostic mode, rolling back')
-            sesh.rollback()
-        else:
-            log.info('Comitting session')
-            sesh.commit()
-    except Exception as e:
-        sesh.rollback()
-        log.critical('Serious errros with MOTIe rtd, see logs',
-                     extra={'log': args.log})
-        sys.exit(1)
-    finally:
-        sesh.commit()
-        sesh.close()
-
 xsl = resource_filename('crmprtd', 'data/moti.xsl')
 transform = XSLT(parse(xsl))
-
+ns = {
+    'xsi': "http://www.w3.org/2001/XMLSchema-instance"
+}
 
 def normalize(file_stream):
     et = parse(file_stream)
     et = transform(et)
-    print(et)
+
     obs_series = et.xpath("//observation-series")
-    # for series in obs_series:
-    #     print('we get here')
-    #     try:
-    #         stn_id = os.xpath("./origin/id[@type='client']")[0].text.strip()
-    #     except IndexError as e:
-    #         raise Exception(
-    #             "Could not detect the station id: xpath search "
-    #             "'//observation-series/origin/id[@type='client']' return no "
-    #             "results")
-    #     print(stn_id)
+    for series in obs_series:
+        try:
+            stn_id = series.xpath("./origin/id[@type='client']")[0].text.strip()
+        except IndexError as e:
+            raise Exception(
+                "Could not detect the station id: xpath search "
+                "'//observation-series/origin/id[@type='client']' return no "
+                "results")
+
+        members = series.xpath('./observation', namespaces=ns)
+        for member in members:
+            # get time and convert to datetime
+            time = member.get('valid-time')
+            if not time:
+                log.warn("Could not find a valid-time attribute for this observation")
+                continue
+
+            tz = pytz.timezone('Canada/Pacific')
+            try:
+                date = dateparse(time).replace(tzinfo=tz)
+            except ValueError as e:
+                raise e # FIXME: handle to error with logging when its setup
+
+
+            for obs in member.iterchildren():
+                variable_name = obs.get('type')
+                if variable_name is None:
+                    continue
+
+                try:
+                    value_element = obs.xpath('./value')[0]
+                except IndexError as e:
+                    log.warn("Could not find the actual value for observation "
+                             "{}/{}. xpath search './value' returned no results"
+                             .format(varname, vartype))
+                    continue
+
+                unit = value_element.get('units')
+
+                try:
+                    value = float(value_element.text)
+                except ValueError:
+                    log.warn("Could not convert value '{}' to a number. Skipping "
+                             "this observation.".format(value))
+                    continue
+
+                named_row = Row(time=date,
+                    val = value,
+                    variable_name=variable_name,
+                    unit=unit,
+                    network_name='MOTI',
+                    station_id=stn_id,
+                    lat=None,
+                    lon=None)
+
+                yield named_row

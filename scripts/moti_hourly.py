@@ -75,4 +75,5 @@ if __name__ == '__main__':
 
     file_stream = download(args)
     for file in file_stream:
-        normalize(file)
+        for row in normalize(file):
+            print(row)
