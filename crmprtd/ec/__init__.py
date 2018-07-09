@@ -12,7 +12,6 @@ from sqlalchemy.exc import IntegrityError
 from crmprtd import Timer
 
 
-
 log = logging.getLogger(__name__)
 ns = {
     'om': 'http://www.opengis.net/om/1.0',

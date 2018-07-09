@@ -71,8 +71,8 @@ def normalize(file_stream):
                     value = float(value_element.text)
                 except ValueError:
                     log.error("Could not convert value to a number. "
-                                "Skipping this observation.",
-                                extra={'value': value})
+                              "Skipping this observation.",
+                              extra={'value': value})
                     continue
 
                 named_row = Row(time=date,
