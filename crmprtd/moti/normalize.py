@@ -7,7 +7,7 @@ import logging
 # Installed libraries
 from pkg_resources import resource_filename
 from lxml.etree import XSLT, parse as xmlparse
-from dateutilr import parse as dateparse
+from dateutil.parser import parse as dateparse
 
 # Local
 from crmprtd import Row
@@ -50,7 +50,8 @@ def normalize(file_stream):
             try:
                 date = dateparse(time).replace(tzinfo=tz)
             except ValueError as e:
-                raise e  # FIXME: handle to error with logging when its setup
+                log.error('Unable to convert value to datetime',
+                          extra={'date': date})
 
             for obs in member.iterchildren():
                 variable_name = obs.get('type')
@@ -63,15 +64,13 @@ def normalize(file_stream):
                     log.warning("Could not find the actual value for "
                                 "observation. xpath search './value' "
                                 "returned no results",
-                                extra={'variable_name': variable_name}
+                                extra={'variable_name': variable_name})
                     continue
-
-                unit = value_element.get('units')
 
                 try:
                     value = float(value_element.text)
                 except ValueError:
-                    log.warning("Could not convert value to a number. "
+                    log.error("Could not convert value to a number. "
                                 "Skipping this observation.",
                                 extra={'value': value})
                     continue
@@ -79,7 +78,7 @@ def normalize(file_stream):
                 named_row = Row(time=date,
                                 val=value,
                                 variable_name=variable_name,
-                                unit=unit,
+                                unit=value_element.get('units'),
                                 network_name='MOTI',
                                 station_id=stn_id,
                                 lat=None,
