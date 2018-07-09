@@ -10,6 +10,7 @@ from crmprtd import Row
 
 def normalize(file_stream):
     log = logging.getLogger(__name__)
+    log.info('Starting WMB data normalization')
 
     var_names = ['station_code',
                  'weather_date',
@@ -42,10 +43,11 @@ def normalize(file_stream):
                                   row.strip().replace('"', '').split(','))}
 
         for key, value in d.items():
-            # check values to ensure valid row
+            # we do not need to create a separate row for these values
             if key == 'station_id' or key == 'weather_date':
                 continue
 
+            # skip is there is no value
             elif len(value) == 0:
                 continue
 
@@ -62,13 +64,14 @@ def normalize(file_stream):
             try:
                 cleaned_date = parse(parsed_date).replace(tzinfo=tz)
             except ValueError:
-                log.error('Unable to parse date {}'.format(date))
+                log.warning('Unable to parse date', extra={'date': date})
                 continue
 
             try:
                 val = float(value)
             except ValueError:
-                log.error('Unable to convert val: {} to float'.format(value))
+                log.warning('Unable to convert val to float',
+                            extra={'value': val})
                 continue
 
             # create namedTuple

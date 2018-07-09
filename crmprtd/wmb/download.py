@@ -33,7 +33,9 @@ def download(args):
         # Connect FTP server and retrieve file
         ftpreader = ftp_connect(args.ftp_server, args.ftp_file, log, auth)
 
-        with SpooledTemporaryFile(max_size=2048, mode='r+') as tempfile:
+        with SpooledTemporaryFile(
+                max_size=os.environ.get('CRMPRTD_MAX_CACHE', 2**20),
+                mode='r+') as tempfile:
             def callback(line):
                 tempfile.write('{}\n'.format(line))
 
@@ -51,12 +53,12 @@ def download(args):
 
 def ftp_connect(host, path, log, auth):
     log.info('Fetching file from FTP')
-    log.info('Listing {}/{}'.format(host, path))
+    log.info('Listing.', extra={'host': host, 'path': path})
 
     try:
         ftpreader = FTPReader(host, auth['u'],
                               auth['p'], path, log)
-        log.info('Opened a connection to {}'.format(host))
+        log.info('Opened a connection to host', extra={'host': host})
     except ftplib.all_errors as e:
         log.critical('Unable to load data from ftp source', exc_info=True)
         sys.exit(1)

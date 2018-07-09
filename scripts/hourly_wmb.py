@@ -76,7 +76,6 @@ if __name__ == '__main__':
     log = setup_logging(args.log_level, args.log, args.error_email)
 
     # Pipeline
-    file_stream = download(args)
-    for file in file_stream:
-        for line in normalize(file):
-            print(line)
+    for file in download(args):
+        for row in normalize(row):
+            print(row)
