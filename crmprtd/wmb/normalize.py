@@ -64,14 +64,14 @@ def normalize(file_stream):
             try:
                 cleaned_date = parse(parsed_date).replace(tzinfo=tz)
             except ValueError:
-                log.warning('Unable to parse date', extra={'date': date})
+                log.error('Unable to parse date', extra={'date': date})
                 continue
 
             try:
                 val = float(value)
             except ValueError:
-                log.warning('Unable to convert val to float',
-                            extra={'value': val})
+                log.error('Unable to convert val to float',
+                          extra={'value': val})
                 continue
 
             # create namedTuple

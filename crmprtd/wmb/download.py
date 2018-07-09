@@ -1,6 +1,7 @@
 # Standard module
 import sys
 import csv
+import os
 import logging
 import logging.config
 import ftplib

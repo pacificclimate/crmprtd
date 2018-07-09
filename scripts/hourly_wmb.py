@@ -77,5 +77,5 @@ if __name__ == '__main__':
 
     # Pipeline
     for file in download(args):
-        for row in normalize(row):
+        for row in normalize(file):
             print(row)

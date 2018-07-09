@@ -105,8 +105,8 @@ class ObsProcessor:
                 dt = parse(d) + relativedelta(hours=+int(t))
                 obs['weather_date'] = dt
             except ValueError as e:
-                log.error('Unexpected values when parsing date: {0}'.format(
-                    obs['weather_date']))
+                log.error('Unexpected values when parsing date',
+                          extra={'date': obs['weather_date']})
                 self._line_errors += 1
                 self._unhandled_errors += 1
                 unparsable_times.append(obs)
