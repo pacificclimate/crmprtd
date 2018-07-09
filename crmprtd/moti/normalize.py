@@ -22,6 +22,7 @@ ns = {
 
 def normalize(file_stream):
     log = logging.getLogger(__name__)
+    log.info('Starting MOTI data normalization')
     et = xmlparse(file_stream)
     et = transform(et)
 
@@ -41,8 +42,8 @@ def normalize(file_stream):
             # get time and convert to datetime
             time = member.get('valid-time')
             if not time:
-                log.warn("Could not find a valid-time attribute for this "
-                         "observation")
+                log.warning("Could not find a valid-time attribute for this "
+                            "observation")
                 continue
 
             tz = pytz.timezone('Canada/Pacific')
@@ -59,9 +60,10 @@ def normalize(file_stream):
                 try:
                     value_element = obs.xpath('./value')[0]
                 except IndexError as e:
-                    log.warn("Could not find the actual value for observation "
-                             "{}. xpath search './value' returned no results"
-                             .format(variable_name))
+                    log.warning("Could not find the actual value for "
+                                "observation. xpath search './value' "
+                                "returned no results",
+                                extra={'variable_name': variable_name}
                     continue
 
                 unit = value_element.get('units')
@@ -69,8 +71,9 @@ def normalize(file_stream):
                 try:
                     value = float(value_element.text)
                 except ValueError:
-                    log.warn("Could not convert value '{}' to a number. "
-                             "Skipping this observation.".format(value))
+                    log.warning("Could not convert value to a number. "
+                                "Skipping this observation.",
+                                extra={'value': value})
                     continue
 
                 named_row = Row(time=date,
