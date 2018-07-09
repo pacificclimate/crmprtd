@@ -43,7 +43,7 @@ def normalize(file_stream):
             # elements, however I think that it _could_ be non-numeric and
             # still be valid XML
             except ValueError as e:
-                log.warning('Unable to convert value',
+                log.error('Unable to convert value',
                           extra={'val': (ele.get('value'))})
                 continue
 
@@ -74,7 +74,7 @@ def normalize(file_stream):
             try:
                 date = dateparse(obs_time).replace(tzinfo=tz)
             except ValueError as e:
-                log.warning('Unable to parse date', extra={'exception': e})
+                log.error('Unable to parse date', extra={'exception': e})
 
             named_row = Row(time=date,
                             val=val,

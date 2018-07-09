@@ -1,5 +1,6 @@
 # Standard module
 import sys
+import os
 import logging
 import logging.config
 from datetime import datetime, timedelta
@@ -7,7 +8,6 @@ from tempfile import SpooledTemporaryFile
 
 # Installed libraries
 import requests
-import logging
 
 # Local
 from crmprtd.ec import makeurl
