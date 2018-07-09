@@ -27,6 +27,7 @@ def normalize(file_stream):
     et = parse_xml(file_stream)
 
     members = et.xpath('//om:member', namespaces=ns)
+    log.info('Starting EC data normalization')
 
     for member in members:
         om = OmMember(member)
@@ -42,8 +43,8 @@ def normalize(file_stream):
             # elements, however I think that it _could_ be non-numeric and
             # still be valid XML
             except ValueError as e:
-                log.error(
-                    'Unable to convert value, val:{}'.format(ele.get('value')))
+                log.warning('Unable to convert value',
+                          extra={'val': (ele.get('value'))})
                 continue
 
             attrs = ['station_name', 'climate_station_number']
@@ -73,7 +74,7 @@ def normalize(file_stream):
             try:
                 date = dateparse(obs_time).replace(tzinfo=tz)
             except ValueError as e:
-                raise e  # FIXME: handle to error with logging when its setup
+                log.warning('Unable to parse date', extra={'exception': e})
 
             named_row = Row(time=date,
                             val=val,

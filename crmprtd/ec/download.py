@@ -46,7 +46,9 @@ def download(args):
             raise IOError(
                 "HTTP {} error for {}".format(req.status_code, req.url))
 
-        with SpooledTemporaryFile(max_size=2048, mode='r+b') as tempfile:
+        with SpooledTemporaryFile(
+                max_size=os.environ.get('CRMPRTD_MAX_CACHE', 2**20),
+                mode='r+b') as tempfile:
             tempfile.write(req.content)
 
             tempfile.seek(0)
