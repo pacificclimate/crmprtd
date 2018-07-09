@@ -10,27 +10,30 @@ from crmprtd import Row
 
 def normalize(file_stream):
     log = logging.getLogger(__name__)
+    log.info('Starting WAMR data normalization')
 
     for row in itertools.islice(file_stream, 1, None):
         try:
             time, station_id, _, variable_name, \
                 _, _, _, unit, _, _, _, val = row.strip().split(',')
         except ValueError as e:
-            log.error('Unable to retrieve items. e:{}\n\t[{}]'.format(e, row))
+            log.warning('Unable to retrieve items.',
+                        extra={'exception': e, 'row': row})
             continue
 
         try:
             val = float(val)
         except ValueError:
-            log.error('Unable to convert val: {} to float'.format(val))
+            log.warning('Unable to convert val to float',
+                        extra={'value': val})
             continue
 
         try:
             tz = pytz.timezone('Canada/Pacific')
             time = parse(time).replace(tzinfo=tz)
         except ValueError:
-            log.error(
-                'Unable to convert date string: {} to datetime'.format(time))
+            log.warning('Unable to convert date string to datetime',
+                        extra={'time': time})
             continue
 
         named_row = Row(time=time,
