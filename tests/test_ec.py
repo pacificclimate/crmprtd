@@ -8,7 +8,8 @@ import pytest
 
 from crmprtd.ec import makeurl, extract_fname_from_url, ns, \
     ObsProcessor, check_history, insert_obs, \
-    recordable_vars, db_unit, OmMember, parse_xml
+    recordable_vars, db_unit, OmMember
+from crmprtd.ec.normalize import parse_xml
 from pycds import Obs
 
 
