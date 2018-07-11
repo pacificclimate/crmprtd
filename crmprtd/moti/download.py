@@ -67,7 +67,7 @@ def download(args):
                 "HTTP {} error for {}".format(req.status_code, req.url))
 
         with SpooledTemporaryFile(
-                max_size=os.environ.get('CRMPRTD_MAX_CACHE', 2**20),
+                max_size=int(os.environ.get('CRMPRTD_MAX_CACHE', 2**20)),
                 mode='r+b') as tempfile:
             tempfile.write(req.content)
 
