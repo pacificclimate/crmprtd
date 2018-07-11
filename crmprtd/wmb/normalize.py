@@ -3,6 +3,7 @@ import pytz
 import logging
 import itertools
 from dateutil.parser import parse
+import datetime
 
 # Local
 from crmprtd import Row
@@ -51,18 +52,11 @@ def normalize(file_stream):
             elif value is None:
                 continue
 
-            # parse date
-            date = d['weather_date']
-            parsed_date = '{}-{}-{} '.format(date[:4], date[4:6], date[6:8])
-            if date[8:10] == '24':
-                parsed_date += '00:00'
-            else:
-                parsed_date += '{}:00'.format(date[8:10])
-
             # convert types where necessary
+            date = d['weather_date']
             tz = pytz.timezone('Canada/Pacific')
             try:
-                cleaned_date = parse(parsed_date).replace(tzinfo=tz)
+                cleaned_date = datetime.datetime.strptime('{}-{}-{} {}'.format(date[:4], date[4:6], date[6:8], date[8:10]), "%Y-%m-%d %H").replace(tzinfo=tz)
             except ValueError:
                 log.error('Unable to parse date', extra={'date': date})
                 continue
@@ -71,7 +65,7 @@ def normalize(file_stream):
                 val = float(value)
             except ValueError:
                 log.error('Unable to convert val to float',
-                          extra={'value': val})
+                          extra={'value': value})
                 continue
 
             # create namedTuple
