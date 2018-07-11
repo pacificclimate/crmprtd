@@ -48,7 +48,7 @@ def normalize(file_stream):
                 continue
 
             # skip is there is no value
-            elif len(value) == 0:
+            elif value is None:
                 continue
 
             # parse date

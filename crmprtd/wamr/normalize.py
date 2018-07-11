@@ -22,7 +22,7 @@ def normalize(file_stream):
             continue
 
         # skip over empty values
-        if len(val) == 0:
+        if val is None:
             continue
 
         try:
