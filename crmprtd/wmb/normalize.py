@@ -75,13 +75,11 @@ def normalize(file_stream):
                 continue
 
             # create namedTuple
-            named_row = Row(time=cleaned_date,
-                            val=val,
-                            variable_name=key,
-                            unit=None,
-                            network_name='WMB',
-                            station_id=d['station_code'],
-                            lat=None,
-                            lon=None)
-
-            yield named_row
+            yield Row(time=cleaned_date,
+                      val=val,
+                      variable_name=key,
+                      unit=None,
+                      network_name='WMB',
+                      station_id=d['station_code'],
+                      lat=None,
+                      lon=None)

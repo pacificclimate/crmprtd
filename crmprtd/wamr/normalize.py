@@ -40,13 +40,11 @@ def normalize(file_stream):
                       extra={'time': time})
             continue
 
-        named_row = Row(time=time,
-                        val=val,
-                        variable_name=variable_name,
-                        unit=unit,
-                        network_name='WAMR',
-                        station_id=station_id,
-                        lat=None,
-                        lon=None)
-
-        yield named_row
+        yield Row(time=time,
+                  val=val,
+                  variable_name=variable_name,
+                  unit=unit,
+                  network_name='WAMR',
+                  station_id=station_id,
+                  lat=None,
+                  lon=None)

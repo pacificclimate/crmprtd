@@ -76,13 +76,11 @@ def normalize(file_stream):
             except ValueError as e:
                 log.error('Unable to parse date', extra={'exception': e})
 
-            named_row = Row(time=date,
-                            val=val,
-                            variable_name=var,
-                            unit=om.member_unit(var),
-                            network_name='EC',
-                            station_id=native_id,
-                            lat=lat,
-                            lon=lon)
-
-            yield named_row
+            yield Row(time=date,
+                      val=val,
+                      variable_name=var,
+                      unit=om.member_unit(var),
+                      network_name='EC',
+                      station_id=native_id,
+                      lat=lat,
+                      lon=lon)
