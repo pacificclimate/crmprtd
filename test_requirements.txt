@@ -1,6 +1,6 @@
-pytest
+pytest==3.6.3
 pytest-cov
-pytest-flake8
+pytest-flake8==1.0.1
 pytest-catchlog
 testing.postgresql
 python-json-logger
