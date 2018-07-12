@@ -5,11 +5,12 @@ from lxml.etree import LxmlError
 from io import BytesIO, StringIO
 from lxml.etree import fromstring, parse, XSLT
 import pytest
+from geoalchemy2.functions import ST_X, ST_Y
 
 from crmprtd.ec import makeurl, extract_fname_from_url, ns, \
     ObsProcessor, check_history, insert_obs, \
-    recordable_vars, db_unit, OmMember, parse_xml
-from pycds import Obs
+    recordable_vars, db_unit, OmMember, parse_xml, closest_stns_within_threshold
+from pycds import Obs, History
 
 
 @pytest.mark.parametrize(('label', 'args', 'expected'), [
@@ -665,3 +666,27 @@ def test_OmMember_index_error_handle(ec_session):
 def test_db_unit_error_handle(ec_session):
     test_val = db_unit(ec_session, 'not_a_var')
     assert test_val is None
+
+
+def test_closest_stns_within_threshold(ec_session):
+    x = closest_stns_within_threshold(ec_session, -123.7, 49.45, 1000)
+    assert len(x) > 0
+
+
+def test_closest_stns_within_threshold_bad_data(ec_session):
+    # https://github.com/pacificclimate/crmprtd/issues/8
+
+    # Find some "good data" to use for the test run
+    x, y = ec_session.query(ST_X(History.the_geom), ST_Y(History.the_geom)).first()
+
+    # Create a couple history entries with reversed lat/lons
+    space1 = History(station_name='Outer space',
+                     the_geom='SRID=4326;POINT(49.1658 -122.9606)')
+    space2 = History(station_name='Outer space',
+                     the_geom='SRID=4326;POINT(50.3225 122.7897)')
+    ec_session.add_all([space1, space2])
+    ec_session.commit()
+
+    # Just search for the good station and ensure there are not errors
+    x = closest_stns_within_threshold(ec_session, x, y, 1)
+    assert len(x) > 0
