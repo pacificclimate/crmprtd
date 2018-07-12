@@ -1,4 +1,5 @@
 # Installed libraries
+import sys
 import pytz
 import logging
 import itertools
@@ -13,32 +14,18 @@ def normalize(file_stream):
     log = logging.getLogger(__name__)
     log.info('Starting WMB data normalization')
 
-    var_names = ['station_code',
-                 'weather_date',
-                 'precipitation',
-                 'temperature',
-                 'relative_humidity',
-                 'wind_speed',
-                 'wind_direction',
-                 'ffmc',
-                 'isi',
-                 'fwi',
-                 'rn_1_pluvio1',
-                 'snow_depth',
-                 'snow_depth_quality',
-                 'precip_pluvio1_status',
-                 'precip_pluvio1_total',
-                 'rn_1_pluvio2',
-                 'precip_pluvio2_status',
-                 'precip_pluvio2_total',
-                 'rn_1_RIT',
-                 'precip_RIT_Status',
-                 'precip_RIT_total',
-                 'precip_rgt',
-                 'solar_radiation_LICOR',
-                 'solar_radiation_CM3']
+    var_names = []
+    is_first = True
+    # be sure to grap variable names on first iteration
+    for row in file_stream:
+        if is_first:
+            for var in row.strip().replace('"', '').split(','):
+                var_names.append(var)
 
-    for row in itertools.islice(file_stream, 1, None):
+            is_first = False
+            continue
+
+        # assign variable name to value
         d = {val: item
              for val, item in zip(var_names,
                                   row.strip().replace('"', '').split(','))}
