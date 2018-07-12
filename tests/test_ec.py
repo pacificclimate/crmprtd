@@ -9,7 +9,8 @@ from geoalchemy2.functions import ST_X, ST_Y
 
 from crmprtd.ec import makeurl, extract_fname_from_url, ns, \
     ObsProcessor, check_history, insert_obs, \
-    recordable_vars, db_unit, OmMember, parse_xml, closest_stns_within_threshold
+    recordable_vars, db_unit, OmMember, parse_xml, \
+    closest_stns_within_threshold
 from pycds import Obs, History
 
 
@@ -677,7 +678,8 @@ def test_closest_stns_within_threshold_bad_data(ec_session):
     # https://github.com/pacificclimate/crmprtd/issues/8
 
     # Find some "good data" to use for the test run
-    x, y = ec_session.query(ST_X(History.the_geom), ST_Y(History.the_geom)).first()
+    x, y = ec_session.query(ST_X(History.the_geom), ST_Y(History.the_geom))\
+                     .first()
 
     # Create a couple history entries with reversed lat/lons
     space1 = History(station_name='Outer space',
