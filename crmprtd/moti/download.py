@@ -67,13 +67,7 @@ def download(args):
             raise IOError(
                 "HTTP {} error for {}".format(req.status_code, req.url))
 
-        with SpooledTemporaryFile(
-                max_size=int(os.environ.get('CRMPRTD_MAX_CACHE', 2**20)),
-                mode='r+b') as tempfile:
-            tempfile.write(req.content)
-
-            tempfile.seek(0)
-            yield tempfile
+        yield req.iter_content(chunk_size=int(os.environ.get('CRMPRTD_MAX_CACHE', 2**20)))
 
     except IOError:
         log.exception("Unable to download or open xml data")

@@ -73,6 +73,7 @@ if __name__ == '__main__':
     log = logging_setup(args.log_conf, args.log,
                         args.error_email, args.log_level)
 
-    for file in download(args):
-        for row in normalize(file):
-            print(row)
+    for gen in download(args):
+        for file in gen:
+            for row in normalize(file):
+                print(row)

@@ -3,6 +3,7 @@
 # Standard module
 import pytz
 import logging
+from io import BytesIO
 
 # Installed libraries
 from pkg_resources import resource_filename
@@ -22,7 +23,7 @@ log = logging.getLogger(__name__)
 
 def normalize(file_stream):
     log.info('Starting MOTI data normalization')
-    et = xmlparse(file_stream)
+    et = xmlparse(BytesIO(file_stream))
     et = transform(et)
 
     obs_series = et.xpath("//observation-series")
