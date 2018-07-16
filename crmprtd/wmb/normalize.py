@@ -11,7 +11,9 @@ from collections import OrderedDict
 # Local
 from crmprtd import Row
 
+
 log = logging.getLogger(__name__)
+
 
 def normalize(file_stream):
     log.info('Starting WMB data normalization')
@@ -32,7 +34,6 @@ def normalize(file_stream):
         _, station_id = data.pop(0)
         _, weather_date = data.pop(0)
 
-        # convert weather date from str --> datetime
         tz = pytz.timezone('Canada/Pacific')
         try:
             date = datetime.datetime.strptime(weather_date, "%Y%m%d%H").replace(tzinfo=tz)
