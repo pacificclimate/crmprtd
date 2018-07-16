@@ -68,7 +68,7 @@ if __name__ == '__main__':
     log = logging_setup(args.log_conf, args.log,
                         args.error_email, args.log_level)
 
-    file_stream = download(args)
-    for file in file_stream:
-        for line in normalize(file):
-            print(line)
+    for gen in download(args):
+        for file in gen:
+            for line in normalize(file):
+                print(line)

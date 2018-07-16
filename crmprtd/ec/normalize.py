@@ -3,9 +3,10 @@
 # Standard module
 import logging
 import pytz
+from io import BytesIO
 
 # Installed libraries
-from lxml.etree import parse, XSLT
+from lxml.etree import parse, XSLT, fromstring
 from dateutil.parser import parse as dateparse
 
 # Local
@@ -26,7 +27,8 @@ def parse_xml(file):
 
 
 def normalize(file_stream):
-    et = parse_xml(file_stream)
+    print(file_stream)
+    et = parse_xml(BytesIO(file_stream))
 
     members = et.xpath('//om:member', namespaces=ns)
     log.info('Starting EC data normalization')
