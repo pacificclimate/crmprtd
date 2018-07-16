@@ -6,61 +6,59 @@ import itertools
 from dateutil.parser import parse
 import datetime
 
+from collections import OrderedDict
+
 # Local
 from crmprtd import Row
 
+log = logging.getLogger(__name__)
 
 def normalize(file_stream):
-    log = logging.getLogger(__name__)
     log.info('Starting WMB data normalization')
 
-    var_names = []
-    is_first = True
-    # be sure to grap variable names on first iteration
-    for row in file_stream:
-        if is_first:
-            for var in row.strip().replace('"', '').split(','):
-                var_names.append(var)
+    def clean_row(row):
+        return row.strip().replace('"', '').split(',')
 
-            is_first = False
+    # set variable names using first row in file stream
+    var_names = []
+    for var in clean_row(file_stream.readline()):
+        var_names.append(var)
+
+    for row in file_stream:
+        # assign variable name to value
+        data = [(var_name, value) for var_name, value in zip(var_names, clean_row(row))]
+
+        # extract station_id and weather_date from list
+        _, station_id = data.pop(0)
+        _, weather_date = data.pop(0)
+
+        # convert weather date from str --> datetime
+        tz = pytz.timezone('Canada/Pacific')
+        try:
+            date = datetime.datetime.strptime(weather_date, "%Y%m%d%H").replace(tzinfo=tz)
+        except ValueError:
+            log.error('Unable to convert date', extra={'date': weather_date})
             continue
 
-        # assign variable name to value
-        d = {val: item
-             for val, item in zip(var_names,
-                                  row.strip().replace('"', '').split(','))}
+        for pair in data:
+            var_name, value = pair
 
-        for key, value in d.items():
-            # we do not need to create a separate row for these values
-            if key == 'station_id' or key == 'weather_date':
-                continue
-
-            # skip is there is no value
-            elif value is None:
-                continue
-
-            # convert types where necessary
-            date = d['weather_date']
-            tz = pytz.timezone('Canada/Pacific')
-            try:
-                cleaned_date = datetime.datetime.strptime('{}-{}-{} {}'.format(date[:4], date[4:6], date[6:8], date[8:10]), "%Y-%m-%d %H").replace(tzinfo=tz)
-            except ValueError:
-                log.error('Unable to parse date', extra={'date': date})
+            # skip if value string is empty
+            if not value:
                 continue
 
             try:
-                val = float(value)
+                value = float(value)
             except ValueError:
                 log.error('Unable to convert val to float',
                           extra={'value': value})
                 continue
 
-            # create namedTuple
-            yield Row(time=cleaned_date,
-                      val=val,
-                      variable_name=key,
+            yield Row(time=date,
+                      val=value,
+                      variable_name=var_name,
                       unit=None,
                       network_name='WMB',
-                      station_id=d['station_code'],
+                      station_id=station_id,
                       lat=None,
                       lon=None)

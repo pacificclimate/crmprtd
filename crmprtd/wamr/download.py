@@ -10,8 +10,10 @@ from tempfile import SpooledTemporaryFile
 from crmprtd import retry
 
 
+log = logging.getLogger(__name__)
+
+
 def download(args):
-    log = logging.getLogger(__name__)
     log.info('Starting WAMR rtd')
 
     try:

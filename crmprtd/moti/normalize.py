@@ -18,10 +18,9 @@ transform = XSLT(xmlparse(xsl))
 ns = {
     'xsi': "http://www.w3.org/2001/XMLSchema-instance"
 }
-
+log = logging.getLogger(__name__)
 
 def normalize(file_stream):
-    log = logging.getLogger(__name__)
     log.info('Starting MOTI data normalization')
     et = xmlparse(file_stream)
     et = transform(et)

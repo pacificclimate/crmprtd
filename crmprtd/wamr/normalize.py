@@ -8,8 +8,9 @@ from dateutil.parser import parse
 from crmprtd import Row
 
 
+log = logging.getLogger(__name__)
+
 def normalize(file_stream):
-    log = logging.getLogger(__name__)
     log.info('Starting WAMR data normalization')
 
     for row in itertools.islice(file_stream, 1, None):

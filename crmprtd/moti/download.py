@@ -13,9 +13,10 @@ import requests
 import yaml
 
 
+log = logging.getLogger(__name__)
+
+
 def download(args):
-    # Setup logging
-    log = logging.getLogger(__name__)
     log.info('Starting MOTIe rtd')
 
     try:

@@ -14,6 +14,9 @@ from crmprtd import Row
 from crmprtd.ec import ns, OmMember
 
 
+log = logging.getLogger(__name__)
+
+
 def parse_xml(file):
     # Parse and transform the xml
     et = parse(file)
@@ -23,7 +26,6 @@ def parse_xml(file):
 
 
 def normalize(file_stream):
-    log = logging.getLogger(__name__)
     et = parse_xml(file_stream)
 
     members = et.xpath('//om:member', namespaces=ns)

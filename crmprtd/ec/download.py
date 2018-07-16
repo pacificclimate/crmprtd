@@ -13,9 +13,10 @@ import requests
 from crmprtd.ec import makeurl
 
 
+log = logging.getLogger(__name__)
+
+
 def download(args):
-    # Setup logging
-    log = logging.getLogger(__name__)
     log.info('Starting EC rtd')
 
     try:

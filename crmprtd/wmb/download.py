@@ -14,8 +14,10 @@ from crmprtd import retry
 import yaml
 
 
+log = logging.getLogger(__name__)
+
+
 def download(args):
-    log = logging.getLogger(__name__)
     log.info('Starting WMB rtd')
 
     # Pull auth from args
