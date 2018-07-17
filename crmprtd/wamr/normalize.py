@@ -24,11 +24,11 @@ def normalize(file_stream):
             continue
 
         # skip over empty values
-        if val is None:
+        if not val:
             continue
 
         try:
-            val = float(val)
+            value = float(val)
         except ValueError:
             log.error('Unable to convert val to float',
                       extra={'value': val})
@@ -36,17 +36,17 @@ def normalize(file_stream):
 
         try:
             tz = pytz.timezone('Canada/Pacific')
-            time = parse(time).replace(tzinfo=tz)
+            dt = parse(time).replace(tzinfo=tz)
         except ValueError:
             log.error('Unable to convert date string to datetime',
                       extra={'time': time})
             continue
 
-        yield Row(time=time,
-                  val=val,
+        yield Row(time=dt,
+                  val=value,
                   variable_name=variable_name,
                   unit=unit,
-                  network_name='WAMR',
+                  network_name='ENV-AQN',
                   station_id=station_id,
                   lat=None,
                   lon=None)
