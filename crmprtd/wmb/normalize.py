@@ -23,8 +23,10 @@ def normalize(file_stream):
 
     # set variable names using first row in file stream
     var_names = []
-    for var in clean_row(file_stream.readline()):
-        var_names.append(var)
+    for first_row in file_stream:
+        for var in clean_row(first_row):
+            var_names.append(var)
+        break
 
     for row in file_stream:
         # assign variable name to value

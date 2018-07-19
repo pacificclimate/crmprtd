@@ -16,6 +16,7 @@ from pkg_resources import resource_stream
 from crmprtd.wamr.download import download
 from crmprtd.wamr.normalize import normalize
 from crmprtd.wamr import setup_logging
+from itertools import tee
 
 
 if __name__ == '__main__':
@@ -88,5 +89,12 @@ if __name__ == '__main__':
 
     # Pipeline
     for file in download(args):
-        for row in normalize(file):
+
+        if args.cache_file:
+            to_cache, file_stream = tee(file)
+            with open(args.cache_file, 'w') as f:
+                for line in to_cache:
+                    f.write(line)
+
+        for row in normalize(file_stream):
             print(row)

@@ -10,6 +10,7 @@
 
 from pkg_resources import resource_stream
 from argparse import ArgumentParser
+from itertools import tee
 
 # Local
 from crmprtd.wmb.download import download
@@ -58,8 +59,10 @@ if __name__ == '__main__':
     parser.add_argument('--password',
                         help=("The password for data requests. Overrides auth "
                               "file."))
-    parser.add_argument('-C', '--cache_dir',
-                        help='Directory in which to put the downloaded file')
+    parser.add_argument('-C', '--cache_file',
+                        default=None,
+                        help=('Full path of file in which to put downloaded '
+                              'observations'))
     parser.add_argument('-a', '--archive_dir',
                         help=('Directory in which to put data that could not '
                               'be added to the database'))
@@ -77,5 +80,12 @@ if __name__ == '__main__':
 
     # Pipeline
     for file in download(args):
-        for row in normalize(file):
+
+        if args.cache_file:
+            to_cache, file_stream = tee(file)
+            with open(args.cache_file, 'w') as f:
+                for line in to_cache:
+                    f.write(line)
+
+        for row in normalize(file_stream):
             print(row)
