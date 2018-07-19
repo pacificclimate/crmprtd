@@ -16,7 +16,7 @@ def normalize(file_stream):
 
     for row in itertools.islice(file_stream, 1, None):
         try:
-            time, station_id, station_name, variable_name, \
+            time, station_id, _, variable_name, \
                 _, _, _, unit, _, _, _, val = row.strip().split(',')
         except ValueError as e:
             log.error('Unable to retrieve items.',
@@ -47,7 +47,6 @@ def normalize(file_stream):
                   variable_name=variable_name,
                   unit=unit,
                   network_name='ENV-AQN',
-                  station_name=station_name,
                   station_id=station_id,
                   lat=None,
                   lon=None)

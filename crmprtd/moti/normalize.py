@@ -81,7 +81,6 @@ def normalize(iterable):
                           variable_name=variable_name,
                           unit=value_element.get('units'),
                           network_name='MoTI',
-                          station_name=None,
                           station_id=stn_id,
                           lat=None,
                           lon=None)
