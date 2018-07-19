@@ -82,10 +82,10 @@ if __name__ == '__main__':
     for file in download(args):
 
         if args.cache_file:
-            to_cache, file_stream = tee(file)
+            to_cache, file = tee(file)
             with open(args.cache_file, 'w') as f:
                 for line in to_cache:
                     f.write(line)
 
-        for row in normalize(file_stream):
+        for row in normalize(file):
             print(row)
