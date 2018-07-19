@@ -38,8 +38,8 @@ if __name__ == '__main__':
                         help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
                               'CRITICAL.  Note that debug output by default '
                               'goes directly to file'))
-    parser.add_argument('-C', '--cache_dir', required=True,
-                        help=('directory in which to put the downloaded file '
+    parser.add_argument('-C', '--cache_file',
+                        help=('file in which to put the downloaded data '
                               'in the event of a post-download error'))
     parser.add_argument('-f', '--filename',
                         help='MPO-XML file to process')
@@ -75,5 +75,10 @@ if __name__ == '__main__':
 
     for gen in download(args):
         for file in gen:
-            for row in normalize(file):
-                print(row)
+
+            if args.cache_file:
+                with open(args.cache_file, 'w') as f:
+                    f.write(file.decode("utf-8"))
+
+            for line in normalize(file):
+                print(line)

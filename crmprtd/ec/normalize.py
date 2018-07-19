@@ -27,7 +27,6 @@ def parse_xml(file):
 
 
 def normalize(file_stream):
-    print(file_stream)
     et = parse_xml(BytesIO(file_stream))
 
     members = et.xpath('//om:member', namespaces=ns)
