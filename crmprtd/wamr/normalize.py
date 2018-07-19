@@ -10,6 +10,7 @@ from crmprtd import Row
 
 log = logging.getLogger(__name__)
 
+
 def normalize(file_stream):
     log.info('Starting WAMR data normalization')
 

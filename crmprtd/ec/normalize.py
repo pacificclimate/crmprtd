@@ -6,7 +6,7 @@ import pytz
 from io import BytesIO
 
 # Installed libraries
-from lxml.etree import parse, XSLT, fromstring
+from lxml.etree import parse, XSLT
 from dateutil.parser import parse as dateparse
 
 # Local

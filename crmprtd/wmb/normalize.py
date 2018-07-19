@@ -1,12 +1,7 @@
 # Installed libraries
-import sys
 import pytz
 import logging
-import itertools
-from dateutil.parser import parse
 import datetime
-
-from collections import OrderedDict
 
 # Local
 from crmprtd import Row
@@ -30,7 +25,8 @@ def normalize(file_stream):
 
     for row in file_stream:
         # assign variable name to value
-        data = [(var_name, value) for var_name, value in zip(var_names, clean_row(row))]
+        data = [(var_name, value)
+                for var_name, value in zip(var_names, clean_row(row))]
 
         # extract station_id and weather_date from list
         _, station_id = data.pop(0)
@@ -38,7 +34,8 @@ def normalize(file_stream):
 
         tz = pytz.timezone('Canada/Pacific')
         try:
-            date = datetime.datetime.strptime(weather_date, "%Y%m%d%H").replace(tzinfo=tz)
+            date = datetime.datetime.strptime(weather_date,
+                                              "%Y%m%d%H").replace(tzinfo=tz)
         except ValueError:
             log.error('Unable to convert date', extra={'date': weather_date})
             continue

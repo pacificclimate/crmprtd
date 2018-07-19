@@ -3,14 +3,11 @@
 # Standard module
 from argparse import ArgumentParser
 from pkg_resources import resource_filename
-from itertools import tee
-from io import BytesIO
-import sys
 
 # Local
 from crmprtd.ec import logging_setup
 from crmprtd.ec.download import download
-from crmprtd.ec.normalize import normalize, parse_xml
+from crmprtd.ec.normalize import normalize
 
 
 if __name__ == '__main__':
