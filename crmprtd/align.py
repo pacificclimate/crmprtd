@@ -13,13 +13,14 @@ from sqlalchemy import and_
 
 # local
 from pycds import Obs, History, Network, Variable, Station
+import sys
 
 
 log = logging.getLogger(__name__)
 
 
-def create_station_and_history_entry(obs_tuple):
-    stn = Station(native_id=obs_tuple.station_id, network=obs_tuple.network_name)
+def create_station_and_history_entry(sesh, obs_tuple, network_id):
+    stn = Station(native_id=obs_tuple.station_id, network_id=network_id)
     with sesh.begin_nested():
         sesh.add(stn)
     log.info('Created new station_id', extra={'stationd_id': stn.id})
@@ -28,7 +29,7 @@ def create_station_and_history_entry(obs_tuple):
     lat = None
     lon = None
 
-    if obs.tuple.lat and obs_tuple.lon:
+    if obs_tuple.lat and obs_tuple.lon:
         hist = History(station=stn,
                        lat=obs_tuple.lat,
                        lon=obs_tuple.lon)
@@ -38,7 +39,7 @@ def create_station_and_history_entry(obs_tuple):
     with sesh.begin_nested():
         sesh.add(hist)
     log.info('Created new history entry', extra={'hid': hist.id})
-
+    sesh.commit()
     return hist.id
 
 
@@ -59,38 +60,41 @@ def align(sesh, obs_tuple):
 
     if q.count() == 0:
         log.info('No station found, creating new station', extra={'native_id': obs_tuple.station_id})
-        hid = create_station_and_history_entry(obs_tuple)
-    elif q.count() == 1:
-        log.info('Matched station', extra={'history_id': q.first()})
-        hid = q.first()
+        network_id, = sesh.query(Network.id).filter(Network.name == obs_tuple.network_name).first()
+        print('network_id {}'.format(network_id))
+        hid = create_station_and_history_entry(sesh, obs_tuple, network_id)
+        print('new hid: {}'.format(hid))
+    # elif q.count() == 1:
+    #     log.info('Matched station', extra={'history_id': q.first()})
+    #     hid = q.first()
+    #
+    # elif q.count() >= 2:    # FIXME: This needs to be handled in some way
+    #     log.info('Found multiple stations', extra={'num_matches': q.count(), 'hids': q.all()})
 
-    elif q.count() >= 2:    # FIXME: This needs to be handled in some way
-        log.info('Found multiple stations', extra={'num_matches': q.count(), 'hids': q.all()})
-
-    # thing (val, variable name, unit)
-    log.info('Check time')
-    if obs_tuple.time is None:
-        log.error('Observation cannot be used without time')
-        return
-    log.info('Observation has time')
-    time = obs_tuple.time
-
-    log.info('Check data')
-    if obs_tuple.val is None:
-        log.error('Observation cannot be used without value')
-        return
-    log.info('Observation has value')
-    val = obs_tuple.val
-
-    log.info('Check if variable name exists in database')
-    q = sesh.query(Variable).join(Network).filter(and_(Network.name == obs_tuple.network_name, Variable.name == obs_tuple.variable_name))
-
-    if q.count() == 1:
-        log.info('Observation variable matches', extra={'var_name': obs_tuple.variable_name})
-        variable = q.first()
-    else:
-        log.warning('No matching varible found', extra={'var_name': obs_tuple.variable_name})
-        return
+    # # thing (val, variable name, unit)
+    # log.info('Check time')
+    # if obs_tuple.time is None:
+    #     log.error('Observation cannot be used without time')
+    #     return
+    # log.info('Observation has time')
+    # time = obs_tuple.time
+    #
+    # log.info('Check data')
+    # if obs_tuple.val is None:
+    #     log.error('Observation cannot be used without value')
+    #     return
+    # log.info('Observation has value')
+    # val = obs_tuple.val
+    #
+    # log.info('Check if variable name exists in database')
+    # q = sesh.query(Variable).join(Network).filter(and_(Network.name == obs_tuple.network_name, Variable.name == obs_tuple.variable_name))
+    #
+    # if q.count() == 1:
+    #     log.info('Observation variable matches', extra={'var_name': obs_tuple.variable_name})
+    #     variable = q.first()
+    # else:
+    #     log.warning('No matching varible found', extra={'var_name': obs_tuple.variable_name})
+    #     return
 
     # log.info('Check unit')
     # if obs_tuple.unit is None:
@@ -108,8 +112,8 @@ def align(sesh, obs_tuple):
     # log.info('Units match')
 
     # check obs before creating object
-    if time and variable and hid:
-        log.info('Observation accepted')
-        # yield Obs(time=time, variable=variable, history=hid, datum=obs_tuple.val)
-    else:
-        log.info('Observation rejected')
+    # if time and variable and hid:
+    #     log.info('Observation accepted')
+    #     # yield Obs(time=time, variable=variable, history=hid, datum=obs_tuple.val)
+    # else:
+    #     log.info('Observation rejected')
