@@ -24,19 +24,22 @@ def create_station_and_history_entry(obs_tuple):
         sesh.add(stn)
     log.info('Created new station_id', extra={'stationd_id': stn.id})
 
-    # FIXME: Need to add a new history entry (w/o station name?)
-    if obs_tuple.lat is None and obs_tuple.lon is None:
+    # FIXME: Need a way to have station name attribute
+    lat = None
+    lon = None
+
+    if obs.tuple.lat and obs_tuple.lon:
         hist = History(station=stn,
-                       sdate=obs_tuple.time)
-    elif obs_tuple.lat and obs_tuple.lon:
-        hist = History(station=stn,
-                       lon=lon,
-                       lat=lat,
-                       sdate=obs_tuple.time)
+                       lat=obs_tuple.lat,
+                       lon=obs_tuple.lon)
+    else:
+        hist = History(station=stn)
 
     with sesh.begin_nested():
         sesh.add(hist)
     log.info('Created new history entry', extra={'hid': hist.id})
+
+    return hist.id
 
 
 def align(sesh, obs_tuple):
@@ -56,7 +59,7 @@ def align(sesh, obs_tuple):
 
     if q.count() == 0:
         log.info('No station found, creating new station', extra={'native_id': obs_tuple.station_id})
-        # create_station_and_history_entry(obs_tuple)
+        hid = create_station_and_history_entry(obs_tuple)
     elif q.count() == 1:
         log.info('Matched station', extra={'history_id': q.first()})
         hid = q.first()
@@ -87,15 +90,14 @@ def align(sesh, obs_tuple):
         variable = q.first()
     else:
         log.warning('No matching varible found', extra={'var_name': obs_tuple.variable_name})
-        # FIXME: we should exit if we cannot match the variable
         return
 
-    log.info('Check unit')
-    if obs_tuple.unit is None:
-        log.info('No unit, converting')
-        # q = sesh.query(Variable.unit).join(Network).filter(Network.name == obs_tuple.network_name).filter(Variable.name == obs_tuple.variable_name)
-    log.info('Observation has unit')
-    unit = obs_tuple.unit
+    # log.info('Check unit')
+    # if obs_tuple.unit is None:
+    #     log.info('No unit, converting')
+    #     # q = sesh.query(Variable.unit).join(Network).filter(Network.name == obs_tuple.network_name).filter(Variable.name == obs_tuple.variable_name)
+    # log.info('Observation has unit')
+    # unit = obs_tuple.unit
 
 
     # q = sesh.query(Variable.unit).join(Network).filter(Network.name == obs_tuple.network_name).filter(Variable.name == obs_tuple.variable_name)
@@ -106,7 +108,7 @@ def align(sesh, obs_tuple):
     # log.info('Units match')
 
     # check obs before creating object
-    if time is not None and variable is not None and hid is not None:
+    if time and variable and hid:
         log.info('Observation accepted')
         # yield Obs(time=time, variable=variable, history=hid, datum=obs_tuple.val)
     else:
