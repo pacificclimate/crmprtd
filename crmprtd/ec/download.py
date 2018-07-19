@@ -47,7 +47,7 @@ def download(args):
             raise IOError(
                 "HTTP {} error for {}".format(req.status_code, req.url))
 
-        yield req.iter_content(chunk_size=2**20)
+        yield req.iter_lines()
 
     except IOError:
         log.exception("Unable to download or open xml data")
