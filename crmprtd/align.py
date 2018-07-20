@@ -10,13 +10,16 @@ pycds.Obs objects. This phase is common to all networks.
 
 import logging
 from sqlalchemy import and_
+from pint import UnitRegistry
+import re
 
 # local
 from pycds import Obs, History, Network, Variable, Station
-import sys
 
 
 log = logging.getLogger(__name__)
+ureg = UnitRegistry()
+Q_ = ureg.Quantity
 
 
 def create_station_and_history_entry(sesh, obs_tuple, network_id):
@@ -26,9 +29,6 @@ def create_station_and_history_entry(sesh, obs_tuple, network_id):
     log.info('Created new station_id', extra={'stationd_id': stn.id})
 
     # FIXME: Need a way to have station name attribute
-    lat = None
-    lon = None
-
     if obs_tuple.lat and obs_tuple.lon:
         hist = History(station=stn,
                        lat=obs_tuple.lat,
@@ -38,82 +38,119 @@ def create_station_and_history_entry(sesh, obs_tuple, network_id):
 
     with sesh.begin_nested():
         sesh.add(hist)
-    log.info('Created new history entry', extra={'hid': hist.id})
+    log.info('Created new history entry', extra={'history': hist.id})
     sesh.commit()
     return hist.id
+
+
+def convert_unit(val, src_unit, dst_unit):
+    try:
+        val = Q_(val, ureg.parse_expression(src_unit))  # src
+        val = val.to(dst_unit).magnitude  # dest
+    except Exception:
+        raise Exception(
+            "Can't convert source unit {} to destination unit {}".format(
+                src_unit, dst_unit)
+        )
 
 
 def align(sesh, obs_tuple):
     # place (network name, station id)
     log.info('Begin alignment on row')
 
-    log.info('Check for network name')
+    log.debug('Check for network name')
     q = sesh.query(Network).filter(Network.name == obs_tuple.network_name)
 
     if q.count() == 0:
         log.error('Observation cannot be used without a valid network name', extra={'network_name': obs_tuple.network_name})
         return
-    log.info('Found matching network name', extra={'network_name': q.first()})
+    log.debug('Found matching network name', extra={'network_name': q.first()})
 
-    log.info('Check if station id in history')
+    log.debug('Check if station id in history')
     q = sesh.query(History.id).join(Station).join(Network).filter(and_(Network.name == obs_tuple.network_name, Station.native_id == obs_tuple.station_id))
 
     if q.count() == 0:
         log.info('No station found, creating new station', extra={'native_id': obs_tuple.station_id})
         network_id, = sesh.query(Network.id).filter(Network.name == obs_tuple.network_name).first()
-        print('network_id {}'.format(network_id))
         hid = create_station_and_history_entry(sesh, obs_tuple, network_id)
-        print('new hid: {}'.format(hid))
-    # elif q.count() == 1:
-    #     log.info('Matched station', extra={'history_id': q.first()})
-    #     hid = q.first()
-    #
-    # elif q.count() >= 2:    # FIXME: This needs to be handled in some way
-    #     log.info('Found multiple stations', extra={'num_matches': q.count(), 'hids': q.all()})
 
-    # # thing (val, variable name, unit)
-    # log.info('Check time')
-    # if obs_tuple.time is None:
-    #     log.error('Observation cannot be used without time')
-    #     return
-    # log.info('Observation has time')
-    # time = obs_tuple.time
-    #
-    # log.info('Check data')
-    # if obs_tuple.val is None:
-    #     log.error('Observation cannot be used without value')
-    #     return
-    # log.info('Observation has value')
-    # val = obs_tuple.val
-    #
-    # log.info('Check if variable name exists in database')
-    # q = sesh.query(Variable).join(Network).filter(and_(Network.name == obs_tuple.network_name, Variable.name == obs_tuple.variable_name))
-    #
-    # if q.count() == 1:
-    #     log.info('Observation variable matches', extra={'var_name': obs_tuple.variable_name})
-    #     variable = q.first()
-    # else:
-    #     log.warning('No matching varible found', extra={'var_name': obs_tuple.variable_name})
-    #     return
+    elif q.count() == 1:
+        log.debug('Matched station', extra={'history_id': q.first()})
+        hid, = q.first()
 
-    # log.info('Check unit')
-    # if obs_tuple.unit is None:
-    #     log.info('No unit, converting')
-    #     # q = sesh.query(Variable.unit).join(Network).filter(Network.name == obs_tuple.network_name).filter(Variable.name == obs_tuple.variable_name)
-    # log.info('Observation has unit')
-    # unit = obs_tuple.unit
+    elif q.count() >= 2:    # FIXME: This needs to be handled in some way
+        log.debug('Found multiple stations', extra={'num_matches': q.count(), 'histories': q.all()})
+        hid = None
+        if obs_tuple.lat and obs_tuple.lon:
+            for id in q.all():
+                lat, lon = sesh.query(History.lat, History.lon).filter(History.id == id)
 
+                if lat == obs_tuple.lat and lon == obs_tuple.lon:
+                    log.info('Matched hid using lat/lon')
+                    hid = id
+                    break
+        else:
+            for id in q.all():
+                q = sesh.query(History.id).filter(and_(History.id == id, History.sdate is not NULL, History.edate is NULL))
 
-    # q = sesh.query(Variable.unit).join(Network).filter(Network.name == obs_tuple.network_name).filter(Variable.name == obs_tuple.variable_name)
-    # if q.first() != unit:
-    #     log.info('Unit does not match, converting')
-    #     # converting
-    #
-    # log.info('Units match')
+                if q.count() > 0:
+                    log.info('Matched hid using sdate/edate')
+                    hid, = q.first()
+                    break
 
-    # check obs before creating object
-    # if time and variable and hid:
-    #     log.info('Observation accepted')
-    #     # yield Obs(time=time, variable=variable, history=hid, datum=obs_tuple.val)
-    # else:
-    #     log.info('Observation rejected')
+        if not hid:
+            log.error('Unable to match station')
+            return
+
+    # thing (val, variable name, unit)
+    log.debug('Check time')
+    if obs_tuple.time is None:
+        log.error('Observation cannot be used without time')
+        return
+    log.debug('Observation has time')
+    time = obs_tuple.time
+
+    log.debug('Check data')
+    if obs_tuple.val is None:
+        log.error('Observation cannot be used without value')
+        return
+    log.debug('Observation has value')
+    datum = obs_tuple.val
+
+    log.debug('Check if variable name exists in database')
+    q = sesh.query(Variable.id).join(Network).filter(and_(Network.name == obs_tuple.network_name, Variable.name == obs_tuple.variable_name))
+
+    if q.count() < 1:
+        log.warning('No matching variable found', extra={'vars_id': obs_tuple.variable_name})
+        return
+
+    vars_id, = q.first()
+    log.debug('Observation variable matches', extra={'vars_id': vars_id})
+
+    log.info('Check unit')
+    if obs_tuple.unit is None:
+        log.info('No unit given, checking if table contains unit')
+        unit, = sesh.query(Variable.unit).join(Network).filter(Network.name == obs_tuple.network_name).filter(Variable.name == obs_tuple.variable_name).first()
+        if not unit:
+            log.info('Table contains no unit for variable', extra={'var_name': obs_tuple.variable_name})
+            return
+        log.info('Unit found')
+    else:
+        log.info('Observation has unit, check if it matches db')
+        unit = obs_tuple.unit
+        unit_db, = sesh.query(Variable.unit).join(Network).filter(Network.name == obs_tuple.network_name).filter(Variable.name == obs_tuple.variable_name).first()
+
+        if unit_db != unit:
+            log.info('Units do not match, converting')
+            # converting
+            try:
+                datum = convert_unit(datum, unit, unit_db)
+            except Exception as e:
+                log.error('Unable to convert units', extra={'src_unit': unit, 'dst_unit': unit_db, 'exception': e})
+                return
+            log.info('Unit converted', extra={'src_unit': unit, 'dst_unit': unit_db})
+        else:
+            log.info('Units match')
+
+    log.info('Alignment completed')
+    yield Obs(time=time, vars_id=vars_id, history_id=hid, datum=datum)
