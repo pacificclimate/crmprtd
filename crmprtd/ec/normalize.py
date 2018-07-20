@@ -83,7 +83,7 @@ def normalize(file_stream):
                       val=val,
                       variable_name=var,
                       unit=om.member_unit(var),
-                      network_name='EC',
+                      network_name='EC_raw',
                       station_id=native_id,
                       lat=lat,
                       lon=lon)
