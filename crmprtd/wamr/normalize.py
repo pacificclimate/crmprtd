@@ -3,6 +3,7 @@ import pytz
 import logging
 import itertools
 from dateutil.parser import parse
+import re
 
 # Local
 from crmprtd import Row
@@ -41,6 +42,10 @@ def normalize(file_stream):
             log.error('Unable to convert date string to datetime',
                       extra={'time': time})
             continue
+
+        # FIXME: This is a bit janky, does it belong in normalize?
+        if unit == '% RH':
+            unit = re.sub('% RH', '%', unit)
 
         yield Row(time=dt,
                   val=value,
