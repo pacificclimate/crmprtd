@@ -24,13 +24,14 @@ Q_ = ureg.Quantity
 
 
 def create_station_and_history_entry(sesh, obs_tuple):
-    # FIXME: add more to extra
     network_id, = sesh.query(Network.id).filter(
         Network.name == obs_tuple.network_name).first()
     stn = Station(native_id=obs_tuple.station_id, network_id=network_id)
     with sesh.begin_nested():
         sesh.add(stn)
-    log.info('Created new station_id', extra={'stationd_id': stn.id})
+    log.info('Created new station entry',
+             extra={'stationd_id': stn.id, 'network_id': network_id,
+                    'network_name': obs_tuple.network_name})
 
     if obs_tuple.lat and obs_tuple.lon:
         hist = History(station=stn,
@@ -41,7 +42,9 @@ def create_station_and_history_entry(sesh, obs_tuple):
 
     with sesh.begin_nested():
         sesh.add(hist)
-    log.info('Created new history entry', extra={'history': hist.id})
+    log.info('Created new history entry',
+             extra={'history': hist.id, 'network_name': obs_tuple.network_name,
+                    'lat': obs_tuple.lat, 'lon': obs_tuple.lon})
     sesh.commit()
     return hist.id
 
@@ -96,8 +99,8 @@ def align(sesh, obs_tuple):
         log.debug('Matched station', extra={'history_id': q.first()})
         hid, = q.first()
 
-    elif q.count() >= 2:    # FIXME: This needs to be handled in some way
-        log.info('Found multiple stations', extra={
+    elif q.count() >= 2:    # FIXME: What happens if we cannot find an "active" station
+        log.debug('Found multiple stations', extra={
             'num_matches': q.count(), 'histories': q.all()})
         hid = None
         if obs_tuple.lat and obs_tuple.lon:
@@ -108,19 +111,19 @@ def align(sesh, obs_tuple):
             close_stns = matching_stns.intersection(
                 closest_stns_within_threshold(sesh, obs_tuple.lon,
                                               obs_tuple.lat, 800))
-            log.info('Station set intersection',
-                     extra={'station_set': close_stns})
+            log.debug('Station set intersection',
+                      extra={'station_set': close_stns})
 
             if len(close_stns) == 0:
-                log.info('Station set is empty, adding new station')
+                log.debug('Station set is empty, adding new station')
                 hid = create_station_and_history_entry(sesh, obs_tuple)
 
             elif len(close_stns) == 1:
-                log.info('Single station in set')
+                log.debug('Single station in set')
                 hid = close_stns.pop()
 
             elif len(close_stns) > 1:
-                log.info('Multiple stations in set')
+                log.debug('Multiple stations in set')
                 closest_pos = 999   # max distance should be 800m at this point
                 for id in close_stns:
                     try:
@@ -136,7 +139,7 @@ def align(sesh, obs_tuple):
 
                     # best case, we find exact match
                     if dist == 0:
-                        log.info('Exact match found')
+                        log.debug('Exact match found')
                         hid = id
                         break
 
@@ -147,8 +150,11 @@ def align(sesh, obs_tuple):
                             closest_pos = dist
 
             if not hid:
+                log.debug('Observation contains lat/lon but does not match '
+                          'any entries in db')
                 hid = create_station_and_history_entry(sesh, obs_tuple)
         else:
+            log.debug('No lat/lon, checking for \"active\" stations')
             for id in q.all():
                 q = sesh.query(History.id).filter(
                     and_(History.id == id,
@@ -156,7 +162,7 @@ def align(sesh, obs_tuple):
                          History.edate is None))
 
                 if q.count() > 0:
-                    log.info('Matched hid using sdate/edate')
+                    log.debug('Matched hid using sdate/edate')
                     hid, = q.first()
                     break
 
@@ -192,27 +198,27 @@ def align(sesh, obs_tuple):
     vars_id, = q.first()
     log.debug('Observation variable matches', extra={'vars_id': vars_id})
 
-    log.info('Check unit')
+    log.debug('Check unit')
     if obs_tuple.unit is None:
-        log.info('No unit given, checking if table contains unit')
+        log.debug('No unit given, checking if table contains unit')
         unit, = sesh.query(Variable.unit).join(Network).filter(and_(
             Network.name == obs_tuple.network_name,
             Variable.name == obs_tuple.variable_name)).first()
         if not unit:
-            log.info('Table contains no unit for variable',
-                     extra={'var_name': obs_tuple.variable_name})
+            log.warning('Table contains no unit for variable',
+                        extra={'var_name': obs_tuple.variable_name})
             return
-        log.info('Unit found')
+        log.debug('Unit found')
     else:
-        log.info('Observation has unit, check if it matches db')
+        log.debug('Observation has unit, check if it matches db')
         unit = obs_tuple.unit
         unit_db, = sesh.query(Variable.unit).join(Network).filter(and_(
             Network.name == obs_tuple.network_name,
             Variable.name == obs_tuple.variable_name)).first()
 
         if unit_db != unit:
-            log.info('Units do not match, converting')
-            # converting
+            log.debug('Units do not match, converting')
+
             try:
                 datum = convert_unit(datum, unit, unit_db)
             except Exception as e:
@@ -221,10 +227,10 @@ def align(sesh, obs_tuple):
                                  'dst_unit': unit_db,
                                  'exception': e})
                 return
-            log.info('Unit converted', extra={
+            log.debug('Unit converted', extra={
                      'src_unit': unit, 'dst_unit': unit_db})
         else:
-            log.info('Units match')
+            log.debug('Units match')
 
     log.info('Alignment completed')
     yield Obs(time=time, vars_id=vars_id, history_id=hid, datum=datum)
