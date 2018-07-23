@@ -62,7 +62,8 @@ def haversine_formula(lat1, lon1, lat2, lon2):
     R = 6378.137
     dLat = lat2 * math.pi / 180 - lat1 * math.pi / 180
     dLon = lon2 * math.pi / 180 - lon1 * math.pi / 180
-    a = math.sin(dLat/2) * math.sin(dLat/2) + math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) * math.sin(dLon/2) * math.sin(dLon/2)
+    a = math.sin(dLat/2) * math.sin(dLat/2) + math.cos(lat1 * math.pi / 180) *\
+        math.cos(lat2 * math.pi / 180) * math.sin(dLon/2) * math.sin(dLon/2)
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
     d = R * c
     return d * 1000
@@ -104,7 +105,9 @@ def align(sesh, obs_tuple):
             for hid in q.first():
                 matching_stns.append(hid)
             matching_stns = set(matching_stns)
-            close_stns = matching_stns.intersection(closest_stns_within_threshold(sesh, obs_tuple.lon, obs_tuple.lat, 800))
+            close_stns = matching_stns.intersection(
+                closest_stns_within_threshold(sesh, obs_tuple.lon,
+                                              obs_tuple.lat, 800))
             log.info('Station set intersection',
                      extra={'station_set': close_stns})
 
@@ -122,7 +125,7 @@ def align(sesh, obs_tuple):
                 for id in close_stns:
                     try:
                         lat, lon = sesh.query(History.lat, History.lon).filter(
-                                    History.id == id).first()
+                            History.id == id).first()
                     except Exception:
                         log.warning('Could not unpack values')
 
@@ -130,7 +133,7 @@ def align(sesh, obs_tuple):
                                              obs_tuple.lon,
                                              float(lat),
                                              float(lon))
-                                             
+
                     # best case, we find exact match
                     if dist == 0:
                         log.info('Exact match found')
