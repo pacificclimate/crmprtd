@@ -11,7 +11,6 @@ pycds.Obs objects. This phase is common to all networks.
 import logging
 from sqlalchemy import and_
 from pint import UnitRegistry
-import sys
 from decimal import Decimal
 
 # local
@@ -24,7 +23,7 @@ Q_ = ureg.Quantity
 
 
 def create_station_and_history_entry(sesh, obs_tuple):
-    #FIXME: add more to extra
+    # FIXME: add more to extra
     network_id, = sesh.query(Network.id).filter(
         Network.name == obs_tuple.network_name).first()
     stn = Station(native_id=obs_tuple.station_id, network_id=network_id)
@@ -92,19 +91,21 @@ def align(sesh, obs_tuple):
 
     elif q.count() >= 2:    # FIXME: This needs to be handled in some way
         log.info('Found multiple stations', extra={
-                  'num_matches': q.count(), 'histories': q.all()})
+            'num_matches': q.count(), 'histories': q.all()})
         hid = None
         if obs_tuple.lat and obs_tuple.lon:
             for id in q.all():
                 try:
-                    lat, lon = sesh.query(
-                        History.lat, History.lon).filter(History.id == id).first()
+                    lat, lon = sesh.query(History.lat, History.lon).filter(
+                                History.id == id).first()
                 except Exception:
                     log.warning('Could not unpack values')
 
-                #FIXME: What do we want the precision to be?
-                log.info('Comparing coordinates, existing: {},{} obs: {},{}'.format(round(lat, get_precision(obs_tuple.lat)), round(lon, get_precision(obs_tuple.lon)), obs_tuple.lat, obs_tuple.lon))
-                if round(lat, get_precision(obs_tuple.lat)) == obs_tuple.lat and round(lon, get_precision(obs_tuple.lon)) == obs_tuple.lon:
+                # FIXME: What do we want the precision to be?
+                lat_precision = get_precision(obs_tuple.lat)
+                lon_precision = get_precision(obs_tuple.lon)
+                if round(lat, lat_precision) == obs_tuple.lat and \
+                        round(lon, lon_precision) == obs_tuple.lon:
                     log.info('Matched hid using lat/lon')
                     hid = id
                     break

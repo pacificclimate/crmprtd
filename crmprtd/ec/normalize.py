@@ -7,7 +7,7 @@ import pytz
 # Installed libraries
 from lxml.etree import parse, XSLT
 from dateutil.parser import parse as dateparse
-from decimal import *
+from decimal import Decimal
 
 # Local
 from pkg_resources import resource_stream
