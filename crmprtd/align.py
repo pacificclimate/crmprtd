@@ -11,7 +11,8 @@ pycds.Obs objects. This phase is common to all networks.
 import logging
 from sqlalchemy import and_
 from pint import UnitRegistry
-import re
+import sys
+from decimal import Decimal
 
 # local
 from pycds import Obs, History, Network, Variable, Station
@@ -22,13 +23,15 @@ ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
 
-def create_station_and_history_entry(sesh, obs_tuple, network_id):
+def create_station_and_history_entry(sesh, obs_tuple):
+    #FIXME: add more to extra
+    network_id, = sesh.query(Network.id).filter(
+        Network.name == obs_tuple.network_name).first()
     stn = Station(native_id=obs_tuple.station_id, network_id=network_id)
     with sesh.begin_nested():
         sesh.add(stn)
     log.info('Created new station_id', extra={'stationd_id': stn.id})
 
-    # FIXME: Need a way to have station name attribute
     if obs_tuple.lat and obs_tuple.lon:
         hist = History(station=stn,
                        lat=obs_tuple.lat,
@@ -49,49 +52,71 @@ def convert_unit(val, src_unit, dst_unit):
         val = val.to(dst_unit).magnitude  # dest
     except Exception:
         raise Exception(
-            "Can't convert source unit {} to destination unit {}".format(
+            "Unable to convert source unit {} to destination unit {}".format(
                 src_unit, dst_unit)
         )
+    return val
+
+
+def get_precision(value):
+    d = Decimal(value)
+    return abs(d.as_tuple().exponent)
 
 
 def align(sesh, obs_tuple):
-    # place (network name, station id)
     log.info('Begin alignment on row')
 
+    # place
     log.debug('Check for network name')
     q = sesh.query(Network).filter(Network.name == obs_tuple.network_name)
 
     if q.count() == 0:
-        log.error('Observation cannot be used without a valid network name', extra={'network_name': obs_tuple.network_name})
+        log.error('Observation cannot be used without a valid network name',
+                  extra={'network_name': obs_tuple.network_name})
         return
     log.debug('Found matching network name', extra={'network_name': q.first()})
 
     log.debug('Check if station id in history')
-    q = sesh.query(History.id).join(Station).join(Network).filter(and_(Network.name == obs_tuple.network_name, Station.native_id == obs_tuple.station_id))
+    q = sesh.query(History.id).join(Station).join(Network).filter(and_(
+        Network.name == obs_tuple.network_name,
+        Station.native_id == obs_tuple.station_id))
 
     if q.count() == 0:
-        log.info('No station found, creating new station', extra={'native_id': obs_tuple.station_id})
-        network_id, = sesh.query(Network.id).filter(Network.name == obs_tuple.network_name).first()
-        hid = create_station_and_history_entry(sesh, obs_tuple, network_id)
+        log.info('No station found, creating new station',
+                 extra={'native_id': obs_tuple.station_id})
+        hid = create_station_and_history_entry(sesh, obs_tuple)
 
     elif q.count() == 1:
         log.debug('Matched station', extra={'history_id': q.first()})
         hid, = q.first()
 
     elif q.count() >= 2:    # FIXME: This needs to be handled in some way
-        log.debug('Found multiple stations', extra={'num_matches': q.count(), 'histories': q.all()})
+        log.info('Found multiple stations', extra={
+                  'num_matches': q.count(), 'histories': q.all()})
         hid = None
         if obs_tuple.lat and obs_tuple.lon:
             for id in q.all():
-                lat, lon = sesh.query(History.lat, History.lon).filter(History.id == id)
+                try:
+                    lat, lon = sesh.query(
+                        History.lat, History.lon).filter(History.id == id).first()
+                except Exception:
+                    log.warning('Could not unpack values')
 
-                if lat == obs_tuple.lat and lon == obs_tuple.lon:
+                #FIXME: What do we want the precision to be?
+                log.info('Comparing coordinates, existing: {},{} obs: {},{}'.format(round(lat, get_precision(obs_tuple.lat)), round(lon, get_precision(obs_tuple.lon)), obs_tuple.lat, obs_tuple.lon))
+                if round(lat, get_precision(obs_tuple.lat)) == obs_tuple.lat and round(lon, get_precision(obs_tuple.lon)) == obs_tuple.lon:
                     log.info('Matched hid using lat/lon')
                     hid = id
                     break
+
+            if not hid:
+                hid = create_station_and_history_entry(sesh, obs_tuple)
         else:
             for id in q.all():
-                q = sesh.query(History.id).filter(and_(History.id == id, History.sdate is not NULL, History.edate is NULL))
+                q = sesh.query(History.id).filter(
+                    and_(History.id == id,
+                         History.sdate is not None,
+                         History.edate is None))
 
                 if q.count() > 0:
                     log.info('Matched hid using sdate/edate')
@@ -102,7 +127,7 @@ def align(sesh, obs_tuple):
             log.error('Unable to match station')
             return
 
-    # thing (val, variable name, unit)
+    # thing
     log.debug('Check time')
     if obs_tuple.time is None:
         log.error('Observation cannot be used without time')
@@ -118,10 +143,13 @@ def align(sesh, obs_tuple):
     datum = obs_tuple.val
 
     log.debug('Check if variable name exists in database')
-    q = sesh.query(Variable.id).join(Network).filter(and_(Network.name == obs_tuple.network_name, Variable.name == obs_tuple.variable_name))
+    q = sesh.query(Variable.id).join(Network).filter(and_(
+        Network.name == obs_tuple.network_name,
+        Variable.name == obs_tuple.variable_name))
 
     if q.count() < 1:
-        log.warning('No matching variable found', extra={'vars_id': obs_tuple.variable_name})
+        log.warning('No matching variable found', extra={
+                    'vars_id': obs_tuple.variable_name})
         return
 
     vars_id, = q.first()
@@ -130,15 +158,20 @@ def align(sesh, obs_tuple):
     log.info('Check unit')
     if obs_tuple.unit is None:
         log.info('No unit given, checking if table contains unit')
-        unit, = sesh.query(Variable.unit).join(Network).filter(Network.name == obs_tuple.network_name).filter(Variable.name == obs_tuple.variable_name).first()
+        unit, = sesh.query(Variable.unit).join(Network).filter(and_(
+            Network.name == obs_tuple.network_name,
+            Variable.name == obs_tuple.variable_name)).first()
         if not unit:
-            log.info('Table contains no unit for variable', extra={'var_name': obs_tuple.variable_name})
+            log.info('Table contains no unit for variable',
+                     extra={'var_name': obs_tuple.variable_name})
             return
         log.info('Unit found')
     else:
         log.info('Observation has unit, check if it matches db')
         unit = obs_tuple.unit
-        unit_db, = sesh.query(Variable.unit).join(Network).filter(Network.name == obs_tuple.network_name).filter(Variable.name == obs_tuple.variable_name).first()
+        unit_db, = sesh.query(Variable.unit).join(Network).filter(and_(
+            Network.name == obs_tuple.network_name,
+            Variable.name == obs_tuple.variable_name)).first()
 
         if unit_db != unit:
             log.info('Units do not match, converting')
@@ -146,9 +179,13 @@ def align(sesh, obs_tuple):
             try:
                 datum = convert_unit(datum, unit, unit_db)
             except Exception as e:
-                log.error('Unable to convert units', extra={'src_unit': unit, 'dst_unit': unit_db, 'exception': e})
+                log.error('Unable to convert units',
+                          extra={'src_unit': unit,
+                                 'dst_unit': unit_db,
+                                 'exception': e})
                 return
-            log.info('Unit converted', extra={'src_unit': unit, 'dst_unit': unit_db})
+            log.info('Unit converted', extra={
+                     'src_unit': unit, 'dst_unit': unit_db})
         else:
             log.info('Units match')
 

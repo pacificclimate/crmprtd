@@ -7,6 +7,7 @@ import pytz
 # Installed libraries
 from lxml.etree import parse, XSLT
 from dateutil.parser import parse as dateparse
+from decimal import *
 
 # Local
 from pkg_resources import resource_stream
@@ -56,7 +57,7 @@ def normalize(file_stream):
                 stn_name, native_id = map(lambda x: member.xpath(
                     ".//mpo:identification-elements/mpo:element[@name='%s']" %
                     x, namespaces=ns)[0].get('value'), attrs)
-                lat, lon = map(float, member.xpath(
+                lat, lon = map(Decimal, member.xpath(
                     './/gml:pos', namespaces=ns)[0].text.split())
                 obs_time = member.xpath(
                     './om:Observation/om:samplingTime//gml:timePosition',
