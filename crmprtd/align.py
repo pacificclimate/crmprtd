@@ -105,15 +105,19 @@ def align(sesh, obs_tuple):
                 matching_stns.append(hid)
             matching_stns = set(matching_stns)
             close_stns = matching_stns.intersection(closest_stns_within_threshold(sesh, obs_tuple.lon, obs_tuple.lat, 800))
-            log.info('Station set intersection', extra={'station_set': close_stns})
+            log.info('Station set intersection',
+                     extra={'station_set': close_stns})
 
             if len(close_stns) == 0:
+                log.info('Station set is empty, adding new station')
                 hid = create_station_and_history_entry(sesh, obs_tuple)
 
             elif len(close_stns) == 1:
+                log.info('Single station in set')
                 hid = close_stns.pop()
 
             elif len(close_stns) > 1:
+                log.info('Multiple stations in set')
                 closest_pos = 999   # max distance should be 800m at this point
                 for id in close_stns:
                     try:
@@ -122,7 +126,11 @@ def align(sesh, obs_tuple):
                     except Exception:
                         log.warning('Could not unpack values')
 
-                    dist = haversine_formula(obs_tuple.lat, obs_tuple.lon, float(lat), float(lon))
+                    dist = haversine_formula(obs_tuple.lat,
+                                             obs_tuple.lon,
+                                             float(lat),
+                                             float(lon))
+                                             
                     # best case, we find exact match
                     if dist == 0:
                         log.info('Exact match found')
