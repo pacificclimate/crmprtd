@@ -11,7 +11,6 @@ pycds.Obs objects. This phase is common to all networks.
 import logging
 from sqlalchemy import and_
 from pint import UnitRegistry
-from decimal import Decimal
 
 # local
 from pycds import Obs, History, Network, Variable, Station
@@ -57,9 +56,14 @@ def convert_unit(val, src_unit, dst_unit):
     return val
 
 
-def get_precision(value):
-    d = Decimal(value)
-    return abs(d.as_tuple().exponent)
+def haversine_formula(lat1, lon1, lat2, lon2):
+    R = 6378.137
+    dLat = lat2 * math.pi / 180 - lat1 * math.pi / 180
+    dLon = lon2 * math.pi / 180 - lon1 * math.pi / 180
+    a = math.sin(dLat/2) * math.sin(dLat/2) + math.cos(lat1 * math.pi / 180) * math.cos(lat2 * math.pi / 180) * math.sin(dLon/2) * math.sin(dLon/2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
+    d = R * c
+    return d * 1000
 
 
 def align(sesh, obs_tuple):
@@ -94,24 +98,24 @@ def align(sesh, obs_tuple):
             'num_matches': q.count(), 'histories': q.all()})
         hid = None
         if obs_tuple.lat and obs_tuple.lon:
-            for id in q.all():
-                try:
-                    lat, lon = sesh.query(History.lat, History.lon).filter(
-                                History.id == id).first()
-                except Exception:
-                    log.warning('Could not unpack values')
-
-                # FIXME: What do we want the precision to be?
-                lat_precision = get_precision(obs_tuple.lat)
-                lon_precision = get_precision(obs_tuple.lon)
-                if round(lat, lat_precision) == obs_tuple.lat and \
-                        round(lon, lon_precision) == obs_tuple.lon:
-                    log.info('Matched hid using lat/lon')
-                    hid = id
-                    break
-
-            if not hid:
-                hid = create_station_and_history_entry(sesh, obs_tuple)
+            # for id in q.all():
+            #     try:
+            #         lat, lon = sesh.query(History.lat, History.lon).filter(
+            #                     History.id == id).first()
+            #     except Exception:
+            #         log.warning('Could not unpack values')
+            #
+            #     # FIXME: What do we want the precision to be?
+            #     lat_precision = get_precision(obs_tuple.lat)
+            #     lon_precision = get_precision(obs_tuple.lon)
+            #     if round(lat, lat_precision) == obs_tuple.lat and \
+            #             round(lon, lon_precision) == obs_tuple.lon:
+            #         log.info('Matched hid using lat/lon')
+            #         hid = id
+            #         break
+            #
+            # if not hid:
+            #     hid = create_station_and_history_entry(sesh, obs_tuple)
         else:
             for id in q.all():
                 q = sesh.query(History.id).filter(
