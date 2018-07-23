@@ -11,9 +11,11 @@ pycds.Obs objects. This phase is common to all networks.
 import logging
 from sqlalchemy import and_
 from pint import UnitRegistry
+import math
 
 # local
 from pycds import Obs, History, Network, Variable, Station
+from crmprtd.ec import closest_stns_within_threshold
 
 
 log = logging.getLogger(__name__)
@@ -98,24 +100,43 @@ def align(sesh, obs_tuple):
             'num_matches': q.count(), 'histories': q.all()})
         hid = None
         if obs_tuple.lat and obs_tuple.lon:
-            # for id in q.all():
-            #     try:
-            #         lat, lon = sesh.query(History.lat, History.lon).filter(
-            #                     History.id == id).first()
-            #     except Exception:
-            #         log.warning('Could not unpack values')
-            #
-            #     # FIXME: What do we want the precision to be?
-            #     lat_precision = get_precision(obs_tuple.lat)
-            #     lon_precision = get_precision(obs_tuple.lon)
-            #     if round(lat, lat_precision) == obs_tuple.lat and \
-            #             round(lon, lon_precision) == obs_tuple.lon:
-            #         log.info('Matched hid using lat/lon')
-            #         hid = id
-            #         break
-            #
-            # if not hid:
-            #     hid = create_station_and_history_entry(sesh, obs_tuple)
+            matching_stns = []
+            for hid in q.first():
+                matching_stns.append(hid)
+            matching_stns = set(matching_stns)
+            close_stns = matching_stns.intersection(closest_stns_within_threshold(sesh, obs_tuple.lon, obs_tuple.lat, 800))
+            log.info('Station set intersection', extra={'station_set': close_stns})
+
+            if len(close_stns) == 0:
+                hid = create_station_and_history_entry(sesh, obs_tuple)
+
+            elif len(close_stns) == 1:
+                hid = close_stns.pop()
+
+            elif len(close_stns) > 1:
+                closest_pos = 999   # max distance should be 800m at this point
+                for id in close_stns:
+                    try:
+                        lat, lon = sesh.query(History.lat, History.lon).filter(
+                                    History.id == id).first()
+                    except Exception:
+                        log.warning('Could not unpack values')
+
+                    dist = haversine_formula(obs_tuple.lat, obs_tuple.lon, float(lat), float(lon))
+                    # best case, we find exact match
+                    if dist == 0:
+                        log.info('Exact match found')
+                        hid = id
+                        break
+
+                    # find closest
+                    else:
+                        if dist < closest_pos:
+                            hid = id
+                            closest_pos = dist
+
+            if not hid:
+                hid = create_station_and_history_entry(sesh, obs_tuple)
         else:
             for id in q.all():
                 q = sesh.query(History.id).filter(
