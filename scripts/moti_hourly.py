@@ -166,6 +166,7 @@ if __name__ == '__main__':
                         help=('directory in which to put the downloaded file '
                               'in the event of a post-download error'))
     parser.add_argument('-P', '--compress',
+                        action='store_true',
                         help='Compress saved download file')
     parser.add_argument('-f', '--filename',
                         help='MPO-XML file to process')
