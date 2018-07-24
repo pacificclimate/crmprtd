@@ -9,6 +9,7 @@ from datetime import datetime, timedelta
 from argparse import ArgumentParser
 import requests
 from pkg_resources import resource_stream
+import gzip
 
 # Installed libraries
 from lxml.etree import parse
@@ -97,8 +98,14 @@ def main(args):
             if req.status_code != 200:
                 raise IOError("HTTP {} error for {}".format(
                     req.status_code, req.url))
-            with open(fname, 'wb') as f:
-                f.write(req.content)
+
+            if args.compress:
+                with gzip.open(fname, 'wb') as f:
+                    f.write(req.content)
+            else:
+                with open(fname, 'wb') as f:
+                    f.write(req.content)
+
     except IOError:
         log.exception("Unable to download or open xml data")
         sys.exit(1)
@@ -158,6 +165,8 @@ if __name__ == '__main__':
     parser.add_argument('-C', '--cache_dir', required=True,
                         help=('directory in which to put the downloaded file '
                               'in the event of a post-download error'))
+    parser.add_argument('-P', '--compress',
+                        help='Compress saved download file')
     parser.add_argument('-f', '--filename',
                         help='MPO-XML file to process')
     parser.add_argument('-S', '--start_time',

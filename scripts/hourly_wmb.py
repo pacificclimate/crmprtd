@@ -231,7 +231,7 @@ if __name__ == '__main__':
     parser.add_argument('-C', '--cache_dir',
                         help='Directory in which to put the downloaded file')
     parser.add_argument('-P', '--compress',
-                        help='Compress saved downloaded file')
+                        help='Compress saved download file')
     parser.add_argument('-a', '--archive_dir',
                         help=('Directory in which to put data that could not '
                               'be added to the database'))
