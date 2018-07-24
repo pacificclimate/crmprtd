@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 
 def normalize(file_stream):
     log.info('Starting MOTI data normalization')
-    et = xmlparse(BytesIO(file_stream))
+    et = xmlparse(file_stream)
     et = transform(et)
 
     obs_series = et.xpath("//observation-series")

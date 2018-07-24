@@ -27,7 +27,7 @@ def parse_xml(file):
 
 
 def normalize(file_stream):
-    et = parse_xml(BytesIO(file_stream))
+    et = parse_xml(file_stream)
 
     members = et.xpath('//om:member', namespaces=ns)
     log.info('Starting EC data normalization')

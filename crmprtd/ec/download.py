@@ -10,7 +10,6 @@ import requests
 # Local
 from crmprtd.ec import makeurl
 
-
 log = logging.getLogger(__name__)
 
 
@@ -44,8 +43,7 @@ def download(args):
         if req.status_code != 200:
             raise IOError(
                 "HTTP {} error for {}".format(req.status_code, req.url))
-
-        yield req.iter_lines()
+        return req.iter_content(chunk_size=None)
 
     except IOError:
         log.exception("Unable to download or open xml data")
