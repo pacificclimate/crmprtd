@@ -99,7 +99,8 @@ def align(sesh, obs_tuple):
         log.debug('Matched station', extra={'history_id': q.first()})
         hid, = q.first()
 
-    elif q.count() >= 2:    # FIXME: What happens if we cannot find an "active" station
+    # FIXME: What happens if we cannot find an "active" station?
+    elif q.count() >= 2:
         log.debug('Found multiple stations', extra={
             'num_matches': q.count(), 'histories': q.all()})
         hid = None
