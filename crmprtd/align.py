@@ -61,6 +61,7 @@ def convert_unit(val, src_unit, dst_unit):
     return val
 
 
+# finds distance between 2 points on a sphere using lon/lat
 def haversine_formula(lat1, lon1, lat2, lon2):
     R = 6378.137
     dLat = lat2 * math.pi / 180 - lat1 * math.pi / 180
@@ -90,6 +91,7 @@ def align(sesh, obs_tuple):
         Network.name == obs_tuple.network_name,
         Station.native_id == obs_tuple.station_id))
 
+    hid = None
     if q.count() == 0:
         log.info('No station found, creating new station',
                  extra={'native_id': obs_tuple.station_id})
@@ -103,7 +105,7 @@ def align(sesh, obs_tuple):
     elif q.count() >= 2:
         log.debug('Found multiple stations', extra={
             'num_matches': q.count(), 'histories': q.all()})
-        hid = None
+
         if obs_tuple.lat and obs_tuple.lon:
             matching_stns = []
             for hid in q.first():
@@ -130,8 +132,9 @@ def align(sesh, obs_tuple):
                     try:
                         lat, lon = sesh.query(History.lat, History.lon).filter(
                             History.id == id).first()
-                    except Exception:
-                        log.warning('Could not unpack values')
+                    except Exception as e:
+                        log.warning('An error occured while accesing the db',
+                                    extra={'exception': e})
 
                     dist = haversine_formula(obs_tuple.lat,
                                              obs_tuple.lon,
@@ -168,7 +171,9 @@ def align(sesh, obs_tuple):
                     break
 
         if not hid:
-            log.error('Unable to match station')
+            log.warning('Unable to match station',
+                        extra={'station_id': obs_tuple.station_id,
+                               'network_name': obs_tuple.network_name})
             return
 
     # thing
@@ -205,11 +210,13 @@ def align(sesh, obs_tuple):
         unit, = sesh.query(Variable.unit).join(Network).filter(and_(
             Network.name == obs_tuple.network_name,
             Variable.name == obs_tuple.variable_name)).first()
+
         if not unit:
             log.warning('Table contains no unit for variable',
                         extra={'var_name': obs_tuple.variable_name})
             return
         log.debug('Unit found')
+
     else:
         log.debug('Observation has unit, check if it matches db')
         unit = obs_tuple.unit
