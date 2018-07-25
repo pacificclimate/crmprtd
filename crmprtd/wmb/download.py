@@ -49,7 +49,7 @@ def download(args):
                                                callback)
 
             tempfile.seek(0)
-            yield tempfile
+            return tempfile.readlines()
 
     except Exception as e:
         log.exception("Unable to process ftp")

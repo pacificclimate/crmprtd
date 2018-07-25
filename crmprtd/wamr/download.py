@@ -20,10 +20,11 @@ def download(args):
         ftpreader = ftp_connect(WAMRFTPReader, args.ftp_server, args.ftp_dir,
                                 log)
 
-        for filename in ftpreader.filenames:
-            with SpooledTemporaryFile(
-                    max_size=int(os.environ.get('CRMPRTD_MAX_CACHE', 2**20)),
-                    mode='r+') as tempfile:
+        with SpooledTemporaryFile(
+                max_size=int(os.environ.get('CRMPRTD_MAX_CACHE', 2**20)),
+                mode='r+') as tempfile:
+
+            for filename in ftpreader.filenames:
 
                 def callback(line):
                     tempfile.write('{}\n'.format(line))
@@ -32,8 +33,8 @@ def download(args):
                 ftpreader.connection.retrlines('RETR {}'.format(filename),
                                                callback)
 
-                tempfile.seek(0)
-                yield tempfile
+            tempfile.seek(0)
+            return tempfile.readlines()
 
     except Exception:
         log.exception("Unable to process ftp")

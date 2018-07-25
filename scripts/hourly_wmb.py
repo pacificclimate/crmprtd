@@ -78,14 +78,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     log = setup_logging(args.log_level, args.log, args.error_email)
 
-    # Pipeline
-    for file in download(args):
+    download_iter = download(args)
 
-        if args.cache_file:
-            to_cache, file = tee(file)
-            with open(args.cache_file, 'w') as f:
-                for line in to_cache:
-                    f.write(line)
+    if args.cache_file:
+        download_iter, cache_iter = tee(download_iter)
+        with open(args.cache_file, 'w') as f:
+            for chunk in cache_iter:
+                f.write(chunk)
 
-        for row in normalize(file):
-            print(row)
+    for row in normalize(download_iter):
+        print(row)
