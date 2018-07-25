@@ -72,9 +72,9 @@ def main(args):
                 raise IOError("HTTP {} error for {}".format(
                     req.status_code, req.url))
 
-            log.info("Saving data file", extra={'filename': fname})
+            log.info("Saving data file", extra={'fname': fname})
             if args.compress:
-                with gzip.open(fname, 'wb') as f:
+                with gzip.open(fname + '.gz', 'wb') as f:
                     f.write(req.content)
             else:
                 with open(fname, 'wb') as f:

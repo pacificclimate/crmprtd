@@ -100,7 +100,7 @@ def main(args):
                     req.status_code, req.url))
 
             if args.compress:
-                with gzip.open(fname, 'wb') as f:
+                with gzip.open(fname + '.gz', 'wb') as f:
                     f.write(req.content)
             else:
                 with open(fname, 'wb') as f:

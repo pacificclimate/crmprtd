@@ -12,6 +12,7 @@ This is largely lifted and modified from the hourly_wmb.py script
 import sys
 import csv
 import os
+import gzip
 
 from datetime import datetime
 from argparse import ArgumentParser
@@ -132,8 +133,9 @@ def main():
         if not args.cache_file:
             args.cache_file = 'wamr_download_{}.csv'.format(datetime.strftime(
                 datetime.now(), '%Y-%m-%dT%H-%M-%S'))
+
         if args.compress:
-            with gzip.open(args.cache_file, 'w') as cache_file:
+            with gzip.open(args.cache_file + '.gz', 'wt') as cache_file:
                 cache_rows(cache_file, rows, fieldnames)
         else:
             with open(args.cache_file, 'w') as cache_file:
