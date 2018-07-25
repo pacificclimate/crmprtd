@@ -3,7 +3,6 @@
 # Standard module
 import logging
 import pytz
-from io import BytesIO
 
 # Installed libraries
 from lxml.etree import parse, XSLT

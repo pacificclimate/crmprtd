@@ -3,7 +3,6 @@
 # Standard module
 import pytz
 import logging
-from io import BytesIO
 
 # Installed libraries
 from pkg_resources import resource_filename

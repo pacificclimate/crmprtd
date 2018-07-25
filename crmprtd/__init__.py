@@ -109,24 +109,27 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
 
 def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
     """
-    Lets you use an iterable (e.g. a generator) that yields bytestrings as a read-only
-    input stream.
+    Lets you use an iterable (e.g. a generator) that yields
+    bytestrings as a read-only input stream.
 
-    The stream implements Python 3's newer I/O API (available in Python 2's io module).
-    For efficiency, the stream is buffered.
+    The stream implements Python 3's newer I/O API (available in
+    Python 2's io module).  For efficiency, the stream is buffered.
 
-    From: https://stackoverflow.com/questions/6657820/python-convert-an-iterable-to-a-stream/20260030#20260030
+    From: goo.gl/Yxm5vz
+
     """
     class IterStream(io.RawIOBase):
         def __init__(self):
             self.leftover = None
+
         def readable(self):
             return True
+
         def readinto(self, b):
             try:
-                l = len(b)  # We're supposed to return at most this much
+                length = len(b)  # We're supposed to return at most this much
                 chunk = self.leftover or next(iterable)
-                output, self.leftover = chunk[:l], chunk[l:]
+                output, self.leftover = chunk[:length], chunk[length:]
                 b[:len(output)] = output
                 return len(output)
             except StopIteration:
