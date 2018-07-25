@@ -1,5 +1,3 @@
-import csv
-import sys
 import ftplib
 import logging
 import os
@@ -7,7 +5,8 @@ import os
 from tempfile import SpooledTemporaryFile
 
 # Local
-from crmprtd import retry
+from crmprtd.download import retry, ftp_connect
+from crmprtd.download import FTPReader
 
 
 log = logging.getLogger(__name__)
@@ -18,7 +17,8 @@ def download(args):
 
     try:
         # Connect FTP server and retrieve file
-        ftpreader = ftp_connect(args.ftp_server, args.ftp_dir, log)
+        ftpreader = ftp_connect(WAMRFTPReader, args.ftp_server, args.ftp_dir,
+                                log)
 
         for filename in ftpreader.filenames:
             with SpooledTemporaryFile(
@@ -36,25 +36,10 @@ def download(args):
                 yield tempfile
 
     except Exception:
-        log.critical("Unable to process ftp")
+        log.exception("Unable to process ftp")
 
 
-def ftp_connect(host, path, log):
-    log.info('Fetching file from FTP')
-    log.info('Listing {}/{}'.format(host, path))
-
-    try:
-        ftpreader = FTPReader(host, None,
-                              None, path, log)
-        log.info('Opened a connection to {}'.format(host))
-    except ftplib.all_errors as e:
-        log.critical('Unable to load data from ftp source', exc_info=True)
-        sys.exit(1)
-
-    return ftpreader
-
-
-class FTPReader(object):
+class WAMRFTPReader(FTPReader):
     '''Glue between the FTP class methods (which are callback based)
        and the csv.DictReader class (which is iteration based)
     '''
@@ -74,27 +59,3 @@ class FTPReader(object):
             self.filenames.append(line)
 
         self.connection.retrlines('NLST ' + data_path, callback)
-
-    def csv_reader(self, log=None):
-        # Just store the lines in memory
-        # It's non-ideal but neither classes support coroutine send/yield
-        if not log:
-            log = logging.getLogger('__name__')
-        lines = []
-
-        def callback(line):
-            lines.append(line)
-
-        for filename in self.filenames:
-            log.info("Downloading %s", filename)
-            # FIXME: This line has some kind of race condition with this
-            self.connection.retrlines('RETR {}'.format(filename), callback)
-
-        r = csv.DictReader(lines)
-        return r
-
-    def __del__(self):
-        try:
-            self.connection.quit()
-        except Exception:
-            self.connection.close()

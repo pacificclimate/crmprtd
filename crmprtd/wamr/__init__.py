@@ -3,7 +3,6 @@ import sys
 import logging
 import logging.config
 import csv
-import ftplib
 from pkg_resources import resource_stream
 
 import pytz
@@ -13,7 +12,7 @@ from pint import UnitRegistry
 
 from crmprtd.db import mass_insert_obs
 from pycds import Network, Station, History, Obs, Variable
-from crmprtd import retry, Timer
+from crmprtd import Timer
 
 tz = pytz.timezone('Canada/Pacific')
 ureg = UnitRegistry()
@@ -224,53 +223,6 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
         sesh.close()
 
     dl.archive(error_file)
-
-
-class FTPReader(object):  # pragma: no cover
-    '''Glue between the FTP class methods (which are callback based)
-       and the csv.DictReader class (which is iteration based)
-    '''
-
-    def __init__(self, host, user, password, data_path, log=None):
-        self.filenames = []
-
-        @retry(ftplib.error_temp, tries=4, delay=3, backoff=2, logger=log)
-        def ftp_connect_with_retry(host, user, password):
-            con = ftplib.FTP(host)
-            con.login(user, password)
-            return con
-
-        self.connection = ftp_connect_with_retry(host, user, password)
-
-        def callback(line):
-            self.filenames.append(line)
-
-        self.connection.retrlines('NLST ' + data_path, callback)
-
-    def csv_reader(self, log=None):
-        # Just store the lines in memory
-        # It's non-ideal but neither classes support coroutine send/yield
-        if not log:
-            log = logging.getLogger('__name__')
-
-        lines = []
-
-        def callback(line):
-            lines.append(line)
-
-        for filename in self.filenames:
-            log.info("Downloading from file", extra={'file': filename})
-            # FIXME: This line has some kind of race condition with this
-            self.connection.retrlines('RETR {}'.format(filename), callback)
-
-        r = csv.DictReader(lines)
-        return r
-
-    def __del__(self):
-        try:
-            self.connection.quit()
-        except Exception:
-            self.connection.close()
 
 
 def file2rows(file_, log):
