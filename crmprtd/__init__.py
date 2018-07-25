@@ -69,6 +69,9 @@ class Timer(object):
 def common_script_arguments(parser):
     parser.add_argument('-c', '--connection_string',
                         help='PostgreSQL connection string')
+    parser.add_argument('-D', '--diag',
+                        default=False, action="store_true",
+                        help="Turn on diagnostic mode (no commits)")
     parser.add_argument('-L', '--log_conf',
                         default=resource_stream(
                             'crmprtd', '/data/logging.yaml'),
