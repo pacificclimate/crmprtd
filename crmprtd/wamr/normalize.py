@@ -1,30 +1,52 @@
-import sys
-
 # Installed libraries
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+import pytz
+import logging
+import itertools
+from dateutil.parser import parse
 
 # Local
-from crmprtd.wamr import rows2db
-from crmprtd.wamr import file2rows
+from crmprtd import Row
 
 
-def input_file_prepare(args, error_file, log):
-    with open(args.input_file) as f:
-        rows, fieldnames = file2rows(f, log)
-    log.info('observations read into memory', extra={'num_obs': len(rows)})
-    prepare(rows, error_file, log, args)
+log = logging.getLogger(__name__)
 
 
-def prepare(rows, error_file, log, args):
-    # Database connection
-    try:
-        engine = create_engine(args.connection_string)
-        Session = sessionmaker(engine)
-        sesh = Session()
-    except Exception as e:
-        log.critical('Error with Database connection', exc_info=True)
-        sys.exit(1)
+def normalize(file_stream):
+    log.info('Starting WAMR data normalization')
 
-    # Hand the row off to the database processings/insertion part of the script
-    rows2db(sesh, rows, error_file, log, args.diag)
+    for row in itertools.islice(file_stream, 1, None):
+        try:
+            time, station_id, _, variable_name, \
+                _, _, _, unit, _, _, _, val = row.strip().split(',')
+        except ValueError as e:
+            log.error('Unable to retrieve items.',
+                      extra={'exception': e, 'row': row})
+            continue
+
+        # skip over empty values
+        if val is None:
+            continue
+
+        try:
+            val = float(val)
+        except ValueError:
+            log.error('Unable to convert val to float',
+                      extra={'value': val})
+            continue
+
+        try:
+            tz = pytz.timezone('Canada/Pacific')
+            time = parse(time).replace(tzinfo=tz)
+        except ValueError:
+            log.error('Unable to convert date string to datetime',
+                      extra={'time': time})
+            continue
+
+        yield Row(time=time,
+                  val=val,
+                  variable_name=variable_name,
+                  unit=unit,
+                  network_name='WAMR',
+                  station_id=station_id,
+                  lat=None,
+                  lon=None)

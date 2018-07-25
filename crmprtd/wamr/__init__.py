@@ -4,14 +4,12 @@ import logging
 import logging.config
 import csv
 from pkg_resources import resource_stream
-import ftplib
 
 import pytz
 from dateutil.parser import parse
 import yaml
 from pint import UnitRegistry
 
-from crmprtd import retry
 from crmprtd.db import mass_insert_obs
 from pycds import Network, Station, History, Obs, Variable
 from crmprtd import Timer
@@ -227,75 +225,11 @@ def rows2db(sesh, rows, error_file, log, diagnostic=False):
     dl.archive(error_file)
 
 
-class FTPReader(object):  # pragma: no cover
-    '''Glue between the FTP class methods (which are callback based)
-       and the csv.DictReader class (which is iteration based)
-    '''
-
-    def __init__(self, host, user, password, data_path, log=None):
-        self.filenames = []
-
-        @retry(ftplib.error_temp, tries=4, delay=3, backoff=2, logger=log)
-        def ftp_connect_with_retry(host, user, password):
-            con = ftplib.FTP(host)
-            con.login(user, password)
-            return con
-
-        self.connection = ftp_connect_with_retry(host, user, password)
-
-        def callback(line):
-            self.filenames.append(line)
-
-        self.connection.retrlines('NLST ' + data_path, callback)
-
-    def csv_reader(self, log=None):
-        # Just store the lines in memory
-        # It's non-ideal but neither classes support coroutine send/yield
-        if not log:
-            log = logging.getLogger('__name__')
-
-        lines = []
-
-        def callback(line):
-            lines.append(line)
-
-        for filename in self.filenames:
-            log.info("Downloading from file", extra={'file': filename})
-            # FIXME: This line has some kind of race condition with this
-            self.connection.retrlines('RETR {}'.format(filename), callback)
-
-        r = csv.DictReader(lines)
-        return r
-
-    def __del__(self):
-        try:
-            self.connection.quit()
-        except Exception:
-            self.connection.close()
-
-
 def file2rows(file_, log):
     try:
         reader = csv.DictReader(file_)
     except csv.Error as e:
         log.critical('Unable to load data from local file', exc_info=True)
-        sys.exit(1)
-
-    return [row for row in reader], reader.fieldnames
-
-
-def ftp2rows(host, path, log):  # pragma: no cover
-    log.info('Fetching file from FTP')
-    log.info('Listing', extra={'host': host, 'path': path})
-
-    try:
-        ftpreader = FTPReader(host, None,
-                              None, path, log)
-        log.info('Opened a connection', extra={'host': host})
-        reader = ftpreader.csv_reader(log)
-        log.info('instantiated the reader and downloaded all of the data')
-    except ftplib.all_errors as e:
-        log.critical('Unable to load data from ftp source', exc_info=True)
         sys.exit(1)
 
     return [row for row in reader], reader.fieldnames

@@ -1,44 +1,62 @@
-import csv
+import ftplib
+import logging
 import os
 
-from datetime import datetime
+from tempfile import SpooledTemporaryFile
 
 # Local
-from crmprtd.wamr import setup_logging
-from crmprtd.wamr import ftp2rows
-from crmprtd.wamr.normalize import prepare, input_file_prepare
+from crmprtd.download import retry, ftp_connect
+from crmprtd.download import FTPReader
 
 
-def run(args):
-    # Logging
-    log = setup_logging(args.log_level, args.log, args.error_email)
+log = logging.getLogger(__name__)
+
+
+def download(args):
     log.info('Starting WAMR rtd')
 
-    # Output files
-    if args.error_file:
-        error_file = open(args.error_file, 'a')
-    else:
-        error_filename = 'wamr_errors_{}.csv'.format(datetime.strftime(
-            datetime.now(), '%Y-%m-%dT%H-%M-%S'))
-        error_file = open(os.path.join(args.cache_dir, error_filename), 'a')
+    try:
+        # Connect FTP server and retrieve file
+        ftpreader = ftp_connect(WAMRFTPReader, args.ftp_server, args.ftp_dir,
+                                log)
 
-    if args.input_file:
-        input_file_prepare(args, error_file, log)
-    else:
-        # FTP
-        rows, fieldnames = ftp2rows(args.ftp_server, args.ftp_dir, log)
+        with SpooledTemporaryFile(
+                max_size=int(os.environ.get('CRMPRTD_MAX_CACHE', 2**20)),
+                mode='r+') as tempfile:
 
-        if not args.cache_file:
-            args.cache_file = 'wamr_download_{}.csv'.format(datetime.strftime(
-                datetime.now(), '%Y-%m-%dT%H-%M-%S'))
-        with open(args.cache_file, 'w') as cache_file:
-            cache_rows(cache_file, rows, fieldnames)
+            for filename in ftpreader.filenames:
 
-    log.info('observations read into memory', extra={'num_obs': len(rows)})
-    prepare(rows, error_file, log, args)
+                def callback(line):
+                    tempfile.write('{}\n'.format(line))
+
+                log.info("Downloading %s", filename)
+                ftpreader.connection.retrlines('RETR {}'.format(filename),
+                                               callback)
+
+            tempfile.seek(0)
+            return tempfile.readlines()
+
+    except Exception:
+        log.exception("Unable to process ftp")
 
 
-def cache_rows(file_, rows, fieldnames):
-    copier = csv.DictWriter(file_, fieldnames=fieldnames)
-    copier.writeheader()
-    copier.writerows(rows)
+class WAMRFTPReader(FTPReader):
+    '''Glue between the FTP class methods (which are callback based)
+       and the csv.DictReader class (which is iteration based)
+    '''
+
+    def __init__(self, host, user, password, data_path, log=None):
+        self.filenames = []
+
+        @retry(ftplib.error_temp, tries=4, delay=3, backoff=2, logger=log)
+        def ftp_connect_with_retry(host, user, password):
+            con = ftplib.FTP(host)
+            con.login(user, password)
+            return con
+
+        self.connection = ftp_connect_with_retry(host, user, password)
+
+        def callback(line):
+            self.filenames.append(line)
+
+        self.connection.retrlines('NLST ' + data_path, callback)

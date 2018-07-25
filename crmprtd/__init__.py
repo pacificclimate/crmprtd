@@ -29,7 +29,7 @@ transformations and extraction of information to the weather
 observations. This may include XML XSLT transformations, unit or
 variable name rewrites according to mapping rules, etc. The input to
 this phase is simply a file stream and the output is simply a stream
-of tuples (time, val, variable name, network name, station id, lat,
+of tuples (time, val, variable name, unit, network name, station id, lat,
 lon) in native types. The idea of this phase is that it requires no
 access to the database, just network specific knowledge.
 
@@ -46,8 +46,13 @@ failures. This phase needs to manage the database transactions for
 speed and reliability. This phase is common to all networks.
 """
 
+import io
 import time
-from functools import wraps
+from collections import namedtuple
+
+
+Row = namedtuple('Row', "time val variable_name unit network_name station_id \
+                         lat lon")
 
 
 class Timer(object):
@@ -60,42 +65,31 @@ class Timer(object):
         self.run_time = self.end - self.start
 
 
-def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
-    """Retry calling the decorated function using an exponential backoff.
-
-    http://www.saltycrane.com/blog/2009/11/trying-out-retry-decorator-python/
-    original from: http://wiki.python.org/moin/PythonDecoratorLibrary#Retry
-
-    :param ExceptionToCheck: the exception to check. may be a tuple of
-        exceptions to check
-    :type ExceptionToCheck: Exception or tuple
-    :param tries: number of times to try (not retry) before giving up
-    :type tries: int
-    :param delay: initial delay between retries in seconds
-    :type delay: int
-    :param backoff: backoff multiplier e.g. value of 2 will double the delay
-        each retry
-    :type backoff: int
-    :param logger: logger to use. If None, print
-    :type logger: logging.Logger instance
+def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
     """
-    def deco_retry(f):
+    Lets you use an iterable (e.g. a generator) that yields
+    bytestrings as a read-only input stream.
 
-        @wraps(f)
-        def f_retry(*args, **kwargs):
-            mtries, mdelay = tries, delay
-            while mtries > 1:
-                try:
-                    return f(*args, **kwargs)
-                except ExceptionToCheck as e:
-                    msg = "%s, Retrying in %d seconds..." % (str(e), mdelay)
-                    if logger:
-                        logger.warning(msg)
-                    else:
-                        print(msg)
-                    time.sleep(mdelay)
-                    mtries -= 1
-                    mdelay *= backoff
-            return f(*args, **kwargs)
-        return f_retry  # true decorator
-    return deco_retry
+    The stream implements Python 3's newer I/O API (available in
+    Python 2's io module).  For efficiency, the stream is buffered.
+
+    From: goo.gl/Yxm5vz
+
+    """
+    class IterStream(io.RawIOBase):
+        def __init__(self):
+            self.leftover = None
+
+        def readable(self):
+            return True
+
+        def readinto(self, b):
+            try:
+                length = len(b)  # We're supposed to return at most this much
+                chunk = self.leftover or next(iterable)
+                output, self.leftover = chunk[:length], chunk[length:]
+                b[:len(output)] = output
+                return len(output)
+            except StopIteration:
+                return 0    # indicate EOF
+    return io.BufferedReader(IterStream(), buffer_size=buffer_size)

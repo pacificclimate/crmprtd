@@ -3,9 +3,13 @@
 # Standard module
 from argparse import ArgumentParser
 from pkg_resources import resource_stream
+from itertools import tee
 
 # Local
-from crmprtd.moti.download import run
+from crmprtd.moti.download import download
+from crmprtd.moti.normalize import normalize
+from crmprtd.moti import logging_setup
+from crmprtd import iterable_to_stream
 
 
 if __name__ == '__main__':
@@ -36,8 +40,8 @@ if __name__ == '__main__':
                         help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
                               'CRITICAL.  Note that debug output by default '
                               'goes directly to file'))
-    parser.add_argument('-C', '--cache_dir', required=True,
-                        help=('directory in which to put the downloaded file '
+    parser.add_argument('-C', '--cache_file',
+                        help=('file in which to put the downloaded data '
                               'in the event of a post-download error'))
     parser.add_argument('-f', '--filename',
                         help='MPO-XML file to process')
@@ -68,4 +72,17 @@ if __name__ == '__main__':
     #                     help='directory in which to put the downloaded file')
 
     args = parser.parse_args()
-    run(args)
+    log = logging_setup(args.log_conf, args.log,
+                        args.error_email, args.log_level)
+
+    download_iter = download(args)
+
+    if args.cache_file:
+        download_iter, cache_iter = tee(download_iter)
+        with open(args.cache_file, 'wb') as f:
+            stream = iterable_to_stream(cache_iter)
+            f.write(stream.read())
+
+    stream = iterable_to_stream(download_iter)
+    for line in normalize(stream):
+        print(line)

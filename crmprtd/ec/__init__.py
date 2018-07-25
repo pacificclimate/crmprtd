@@ -1,8 +1,8 @@
-from lxml.etree import LxmlError, parse, tostring, XSLT
+from lxml.etree import tostring, LxmlError
 from datetime import datetime
 import re
+import yaml
 import logging
-from pkg_resources import resource_stream
 from urllib.parse import urlparse
 
 from pycds import History, Station, Network, Obs, Variable
@@ -13,7 +13,6 @@ from crmprtd import Timer
 
 
 log = logging.getLogger(__name__)
-
 ns = {
     'om': 'http://www.opengis.net/om/1.0',
     'mpo': "http://dms.ec.gc.ca/schema/point-observation/2.1",
@@ -21,6 +20,23 @@ ns = {
     'xlink': "http://www.w3.org/1999/xlink",
     'xsi': "http://www.w3.org/2001/XMLSchema-instance"
 }
+
+
+def logging_setup(log_conf, log, error_email, log_level):
+    with open(log_conf, 'rb') as f:
+        log_conf = yaml.load(f)
+    if log:
+        log_conf['handlers']['file']['filename'] = log
+    else:
+        log = log_conf['handlers']['file']['filename']
+    if error_email:
+        log_conf['handlers']['mail']['toaddrs'] = error_email
+    logging.config.dictConfig(log_conf)
+    log = logging.getLogger('crmprtd.ec')
+    if log_level:
+        log.setLevel(log_level)
+
+    return log
 
 
 def makeurl(freq='daily', province='BC', language='e', time=datetime.utcnow()):
@@ -41,14 +57,6 @@ def makeurl(freq='daily', province='BC', language='e', time=datetime.utcnow()):
 def extract_fname_from_url(url):
     p = urlparse(url).path
     return p.split('/')[-1]
-
-
-def parse_xml(fname):
-    # Parse and transform the xml
-    et = parse(fname)
-    xsl = resource_stream('crmprtd', 'data/ec_xform.xsl')
-    transform = XSLT(parse(xsl))
-    return transform(et)
 
 
 class ObsProcessor:
@@ -387,7 +395,7 @@ def db_unit(sesh, var_name):
         return None
 
 
-class OmMember:
+class OmMember(object):
     def __init__(self, member):
         self.member = member
 

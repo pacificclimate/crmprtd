@@ -9,8 +9,10 @@ from geoalchemy2.functions import ST_X, ST_Y
 
 from crmprtd.ec import makeurl, extract_fname_from_url, ns, \
     ObsProcessor, check_history, insert_obs, \
-    recordable_vars, db_unit, OmMember, parse_xml, \
+    recordable_vars, db_unit, OmMember, \
     closest_stns_within_threshold
+
+from crmprtd.ec.normalize import parse_xml
 from pycds import Obs, History
 
 

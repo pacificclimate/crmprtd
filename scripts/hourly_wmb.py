@@ -10,9 +10,12 @@
 
 from pkg_resources import resource_stream
 from argparse import ArgumentParser
+from itertools import tee
 
 # Local
-from crmprtd.wmb.download import run
+from crmprtd.wmb.download import download
+from crmprtd.wmb.normalize import normalize
+from crmprtd.wmb import setup_logging
 
 
 if __name__ == '__main__':
@@ -56,8 +59,10 @@ if __name__ == '__main__':
     parser.add_argument('--password',
                         help=("The password for data requests. Overrides auth "
                               "file."))
-    parser.add_argument('-C', '--cache_dir',
-                        help='Directory in which to put the downloaded file')
+    parser.add_argument('-C', '--cache_file',
+                        default=None,
+                        help=('Full path of file in which to put downloaded '
+                              'observations'))
     parser.add_argument('-a', '--archive_dir',
                         help=('Directory in which to put data that could not '
                               'be added to the database'))
@@ -71,4 +76,15 @@ if __name__ == '__main__':
                         help="Turn on diagnostic mode (no commits)")
 
     args = parser.parse_args()
-    run(args)
+    log = setup_logging(args.log_level, args.log, args.error_email)
+
+    download_iter = download(args)
+
+    if args.cache_file:
+        download_iter, cache_iter = tee(download_iter)
+        with open(args.cache_file, 'w') as f:
+            for chunk in cache_iter:
+                f.write(chunk)
+
+    for row in normalize(download_iter):
+        print(row)

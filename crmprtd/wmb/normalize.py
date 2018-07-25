@@ -1,70 +1,64 @@
-# Standard module
-import sys
-import os
-import csv
-
-from datetime import datetime
+# Installed libraries
+import pytz
+import logging
+import datetime
 
 # Local
-from crmprtd.wmb import ObsProcessor, DataLogger
-
-# Installed libraries
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from crmprtd import Row
 
 
-def save_file(reader, cache_dir, data):
-    # save the downloaded file
-    fname_out = os.path.join(cache_dir,
-                             'wmb_download' +
-                             datetime.strftime(datetime.now(),
-                                               '%Y-%m-%dT%H-%M-%S') +
-                             '.csv')
-    with open(fname_out, 'w') as f_out:
-        copier = csv.DictWriter(f_out, fieldnames=reader.fieldnames)
-        copier.writeheader()
-        copier.writerows(data)
+log = logging.getLogger(__name__)
 
 
-def prepare(args, log, reader):
-    data = list(reader)
-    save_file(reader, args.cache_dir, data)
-    log.info('processed all rows from reader')
-    log.info('{0} observations read into memory'.format(len(data)))
+def normalize(file_stream):
+    log.info('Starting WMB data normalization')
 
-    dl = DataLogger()
+    def clean_row(row):
+        return row.strip().replace('"', '').split(',')
 
-    # Open database connection
-    # I think this would fall under the align/insert?
-    try:
-        engine = create_engine(args.connection_string)
-        Session = sessionmaker(engine)
-        sesh = Session()
-        sesh.begin_nested()
-    except Exception as e:
-        dl.add_row(data, 'db-connection error')
-        data_archive = dl.archive(args.archive_dir)
-        log.critical('Error with database connection, see logfile, data saved',
-                     extra={'log': args.log, 'data_archive': data_archive})
-        sys.exit(1)
+    # set variable names using first row in file stream
+    var_names = []
+    for first_row in file_stream:
+        for var in clean_row(first_row):
+            var_names.append(var)
+        break
 
-    try:
-        op = ObsProcessor(sesh, data, args)
-        op.process()
-        if args.diag:
-            log.info('Diagnostic mode, rolling back all transactions')
-            sesh.rollback()
-        else:
-            log.info('Commiting the session')
-            sesh.commit()
+    for row in file_stream:
+        # assign variable name to value
+        data = [(var_name, value)
+                for var_name, value in zip(var_names, clean_row(row))]
 
-    except Exception as e:
-        dl.add_row(data, 'preproc error')
-        sesh.rollback()
-        data_archive = dl.archive(args.archive_dir)
-        log.critical('Error with database connection, see logfile, data saved',
-                     extra={'log': args.log, 'data_archive': data_archive})
-        sys.exit(1)
-    finally:
-        sesh.commit()
-        sesh.close()
+        # extract station_id and weather_date from list
+        _, station_id = data.pop(0)
+        _, weather_date = data.pop(0)
+
+        tz = pytz.timezone('Canada/Pacific')
+        try:
+            date = datetime.datetime.strptime(weather_date,
+                                              "%Y%m%d%H").replace(tzinfo=tz)
+        except ValueError:
+            log.error('Unable to convert date', extra={'date': weather_date})
+            continue
+
+        for pair in data:
+            var_name, value = pair
+
+            # skip if value string is empty
+            if not value:
+                continue
+
+            try:
+                value = float(value)
+            except ValueError:
+                log.error('Unable to convert val to float',
+                          extra={'value': value})
+                continue
+
+            yield Row(time=date,
+                      val=value,
+                      variable_name=var_name,
+                      unit=None,
+                      network_name='WMB',
+                      station_id=station_id,
+                      lat=None,
+                      lon=None)
