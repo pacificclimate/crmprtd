@@ -89,7 +89,7 @@ def common_script_arguments(parser):
                               'the program should report critical errors'))
     parser.add_argument('-C', '--cache_dir',
                         help='Directory in which to put the downloaded file')
-    parser.add_argument('-f', '--filename',
+    parser.add_argument('-i', '--input_file',
                         help='Input file to process')
     return parser
 
