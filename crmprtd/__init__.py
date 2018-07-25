@@ -48,12 +48,8 @@ speed and reliability. This phase is common to all networks.
 
 import io
 import time
-import argparse
-from collections import namedtuple
-
-
-Row = namedtuple('Row', "time val variable_name unit network_name station_id \
-                         lat lon")
+from pkg_resources import resource_stream
+from functools import wraps
 
 
 class Timer(object):
@@ -86,7 +82,7 @@ def common_script_arguments(parser):
                         help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
                               'CRITICAL.  Note that debug output by default '
                               'goes directly to file'))
-    parser.add_argument('-e', '--error_email',
+    parser.add_argument('-m', '--error_email',
                         default=None,
                         help=('Override the default e-mail address to which '
                               'the program should report critical errors'))
