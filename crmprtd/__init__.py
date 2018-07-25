@@ -48,6 +48,7 @@ speed and reliability. This phase is common to all networks.
 
 import io
 import time
+import argparse
 from collections import namedtuple
 
 
@@ -63,6 +64,34 @@ class Timer(object):
     def __exit__(self, *args):
         self.end = time.time()
         self.run_time = self.end - self.start
+
+
+def common_script_arguments(parser):
+    parser.add_argument('-c', '--connection_string',
+                        help='PostgreSQL connection string')
+    parser.add_argument('-L', '--log_conf',
+                        default=resource_stream(
+                            'crmprtd', '/data/logging.yaml'),
+                        help=('YAML file to use to override the default '
+                              'logging configuration'))
+    parser.add_argument('-l', '--log',
+                        default=None,
+                        help='Override the default log filename')
+    parser.add_argument('-v', '--log_level',
+                        choices=['DEBUG', 'INFO',
+                                 'WARNING', 'ERROR', 'CRITICAL'],
+                        help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
+                              'CRITICAL.  Note that debug output by default '
+                              'goes directly to file'))
+    parser.add_argument('-e', '--error_email',
+                        default=None,
+                        help=('Override the default e-mail address to which '
+                              'the program should report critical errors'))
+    parser.add_argument('-C', '--cache_dir',
+                        help='Directory in which to put the downloaded file')
+    parser.add_argument('-f', '--filename',
+                        help='Input file to process')
+    return parser
 
 
 def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
