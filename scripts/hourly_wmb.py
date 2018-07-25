@@ -104,7 +104,7 @@ def main(args):
                                                    '%Y-%m-%dT%H-%M-%S') +
                                  '.csv')
         if args.compress:
-            with gzip.open(fname_out, 'w') as f_out:
+            with gzip.open(fname_out + '.gz', 'wt') as f_out:
                 copier = csv.DictWriter(f_out, fieldnames=reader.fieldnames)
                 copier.writeheader()
                 copier.writerows(data)
