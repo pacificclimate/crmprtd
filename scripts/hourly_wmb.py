@@ -15,6 +15,7 @@ import logging
 import logging.config
 import os
 import ftplib
+import gzip
 
 from datetime import datetime
 from argparse import ArgumentParser
@@ -102,10 +103,16 @@ def main(args):
                                  datetime.strftime(datetime.now(),
                                                    '%Y-%m-%dT%H-%M-%S') +
                                  '.csv')
-        with open(fname_out, 'w') as f_out:
-            copier = csv.DictWriter(f_out, fieldnames=reader.fieldnames)
-            copier.writeheader()
-            copier.writerows(data)
+        if args.compress:
+            with gzip.open(fname_out + '.gz', 'wt') as f_out:
+                copier = csv.DictWriter(f_out, fieldnames=reader.fieldnames)
+                copier.writeheader()
+                copier.writerows(data)
+        else:
+            with open(fname_out, 'w') as f_out:
+                copier = csv.DictWriter(f_out, fieldnames=reader.fieldnames)
+                copier.writeheader()
+                copier.writerows(data)
 
     log.info('Observations read into memory', extra={'num_obs': len(data)})
     dl = DataLogger()
@@ -223,6 +230,9 @@ if __name__ == '__main__':
                               "file."))
     parser.add_argument('-C', '--cache_dir',
                         help='Directory in which to put the downloaded file')
+    parser.add_argument('-P', '--compress',
+                        action='store_true',
+                        help='Compress saved download file')
     parser.add_argument('-a', '--archive_dir',
                         help=('Directory in which to put data that could not '
                               'be added to the database'))

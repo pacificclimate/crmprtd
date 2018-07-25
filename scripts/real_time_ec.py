@@ -8,6 +8,7 @@ import logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 from pkg_resources import resource_filename
+import gzip
 
 # Installed libraries
 import requests
@@ -71,9 +72,13 @@ def main(args):
                 raise IOError("HTTP {} error for {}".format(
                     req.status_code, req.url))
 
-            log.info("Saving data file", extra={'filename': fname})
-            with open(fname, 'wb') as f:
-                f.write(req.content)
+            log.info("Saving data file", extra={'fname': fname})
+            if args.compress:
+                with gzip.open(fname + '.gz', 'wb') as f:
+                    f.write(req.content)
+            else:
+                with open(fname, 'wb') as f:
+                    f.write(req.content)
 
     except IOError:
         log.exception("Unable to download or open xml data")
@@ -154,6 +159,9 @@ if __name__ == '__main__':
     parser.add_argument('-C', '--cache_dir', required=True,
                         help=('directory in which to put the downloaded file '
                               'in the event of a post-download error'))
+    parser.add_argument('-P', '--compress',
+                        action='store_true',
+                        help='Compress saved download file')
     parser.add_argument('-f', '--filename',
                         help='MPO-XML file to process')
     parser.add_argument('-p', '--province', required=True,
