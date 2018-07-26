@@ -87,8 +87,9 @@ def common_script_arguments(parser):
                         default=None,
                         help=('Override the default e-mail address to which '
                               'the program should report critical errors'))
-    parser.add_argument('-C', '--cache_dir',
-                        help='Directory in which to put the downloaded file')
+    parser.add_argument('-C', '--cache_file',
+                        help='Full path of file in which to put downloaded '
+                              'observations')
     parser.add_argument('-i', '--input_file',
                         help='Input file to process')
     return parser
