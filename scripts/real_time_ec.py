@@ -6,10 +6,10 @@ from pkg_resources import resource_filename
 from itertools import tee
 
 # Local
-from crmprtd.ec import logging_setup
 from crmprtd.ec.download import download
 from crmprtd.ec.normalize import normalize
-from crmprtd import iterable_to_stream
+from crmprtd.ec import logging_setup
+from crmprtd import iterable_to_stream, common_script_arguments
 
 
 if __name__ == '__main__':

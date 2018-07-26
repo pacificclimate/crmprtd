@@ -9,7 +9,7 @@ from itertools import tee
 from crmprtd.moti.download import download
 from crmprtd.moti.normalize import normalize
 from crmprtd.moti import logging_setup
-from crmprtd import iterable_to_stream
+from crmprtd import iterable_to_stream, common_script_arguments
 
 
 if __name__ == '__main__':

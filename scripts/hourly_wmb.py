@@ -18,6 +18,7 @@ from crmprtd.wmb.normalize import normalize
 from crmprtd.wmb import setup_logging
 from crmprtd import common_script_arguments
 
+
 if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('-f', '--ftp_server',

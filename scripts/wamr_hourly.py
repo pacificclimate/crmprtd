@@ -11,12 +11,14 @@ This is largely lifted and modified from the hourly_wmb.py script
 
 from argparse import ArgumentParser
 from pkg_resources import resource_stream
+from itertools import tee
 
 # Local
 from crmprtd.wamr.download import download
 from crmprtd.wamr.normalize import normalize
 from crmprtd.wamr import setup_logging
-from itertools import tee
+from crmprtd import common_script_arguments
+
 
 
 if __name__ == '__main__':
