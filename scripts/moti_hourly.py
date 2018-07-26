@@ -8,7 +8,7 @@ from itertools import tee
 # Local
 from crmprtd.moti.download import download
 from crmprtd.moti.normalize import normalize
-from crmprtd.moti import logging_setup
+from crmprtd import setup_logging
 from crmprtd import iterable_to_stream, common_script_arguments
 
 
@@ -37,8 +37,8 @@ if __name__ == '__main__':
                               "auth file."))
     parser = common_script_arguments(parser)
     args = parser.parse_args()
-    log = logging_setup(args.log_conf, args.log,
-                        args.error_email, args.log_level)
+    log = setup_logging(args.log_conf, args.log,
+                        args.error_email, args.log_level, 'crmprtd.moti')
 
     download_iter = download(args)
 

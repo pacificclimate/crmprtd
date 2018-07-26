@@ -49,8 +49,15 @@ speed and reliability. This phase is common to all networks.
 import io
 import time
 import argparse
+import logging
+import yaml
 from pkg_resources import resource_stream
 from functools import wraps
+from collections import namedtuple
+
+
+Row = namedtuple('Row', "time val variable_name unit network_name \
+                         station_id lat lon")
 
 
 class Timer(object):
@@ -93,6 +100,22 @@ def common_script_arguments(parser):
     parser.add_argument('-i', '--input_file',
                         help='Input file to process')
     return parser
+
+
+def setup_logging(log_conf, log, error_email, log_level, name):
+    log_c = yaml.load(log_conf)
+    if log:
+        log_c['handlers']['file']['filename'] = log
+    else:
+        log = log_c['handlers']['file']['filename']
+    if error_email:
+        log_c['handlers']['mail']['toaddrs'] = error_email
+    logging.config.dictConfig(log_c)
+    log = logging.getLogger(name)
+    if log_level:
+        log.setLevel(log_level)
+
+    return log
 
 
 def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):

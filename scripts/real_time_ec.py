@@ -8,7 +8,7 @@ from itertools import tee
 # Local
 from crmprtd.ec.download import download
 from crmprtd.ec.normalize import normalize
-from crmprtd.ec import logging_setup
+from crmprtd import setup_logging
 from crmprtd import iterable_to_stream, common_script_arguments
 
 
@@ -33,8 +33,8 @@ if __name__ == '__main__':
                               'this threshold'))
     parser = common_script_arguments(parser)
     args = parser.parse_args()
-    log = logging_setup(args.log_conf, args.log,
-                        args.error_email, args.log_level)
+    log = setup_logging(args.log_conf, args.log,
+                        args.error_email, args.log_level, 'crmprtd.ec')
 
     download_iter = download(args)
 

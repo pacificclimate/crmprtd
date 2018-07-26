@@ -16,9 +16,8 @@ from itertools import tee
 # Local
 from crmprtd.wamr.download import download
 from crmprtd.wamr.normalize import normalize
-from crmprtd.wamr import setup_logging
+from crmprtd import setup_logging
 from crmprtd import common_script_arguments
-
 
 
 if __name__ == '__main__':
@@ -31,10 +30,11 @@ if __name__ == '__main__':
                         default=('pub/outgoing/AIR/Hourly_Raw_Air_Data/'
                                  'Meteorological/'),
                         help='FTP Directory containing WAMR\'s data files')
-                        
+
     parser = common_script_arguments(parser)
     args = parser.parse_args()
-    log = setup_logging(args.log_level, args.log, args.error_email)
+    log = setup_logging(args.log_conf, args.log,
+                        args.error_email, args.log_level, 'crmprtd.wamr')
 
     download_iter = download(args)
 

@@ -15,7 +15,7 @@ from itertools import tee
 # Local
 from crmprtd.wmb.download import download
 from crmprtd.wmb.normalize import normalize
-from crmprtd.wmb import setup_logging
+from crmprtd import setup_logging
 from crmprtd import common_script_arguments
 
 
@@ -42,7 +42,8 @@ if __name__ == '__main__':
                               "file."))
     parser = common_script_arguments(parser)
     args = parser.parse_args()
-    log = setup_logging(args.log_level, args.log, args.error_email)
+    log = setup_logging(args.log_conf, args.log,
+                        args.error_email, args.log_level, 'crmprtd.wmb')
 
     download_iter = download(args)
 
