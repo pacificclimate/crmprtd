@@ -2,7 +2,6 @@
 
 # Standard module
 from argparse import ArgumentParser
-from pkg_resources import resource_filename
 from itertools import tee
 
 # Local

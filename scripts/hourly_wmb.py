@@ -8,7 +8,6 @@
 # FIMXE: Replace email_error with using a logging handler to catch critical
 # errors (i.e. logger.critical()) and do the email
 
-from pkg_resources import resource_stream
 from argparse import ArgumentParser
 from itertools import tee
 

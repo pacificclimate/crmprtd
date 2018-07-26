@@ -1,8 +1,4 @@
 import logging
-
-# debug
-from pkg_resources import resource_stream
-
 from datetime import datetime
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta

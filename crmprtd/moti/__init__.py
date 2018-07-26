@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 import logging
 
 import pytz
-import yaml
 from lxml.etree import parse, XSLT
 from sqlalchemy.exc import IntegrityError
 

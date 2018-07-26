@@ -10,7 +10,6 @@ This is largely lifted and modified from the hourly_wmb.py script
 
 
 from argparse import ArgumentParser
-from pkg_resources import resource_stream
 from itertools import tee
 
 # Local

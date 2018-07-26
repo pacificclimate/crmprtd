@@ -1,7 +1,6 @@
 from lxml.etree import tostring, LxmlError
 from datetime import datetime
 import re
-import yaml
 import logging
 from urllib.parse import urlparse
 
