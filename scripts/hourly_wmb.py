@@ -40,9 +40,6 @@ if __name__ == '__main__':
     parser.add_argument('--password',
                         help=("The password for data requests. Overrides auth "
                               "file."))
-    parser.add_argument('-a', '--archive_dir',
-                        help=('Directory in which to put data that could not '
-                              'be added to the database'))
     parser = common_script_arguments(parser)
     args = parser.parse_args()
     log = setup_logging(args.log_level, args.log, args.error_email)
