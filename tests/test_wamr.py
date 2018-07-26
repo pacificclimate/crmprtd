@@ -3,10 +3,13 @@
 import sys
 from tempfile import TemporaryFile
 from io import StringIO
+from pkg_resources import resource_stream
+import logging
 
 import pytest
 
-from crmprtd.wamr import rows2db, process_obs, setup_logging, file2rows, \
+from crmprtd import setup_logging
+from crmprtd.wamr import rows2db, process_obs, file2rows, \
     DataLogger, create_station_mapping, create_variable_mapping
 from pycds import Obs, History, Network, Variable
 
@@ -42,7 +45,8 @@ def maybe_fake_file(lines):
 ])
 def test_rows2db(test_session, diagnostic, expected):
 
-    log = setup_logging('DEBUG')
+    log = logging.getLogger(__name__)
+    log.setLevel('DEBUG')
 
     lines = '''DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE
 2017-05-21 17:00,0260011,Warfield Elementary Met_60,TEMP_MEAN,TEMP_MEAN,TEMP 10M,25.3,°C,1,n/a,Data Ok,25.3
@@ -74,7 +78,8 @@ def test_rows2db_units_conversion(test_session):
         unit that is recorded in the databse
     '''
     sesh = test_session
-    log = setup_logging('DEBUG')
+    log = logging.getLogger(__name__)
+    log.setLevel('DEBUG')
 
     network = sesh.query(Network).filter(Network.name == 'ENV-AQN').first()
     # Define the units in the database to always be stored as degrees celsius
@@ -118,7 +123,8 @@ def test_process_obs_error_handle(test_session):
     lines = '''DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE
 2017-05-21 17:00,0260011,Warfield Elementary Met_60,BAD_VAR,TEMP_MEAN,TEMP 10M,32.0,°F,1,n/a,Data Ok,32.0
 ''' # noqa
-    log = setup_logging('DEBUG', 'mof.log', 'error_file')
+    log = setup_logging(resource_stream('crmprtd', '/data/logging.yaml'),
+                        'mof.log', 'error_file', 'DEBUG', 'crmprtd.wamr')
     f = StringIO(lines)
     rows, fieldnames = file2rows(f, log)
 
@@ -130,7 +136,8 @@ def test_process_obs_error_handle(test_session):
 
 
 def test_rows2db_error_handle(test_session):
-    log = setup_logging('DEBUG')
+    log = logging.getLogger(__name__)
+    log.setLevel('DEBUG')
     rows = {'reason': 'test'}
     with pytest.raises(SystemExit):
         with TemporaryFile('w+t') as error_file:
