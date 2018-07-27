@@ -2,7 +2,7 @@ from pkg_resources import resource_filename
 from datetime import datetime
 from lxml.etree import LxmlError
 
-from io import BytesIO, StringIO
+from io import BytesIO
 from lxml.etree import fromstring, parse, XSLT
 import pytest
 from geoalchemy2.functions import ST_X, ST_Y
