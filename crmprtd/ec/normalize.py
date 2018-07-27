@@ -10,15 +10,16 @@ from dateutil.parser import parse as dateparse
 
 # Local
 from pkg_resources import resource_stream
-from crmprtd import Row
+from crmprtd import Row, iterable_to_stream
 from crmprtd.ec import ns, OmMember
 
 
 log = logging.getLogger(__name__)
 
 
-def parse_xml(file):
+def parse_xml(iterable):
     # Parse and transform the xml
+    file = iterable_to_stream(iterable)
     et = parse(file)
     xsl = resource_stream('crmprtd', 'data/ec_xform.xsl')
     transform = XSLT(parse(xsl))

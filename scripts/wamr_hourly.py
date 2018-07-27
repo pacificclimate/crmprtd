@@ -16,7 +16,7 @@ from pkg_resources import resource_stream
 from crmprtd.wamr.download import download
 from crmprtd.wamr.normalize import normalize
 from crmprtd.wamr import setup_logging
-from itertools import tee
+from crmprtd import run_data_pipeline
 
 
 if __name__ == '__main__':
@@ -87,13 +87,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     log = setup_logging(args.log_level, args.log, args.error_email)
 
-    download_iter = download(args)
-
-    if args.cache_file:
-        download_iter, cache_iter = tee(download_iter)
-        with open(args.cache_file, 'w') as f:
-            for chunk in cache_iter:
-                f.write(chunk)
-
-    for row in normalize(download_iter):
-        print(row)
+    run_data_pipeline(download, normalize, args)

@@ -10,7 +10,7 @@ from lxml.etree import XSLT, parse as xmlparse
 from dateutil.parser import parse as dateparse
 
 # Local
-from crmprtd import Row
+from crmprtd import Row, iterable_to_stream
 
 
 xsl = resource_filename('crmprtd', 'data/moti.xsl')
@@ -21,8 +21,9 @@ ns = {
 log = logging.getLogger(__name__)
 
 
-def normalize(file_stream):
+def normalize(iterable):
     log.info('Starting MOTI data normalization')
+    file_stream = iterable_to_stream(iterable)
     et = xmlparse(file_stream)
     et = transform(et)
 
