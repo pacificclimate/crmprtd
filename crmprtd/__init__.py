@@ -68,7 +68,7 @@ class Timer(object):
         self.run_time = self.end - self.start
 
 
-def common_script_arguments(parser):
+def common_script_arguments(parser):    # pragma: no cover
     parser.add_argument('-c', '--connection_string',
                         help='PostgreSQL connection string')
     parser.add_argument('-D', '--diag',
@@ -82,7 +82,7 @@ def common_script_arguments(parser):
     parser.add_argument('-l', '--log',
                         default=None,
                         help='Override the default log filename')
-    parser.add_argument('-v', '--log_level',
+    parser.add_argument('-o', '--log_level',
                         choices=['DEBUG', 'INFO',
                                  'WARNING', 'ERROR', 'CRITICAL'],
                         help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
