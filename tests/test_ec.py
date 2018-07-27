@@ -488,7 +488,7 @@ def test_process_xml(ec_session, caplog):
 
 
 def test_parse_xml(test_session):
-    et = '''<?xml version="1.0" standalone="no"?>
+    et = b'''<?xml version="1.0" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -542,8 +542,7 @@ def test_parse_xml(test_session):
     </om:Observation>
   </om:member>
 </om:ObservationCollection>''' # noqa
-    et = StringIO(et)
-    transformed = parse_xml(et)
+    transformed = parse_xml(iter(et.splitlines()))
 
     o = ObsProcessor(transformed, test_session, 1000)
 
