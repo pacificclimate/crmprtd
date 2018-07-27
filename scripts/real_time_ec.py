@@ -2,13 +2,11 @@
 
 # Standard module
 from argparse import ArgumentParser
-from itertools import tee
 
 # Local
 from crmprtd.ec.download import download
 from crmprtd.ec.normalize import normalize
-from crmprtd import setup_logging
-from crmprtd import iterable_to_stream, common_script_arguments
+from crmprtd import common_script_arguments, setup_logging, run_data_pipeline
 
 
 if __name__ == '__main__':
@@ -35,14 +33,4 @@ if __name__ == '__main__':
     log = setup_logging(args.log_conf, args.log,
                         args.error_email, args.log_level, 'crmprtd.ec')
 
-    download_iter = download(args)
-
-    if args.cache_file:
-        download_iter, cache_iter = tee(download_iter)
-        with open(args.cache_file, 'wb') as f:
-            stream = iterable_to_stream(cache_iter)
-            f.write(stream.read())
-
-    stream = iterable_to_stream(download_iter)
-    for line in normalize(stream):
-        print(line)
+    run_data_pipeline(download, normalize, args)

@@ -52,6 +52,7 @@ import logging
 import yaml
 from pkg_resources import resource_stream
 from collections import namedtuple
+from itertools import tee
 
 
 Row = namedtuple('Row', "time val variable_name unit network_name \
@@ -144,3 +145,29 @@ def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
             except StopIteration:
                 return 0    # indicate EOF
     return io.BufferedReader(IterStream(), buffer_size=buffer_size)
+
+
+def run_data_pipeline(download_func, normalize_func, download_args):
+    '''Executes all stages of the data processing pipeline.
+
+       Downloads the data, according to the download arguments
+       provided (generally from the command line), normalizes the data
+       based on the network's format. The the fuction send the
+       normalized rows through the align and insert phases of the
+       pipeline.
+
+    '''
+    args = download_args
+    download_iter = download_func(args)
+
+    if args.cache_file:
+        download_iter, cache_iter = tee(download_iter)
+        with open(args.cache_file, 'w') as f:
+            for chunk in cache_iter:
+                f.write(chunk)
+
+    rows = [row for row in normalize_func(download_iter)]
+    for row in rows:
+        print(row)
+    # observations = [align(row) for row in rows]
+    # insert(observations)

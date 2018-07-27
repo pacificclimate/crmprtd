@@ -10,13 +10,11 @@ This is largely lifted and modified from the hourly_wmb.py script
 
 
 from argparse import ArgumentParser
-from itertools import tee
 
 # Local
 from crmprtd.wamr.download import download
 from crmprtd.wamr.normalize import normalize
-from crmprtd import setup_logging
-from crmprtd import common_script_arguments
+from crmprtd import common_script_arguments, setup_logging, run_data_pipeline
 
 
 if __name__ == '__main__':
@@ -35,13 +33,4 @@ if __name__ == '__main__':
     log = setup_logging(args.log_conf, args.log,
                         args.error_email, args.log_level, 'crmprtd.wamr')
 
-    download_iter = download(args)
-
-    if args.cache_file:
-        download_iter, cache_iter = tee(download_iter)
-        with open(args.cache_file, 'w') as f:
-            for chunk in cache_iter:
-                f.write(chunk)
-
-    for row in normalize(download_iter):
-        print(row)
+    run_data_pipeline(download, normalize, args)
