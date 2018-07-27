@@ -48,11 +48,14 @@ speed and reliability. This phase is common to all networks.
 
 import io
 import time
+import logging
+import yaml
+from pkg_resources import resource_stream
 from collections import namedtuple
 
 
-Row = namedtuple('Row', "time val variable_name unit network_name station_id \
-                         lat lon")
+Row = namedtuple('Row', "time val variable_name unit network_name \
+                         station_id lat lon")
 
 
 class Timer(object):
@@ -63,6 +66,54 @@ class Timer(object):
     def __exit__(self, *args):
         self.end = time.time()
         self.run_time = self.end - self.start
+
+
+def common_script_arguments(parser):    # pragma: no cover
+    parser.add_argument('-c', '--connection_string',
+                        help='PostgreSQL connection string')
+    parser.add_argument('-D', '--diag',
+                        default=False, action="store_true",
+                        help="Turn on diagnostic mode (no commits)")
+    parser.add_argument('-L', '--log_conf',
+                        default=resource_stream(
+                            'crmprtd', '/data/logging.yaml'),
+                        help=('YAML file to use to override the default '
+                              'logging configuration'))
+    parser.add_argument('-l', '--log',
+                        default=None,
+                        help='Override the default log filename')
+    parser.add_argument('-o', '--log_level',
+                        choices=['DEBUG', 'INFO',
+                                 'WARNING', 'ERROR', 'CRITICAL'],
+                        help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
+                              'CRITICAL.  Note that debug output by default '
+                              'goes directly to file'))
+    parser.add_argument('-m', '--error_email',
+                        default=None,
+                        help=('Override the default e-mail address to which '
+                              'the program should report critical errors'))
+    parser.add_argument('-C', '--cache_file',
+                        help='Full path of file in which to put downloaded '
+                              'observations')
+    parser.add_argument('-i', '--input_file',
+                        help='Input file to process')
+    return parser
+
+
+def setup_logging(log_conf, log, error_email, log_level, name):
+    log_c = yaml.load(log_conf)
+    if log:
+        log_c['handlers']['file']['filename'] = log
+    else:
+        log = log_c['handlers']['file']['filename']
+    if error_email:
+        log_c['handlers']['mail']['toaddrs'] = error_email
+    logging.config.dictConfig(log_c)
+    log = logging.getLogger(name)
+    if log_level:
+        log.setLevel(log_level)
+
+    return log
 
 
 def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):

@@ -1,9 +1,4 @@
 import logging
-import yaml
-
-# debug
-from pkg_resources import resource_stream
-
 from datetime import datetime
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
@@ -17,22 +12,6 @@ from crmprtd.wmb_exceptions import InsertionError, UniquenessError
 from crmprtd import Timer
 
 log = logging.getLogger(__name__)
-
-
-def setup_logging(log, error_email, log_level):
-    log_c = yaml.load(resource_stream('crmprtd', '/data/logging.yaml'))
-    if log:
-        log_c['handlers']['file']['filename'] = log
-    else:
-        log = log_c['handlers']['file']['filename']
-    if error_email:
-        log_c['handlers']['mail']['toaddrs'] = error_email
-    logging.config.dictConfig(log_c)
-    log = logging.getLogger('crmprtd.wmb')
-    if log_level:
-        log.setLevel(log_level)
-
-    return log
 
 
 class ObsProcessor:
