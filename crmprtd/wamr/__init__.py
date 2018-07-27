@@ -3,11 +3,9 @@ import sys
 import logging
 import logging.config
 import csv
-from pkg_resources import resource_stream
 
 import pytz
 from dateutil.parser import parse
-import yaml
 from pint import UnitRegistry
 
 from crmprtd.db import mass_insert_obs
@@ -148,25 +146,6 @@ class DataLogger(object):
         import itertools
         for row in itertools.chain(self.bad_rows, self.bad_obs):
             yield row
-
-
-def setup_logging(level, filename=None, email=None):
-    '''Read in the logging configuration and return a logger object
-    '''
-    log_conf = yaml.load(resource_stream('crmprtd', '/data/logging.yaml'))
-    if filename:
-        log_conf['handlers']['file']['filename'] = filename
-    else:
-        filename = log_conf['handlers']['file']['filename']
-    if email:
-        log_conf['handlers']['mail']['toaddrs'] = email
-    logging.config.dictConfig(log_conf)
-    log = logging.getLogger('crmprtd.wamr')
-
-    if level:
-        log.setLevel(level)
-
-    return log
 
 
 def rows2db(sesh, rows, error_file, log, diagnostic=False):

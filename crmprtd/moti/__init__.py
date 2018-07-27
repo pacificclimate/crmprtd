@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 import logging
 
 import pytz
-import yaml
 from lxml.etree import parse, XSLT
 from sqlalchemy.exc import IntegrityError
 
@@ -11,22 +10,6 @@ from pycds import History, Network, Station, Variable, Obs
 from crmprtd import Timer
 
 log = logging.getLogger(__name__)
-
-
-def logging_setup(log_conf, log, error_email, log_level):
-    log_c = yaml.load(log_conf)
-    if log:
-        log_c['handlers']['file']['filename'] = log
-    else:
-        log = log_c['handlers']['file']['filename']
-    if error_email:
-        log_c['handlers']['mail']['toaddrs'] = error_email
-    logging.config.dictConfig(log_c)
-    log = logging.getLogger('crmprtd.moti')
-    if log_level:
-        log.setLevel(log_level)
-
-    return log
 
 
 xsl = resource_filename('crmprtd', 'data/moti.xsl')

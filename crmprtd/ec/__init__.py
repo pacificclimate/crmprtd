@@ -1,7 +1,6 @@
 from lxml.etree import tostring, LxmlError
 from datetime import datetime
 import re
-import yaml
 import logging
 from urllib.parse import urlparse
 
@@ -20,23 +19,6 @@ ns = {
     'xlink': "http://www.w3.org/1999/xlink",
     'xsi': "http://www.w3.org/2001/XMLSchema-instance"
 }
-
-
-def logging_setup(log_conf, log, error_email, log_level):
-    with open(log_conf, 'rb') as f:
-        log_conf = yaml.load(f)
-    if log:
-        log_conf['handlers']['file']['filename'] = log
-    else:
-        log = log_conf['handlers']['file']['filename']
-    if error_email:
-        log_conf['handlers']['mail']['toaddrs'] = error_email
-    logging.config.dictConfig(log_conf)
-    log = logging.getLogger('crmprtd.ec')
-    if log_level:
-        log.setLevel(log_level)
-
-    return log
 
 
 def makeurl(freq='daily', province='BC', language='e', time=datetime.utcnow()):
