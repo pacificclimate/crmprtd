@@ -24,21 +24,18 @@ Q_ = ureg.Quantity
 
 
 def create_station_and_history_entry(sesh, obs_tuple):
-    network_id, = sesh.query(Network.id).filter(
+    network, = sesh.query(Network).filter(
         Network.name == obs_tuple.network_name).first()
-    stn = Station(native_id=obs_tuple.station_id, network_id=network_id)
+    stn = Station(native_id=obs_tuple.native_id, network=obs_tuple.network)
     with sesh.begin_nested():
         sesh.add(stn)
     log.info('Created new station entry',
-             extra={'stationd_id': stn.id, 'network_id': network_id,
+             extra={'station': stn, 'network': network,
                     'network_name': obs_tuple.network_name})
 
-    if obs_tuple.lat and obs_tuple.lon:
-        hist = History(station=stn,
-                       lat=obs_tuple.lat,
-                       lon=obs_tuple.lon)
-    else:
-        hist = History(station=stn)
+    hist = History(station=stn,
+                   lat=obs_tuple.lat,
+                   lon=obs_tuple.lon)
 
     with sesh.begin_nested():
         sesh.add(hist)
@@ -46,7 +43,7 @@ def create_station_and_history_entry(sesh, obs_tuple):
              extra={'history': hist.id, 'network_name': obs_tuple.network_name,
                     'lat': obs_tuple.lat, 'lon': obs_tuple.lon})
     sesh.commit()
-    return hist.id
+    return hist
 
 
 def convert_unit(val, src_unit, dst_unit):
@@ -61,16 +58,116 @@ def convert_unit(val, src_unit, dst_unit):
     return val
 
 
-# finds distance between 2 points on a sphere using lon/lat
-def haversine_formula(lat1, lon1, lat2, lon2):
-    R = 6378.137
-    dLat = lat2 * math.pi / 180 - lat1 * math.pi / 180
-    dLon = lon2 * math.pi / 180 - lon1 * math.pi / 180
-    a = math.sin(dLat/2) * math.sin(dLat/2) + math.cos(lat1 * math.pi / 180) *\
-        math.cos(lat2 * math.pi / 180) * math.sin(dLon/2) * math.sin(dLon/2)
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1-a))
-    d = R * c
-    return d * 1000
+def is_not_network(sesh, network_name):
+    '''
+    Check if given network name is not in the database
+    '''
+    network = sesh.query(Network).filter(Network.name == obs_tuple.network_name)
+    return network.count() == 0
+
+
+def get_history(sesh, obs_tuple):
+    history = sesh.query(History).join(Station).join(Network).filter(and_(Network.name == obs_tuple.network_name, Station.native_id == obs_tuple.native_id))
+
+    if history.count() == 0:
+        return create_station_and_history_entry(sesh, obs_tuple)
+    elif history.count() == 1:
+        return history
+    elif history.count() >= 2:
+        return match_station(sesh, obs_tuple, history)
+    else:
+        return None
+
+
+def match_station(sesh, obs_tuple, history):
+    if lat and lon:
+        return match_station_with_location(sesh, obs_tuple, history)
+    else:
+        return match_station_with_active(sesh, obs_tuple)
+
+
+def match_station_with_location(sesh, obs_tuple, history):
+    close_stns = closest_stns_within_threshold(sesh, lon, lat, 800)
+
+    if len(close_stns) == 0:
+        return create_station_and_history_entry(sesh, obs_tuple, history)
+
+    for id in close_stns:
+        for hist in history:
+            if id == h.id:
+                return hist
+
+    # if we get here something has gone wrong
+    return None
+
+
+def match_station_with_active(sesh, obs_tuple, history):
+    for id in history:
+        hist = sesh.query(History).filter(
+            and_(History.id == id,
+                 History.sdate is not None,
+                 History.edate is None))
+
+        if hist:
+            return hist
+
+    # could not find a station
+    return None
+
+
+def get_variable(sesh, network_name, variable_name):
+    variable = sesh.query(Variable).join(Network).filter(and_(
+        Network.name == obs_tuple.network_name,
+        Variable.name == obs_tuple.variable_name)).first()
+
+    if not variable:
+        return None
+
+    return variable
+
+
+def unit_check(sesh, unit_obs, unit_db, val):
+    if not unit_obs and unit_db is None:
+        return None
+    else:
+        return unit_db_check(unit_obs, unit_db, val)
+
+
+def unit_db_check(unit_obs, unit_db, val):
+    if unit_obs != unit_db:
+        try:
+            val_conv = convert_unit(val, unit_obs, unit_db)
+        except Exception as e:
+            log.error('Unable to convert units',
+                      extra={'src_unit': unit,
+                             'dst_unit': unit_db,
+                             'exception': e})
+            return None
+        return val_conv
+    else:
+        return val
+
+
+def align_refactor(sesh, obs_tuple):
+    # Without these items an Obs object cannot be produced
+    if not obs_tuple.network_name or not obs_tuple.time or not obs_tuple.val or not obs_tuple.variable_name:
+        return None
+
+    if is_not_network(sesh, obs_tuple.network_name):
+        return None
+
+    history = get_history(sesh, obs_tuple)
+    variable = get_variable(sesh, obs_tuple.network_name, obs_tuple.variable_name)
+
+    # Necessary attributes for Obs object
+    if not history or not variable:
+        return None
+
+    datum = unit_check(sesh, variable, obs_tuple.unit, obs_tuple.val)
+    if not datum:
+        return None
+
+    return Obs(history=history, time=time, datum=datum, variable=variable)
 
 
 def align(sesh, obs_tuple):
@@ -241,4 +338,4 @@ def align(sesh, obs_tuple):
             log.debug('Units match')
 
     log.info('Alignment completed')
-    yield Obs(time=time, vars_id=vars_id, history_id=hid, datum=datum)
+    return Obs(time=time, vars_id=vars_id, history_id=hid, datum=datum)
