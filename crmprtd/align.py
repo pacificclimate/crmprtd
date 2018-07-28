@@ -23,6 +23,76 @@ ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
 
+def convert_unit(val, src_unit, dst_unit):
+    try:
+        val = Q_(val, ureg.parse_expression(src_unit))  # src
+        val = val.to(dst_unit).magnitude  # dest
+    except Exception:
+        raise Exception(
+            "Unable to convert source unit {} to destination unit {}".format(
+                src_unit, dst_unit)
+        )
+    return val
+
+
+def unit_db_check(unit_obs, unit_db, val):
+    if unit_obs != unit_db:
+        try:
+            val_conv = convert_unit(val, unit_obs, unit_db)
+        except Exception as e:
+            log.error('Unable to convert units',
+                      extra={'src_unit': unit,
+                             'dst_unit': unit_db,
+                             'exception': e})
+            return None
+        return val_conv
+    else:
+        return val
+
+
+def unit_check(sesh, unit_obs, unit_db, val):
+    if not unit_obs and unit_db is None:
+        return None
+    else:
+        return unit_db_check(unit_obs, unit_db, val)
+
+
+def match_station_with_active(sesh, obs_tuple, history):
+    for id in history:
+        hist = sesh.query(History).filter(
+            and_(History.id == id,
+                 History.sdate is not None,
+                 History.edate is None))
+
+        if hist:
+            return hist
+
+    # could not find a station
+    return None
+
+
+def match_station_with_location(sesh, obs_tuple, history):
+    close_stns = closest_stns_within_threshold(sesh, lon, lat, 800)
+
+    if len(close_stns) == 0:
+        return create_station_and_history_entry(sesh, obs_tuple, history)
+
+    for id in close_stns:
+        for hist in history:
+            if id == h.id:
+                return hist
+
+    # if we get here something has gone wrong
+    return None
+
+
+def match_station(sesh, obs_tuple, history):
+    if lat and lon:
+        return match_station_with_location(sesh, obs_tuple, history)
+    else:
+        return match_station_with_active(sesh, obs_tuple)
+
+
 def create_station_and_history_entry(sesh, obs_tuple):
     network, = sesh.query(Network).filter(
         Network.name == obs_tuple.network_name).first()
@@ -46,24 +116,15 @@ def create_station_and_history_entry(sesh, obs_tuple):
     return hist
 
 
-def convert_unit(val, src_unit, dst_unit):
-    try:
-        val = Q_(val, ureg.parse_expression(src_unit))  # src
-        val = val.to(dst_unit).magnitude  # dest
-    except Exception:
-        raise Exception(
-            "Unable to convert source unit {} to destination unit {}".format(
-                src_unit, dst_unit)
-        )
-    return val
+def get_variable(sesh, network_name, variable_name):
+    variable = sesh.query(Variable).join(Network).filter(and_(
+        Network.name == obs_tuple.network_name,
+        Variable.name == obs_tuple.variable_name)).first()
 
+    if not variable:
+        return None
 
-def is_not_network(sesh, network_name):
-    '''
-    Check if given network name is not in the database
-    '''
-    network = sesh.query(Network).filter(Network.name == obs_tuple.network_name)
-    return network.count() == 0
+    return variable
 
 
 def get_history(sesh, obs_tuple):
@@ -79,73 +140,9 @@ def get_history(sesh, obs_tuple):
         return None
 
 
-def match_station(sesh, obs_tuple, history):
-    if lat and lon:
-        return match_station_with_location(sesh, obs_tuple, history)
-    else:
-        return match_station_with_active(sesh, obs_tuple)
-
-
-def match_station_with_location(sesh, obs_tuple, history):
-    close_stns = closest_stns_within_threshold(sesh, lon, lat, 800)
-
-    if len(close_stns) == 0:
-        return create_station_and_history_entry(sesh, obs_tuple, history)
-
-    for id in close_stns:
-        for hist in history:
-            if id == h.id:
-                return hist
-
-    # if we get here something has gone wrong
-    return None
-
-
-def match_station_with_active(sesh, obs_tuple, history):
-    for id in history:
-        hist = sesh.query(History).filter(
-            and_(History.id == id,
-                 History.sdate is not None,
-                 History.edate is None))
-
-        if hist:
-            return hist
-
-    # could not find a station
-    return None
-
-
-def get_variable(sesh, network_name, variable_name):
-    variable = sesh.query(Variable).join(Network).filter(and_(
-        Network.name == obs_tuple.network_name,
-        Variable.name == obs_tuple.variable_name)).first()
-
-    if not variable:
-        return None
-
-    return variable
-
-
-def unit_check(sesh, unit_obs, unit_db, val):
-    if not unit_obs and unit_db is None:
-        return None
-    else:
-        return unit_db_check(unit_obs, unit_db, val)
-
-
-def unit_db_check(unit_obs, unit_db, val):
-    if unit_obs != unit_db:
-        try:
-            val_conv = convert_unit(val, unit_obs, unit_db)
-        except Exception as e:
-            log.error('Unable to convert units',
-                      extra={'src_unit': unit,
-                             'dst_unit': unit_db,
-                             'exception': e})
-            return None
-        return val_conv
-    else:
-        return val
+def is_network(sesh, network_name):
+    network = sesh.query(Network).filter(Network.name == obs_tuple.network_name)
+    return network.count() != 0
 
 
 def align(sesh, obs_tuple):
@@ -153,7 +150,7 @@ def align(sesh, obs_tuple):
     if not obs_tuple.network_name or not obs_tuple.time or not obs_tuple.val or not obs_tuple.variable_name:
         return None
 
-    if is_not_network(sesh, obs_tuple.network_name):
+    if not is_network(sesh, obs_tuple.network_name):
         return None
 
     history = get_history(sesh, obs_tuple)
