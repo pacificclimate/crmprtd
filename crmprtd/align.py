@@ -11,7 +11,6 @@ pycds.Obs objects. This phase is common to all networks.
 import logging
 from sqlalchemy import and_
 from pint import UnitRegistry
-import math
 
 # local
 from pycds import Obs, History, Network, Variable, Station
@@ -41,7 +40,7 @@ def unit_db_check(unit_obs, unit_db, val):
             val_conv = convert_unit(val, unit_obs, unit_db)
         except Exception as e:
             log.error('Unable to convert units',
-                      extra={'src_unit': unit,
+                      extra={'src_unit': unit_obs,
                              'dst_unit': unit_db,
                              'exception': e})
             return None
@@ -72,14 +71,15 @@ def match_station_with_active(sesh, obs_tuple, history):
 
 
 def match_station_with_location(sesh, obs_tuple, history):
-    close_stns = closest_stns_within_threshold(sesh, lon, lat, 800)
+    close_stns = closest_stns_within_threshold(sesh, obs_tuple.lon,
+                                               obs_tuple.lat, 800)
 
     if len(close_stns) == 0:
         return create_station_and_history_entry(sesh, obs_tuple, history)
 
     for id in close_stns:
         for hist in history:
-            if id == h.id:
+            if id == hist.id:
                 return hist
 
     # if we get here something has gone wrong
@@ -87,7 +87,7 @@ def match_station_with_location(sesh, obs_tuple, history):
 
 
 def match_station(sesh, obs_tuple, history):
-    if lat and lon:
+    if obs_tuple.lat and obs_tuple.lon:
         return match_station_with_location(sesh, obs_tuple, history)
     else:
         return match_station_with_active(sesh, obs_tuple)
@@ -118,8 +118,8 @@ def create_station_and_history_entry(sesh, obs_tuple):
 
 def get_variable(sesh, network_name, variable_name):
     variable = sesh.query(Variable).join(Network).filter(and_(
-        Network.name == obs_tuple.network_name,
-        Variable.name == obs_tuple.variable_name)).first()
+        Network.name == network_name,
+        Variable.name == variable_name)).first()
 
     if not variable:
         return None
@@ -128,7 +128,9 @@ def get_variable(sesh, network_name, variable_name):
 
 
 def get_history(sesh, obs_tuple):
-    history = sesh.query(History).join(Station).join(Network).filter(and_(Network.name == obs_tuple.network_name, Station.native_id == obs_tuple.native_id))
+    history = sesh.query(History).join(Station).join(Network).filter(and_(
+        Network.name == obs_tuple.network_name,
+        Station.native_id == obs_tuple.native_id))
 
     if history.count() == 0:
         return create_station_and_history_entry(sesh, obs_tuple)
@@ -141,20 +143,23 @@ def get_history(sesh, obs_tuple):
 
 
 def is_network(sesh, network_name):
-    network = sesh.query(Network).filter(Network.name == obs_tuple.network_name)
+    network = sesh.query(Network).filter(
+        Network.name == network_name)
     return network.count() != 0
 
 
 def align(sesh, obs_tuple):
     # Without these items an Obs object cannot be produced
-    if not obs_tuple.network_name or not obs_tuple.time or not obs_tuple.val or not obs_tuple.variable_name:
+    if not obs_tuple.network_name or not obs_tuple.time or not obs_tuple.val \
+            or not obs_tuple.variable_name:
         return None
 
     if not is_network(sesh, obs_tuple.network_name):
         return None
 
     history = get_history(sesh, obs_tuple)
-    variable = get_variable(sesh, obs_tuple.network_name, obs_tuple.variable_name)
+    variable = get_variable(sesh, obs_tuple.network_name,
+                            obs_tuple.variable_name)
 
     # Necessary attributes for Obs object
     if not history or not variable:
@@ -164,4 +169,7 @@ def align(sesh, obs_tuple):
     if not datum:
         return None
 
-    return Obs(history=history, time=time, datum=datum, variable=variable)
+    return Obs(history=history,
+               time=obs_tuple.time,
+               datum=datum,
+               variable=variable)
