@@ -50,53 +50,52 @@ def unit_db_check(unit_obs, unit_db, val):
 
 
 def unit_check(sesh, unit_obs, unit_db, val):
-    if not unit_obs and unit_db is None:
+    if not unit_obs and not unit_db:
         return None
     else:
         return unit_db_check(unit_obs, unit_db, val)
 
 
-def match_station_with_active(sesh, obs_tuple, history):
-    for id in history:
+def match_station_with_active(sesh, obs_tuple, histories):
+    for history in histories:
         hist = sesh.query(History).filter(
-            and_(History.id == id,
-                 History.sdate is not None,
-                 History.edate is None))
+            and_(History.id == history.id,
+                 History.sdate != None,
+                 History.edate == None))
 
-        if hist:
-            return hist
+        if hist.count() == 1:
+            return hist.first()
 
     # could not find a station
     return None
 
 
-def match_station_with_location(sesh, obs_tuple, history):
+def match_station_with_location(sesh, obs_tuple, histories):
     close_stns = closest_stns_within_threshold(sesh, obs_tuple.lon,
                                                obs_tuple.lat, 800)
 
     if len(close_stns) == 0:
-        return create_station_and_history_entry(sesh, obs_tuple, history)
+        return create_station_and_history_entry(sesh, obs_tuple)
 
     for id in close_stns:
-        for hist in history:
-            if id == hist.id:
-                return hist
-
-    # if we get here something has gone wrong
-    return None
+        for history in histories:
+            if id == history.id:
+                return history
 
 
 def match_station(sesh, obs_tuple, history):
     if obs_tuple.lat and obs_tuple.lon:
         return match_station_with_location(sesh, obs_tuple, history)
     else:
-        return match_station_with_active(sesh, obs_tuple)
+        return match_station_with_active(sesh, obs_tuple, history)
 
 
 def create_station_and_history_entry(sesh, obs_tuple):
-    network, = sesh.query(Network).filter(
-        Network.name == obs_tuple.network_name).first()
-    stn = Station(native_id=obs_tuple.native_id, network=obs_tuple.network)
+    network = sesh.query(Network).filter(
+        Network.name == obs_tuple.network_name)
+
+    network = network.first()
+    stn = Station(native_id=obs_tuple.station_id, network=network)
     with sesh.begin_nested():
         sesh.add(stn)
     log.info('Created new station entry',
@@ -130,16 +129,14 @@ def get_variable(sesh, network_name, variable_name):
 def get_history(sesh, obs_tuple):
     history = sesh.query(History).join(Station).join(Network).filter(and_(
         Network.name == obs_tuple.network_name,
-        Station.native_id == obs_tuple.native_id))
+        Station.native_id == obs_tuple.station_id))
 
     if history.count() == 0:
         return create_station_and_history_entry(sesh, obs_tuple)
     elif history.count() == 1:
-        return history
+        return history.first()
     elif history.count() >= 2:
         return match_station(sesh, obs_tuple, history)
-    else:
-        return None
 
 
 def is_network(sesh, network_name):
@@ -165,7 +162,7 @@ def align(sesh, obs_tuple):
     if not history or not variable:
         return None
 
-    datum = unit_check(sesh, variable, obs_tuple.unit, obs_tuple.val)
+    datum = unit_check(sesh, obs_tuple.unit, variable.unit, obs_tuple.val)
     if not datum:
         return None
 
