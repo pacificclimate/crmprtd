@@ -15,7 +15,7 @@ def test_check_history(test_session):
     stn_id = '666'
     check_history(stn_id, test_session)
     q = test_session.query(History)
-    assert q.count() == 8
+    assert q.count() == 9
 
 
 def test_data(test_session, moti_sawr7110_xml):
