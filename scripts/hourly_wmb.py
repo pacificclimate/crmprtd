@@ -9,8 +9,6 @@
 # errors (i.e. logger.critical()) and do the email
 
 from argparse import ArgumentParser
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 # Local
 from crmprtd.wmb.download import download

@@ -9,7 +9,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.sql import func
 from sqlalchemy.exc import IntegrityError
 from crmprtd import Timer
-from crmprtd.align import closest_stns_within_threshold 
+from crmprtd.align import closest_stns_within_threshold
 
 
 log = logging.getLogger(__name__)
