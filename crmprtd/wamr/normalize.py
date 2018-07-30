@@ -43,7 +43,6 @@ def normalize(file_stream):
                       extra={'time': time})
             continue
 
-        # FIXME: This is a bit janky, does it belong in normalize?
         if unit == '% RH':
             unit = re.sub('% RH', '%', unit)
 
