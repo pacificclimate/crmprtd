@@ -167,7 +167,7 @@ def run_data_pipeline(download_func, normalize_func, download_args):
                 f.write(chunk)
 
     rows = [row for row in normalize_func(download_iter)]
-    for row in rows:
-        print(row)
-    # observations = [align(row) for row in rows]
+    observations = [align(row) for row in rows]
+    for ob in observations:
+        print(obs)
     # insert(observations)
