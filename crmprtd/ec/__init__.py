@@ -9,6 +9,7 @@ from sqlalchemy import and_, or_
 from sqlalchemy.sql import func
 from sqlalchemy.exc import IntegrityError
 from crmprtd import Timer
+from crmprtd.align import closest_stns_within_threshold 
 
 
 log = logging.getLogger(__name__)
@@ -123,31 +124,6 @@ class ObsProcessor:
         if len(om.member.xpath("./om:Observation/om:result//mpo:element",
            namespaces=ns)) == 0:
             member.getparent().remove(member)
-
-
-def closest_stns_within_threshold(sesh, lon, lat, threshold):
-    # Select all history entries that match this station
-    log.debug("Searching for matching meta_history entries")
-
-    query_txt = """
-        WITH stns_in_thresh AS (
-            SELECT history_id, lat, lon, Geography(ST_Transform(the_geom,4326)) as p_existing,
-                Geography(ST_SetSRID(ST_MakePoint(:x, :y),4326)) as p_new
-            FROM crmp.meta_history
-            WHERE the_geom && ST_Buffer(Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)),:thresh)
-        )
-        SELECT history_id, ST_Distance(p_existing,p_new) as dist
-        FROM stns_in_thresh
-        ORDER BY dist
-""" # noqa
-    q = sesh.execute(query_txt, {
-        'x': lon,
-        'y': lat,
-        'thresh': threshold}
-    )
-    valid_hid = set([x[0] for x in q.fetchall()])
-    log.debug("history_ids in threshold", extra={'hid': valid_hid})
-    return valid_hid
 
 
 def check_history(member, sesh, threshold):

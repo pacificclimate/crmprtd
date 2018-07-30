@@ -1,8 +1,9 @@
 import pytest
 from datetime import datetime
+from geoalchemy2.functions import ST_X, ST_Y
 
 from crmprtd.align import is_network, get_history, get_variable, unit_check, \
-    align
+    align, closest_stns_within_threshold
 from crmprtd import Row
 from pycds import Station, History
 
@@ -222,3 +223,28 @@ def test_align_successes(test_session, obs_tuple, expected_hid, expected_time,
 def test_align_failures(test_session, obs_tuple):
     ob = align(test_session, obs_tuple)
     assert ob is None
+
+
+def test_closest_stns_within_threshold(ec_session):
+    x = closest_stns_within_threshold(ec_session, -123.7, 49.45, 1000)
+    assert len(x) > 0
+
+
+def test_closest_stns_within_threshold_bad_data(ec_session):
+    # https://github.com/pacificclimate/crmprtd/issues/8
+
+    # Find some "good data" to use for the test run
+    x, y = ec_session.query(ST_X(History.the_geom), ST_Y(History.the_geom))\
+                     .first()
+
+    # Create a couple history entries with reversed lat/lons
+    space1 = History(station_name='Outer space',
+                     the_geom='SRID=4326;POINT(49.1658 -122.9606)')
+    space2 = History(station_name='Outer space',
+                     the_geom='SRID=4326;POINT(50.3225 122.7897)')
+    ec_session.add_all([space1, space2])
+    ec_session.commit()
+
+    # Just search for the good station and ensure there are not errors
+    x = closest_stns_within_threshold(ec_session, x, y, 1)
+    assert len(x) > 0

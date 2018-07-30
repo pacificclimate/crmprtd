@@ -14,12 +14,36 @@ from pint import UnitRegistry
 
 # local
 from pycds import Obs, History, Network, Variable, Station
-from crmprtd.ec import closest_stns_within_threshold
 
 
 log = logging.getLogger(__name__)
 ureg = UnitRegistry()
 Q_ = ureg.Quantity
+
+
+def closest_stns_within_threshold(sesh, lon, lat, threshold):
+    # Select all history entries that match this station
+    log.debug("Searching for matching meta_history entries")
+
+    query_txt = """
+        WITH stns_in_thresh AS (
+            SELECT history_id, lat, lon, Geography(ST_Transform(the_geom,4326)) as p_existing,
+                Geography(ST_SetSRID(ST_MakePoint(:x, :y),4326)) as p_new
+            FROM crmp.meta_history
+            WHERE the_geom && ST_Buffer(Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)),:thresh)
+        )
+        SELECT history_id, ST_Distance(p_existing,p_new) as dist
+        FROM stns_in_thresh
+        ORDER BY dist
+""" # noqa
+    q = sesh.execute(query_txt, {
+        'x': lon,
+        'y': lat,
+        'thresh': threshold}
+    )
+    valid_hid = set([x[0] for x in q.fetchall()])
+    log.debug("history_ids in threshold", extra={'hid': valid_hid})
+    return valid_hid
 
 
 def convert_unit(val, src_unit, dst_unit):
@@ -28,10 +52,11 @@ def convert_unit(val, src_unit, dst_unit):
     try:
         val = Q_(val, ureg.parse_expression(src_unit))  # src
         val = val.to(dst_unit).magnitude  # dest
-    except Exception:
+    except Exception as e:
         log.error('Unable to convert units', extra={'src_unit': src_unit,
                                                     'dst_unit': dst_unit,
                                                     'exception': e})
+        raise e
     log.debug('Converted units')
     return val
 
@@ -66,7 +91,7 @@ def match_station_with_active(sesh, obs_tuple, histories):
         hist = sesh.query(History).filter(
             and_(History.id == history.id,
                  History.sdate != None,
-                 History.edate == None))
+                 History.edate == None))    # noqa
 
         if hist.count() == 1:
             log.debug('Matched history',
@@ -165,8 +190,8 @@ def is_network(sesh, network_name):
 def align(sesh, obs_tuple):
     log.info('Begin alignment')
     # Without these items an Obs object cannot be produced
-    if not obs_tuple.network_name or not obs_tuple.time or not obs_tuple.val \
-            or not obs_tuple.variable_name:
+    if obs_tuple.network_name is None or obs_tuple.time is None or \
+            obs_tuple.val is None or obs_tuple.variable_name is None:
         log.warning('Observation missing critical information',
                     extra={'network_name': obs_tuple.network_name,
                            'time': obs_tuple.time,

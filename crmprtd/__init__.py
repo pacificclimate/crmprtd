@@ -50,9 +50,12 @@ import io
 import time
 import logging
 import yaml
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from pkg_resources import resource_stream
 from collections import namedtuple
 from itertools import tee
+from crmprtd.align import align
 
 
 Row = namedtuple('Row', "time val variable_name unit network_name \
@@ -167,7 +170,12 @@ def run_data_pipeline(download_func, normalize_func, download_args):
                 f.write(chunk)
 
     rows = [row for row in normalize_func(download_iter)]
-    observations = [align(row) for row in rows]
+
+    engine = create_engine(args.connection_string)
+    Session = sessionmaker(engine)
+    sesh = Session()
+
+    observations = [align(sesh, row) for row in rows]
     for ob in observations:
-        print(obs)
+        print(ob)
     # insert(observations)
