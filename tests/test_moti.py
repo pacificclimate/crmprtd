@@ -1,11 +1,9 @@
 from pkg_resources import resource_filename
 from datetime import datetime
 
-from lxml.etree import fromstring, parse, XSLT
-import pytest
+from lxml.etree import parse, XSLT
 import pytz
 
-from pycds import Obs, Station, History
 from crmprtd.moti import url_generator, slice_timesteps
 
 bctz = pytz.timezone('America/Vancouver')

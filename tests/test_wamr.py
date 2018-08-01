@@ -3,14 +3,8 @@
 import sys
 from tempfile import TemporaryFile
 from io import StringIO
-from pkg_resources import resource_stream
-import logging
 
-import pytest
-
-from crmprtd import setup_logging
-from crmprtd.wamr import file2rows, DataLogger
-from pycds import Obs, History, Network, Variable
+from crmprtd.wamr import DataLogger
 
 # def test_insert(crmp_session):
 #     pass

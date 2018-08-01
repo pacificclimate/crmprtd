@@ -2,13 +2,12 @@ from pkg_resources import resource_filename
 from datetime import datetime
 from lxml.etree import LxmlError
 
-from io import BytesIO
 from lxml.etree import fromstring, parse, XSLT
 import pytest
 
-from crmprtd.ec import makeurl, extract_fname_from_url, ns, insert_obs, db_unit, OmMember
+from crmprtd.ec import makeurl, extract_fname_from_url, ns, insert_obs, \
+    db_unit, OmMember
 
-from crmprtd.ec.normalize import parse_xml
 from pycds import Obs
 
 

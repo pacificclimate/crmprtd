@@ -1,12 +1,10 @@
 import pytest
 import pytz
-import csv
 import logging
 
 from datetime import datetime
-from io import StringIO
 
-from pycds import Obs, History, Network, Station
+from pycds import Obs
 from crmprtd.wmb import insert_obs
 from crmprtd.wmb_exceptions import UniquenessError, InsertionError
 

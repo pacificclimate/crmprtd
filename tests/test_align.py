@@ -27,7 +27,8 @@ def test_get_history_with_no_matches(test_session):
                     lat=None,
                     lon=None)
 
-    history = get_history(test_session, obs_tuple.network_name, obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
+    history = get_history(test_session, obs_tuple.network_name,
+                          obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
     assert history is not None
 
     q = test_session.query(Station)
@@ -47,7 +48,8 @@ def test_get_history_with_single_match(test_session):
                     lat=None,
                     lon=None)
 
-    history = get_history(test_session, obs_tuple.network_name, obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
+    history = get_history(test_session, obs_tuple.network_name,
+                          obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
     assert history is not None
 
     q = test_session.query(Station)
@@ -67,7 +69,8 @@ def test_get_history_with_multiple_matches_and_location(test_session):
                     lat=49.45,
                     lon=-123.7)
 
-    history = get_history(test_session, obs_tuple.network_name, obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
+    history = get_history(test_session, obs_tuple.network_name,
+                          obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
     assert history.id == 20
 
 
@@ -81,7 +84,8 @@ def test_get_history_with_multiple_matches_and_no_location(test_session):
                     lat=None,
                     lon=None)
 
-    history = get_history(test_session, obs_tuple.network_name, obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
+    history = get_history(test_session, obs_tuple.network_name,
+                          obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
     assert history.id == 21
 
 
@@ -226,7 +230,8 @@ def test_align_failures(test_session, obs_tuple):
 
 
 def test_closest_stns_within_threshold(ec_session):
-    x = closest_stns_within_threshold(ec_session, 'EC_raw', -123.7, 49.45, 1000)
+    x = closest_stns_within_threshold(ec_session, 'EC_raw',
+                                      -123.7, 49.45, 1000)
     assert len(x) > 0
 
 
