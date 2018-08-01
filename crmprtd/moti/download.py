@@ -14,14 +14,14 @@ import yaml
 log = logging.getLogger(__name__)
 
 
-def download(bciduser, bcidpass, auth, auth_key,
+def download(username, password, auth, auth_key,
              start_time, end_time, station_id):
     log.info('Starting MOTIe rtd')
 
     try:
         # Pull auth from file or command line
-        if bciduser or bcidpass:
-            auth = (bciduser, bcidpass)
+        if username or password:
+            auth = (username, password)
         else:
             assert auth and auth_key, ("Must provide both the auth "
                                        "file and the key to use for "

@@ -101,6 +101,21 @@ def common_script_arguments(parser):    # pragma: no cover
     return parser
 
 
+def common_auth_arguments(parser):
+    parser.add_argument('--auth',
+                        help="Yaml file with plaintext usernames/passwords")
+    parser.add_argument('--auth_key',
+                        help=("Top level key which user/pass are stored in "
+                              "yaml file."))
+    parser.add_argument('--username',
+                        help=("The username for data requests. Overrides auth "
+                              "file."))
+    parser.add_argument('--password',
+                        help=("The password for data requests. Overrides auth "
+                              "file."))
+    return parser
+
+
 def setup_logging(log_conf, log, error_email, log_level, name):
     log_c = yaml.load(log_conf)
     if log:
