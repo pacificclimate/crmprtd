@@ -7,10 +7,7 @@ from tempfile import SpooledTemporaryFile
 
 # Local
 from crmprtd.download import retry, ftp_connect
-from crmprtd.download import FTPReader
-
-# Installed libraries
-import yaml
+from crmprtd.download import FTPReader, extract_auth
 
 
 log = logging.getLogger(__name__)
@@ -19,17 +16,7 @@ log = logging.getLogger(__name__)
 def download(username, password, auth, auth_key, ftp_server, ftp_file):
     log.info('Starting WMB rtd')
 
-    # Pull auth from args
-    if username or password:
-        auth = {'u': username, 'p': password}
-    else:
-        assert auth and auth_key, ("Must provide both the auth file "
-                                   "and the key to use for this "
-                                   "script (--auth_key)")
-        with open(auth, 'r') as f:
-            config = yaml.load(f)
-        auth = {'u': config[auth_key]['username'],
-                'p': config[auth_key]['password']}
+    auth = extract_auth(username, password, auth, auth_key)
 
     try:
         # Connect FTP server and retrieve file

@@ -5,6 +5,8 @@ import logging
 import csv
 from functools import wraps
 
+import yaml
+
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     """Retry calling the decorated function using an exponential backoff.
@@ -98,3 +100,23 @@ class FTPReader(object):
             self.connection.quit()
         except Exception:
             self.connection.close()
+
+
+def extract_auth(username, password, auth_file, auth_key):
+    '''Extract auth information
+
+    Use either the username/password provided or pull the info out from the
+    provided yaml file
+    '''
+    if username or password:
+        return {'u': username, 'p': password}
+    else:
+        assert auth_file and auth_key, ("Must provide both the auth file "
+                                        "and the key to use for this "
+                                        "script (--auth_key)")
+        with open(auth_file, 'r') as f:
+            config = yaml.load(f)
+        return {
+            'u': config[auth_key]['username'],
+            'p': config[auth_key]['password']
+        }

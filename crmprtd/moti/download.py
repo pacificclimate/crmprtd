@@ -5,11 +5,12 @@ import sys
 import logging
 import logging.config
 from datetime import datetime, timedelta
-import requests
 
 # Installed libraries
-import yaml
+import requests
 
+# Local
+from crmprtd.download import extract_auth
 
 log = logging.getLogger(__name__)
 
@@ -19,17 +20,7 @@ def download(username, password, auth, auth_key,
     log.info('Starting MOTIe rtd')
 
     try:
-        # Pull auth from file or command line
-        if username or password:
-            auth = (username, password)
-        else:
-            assert auth and auth_key, ("Must provide both the auth "
-                                       "file and the key to use for "
-                                       "this script (--auth_key)")
-            with open(auth, 'r') as f:
-                config = yaml.load(f)
-            auth = (config[auth_key]['username'],
-                    config[auth_key]['password'])
+        auth = extract_auth(username, password, auth, auth_key)
 
         if start_time and end_time:
             start_time = datetime.strptime(
@@ -59,7 +50,7 @@ def download(username, password, auth, auth_key,
         a = requests.adapters.HTTPAdapter(max_retries=3)
         s.mount('https://', a)
         req = s.get('https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110',
-                    params=payload, auth=auth)
+                    params=payload, auth=(auth['u'], auth['p']))
 
         log.info('{}: {}'.format(req.status_code, req.url))
         if req.status_code != 200:
