@@ -61,26 +61,27 @@ def convert_unit(val, src_unit, dst_unit):
 
 
 def unit_check(unit_obs, unit_db, val):
-    log.debug('Check if there are units to compare')
     if not unit_obs and not unit_db:
         return None
     else:
         return convert_unit(val, unit_obs, unit_db)
 
 
-def find_active_history(sesh, histories):
+def find_active_history(histories):
     log.debug('Search for active stations')
-    for history in histories:
-        hist = sesh.query(History).filter(
-            and_(History.id == history.id,
-                 History.sdate != None,
-                 History.edate == None))    # noqa
+    matching_histories = [h for h in histories if h.sdate is not None and h.edate is None]
 
-        if hist.count() == 1:
-            log.debug('Matched history',
-                      extra={'station_name': hist.first().station_name})
-            return hist.first()
-    return None
+    if len(matching_histories) == 1:
+        hist = matching_histories.pop(0)
+        log.debug('Matched history',
+                  extra={'station_name': hist.station_name})
+        return hist
+
+    elif len(matching_histories) > 1:
+        log.error('Multiple active stations in db',
+                  extra={'num_active_stns': len(matching_histories),
+                         'network_name': matching_histories[0].network_name})
+        return None
 
 
 def match_station_with_location(sesh, obs_tuple, histories):
@@ -100,11 +101,11 @@ def match_station_with_location(sesh, obs_tuple, histories):
                 return history
 
 
-def match_station(sesh, obs_tuple, history):
+def match_station(sesh, obs_tuple, histories):
     if obs_tuple.lat and obs_tuple.lon:
-        return match_station_with_location(sesh, obs_tuple, history)
+        return match_station_with_location(sesh, obs_tuple, histories)
     else:
-        return find_active_history(sesh, history)
+        return find_active_history(histories)
 
 
 def create_station_and_history_entry(sesh, obs_tuple):
