@@ -6,63 +6,9 @@ import pytest
 import pytz
 
 from pycds import Obs, Station, History
-from crmprtd.moti import process, url_generator, slice_timesteps, check_history
+from crmprtd.moti import url_generator, slice_timesteps
 
 bctz = pytz.timezone('America/Vancouver')
-
-
-def test_check_history(test_session):
-    stn_id = '666'
-    check_history(stn_id, test_session)
-    q = test_session.query(History)
-    assert q.count() == 9
-
-
-def test_data(test_session, moti_sawr7110_xml):
-    c1 = test_session.query(Obs).count()
-
-    process(test_session, moti_sawr7110_xml)
-    test_session.commit()
-    q = test_session.query(Obs)
-    obs = q.all()
-    assert len(obs) - c1 == 2
-
-
-def test_catch_duplicates(test_session, moti_sawr7110_xml):
-    """Original test of duplicates that didn't check what actually got
-    committed to the database."""
-    rv = process(test_session, moti_sawr7110_xml)
-    assert rv == {'failures': 0, 'successes': 2, 'skips': 2}
-    rv = process(test_session, moti_sawr7110_xml)
-    assert rv == {'failures': 0, 'successes': 0, 'skips': 4}
-
-
-def test_duplicates(test_session, moti_sawr7110_xml_2a, moti_sawr7110_xml_2b):
-    """Test that duplicates are skipped, and that skipping them does not
-    cause preceding or following non-duplicate inserts to be abandoned."""
-
-    # Insert initial observation set, no duplicates
-    rv = process(test_session, moti_sawr7110_xml_2a)
-    assert rv == {'failures': 0, 'successes': 1, 'skips': 0}
-
-    # Insert next observation set, with duplicate of first bracketed by
-    # non-duplicates before and after
-    rv = process(test_session, moti_sawr7110_xml_2b)
-    assert rv == {'failures': 0, 'successes': 2, 'skips': 1}
-
-    # Check that all non-duplicates actually got commited
-    # to the database and not rolled back due to the duplicate
-    test_session.commit()
-    q = (
-        test_session.query(Obs)
-        .join(History)
-        .join(Station)
-        .filter(Station.native_id == '11091')
-    )
-    print('Commited observations')
-    for obs in q.all():
-        print(obs.time)
-    assert q.count() == 3
 
 
 xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -137,15 +83,6 @@ xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
  </cmml>'''} # noqa
 
 
-@pytest.mark.parametrize(('xml'), xml.values(), ids=list(xml.keys()))
-def test_broken_obs(test_session, xml):
-    xml = fromstring(xml)
-    n_obs_before = test_session.query(Obs).count()
-    process(test_session, xml)
-    n_obs_after = test_session.query(Obs).count()
-    assert n_obs_before == n_obs_after
-
-
 def test_missing_client_id(test_session):
     et = fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
@@ -157,7 +94,7 @@ def test_missing_client_id(test_session):
     </observation-series>
   </data>
 </cmml>''') # noqa
-    e = pytest.raises(Exception, process, test_session, et)
+    e = pytest.raises(Exception, test_session, et)
     assert ("Could not detect the station id: xpath search "
             "'//observation-series/origin/id[@type='client']' "
             "return no results") in str(e)
@@ -254,82 +191,3 @@ def test_timestep_slices():
                 (bctz.localize(datetime(2010, 1, 8, 1)),
                 bctz.localize(datetime(2010, 1, 15)))]
     assert results == expected
-
-
-def test_skipped_vars(test_session):
-    xml = fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
-  <data>
-    <observation-series>
-      <origin type="station">
-        <id type="client">11091</id>
-        <id type="network">BC_MoT_11091</id>
-      </origin>
-      <observation valid-time="2011-04-07T01:00:00-07:00">
-        <pavement index="1" type="temperature">
-          <qualifier units="unitless" type="lane-number">1</qualifier>
-          <value units="degC">1.7</value>
-        </pavement>
-        <pavement index="2" type="temperature">
-          <qualifier units="unitless" type="lane-number">1</qualifier>
-          <value units="degC">2.6</value>
-        </pavement>
-        <pavement index="1" type="freeze-point">
-          <qualifier units="unitless" type="lane-number">1</qualifier>
-          <value units="degC">-21.1</value>
-        </pavement>
-        <pavement index="1" type="surface-status">
-          <qualifier type="categorical-table" units="string">BC-MoT-pavement-surface-condition-code</qualifier>
-          <value units="code">24</value>
-        </pavement>
-        <subsurface index="1" type="temperature">
-          <qualifier units="unitless" type="lane-number">1</qualifier>
-          <qualifier units="cm" type="sensor-depth">25</qualifier>
-          <value units="degC">6.7</value>
-        </subsurface>
-        <extension index="2">
-          <qualifier units="string" type="name">bcmot-precipitation-detection-ratio</qualifier>
-          <value units="unitless">.079</value>
-        </extension>
-      </observation>
-    </observation-series>
-  </data>
-</cmml>''') # noqa
-    n_obs_before = test_session.query(Obs).count()
-    r = process(test_session, xml)
-    assert r == {'failures': 0, 'successes': 0, 'skips': 6}
-
-    n_obs_after = test_session.query(Obs).count()
-    assert n_obs_before == n_obs_after
-
-    # TODO: need to actually check no warnings logged for var lookups
-
-
-def test_unknown_var(test_session, caplog):
-    xml = fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
-  <data>
-    <observation-series>
-      <origin type="station">
-        <id type="client">11091</id>
-        <id type="network">BC_MoT_11091</id>
-      </origin>
-      <observation valid-time="2011-04-07T01:00:00-07:00">
-        <temperature index="1" type="tree-temperature">
-          <value units="degC">-.813</value>
-        </temperature>
-      </observation>
-    </observation-series>
-  </data>
-</cmml>''') # noqa
-    n_obs_before = test_session.query(Obs).count()
-    r = process(test_session, xml)
-    assert r == {'failures': 0, 'successes': 0, 'skips': 1}
-
-    n_obs_after = test_session.query(Obs).count()
-    assert n_obs_before == n_obs_after
-
-    t = ('Could not find variable in the database. Skipping this observation.')
-    assert t == caplog.records[0].msg
-
-    # TODO: need to actually check log warning
