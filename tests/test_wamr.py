@@ -9,8 +9,7 @@ import logging
 import pytest
 
 from crmprtd import setup_logging
-from crmprtd.wamr import rows2db, process_obs, file2rows, \
-    DataLogger, create_station_mapping, create_variable_mapping
+from crmprtd.wamr import rows2db, file2rows, DataLogger
 from pycds import Obs, History, Network, Variable
 
 # def test_insert(crmp_session):
@@ -115,24 +114,6 @@ def test_rows2db_units_conversion(test_session):
 def test_datalogger_no_args():
     dl = DataLogger(None)
     assert dl.log is not None
-
-
-def test_process_obs_error_handle(test_session):
-    # lines contains a 'BAD_VAR' which does not exist and will cause an error
-    # in wamr --> process_obs()
-    lines = '''DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE
-2017-05-21 17:00,0260011,Warfield Elementary Met_60,BAD_VAR,TEMP_MEAN,TEMP 10M,32.0,°F,1,n/a,Data Ok,32.0
-''' # noqa
-    log = setup_logging(resource_stream('crmprtd', '/data/logging.yaml'),
-                        'mof.log', 'error_file', 'DEBUG', 'crmprtd.wamr')
-    f = StringIO(lines)
-    rows, fieldnames = file2rows(f, log)
-
-    histories = create_station_mapping(test_session, rows)
-    variables = create_variable_mapping(test_session, rows)
-    for row in rows:
-        with pytest.raises(Exception):
-            process_obs(test_session, row, None, histories, variables)
 
 
 def test_rows2db_error_handle(test_session):
