@@ -53,14 +53,14 @@ def convert_unit(val, src_unit, dst_unit):
             val = val.to(dst_unit).magnitude  # dest
         except UndefinedUnitError as e:
             log.error('Unable to convert units',
-                      extra={'src_unit': unit_obs,
-                             'dst_unit': unit_db,
+                      extra={'src_unit': src_unit,
+                             'dst_unit': dst_unit,
                              'exception': e})
             return None
     return val
 
 
-def unit_check(unit_obs, unit_db, val):
+def unit_check(val, unit_obs, unit_db):
     if not unit_obs and not unit_db:
         return None
     else:
@@ -98,7 +98,7 @@ def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
 
 
 def match_station(sesh, network_name, native_id, lat, lon, histories):
-    if obs_tuple.lat and obs_tuple.lon:
+    if lat and lon:
         return find_nearest_history(sesh, network_name, native_id, lat, lon, histories)
     else:
         return find_active_history(histories)
@@ -149,7 +149,7 @@ def get_history(sesh, network_name, native_id, lat, lon):
     if histories.count() == 0:
         return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
     elif histories.count() == 1:
-        return history.all()
+        return histories.one_or_none()
     elif histories.count() >= 2:
         return match_station(sesh, network_name, native_id, lat, lon, histories)
 
@@ -180,7 +180,7 @@ def align(sesh, obs_tuple):
                     extra={'network_name': obs_tuple.network_name})
         return None
 
-    history = get_history(sesh, obs_tuple)
+    history = get_history(sesh, obs_tuple.network_name, obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
     if not history:
         log.warning('Could not find history match',
                     extra={'network_name': obs_tuple.network_name,
@@ -196,7 +196,7 @@ def align(sesh, obs_tuple):
                     extra={'history': history, 'variable': variable})
         return None
 
-    datum = unit_check(obs_tuple.unit, variable.unit, obs_tuple.val)
+    datum = unit_check(obs_tuple.val, obs_tuple.unit, variable.unit)
     if not datum:
         log.warning('Unable to confirm data units',
                     extra={'unit_obs': obs_tuple.unit,

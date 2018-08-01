@@ -27,7 +27,7 @@ def test_get_history_with_no_matches(test_session):
                     lat=None,
                     lon=None)
 
-    history = get_history(test_session, obs_tuple)
+    history = get_history(test_session, obs_tuple.network_name, obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
     assert history is not None
 
     q = test_session.query(Station)
@@ -47,7 +47,7 @@ def test_get_history_with_single_match(test_session):
                     lat=None,
                     lon=None)
 
-    history = get_history(test_session, obs_tuple)
+    history = get_history(test_session, obs_tuple.network_name, obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
     assert history is not None
 
     q = test_session.query(Station)
@@ -67,7 +67,7 @@ def test_get_history_with_multiple_matches_and_location(test_session):
                     lat=49.45,
                     lon=-123.7)
 
-    history = get_history(test_session, obs_tuple)
+    history = get_history(test_session, obs_tuple.network_name, obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
     assert history.id == 20
 
 
@@ -81,7 +81,7 @@ def test_get_history_with_multiple_matches_and_no_location(test_session):
                     lat=None,
                     lon=None)
 
-    history = get_history(test_session, obs_tuple)
+    history = get_history(test_session, obs_tuple.network_name, obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
     assert history.id == 21
 
 
@@ -103,7 +103,7 @@ def test_get_variable_no_match(test_session):
 def test_unit_check(test_session, network_name, variable_name, unit,
                     val, expected):
     variable = get_variable(test_session, network_name, variable_name)
-    check_val = unit_check(test_session, unit, variable.unit, val)
+    check_val = unit_check(val, unit, variable.unit)
     assert check_val == expected
 
 
@@ -226,7 +226,7 @@ def test_align_failures(test_session, obs_tuple):
 
 
 def test_closest_stns_within_threshold(ec_session):
-    x = closest_stns_within_threshold(ec_session, -123.7, 49.45, 1000)
+    x = closest_stns_within_threshold(ec_session, 'EC_raw', -123.7, 49.45, 1000)
     assert len(x) > 0
 
 
@@ -246,5 +246,5 @@ def test_closest_stns_within_threshold_bad_data(ec_session):
     ec_session.commit()
 
     # Just search for the good station and ensure there are not errors
-    x = closest_stns_within_threshold(ec_session, x, y, 1)
+    x = closest_stns_within_threshold(ec_session, 'EC_raw', x, y, 1)
     assert len(x) > 0
