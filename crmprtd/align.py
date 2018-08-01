@@ -22,9 +22,6 @@ Q_ = ureg.Quantity
 
 
 def closest_stns_within_threshold(sesh, network_name, lon, lat, threshold):
-    # Select all history entries that match this station
-    log.debug("Searching for matching meta_history entries")
-
     query_txt = """
         WITH stns_in_thresh AS (
             SELECT history_id, station_id, lat, lon, Geography(ST_Transform(the_geom,4326)) as p_existing,
@@ -46,7 +43,6 @@ def closest_stns_within_threshold(sesh, network_name, lon, lat, threshold):
         'network_name': network_name}
     )
     valid_hid = set([x[0] for x in q.fetchall()])
-    log.debug("history_ids in threshold", extra={'hid': valid_hid})
     return valid_hid
 
 
@@ -72,7 +68,6 @@ def unit_check(unit_obs, unit_db, val):
 
 
 def find_active_history(histories):
-    log.debug('Search for active stations')
     matching_histories = [h for h in histories if h.sdate is not None and h.edate is None]
 
     if len(matching_histories) == 1:
@@ -89,11 +84,9 @@ def find_active_history(histories):
 
 
 def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
-    log.debug('Find matching station with location')
     close_stns = closest_stns_within_threshold(sesh, network_name, lon, lat, 800)
 
     if len(close_stns) == 0:
-        log.debug('No station nearby')
         return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
 
     for id in close_stns:
@@ -137,21 +130,18 @@ def create_station_and_history_entry(sesh, network_name, native_id, lat, lon):
 
 
 def get_variable(sesh, network_name, variable_name):
-    log.debug('Get variable from db', extra={'var_name': variable_name,
-                                             'network_name': network_name})
     variable = sesh.query(Variable).join(Network).filter(and_(
         Network.name == network_name,
         Variable.name == variable_name)).first()
 
     if not variable:
-        log.debug('Unable to match variable')
+        log.warning('Unable to match variable')
         return None
 
     return variable
 
 
 def get_history(sesh, network_name, native_id, lat, lon):
-    log.debug('Find history entry')
     histories = sesh.query(History).join(Station).join(Network).filter(and_(
         Network.name == network_name,
         Station.native_id == native_id))
@@ -165,7 +155,6 @@ def get_history(sesh, network_name, native_id, lat, lon):
 
 
 def is_network(sesh, network_name):
-    log.debug('Check if network in db', extra={'network_name': network_name})
     network = sesh.query(Network).filter(
         Network.name == network_name)
     return network.count() != 0
@@ -177,7 +166,6 @@ def has_required_information(obs_tuple):
 
 
 def align(sesh, obs_tuple):
-    log.info('Begin alignment')
     # Without these items an Obs object cannot be produced
     if not has_required_information(obs_tuple):
         log.warning('Observation missing critical information',
@@ -188,7 +176,7 @@ def align(sesh, obs_tuple):
         return None
 
     if not is_network(sesh, obs_tuple.network_name):
-        log.warning('Network does not exist in db',
+        log.error('Network does not exist in db',
                     extra={'network_name': obs_tuple.network_name})
         return None
 
@@ -216,7 +204,6 @@ def align(sesh, obs_tuple):
                            'data': obs_tuple.val})
         return None
 
-    log.info('Completed align')
     return Obs(history=history,
                time=obs_tuple.time,
                datum=datum,
