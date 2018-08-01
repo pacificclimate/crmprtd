@@ -84,7 +84,7 @@ def find_active_history(histories):
         return None
 
 
-def match_station_with_location(sesh, network_name, native_id, lat, lon, histories):
+def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
     log.debug('Find matching station with location')
     close_stns = closest_stns_within_threshold(sesh, lon, lat, 800)
 
@@ -102,7 +102,7 @@ def match_station_with_location(sesh, network_name, native_id, lat, lon, histori
 
 def match_station(sesh, network_name, native_id, lat, lon, histories):
     if obs_tuple.lat and obs_tuple.lon:
-        return match_station_with_location(sesh, network_name, native_id, lat, lon, histories)
+        return find_nearest_history(sesh, network_name, native_id, lat, lon, histories)
     else:
         return find_active_history(histories)
 
@@ -148,16 +148,16 @@ def get_variable(sesh, network_name, variable_name):
 
 def get_history(sesh, network_name, native_id, lat, lon):
     log.debug('Find history entry')
-    history = sesh.query(History).join(Station).join(Network).filter(and_(
+    histories = sesh.query(History).join(Station).join(Network).filter(and_(
         Network.name == network_name,
         Station.native_id == native_id))
 
-    if history.count() == 0:
+    if histories.count() == 0:
         return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
-    elif history.count() == 1:
+    elif histories.count() == 1:
         return history.all()
-    elif history.count() >= 2:
-        return match_station(sesh, network_name, native_id, lat, lon, history)
+    elif histories.count() >= 2:
+        return match_station(sesh, network_name, native_id, lat, lon, histories)
 
 
 def is_network(sesh, network_name):
