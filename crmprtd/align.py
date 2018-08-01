@@ -10,7 +10,7 @@ pycds.Obs objects. This phase is common to all networks.
 
 import logging
 from sqlalchemy import and_
-from pint import UnitRegistry
+from pint import UnitRegistry, UndefinedUnitError
 
 # local
 from pycds import Obs, History, Network, Variable, Station
@@ -47,42 +47,25 @@ def closest_stns_within_threshold(sesh, lon, lat, threshold):
 
 
 def convert_unit(val, src_unit, dst_unit):
-    log.debug('Converting units', extra={'src_unit': src_unit,
-                                         'dst_unit': dst_unit})
-    try:
-        val = Q_(val, ureg.parse_expression(src_unit))  # src
-        val = val.to(dst_unit).magnitude  # dest
-    except Exception as e:
-        log.error('Unable to convert units', extra={'src_unit': src_unit,
-                                                    'dst_unit': dst_unit,
-                                                    'exception': e})
-        raise e
-    log.debug('Converted units')
-    return val
-
-
-def unit_db_check(unit_obs, unit_db, val):
-    log.debug('Check if units match')
-    if unit_obs != unit_db:
+    if src_unit != dst_unit:
         try:
-            val_conv = convert_unit(val, unit_obs, unit_db)
-        except Exception as e:
+            val = Q_(val, ureg.parse_expression(src_unit))  # src
+            val = val.to(dst_unit).magnitude  # dest
+        except UndefinedUnitError as e:
             log.error('Unable to convert units',
                       extra={'src_unit': unit_obs,
                              'dst_unit': unit_db,
                              'exception': e})
             return None
-        return val_conv
-    else:
-        return val
+    return val
 
 
-def unit_check(sesh, unit_obs, unit_db, val):
+def unit_check(unit_obs, unit_db, val):
     log.debug('Check if there are units to compare')
     if not unit_obs and not unit_db:
         return None
     else:
-        return unit_db_check(unit_obs, unit_db, val)
+        return convert_unit(val, unit_obs, unit_db)
 
 
 def find_active_history(sesh, histories):
@@ -216,7 +199,7 @@ def align(sesh, obs_tuple):
                     extra={'history': history, 'variable': variable})
         return None
 
-    datum = unit_check(sesh, obs_tuple.unit, variable.unit, obs_tuple.val)
+    datum = unit_check(obs_tuple.unit, variable.unit, obs_tuple.val)
     if not datum:
         log.warning('Unable to confirm data units',
                     extra={'unit_obs': obs_tuple.unit,
