@@ -147,7 +147,8 @@ def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
     return io.BufferedReader(IterStream(), buffer_size=buffer_size)
 
 
-def run_data_pipeline(download_func, normalize_func, download_args):
+def run_data_pipeline(download_func, normalize_func, download_args,
+                      cache_file):
     '''Executes all stages of the data processing pipeline.
 
        Downloads the data, according to the download arguments
@@ -157,12 +158,11 @@ def run_data_pipeline(download_func, normalize_func, download_args):
        pipeline.
 
     '''
-    args = download_args
-    download_iter = download_func(args)
+    download_iter = download_func(**download_args)
 
-    if args.cache_file:
+    if cache_file:
         download_iter, cache_iter = tee(download_iter)
-        with open(args.cache_file, 'w') as f:
+        with open(cache_file, 'w') as f:
             for chunk in cache_iter:
                 f.write(chunk)
 
@@ -171,3 +171,7 @@ def run_data_pipeline(download_func, normalize_func, download_args):
         print(row)
     # observations = [align(row) for row in rows]
     # insert(observations)
+
+
+def subset_dict(a_dict, keys_wanted):
+    return {key: a_dict[key] for key in keys_wanted if key in a_dict}

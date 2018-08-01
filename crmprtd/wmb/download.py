@@ -16,24 +16,24 @@ import yaml
 log = logging.getLogger(__name__)
 
 
-def download(args):
+def download(username, password, auth, auth_key, ftp_server, ftp_file):
     log.info('Starting WMB rtd')
 
     # Pull auth from args
-    if args.username or args.password:
-        auth = {'u': args.username, 'p': args.password}
+    if username or password:
+        auth = {'u': username, 'p': password}
     else:
-        assert args.auth and args.auth_key, ("Must provide both the auth file "
-                                             "and the key to use for this "
-                                             "script (--auth_key)")
-        with open(args.auth, 'r') as f:
+        assert auth and auth_key, ("Must provide both the auth file "
+                                   "and the key to use for this "
+                                   "script (--auth_key)")
+        with open(auth, 'r') as f:
             config = yaml.load(f)
-        auth = {'u': config[args.auth_key]['username'],
-                'p': config[args.auth_key]['password']}
+        auth = {'u': config[auth_key]['username'],
+                'p': config[auth_key]['password']}
 
     try:
         # Connect FTP server and retrieve file
-        ftpreader = ftp_connect(WMBFTPReader, args.ftp_server, args.ftp_file,
+        ftpreader = ftp_connect(WMBFTPReader, ftp_server, ftp_file,
                                 log, auth)
 
         with SpooledTemporaryFile(

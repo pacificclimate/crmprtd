@@ -12,12 +12,12 @@ from crmprtd.download import FTPReader
 log = logging.getLogger(__name__)
 
 
-def download(args):
+def download(ftp_server, ftp_dir):
     log.info('Starting WAMR rtd')
 
     try:
         # Connect FTP server and retrieve file
-        ftpreader = ftp_connect(WAMRFTPReader, args.ftp_server, args.ftp_dir,
+        ftpreader = ftp_connect(WAMRFTPReader, ftp_server, ftp_dir,
                                 log)
 
         with SpooledTemporaryFile(
