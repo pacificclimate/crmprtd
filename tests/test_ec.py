@@ -7,8 +7,7 @@ from lxml.etree import fromstring, parse, XSLT
 import pytest
 
 from crmprtd.ec import makeurl, extract_fname_from_url, ns, \
-    ObsProcessor, check_history, insert_obs, \
-    recordable_vars, db_unit, OmMember
+    check_history, insert_obs, db_unit, OmMember
 
 from crmprtd.ec.normalize import parse_xml
 from pycds import Obs
@@ -372,12 +371,6 @@ def test_new_station(ec_session):
     assert hid3 == 1
 
 
-def test_get_recordable_vars(ec_session):
-    rv = recordable_vars(ec_session)
-    assert rv['total_precipitation'] == 100
-    assert rv['air_temperature'] == 101
-
-
 @pytest.mark.parametrize(('net_var_name', 'unit'), [
     ('total_precipitation', 'mm'),
     ('air_temperature', 'Celsius')
@@ -466,130 +459,6 @@ def test_insert_duplicate_obs(ec_session, et, hid, vname, vid):
     insert_obs(ec_session, om2, hid, vname, vid)
     count3 = ec_session.query(Obs).count()
     assert count3 == count2
-
-
-def test_process_xml(ec_session, caplog):
-    import logging
-    caplog.set_level(logging.INFO)
-
-    from tests.ec_data import hourly_bc_2016061115, hourly_bc_2016061116
-
-    obs_count = ec_session.query(Obs).count()
-
-    op = ObsProcessor(hourly_bc_2016061115, ec_session, 1000)
-    op.process()
-    assert ec_session.query(Obs).count() == obs_count + 130
-
-    op = ObsProcessor(hourly_bc_2016061116, ec_session, 1000)
-    op.process()
-    assert ec_session.query(Obs).count() == obs_count + 260
-
-
-def test_parse_xml(test_session):
-    et = b'''<?xml version="1.0" standalone="no"?>
-<om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <om:member>
-    <om:Observation>
-      <om:metadata>
-        <set>
-          <general>
-            <author build="build.4063" name="MSC-DMS-PG-WXO-Summary" version="2.4"/>
-            <dataset name="mscobservation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/"/>
-            <phase name="product-wxo_xml-1.0/"/>
-            <id xlink:href="/data/msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
-            <parent xlink:href="/data/msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
-          </general>
-          <identification-elements>
-            <element name="station_name" uom="unitless" value="Beaver Creek Airport"/>
-            <element name="latitude" uom="degree" value="62.416667"/>
-            <element name="longitude" uom="degree" value="-140.866667"/>
-            <element name="transport_canada_id" uom="unitless" value="YXX"/>
-            <element name="observation_date_utc" uom="unitless" value="2016-05-28T02:00:00.000Z"/>
-            <element name="observation_date_local_time" uom="unitless" value="2016-05-27T19:00:00.000 PDT"/>
-            <element name="climate_station_number" uom="unitless" value="2100160"/>
-            <element name="wmo_station_number" uom="unitless" value="10000"/>
-          </identification-elements>
-        </set>
-      </om:metadata>
-      <om:samplingTime>
-        <gml:TimeInstant>
-          <gml:timePosition>2016-05-28T02:00:00.000Z</gml:timePosition>
-        </gml:TimeInstant>
-      </om:samplingTime>
-      <om:resultTime>
-        <gml:TimeInstant>
-          <gml:timePosition>2016-05-28T02:00:00.000Z</gml:timePosition>
-        </gml:TimeInstant>
-      </om:resultTime>
-      <om:procedure xlink:href="msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
-      <om:observedProperty gml:remoteSchema="/schema/point-observation/2.0.xsd"/>
-      <om:featureOfInterest>
-        <gml:FeatureCollection>
-          <gml:location>
-            <gml:Point>
-              <gml:pos>49.025278 -122.36</gml:pos>
-            </gml:Point>
-          </gml:location>
-        </gml:FeatureCollection>
-      </om:featureOfInterest>
-      <om:result>
-        <elements>
-          <element name="precipitation" uom="mm" value="55"/>
-        </elements>
-      </om:result>
-    </om:Observation>
-  </om:member>
-</om:ObservationCollection>''' # noqa
-    transformed = parse_xml(iter(et.splitlines()))
-
-    o = ObsProcessor(transformed, test_session, 1000)
-
-    q = test_session.query(Obs)
-    assert q.count() == 3
-
-    o.process()
-
-    q = test_session.query(Obs)
-    assert q.count() == 4
-
-
-def test_process_error_handle():
-    et = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <om:member>
-    <om:Observation>
-      <om:metadata>
-        <set>
-          <general>
-            <dataset name="mscobservation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/"/>
-          </general>
-          <identification-elements>
-            <element name="station_name" uom="unitless" value="Sechelt"/>
-            <element name="climate_station_number" uom="unitless" value="1047172"/>
-          </identification-elements>
-        </set>
-      </om:metadata>
-      <om:samplingTime>
-        <gml:TimeInstant>
-          <gml:timePosition>2012-09-28T02:00:00.000Z</gml:timePosition>
-        </gml:TimeInstant>
-      </om:samplingTime>
-      <om:featureOfInterest>
-        <gml:FeatureCollection>
-          <gml:location>
-            <gml:Point>
-              <gml:pos>49.45 -123.7</gml:pos>
-            </gml:Point>
-          </gml:location>
-        </gml:FeatureCollection>
-      </om:featureOfInterest>
-    </om:Observation>
-  </om:member>
-</om:ObservationCollection>''' # noqa
-    transformed = parse_xml(BytesIO(et))
-    o = ObsProcessor(transformed, 'incorrect', 'values')
-    with pytest.raises(Exception):
-        o.process()
 
 
 def test_OmMember_index_error_handle(ec_session):
