@@ -1,15 +1,11 @@
 import logging
 from datetime import datetime
-from dateutil.parser import parse
-from dateutil.relativedelta import relativedelta
 from decimal import Decimal
-import time
 
-from sqlalchemy import and_, or_
+from sqlalchemy import and_
 
-from pycds import Network, Station, Variable, History, Obs
+from pycds import Obs
 from crmprtd.wmb_exceptions import InsertionError, UniquenessError
-from crmprtd import Timer
 
 log = logging.getLogger(__name__)
 

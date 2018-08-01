@@ -1,15 +1,10 @@
-from lxml.etree import tostring, LxmlError
+from lxml.etree import LxmlError
 from datetime import datetime
-import re
 import logging
 from urllib.parse import urlparse
 
-from pycds import History, Station, Network, Obs, Variable
-from sqlalchemy import and_, or_
-from sqlalchemy.sql import func
+from pycds import Network, Obs, Variable
 from sqlalchemy.exc import IntegrityError
-from crmprtd import Timer
-from crmprtd.align import closest_stns_within_threshold
 
 
 log = logging.getLogger(__name__)

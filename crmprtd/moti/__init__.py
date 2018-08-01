@@ -4,13 +4,9 @@ import logging
 
 import pytz
 from lxml.etree import parse, XSLT
-from sqlalchemy.exc import IntegrityError
 
-from pycds import History, Network, Station, Variable, Obs
-from crmprtd import Timer
 
 log = logging.getLogger(__name__)
-
 
 xsl = resource_filename('crmprtd', 'data/moti.xsl')
 transform = XSLT(parse(xsl))
@@ -41,7 +37,7 @@ def makeurl(report='7110', request='historic',
            '&to={to}').format(**locals())
     return url
 
-    
+
 def url_generator(station, from_, to, report='7110', request='historic'):
     if not isinstance(from_, datetime):
         raise ValueError("from_ paramater is not a datetime, but must be")

@@ -68,7 +68,8 @@ def unit_check(val, unit_obs, unit_db):
 
 
 def find_active_history(histories):
-    matching_histories = [h for h in histories if h.sdate is not None and h.edate is None]
+    matching_histories = [h for h in histories
+                          if h.sdate is not None and h.edate is None]
 
     if len(matching_histories) == 1:
         hist = matching_histories.pop(0)
@@ -84,10 +85,12 @@ def find_active_history(histories):
 
 
 def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
-    close_stns = closest_stns_within_threshold(sesh, network_name, lon, lat, 800)
+    close_stns = closest_stns_within_threshold(sesh, network_name,
+                                               lon, lat, 800)
 
     if len(close_stns) == 0:
-        return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
+        return create_station_and_history_entry(sesh, network_name,
+                                                native_id, lat, lon)
 
     for id in close_stns:
         for history in histories:
@@ -99,7 +102,8 @@ def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
 
 def match_station(sesh, network_name, native_id, lat, lon, histories):
     if lat and lon:
-        return find_nearest_history(sesh, network_name, native_id, lat, lon, histories)
+        return find_nearest_history(sesh, network_name, native_id,
+                                    lat, lon, histories)
     else:
         return find_active_history(histories)
 
@@ -147,11 +151,13 @@ def get_history(sesh, network_name, native_id, lat, lon):
         Station.native_id == native_id))
 
     if histories.count() == 0:
-        return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
+        return create_station_and_history_entry(sesh, network_name, native_id,
+                                                lat, lon)
     elif histories.count() == 1:
         return histories.one_or_none()
     elif histories.count() >= 2:
-        return match_station(sesh, network_name, native_id, lat, lon, histories)
+        return match_station(sesh, network_name, native_id, lat, lon,
+                             histories)
 
 
 def is_network(sesh, network_name):
@@ -177,10 +183,11 @@ def align(sesh, obs_tuple):
 
     if not is_network(sesh, obs_tuple.network_name):
         log.error('Network does not exist in db',
-                    extra={'network_name': obs_tuple.network_name})
+                  extra={'network_name': obs_tuple.network_name})
         return None
 
-    history = get_history(sesh, obs_tuple.network_name, obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
+    history = get_history(sesh, obs_tuple.network_name, obs_tuple.station_id,
+                          obs_tuple.lat, obs_tuple.lon)
     if not history:
         log.warning('Could not find history match',
                     extra={'network_name': obs_tuple.network_name,

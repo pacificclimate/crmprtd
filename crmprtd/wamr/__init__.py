@@ -1,16 +1,11 @@
-import re
 import sys
 import logging
 import logging.config
 import csv
 
 import pytz
-from dateutil.parser import parse
 from pint import UnitRegistry
 
-from crmprtd.db import mass_insert_obs
-from pycds import Network, Station, History, Obs, Variable
-from crmprtd import Timer
 
 tz = pytz.timezone('Canada/Pacific')
 ureg = UnitRegistry()
