@@ -56,62 +56,6 @@ class DataLogger(object):
             yield row
 
 
-def rows2db(sesh, rows, error_file, log, diagnostic=False):
-    '''
-    Args:
-        sesh (sqlalchemy.Session): A session with the crmp database
-        rows (list):
-        error_file (file):
-        log (logging.Logger):
-
-    '''
-    dl = DataLogger(log)
-
-    sesh.begin_nested()
-
-    try:
-        log.info('Processing observations')
-        histories = create_station_mapping(sesh, rows)
-        variables = create_variable_mapping(sesh, rows)
-
-        obs = []
-        for row in rows:
-            try:
-                obs.append(process_obs(sesh, row, log, histories, variables))
-            except Exception as e:
-                dl.add_row(row, e.args[0])
-
-        log.info("Starting a mass insertion", extra={'num_obs': len(obs)})
-        with Timer() as tmr:
-            n_insertions = mass_insert_obs(sesh, obs, log)
-
-        log.info("Data processed and inserted",
-                 extra={'num_insertions': n_insertions,
-                        'insertions_per_sec': (n_insertions/tmr.run_time)})
-
-        if diagnostic:
-            log.info('Diagnostic mode, rolling back all transactions')
-            sesh.rollback()
-        else:
-            log.info('Commiting the sesh')
-            sesh.commit()
-
-    # FIXME: sqlalchemy.exc.OperationalError? (cannot connect to db)
-    # sqlalchemy.exc.InternalError (read-only transaction)
-    except Exception as e:
-        dl.add_row(rows, 'preproc error')
-        sesh.rollback()
-        data_archive = dl.archive(error_file)
-        log.critical('Error data preprocessing. See logfile.',
-                     extra={'data_archive': data_archive})
-        sys.exit(1)
-    finally:
-        sesh.commit()
-        sesh.close()
-
-    dl.archive(error_file)
-
-
 def file2rows(file_, log):
     try:
         reader = csv.DictReader(file_)

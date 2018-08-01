@@ -83,23 +83,6 @@ xml = {'no_obs': b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
  </cmml>'''} # noqa
 
 
-def test_missing_client_id(test_session):
-    et = fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
-  <head>
-  </head>
-  <data>
-    <observation-series>
-      <origin type="station" />
-    </observation-series>
-  </data>
-</cmml>''') # noqa
-    e = pytest.raises(Exception, test_session, et)
-    assert ("Could not detect the station id: xpath search "
-            "'//observation-series/origin/id[@type='client']' "
-            "return no results") in str(e)
-
-
 def test_url_generator():
     urls = url_generator('1', bctz.localize(
         datetime(2010, 1, 1)), bctz.localize(datetime(2010, 3, 1)))
