@@ -21,25 +21,29 @@ ureg = UnitRegistry()
 Q_ = ureg.Quantity
 
 
-def closest_stns_within_threshold(sesh, lon, lat, threshold):
+def closest_stns_within_threshold(sesh, network_name, lon, lat, threshold):
     # Select all history entries that match this station
     log.debug("Searching for matching meta_history entries")
 
     query_txt = """
         WITH stns_in_thresh AS (
-            SELECT history_id, lat, lon, Geography(ST_Transform(the_geom,4326)) as p_existing,
+            SELECT history_id, station_id, lat, lon, Geography(ST_Transform(the_geom,4326)) as p_existing,
                 Geography(ST_SetSRID(ST_MakePoint(:x, :y),4326)) as p_new
             FROM crmp.meta_history
             WHERE the_geom && ST_Buffer(Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)),:thresh)
         )
         SELECT history_id, ST_Distance(p_existing,p_new) as dist
         FROM stns_in_thresh
+        NATURAL JOIN crmp.meta_station
+        NATURAL JOIN crmp.meta_network
+        WHERE network_name = :network_name
         ORDER BY dist
 """ # noqa
     q = sesh.execute(query_txt, {
         'x': lon,
         'y': lat,
-        'thresh': threshold}
+        'thresh': threshold,
+        'network_name': network_name}
     )
     valid_hid = set([x[0] for x in q.fetchall()])
     log.debug("history_ids in threshold", extra={'hid': valid_hid})
@@ -86,7 +90,7 @@ def find_active_history(histories):
 
 def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
     log.debug('Find matching station with location')
-    close_stns = closest_stns_within_threshold(sesh, lon, lat, 800)
+    close_stns = closest_stns_within_threshold(sesh, network_name, lon, lat, 800)
 
     if len(close_stns) == 0:
         log.debug('No station nearby')
