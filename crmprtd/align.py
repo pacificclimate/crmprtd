@@ -171,11 +171,15 @@ def is_network(sesh, network_name):
     return network.count() != 0
 
 
+def has_required_information(obs_tuple):
+    return obs_tuple.network_name is not None and obs_tuple.time is not None \
+        and obs_tuple.val is not None and obs_tuple.variable_name is not None
+
+
 def align(sesh, obs_tuple):
     log.info('Begin alignment')
     # Without these items an Obs object cannot be produced
-    if obs_tuple.network_name is None or obs_tuple.time is None or \
-            obs_tuple.val is None or obs_tuple.variable_name is None:
+    if not has_required_information(obs_tuple):
         log.warning('Observation missing critical information',
                     extra={'network_name': obs_tuple.network_name,
                            'time': obs_tuple.time,
