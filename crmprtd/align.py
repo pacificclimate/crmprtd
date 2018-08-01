@@ -85,7 +85,7 @@ def unit_check(sesh, unit_obs, unit_db, val):
         return unit_db_check(unit_obs, unit_db, val)
 
 
-def match_station_with_active(sesh, obs_tuple, histories):
+def find_active_history(sesh, histories):
     log.debug('Search for active stations')
     for history in histories:
         hist = sesh.query(History).filter(
@@ -97,10 +97,6 @@ def match_station_with_active(sesh, obs_tuple, histories):
             log.debug('Matched history',
                       extra={'station_name': hist.first().station_name})
             return hist.first()
-
-    log.warning('Could not find match',
-                extra={'network_name': obs_tuple.network_name,
-                       'native_id': obs_tuple.station_id})
     return None
 
 
@@ -125,7 +121,7 @@ def match_station(sesh, obs_tuple, history):
     if obs_tuple.lat and obs_tuple.lon:
         return match_station_with_location(sesh, obs_tuple, history)
     else:
-        return match_station_with_active(sesh, obs_tuple, history)
+        return find_active_history(sesh, history)
 
 
 def create_station_and_history_entry(sesh, obs_tuple):
@@ -205,11 +201,17 @@ def align(sesh, obs_tuple):
         return None
 
     history = get_history(sesh, obs_tuple)
+    if not history:
+        log.warning('Could not find history match',
+                    extra={'network_name': obs_tuple.network_name,
+                           'native_id': obs_tuple.station_id})
+        return None
+
     variable = get_variable(sesh, obs_tuple.network_name,
                             obs_tuple.variable_name)
 
     # Necessary attributes for Obs object
-    if not history or not variable:
+    if not variable:
         log.warning('Could not retrieve necessary information from db',
                     extra={'history': history, 'variable': variable})
         return None
