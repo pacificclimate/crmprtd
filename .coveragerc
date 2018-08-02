@@ -3,6 +3,10 @@
     source = crmprtd
     omit =
         crmprtd/wmb_excptions
+        crmprtd/ec/download.py
+        crmprtd/moti/download.py
+        crmprtd/wamr/download.py
+        crmprtd/wmb/download.py
 
 [report]
     fail_under = 50
