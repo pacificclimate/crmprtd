@@ -125,10 +125,9 @@ def create_station_and_history_entry(sesh, network_name, native_id, lat, lon):
 
     with sesh.begin_nested():
         sesh.add(hist)
-    log.info('Created new history entry',
-             extra={'history': hist.id, 'network_name': network_name,
-                    'lat': lat, 'lon': lon})
-    log.warning('A new history entry has been added without elevation')
+    log.warning('Created new history entry',
+                extra={'history': hist.id, 'network_name': network_name,
+                       'native_id': stn.native_id, 'lat': lat, 'lon': lon})
     sesh.commit()
     return hist
 
