@@ -1,6 +1,5 @@
 from crmprtd.moti.normalize import normalize
 from io import BytesIO
-import pytest
 
 
 def test_normalize_good_data():
@@ -43,7 +42,7 @@ def test_normalize_good_data():
       </observation>
     </observation-series>
   </data>
-</cmml>'''
+</cmml>''' # noqa
     f = BytesIO(lines)
     rows = [row for row in normalize(f)]
     assert len(rows) == 4
@@ -80,7 +79,7 @@ def test_normalize_missing_stn_indexerror():
       </observation>
     </observation-series>
   </data>
-</cmml>'''
+</cmml>''' # noqa
     f = BytesIO(lines)
     rows = [row for row in normalize(f)]
     assert len(rows) == 0
@@ -126,7 +125,7 @@ def test_normalize_missing_time():
       </observation>
     </observation-series>
   </data>
-</cmml>'''
+</cmml>''' # noqa
     f = BytesIO(lines)
     rows = [row for row in normalize(f)]
     assert len(rows) == 2
@@ -164,7 +163,7 @@ def test_normalize_bad_time(moti_sawr7110_xml):
       </observation>
     </observation-series>
   </data>
-</cmml>'''
+</cmml>''' # noqa
     f = BytesIO(lines)
     rows = [row for row in normalize(f)]
     assert len(rows) == 0
@@ -199,7 +198,7 @@ def test_normalize_missing_var_name():
       </observation>
     </observation-series>
   </data>
-</cmml>'''
+</cmml>''' # noqa
     f = BytesIO(lines)
     rows = [row for row in normalize(f)]
     assert len(rows) == 0
@@ -236,7 +235,7 @@ def test_normalize_missing_value():
       </observation>
     </observation-series>
   </data>
-</cmml>'''
+</cmml>''' # noqa
     f = BytesIO(lines)
     rows = [row for row in normalize(f)]
     assert len(rows) == 1
@@ -273,7 +272,7 @@ def test_normalize_bad_value():
       </observation>
     </observation-series>
   </data>
-</cmml>'''
+</cmml>''' # noqa
     f = BytesIO(lines)
     rows = [row for row in normalize(f)]
     assert len(rows) == 0

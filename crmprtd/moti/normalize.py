@@ -52,7 +52,7 @@ def normalize(iterable):
                 date = dateparse(time).replace(tzinfo=tz)
             except ValueError as e:
                 log.warning('Unable to convert value to datetime',
-                          extra={'time': time})
+                            extra={'time': time})
                 continue
 
             for obs in member.iterchildren():
