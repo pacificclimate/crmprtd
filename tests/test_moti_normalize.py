@@ -43,9 +43,11 @@ def test_normalize_good_data():
     </observation-series>
   </data>
 </cmml>''' # noqa
-    f = BytesIO(lines)
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 4
+    for row in rows:
+        assert row.station_id == '11091'
+        assert row.network_name == 'MoTIe'
 
 
 def test_normalize_missing_stn_indexerror():
@@ -80,8 +82,7 @@ def test_normalize_missing_stn_indexerror():
     </observation-series>
   </data>
 </cmml>''' # noqa
-    f = BytesIO(lines)
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
 
 
@@ -126,9 +127,10 @@ def test_normalize_missing_time():
     </observation-series>
   </data>
 </cmml>''' # noqa
-    f = BytesIO(lines)
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 2
+    for row in rows:
+        row.time is not None
 
 
 def test_normalize_bad_time(moti_sawr7110_xml):
@@ -164,8 +166,7 @@ def test_normalize_bad_time(moti_sawr7110_xml):
     </observation-series>
   </data>
 </cmml>''' # noqa
-    f = BytesIO(lines)
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
 
 
@@ -199,8 +200,7 @@ def test_normalize_missing_var_name():
     </observation-series>
   </data>
 </cmml>''' # noqa
-    f = BytesIO(lines)
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
 
 
@@ -236,9 +236,12 @@ def test_normalize_missing_value():
     </observation-series>
   </data>
 </cmml>''' # noqa
-    f = BytesIO(lines)
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 1
+    row, = rows
+    assert row.time is not None
+    assert row.val == 964
+    assert row.variable_name == 'ATMOSPHERIC_PRESSURE'
 
 
 def test_normalize_bad_value():
@@ -273,6 +276,5 @@ def test_normalize_bad_value():
     </observation-series>
   </data>
 </cmml>''' # noqa
-    f = BytesIO(lines)
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0

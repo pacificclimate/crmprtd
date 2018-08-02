@@ -10,19 +10,17 @@ def test_normalize_good_data():
 2018-07-30 11:00,0250009,Trail Butler Park Met_60,HUMIDITY,HUMIDITY,HUMIDITY,27.87,% RH,1,n/a,Data Ok,27.9
 2018-07-30 10:00,0250009,Trail Butler Park Met_60,HUMIDITY,HUMIDITY,HUMIDITY,34.03,% RH,1,n/a,Data Ok,34.0
 ''' # noqa
-    f = StringIO(lines)
-
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(StringIO(lines))]
     assert len(rows) == 5
+    for row in rows:
+        assert row.unit == '%'
 
 
 def test_normalize_unpack_error_catch():
     lines = '''DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE, BAD_VAR
 2018-07-30 14:00,0250009,Trail Butler Park Met_60,HUMIDITY,HUMIDITY,HUMIDITY,11.68,% RH,1,n/a,Data Ok,11.7,bad_var
 ''' # noqa
-    f = StringIO(lines)
-
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(StringIO(lines))]
     assert len(rows) == 0
 
 
@@ -30,9 +28,7 @@ def test_normalize_missing_value():
     lines = '''DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE
 2018-07-30 14:00,0250009,Trail Butler Park Met_60,HUMIDITY,HUMIDITY,HUMIDITY,11.68,% RH,1,n/a,Data Ok,
 ''' # noqa
-    f = StringIO(lines)
-
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(StringIO(lines))]
     assert len(rows) == 0
 
 
@@ -40,9 +36,7 @@ def test_normalize_bad_value():
     lines = '''DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE
 2018-07-30 14:00,0250009,Trail Butler Park Met_60,HUMIDITY,HUMIDITY,HUMIDITY,11.68,% RH,1,n/a,Data Ok,bad_val
 ''' # noqa
-    f = StringIO(lines)
-
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(StringIO(lines))]
     assert len(rows) == 0
 
 
@@ -50,7 +44,5 @@ def test_normalize_bad_date():
     lines = '''DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE
 BAD_DATE,0250009,Trail Butler Park Met_60,HUMIDITY,HUMIDITY,HUMIDITY,11.68,% RH,1,n/a,Data Ok,11.7
 ''' # noqa
-    f = StringIO(lines)
-
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(StringIO(lines))]
     assert len(rows) == 0

@@ -70,9 +70,14 @@ def test_normalize_good_data():
     </om:Observation>
   </om:member>
 </om:ObservationCollection>''' # noqa
-    f = BytesIO(lines)
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 10
+    for row in rows:
+        assert row.station_id is not None
+        assert row.time is not None
+        assert row.variable_name is not None
+        assert row.val is not None
+        assert row.network_name is not None
 
 
 def test_normalize_bad_stn():
@@ -142,8 +147,7 @@ def test_normalize_bad_stn():
     </om:Observation>
   </om:member>
 </om:ObservationCollection>''' # noqa
-    f = BytesIO(lines)
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
 
 
@@ -215,6 +219,5 @@ def test_normalize_bad_date():
     </om:Observation>
   </om:member>
 </om:ObservationCollection>''' # noqa
-    f = BytesIO(lines)
-    rows = [row for row in normalize(f)]
+    rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
