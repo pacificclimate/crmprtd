@@ -102,20 +102,25 @@ class FTPReader(object):
             self.connection.close()
 
 
-def extract_auth(username, password, auth_file, auth_key):
+def extract_auth(username, password, auth_yaml, auth_key):
     '''Extract auth information
 
     Use either the username/password provided or pull the info out from the
     provided yaml file
     '''
+    def none_to_empty_string(s):
+        return s if s else ''
+
     if username or password:
-        return {'u': username, 'p': password}
+        return {
+            'u': none_to_empty_string(username),
+            'p': none_to_empty_string(password)
+        }
     else:
-        assert auth_file and auth_key, ("Must provide both the auth file "
+        assert auth_yaml and auth_key, ("Must provide both the auth file "
                                         "and the key to use for this "
                                         "script (--auth_key)")
-        with open(auth_file, 'r') as f:
-            config = yaml.load(f)
+        config = yaml.load(auth_yaml)
         return {
             'u': config[auth_key]['username'],
             'p': config[auth_key]['password']

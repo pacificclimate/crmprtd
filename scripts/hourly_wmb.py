@@ -33,7 +33,7 @@ if __name__ == '__main__':
     log = setup_logging(args.log_conf, args.log,
                         args.error_email, args.log_level, 'crmprtd.wmb')
 
-    dl_args = ['username', 'password', 'auth', 'auth_key', 'ftp_server',
+    dl_args = ['username', 'password', 'auth_fname', 'auth_key', 'ftp_server',
                'ftp_file']
     dl_args = subset_dict(vars(args), dl_args)
 

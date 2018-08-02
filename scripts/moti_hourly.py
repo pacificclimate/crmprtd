@@ -28,7 +28,7 @@ if __name__ == '__main__':
     log = setup_logging(args.log_conf, args.log,
                         args.error_email, args.log_level, 'crmprtd.moti')
 
-    dl_args = ['start_time', 'end_time', 'station_id', 'auth',
+    dl_args = ['start_time', 'end_time', 'station_id', 'auth_fname',
                'auth_key', 'username', 'password']
     dl_args = subset_dict(vars(args), dl_args)
 

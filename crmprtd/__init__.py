@@ -102,7 +102,7 @@ def common_script_arguments(parser):    # pragma: no cover
 
 
 def common_auth_arguments(parser):     # pragma: no cover
-    parser.add_argument('--auth',
+    parser.add_argument('--auth_fname',
                         help="Yaml file with plaintext usernames/passwords")
     parser.add_argument('--auth_key',
                         help=("Top level key which user/pass are stored in "

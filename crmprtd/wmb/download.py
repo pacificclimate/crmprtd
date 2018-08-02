@@ -13,10 +13,11 @@ from crmprtd.download import FTPReader, extract_auth
 log = logging.getLogger(__name__)
 
 
-def download(username, password, auth, auth_key, ftp_server, ftp_file):
+def download(username, password, auth_fname, auth_key, ftp_server, ftp_file):
     log.info('Starting WMB rtd')
 
-    auth = extract_auth(username, password, auth, auth_key)
+    auth_yaml = open(auth_fname, 'r').read() if auth_fname else None
+    auth = extract_auth(username, password, auth_yaml, auth_key)
 
     try:
         # Connect FTP server and retrieve file

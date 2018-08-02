@@ -15,12 +15,13 @@ from crmprtd.download import extract_auth
 log = logging.getLogger(__name__)
 
 
-def download(username, password, auth, auth_key,
+def download(username, password, auth_fname, auth_key,
              start_time, end_time, station_id):
     log.info('Starting MOTIe rtd')
 
     try:
-        auth = extract_auth(username, password, auth, auth_key)
+        auth_yaml = open(auth_fname, 'r').read() if auth_fname else None
+        auth = extract_auth(username, password, auth_yaml, auth_key)
 
         if start_time and end_time:
             start_time = datetime.strptime(
