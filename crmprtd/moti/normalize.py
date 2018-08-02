@@ -33,10 +33,10 @@ def normalize(iterable):
             stn_id = series.xpath(
                         "./origin/id[@type='client']")[0].text.strip()
         except IndexError as e:
-            raise Exception(
-                "Could not detect the station id: xpath search "
-                "'//observation-series/origin/id[@type='client']' return no "
-                "results")
+            log.error("Could not detect the station id: xpath search "
+                      "'//observation-series/origin/id[@type='client']' "
+                      "return no results", extra={'exception': e})
+            continue
 
         members = series.xpath('./observation', namespaces=ns)
         for member in members:
@@ -51,8 +51,9 @@ def normalize(iterable):
             try:
                 date = dateparse(time).replace(tzinfo=tz)
             except ValueError as e:
-                log.error('Unable to convert value to datetime',
-                          extra={'date': date})
+                log.warning('Unable to convert value to datetime',
+                          extra={'time': time})
+                continue
 
             for obs in member.iterchildren():
                 variable_name = obs.get('type')
@@ -73,7 +74,7 @@ def normalize(iterable):
                 except ValueError:
                     log.error("Could not convert value to a number. "
                               "Skipping this observation.",
-                              extra={'value': value})
+                              extra={'value': value_element})
                     continue
 
                 yield Row(time=date,
