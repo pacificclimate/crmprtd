@@ -1,6 +1,7 @@
 from crmprtd.ec.normalize import normalize
 from io import BytesIO
 
+
 def test_normalize_good_data():
     lines = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
