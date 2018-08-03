@@ -104,6 +104,21 @@ def common_script_arguments(parser):    # pragma: no cover
     return parser
 
 
+def common_auth_arguments(parser):     # pragma: no cover
+    parser.add_argument('--auth_fname',
+                        help="Yaml file with plaintext usernames/passwords")
+    parser.add_argument('--auth_key',
+                        help=("Top level key which user/pass are stored in "
+                              "yaml file."))
+    parser.add_argument('--username',
+                        help=("The username for data requests. Overrides auth "
+                              "file."))
+    parser.add_argument('--password',
+                        help=("The password for data requests. Overrides auth "
+                              "file."))
+    return parser
+
+
 def setup_logging(log_conf, log, error_email, log_level, name):
     log_c = yaml.load(log_conf)
     if log:
@@ -150,7 +165,8 @@ def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
     return io.BufferedReader(IterStream(), buffer_size=buffer_size)
 
 
-def run_data_pipeline(download_func, normalize_func, download_args):
+def run_data_pipeline(download_func, normalize_func, download_args,
+                      cache_file):
     '''Executes all stages of the data processing pipeline.
 
        Downloads the data, according to the download arguments
@@ -159,12 +175,11 @@ def run_data_pipeline(download_func, normalize_func, download_args):
        normalized rows through the align and insert phases of the
        pipeline.
     '''
-    args = download_args
-    download_iter = download_func(args)
+    download_iter = download_func(**download_args)
 
-    if args.cache_file:
+    if cache_file:
         download_iter, cache_iter = tee(download_iter)
-        with open(args.cache_file, 'w') as f:
+        with open(cache_file, 'w') as f:
             for chunk in cache_iter:
                 f.write(chunk)
 
@@ -178,3 +193,7 @@ def run_data_pipeline(download_func, normalize_func, download_args):
     for ob in observations:
         print(ob)
     # insert(observations)
+
+
+def subset_dict(a_dict, keys_wanted):
+    return {key: a_dict[key] for key in keys_wanted if key in a_dict}

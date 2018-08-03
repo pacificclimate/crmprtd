@@ -13,22 +13,22 @@ from crmprtd.ec import makeurl
 log = logging.getLogger(__name__)
 
 
-def download(args):
+def download(time, frequency, province, language):
     log.info('Starting EC rtd')
 
     try:
         # Determine time parameter
-        if args.time:
-            args.time = datetime.strptime(args.time, '%Y/%m/%d %H:%M:%S')
+        if time:
+            time = datetime.strptime(time, '%Y/%m/%d %H:%M:%S')
             log.info("Starting manual run "
-                     "using timestamp {0}".format(args.time))
+                     "using timestamp {0}".format(time))
         else:
             # go back a day
             deltat = timedelta(
-                1 / 24.) if args.frequency == 'hourly' else timedelta(1)
-            args.time = datetime.utcnow() - deltat
+                1 / 24.) if frequency == 'hourly' else timedelta(1)
+            time = datetime.utcnow() - deltat
             log.info("Starting automatic run "
-                     "using timestamp {0}".format(args.time))
+                     "using timestamp {0}".format(time))
 
         # Configure requests to use retry
         s = requests.Session()
@@ -36,7 +36,7 @@ def download(args):
         s.mount('https://', a)
 
         # Construct and download the xml
-        url = makeurl(args.frequency, args.province, args.language, args.time)
+        url = makeurl(frequency, province, language, time)
 
         log.info("Downloading {0}".format(url))
         req = s.get(url)

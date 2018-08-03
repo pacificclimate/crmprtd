@@ -14,7 +14,8 @@ from argparse import ArgumentParser
 # Local
 from crmprtd.wamr.download import download
 from crmprtd.wamr.normalize import normalize
-from crmprtd import common_script_arguments, setup_logging, run_data_pipeline
+from crmprtd import common_script_arguments, setup_logging, run_data_pipeline,\
+    subset_dict
 
 
 if __name__ == '__main__':
@@ -33,4 +34,7 @@ if __name__ == '__main__':
     log = setup_logging(args.log_conf, args.log,
                         args.error_email, args.log_level, 'crmprtd.wamr')
 
-    run_data_pipeline(download, normalize, args)
+    dl_args = ['ftp_server', 'ftp_dir']
+    dl_args = subset_dict(vars(args), dl_args)
+
+    run_data_pipeline(download, normalize, dl_args, args.cache_file)
