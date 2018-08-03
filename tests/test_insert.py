@@ -16,12 +16,8 @@ def generate_best_obs(num_obs):
     return best_obs
 
 
-def generate_worst_obs(db, num_obs):
+def generate_worst_obs(sesh, num_obs):
     worst_obs = []
-
-    # add observation that will be duplicated
-    Session = sessionmaker(create_engine(db))
-    sesh = Session()
 
     ob = Obs(time=datetime.now(), history_id=15, vars_id=7, datum=66)
 
@@ -101,35 +97,46 @@ obs = generate_best_obs(%d)
     SETUP_CODE_WORST = """
 from __main__ import generate_worst_obs
 from crmprtd.insert import insert_with_one_by_one, insert_with_chunks, \
-    insert_with_mass
-obs = generate_worst_obs('%s', %d)
+    insert_mass
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+Session = sessionmaker(create_engine('%s'))
+sesh = Session()
+obs = generate_worst_obs(sesh, %d)
 """ % (db, num_obs)
 
     # Test code for timeit
     TEST_CODE_ONE_BY_ONE = """insert_with_one_by_one('%s', obs)""" % (db)
     TEST_CODE_CHUNKS = """insert_with_chunks('%s', obs, %d)""" % (db, chunk_size)
-    TEST_CODE_MASS = """insert_with_mass('%s', obs)""" % (db)
+    TEST_CODE_MASS = """insert_mass(sesh, obs)"""
 
     # One by One with best case observations
-    results = run_time_test(SETUP_CODE_BEST, TEST_CODE_ONE_BY_ONE, num_iter)
-    results_to_file(results, 'one_by_one', num_obs, 'Best case', num_iter)
+    # results = run_time_test(SETUP_CODE_BEST, TEST_CODE_ONE_BY_ONE, num_iter)
+    # results_to_file(results, 'one_by_one', num_obs, 'Best case', num_iter)
 
     # One by One with worst case observations
-    results = run_time_test(SETUP_CODE_WORST, TEST_CODE_ONE_BY_ONE, num_iter)
-    results_to_file(results, 'one_by_one', num_obs, 'Worst Case', num_iter)
+    # results = run_time_test(SETUP_CODE_WORST, TEST_CODE_ONE_BY_ONE, num_iter)
+    # results_to_file(results, 'one_by_one', num_obs, 'Worst Case', num_iter)
 
     # Chunks with best case observations
-    results = run_time_test(SETUP_CODE_BEST, TEST_CODE_CHUNKS, num_iter)
-    results_to_file(results, 'chunks', num_obs, 'Best Case', num_iter, chunk_size)
+    # results = run_time_test(SETUP_CODE_BEST, TEST_CODE_CHUNKS, num_iter)
+    # results_to_file(results, 'chunks', num_obs, 'Best Case', num_iter, chunk_size)
 
     # Chunks with worst case observations
-    results = run_time_test(SETUP_CODE_WORST, TEST_CODE_CHUNKS, num_iter)
-    results_to_file(results, 'chunks', num_obs, 'Worst Case', num_iter, chunk_size)
+    # results = run_time_test(SETUP_CODE_WORST, TEST_CODE_CHUNKS, num_iter)
+    # results_to_file(results, 'chunks', num_obs, 'Worst Case', num_iter, chunk_size)
 
     # Mass with best case observations
-    results = run_time_test(SETUP_CODE_BEST, TEST_CODE_MASS, num_iter)
-    results_to_file(results, 'mass', num_obs, 'Best Case', num_iter)
+    # results = run_time_test(SETUP_CODE_BEST, TEST_CODE_MASS, num_iter)
+    # results_to_file(results, 'mass', num_obs, 'Best Case', num_iter)
 
     # Mass with worst case observations
-    results = run_time_test(SETUP_CODE_WORST, TEST_CODE_MASS, num_iter)
-    results_to_file(results, 'mass', num_obs, 'Worst Case', num_iter)
+    # results = run_time_test(SETUP_CODE_WORST, TEST_CODE_MASS, num_iter)
+    # results_to_file(results, 'mass', num_obs, 'Worst Case', num_iter)
+
+    from crmprtd.insert import insert_mass
+    Session = sessionmaker(create_engine(db))
+    sesh = Session()
+    obs = generate_worst_obs(sesh, num_obs)
+    stuff = insert_mass(sesh, obs)
+    print(stuff)

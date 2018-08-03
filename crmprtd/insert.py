@@ -16,6 +16,7 @@ from sqlalchemy.orm import sessionmaker
 import sys
 from sqlalchemy import and_
 from crmprtd.wmb_exceptions import UniquenessError, InsertionError
+from sqlalchemy.exc import IntegrityError
 import statistics
 
 
@@ -64,6 +65,7 @@ def insert_mass(sesh, os):
         except IntegrityError as e:
             # print("Failure, observation already exists. os: {}, exception: {}".format(os, e))
             sesh.rollback()
+            print('HERE')
             return 0
         else:
             # print("Success for single observation")
@@ -75,12 +77,14 @@ def insert_mass(sesh, os):
         try:
             with sesh.begin_nested():
                 ## print("New SAVEPOINT. num_obs:{}".format(len(os)))
+                print('has to')
                 sesh.add_all(os)
         except IntegrityError:
             # print("Failed, splitting observations.")
             sesh.rollback()
             a, b = split(os)
             # print("Splitings observations into a, b.")
+            print('maybe')
             a, b = insert_mass(sesh, a), insert_mass(sesh, b)
             combined = a + b
             # print("Returning from split call")
@@ -88,6 +92,7 @@ def insert_mass(sesh, os):
         else:
             # print("Successfully inserted observations")
             sesh.rollback()
+            print('ill be pissed')
             return len(os)
 
 
@@ -115,12 +120,3 @@ def insert_with_chunks(db, obs, chunk_size):
             insert_mass(sesh, chunk)
         except:
             pass
-
-def insert_with_mass(db, obs):
-    Session = sessionmaker(create_engine(db))
-    sesh = Session()
-
-    try:
-        insert_mass(sesh, obs)
-    except:
-        pass
