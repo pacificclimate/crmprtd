@@ -58,7 +58,7 @@ def normalize(file_stream):
                       val=value,
                       variable_name=var_name,
                       unit=None,
-                      network_name='WMB',
+                      network_name='FLNRO-WMB',
                       station_id=station_id,
                       lat=None,
                       lon=None)

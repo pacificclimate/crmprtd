@@ -72,18 +72,20 @@ def normalize(file_stream):
             # or obs_time in which case we don't need to process this item
             except IndexError:
                 log.warning("This member does not appear to be a station")
+                continue
 
             tz = pytz.timezone('Canada/Pacific')
             try:
                 date = dateparse(obs_time).replace(tzinfo=tz)
             except ValueError as e:
                 log.error('Unable to parse date', extra={'exception': e})
+                continue
 
             yield Row(time=date,
                       val=val,
                       variable_name=var,
                       unit=om.member_unit(var),
-                      network_name='EC',
+                      network_name='EC_raw',
                       station_id=native_id,
                       lat=lat,
                       lon=lon)
