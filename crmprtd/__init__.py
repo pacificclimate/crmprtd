@@ -166,7 +166,7 @@ def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
 
 
 def run_data_pipeline(download_func, normalize_func, download_args,
-                      cache_file):
+                      cache_file, connection_string):
     '''Executes all stages of the data processing pipeline.
 
        Downloads the data, according to the download arguments
@@ -185,7 +185,7 @@ def run_data_pipeline(download_func, normalize_func, download_args,
 
     rows = [row for row in normalize_func(download_iter)]
 
-    engine = create_engine(args.connection_string)
+    engine = create_engine(connection_string)
     Session = sessionmaker(engine)
     sesh = Session()
 

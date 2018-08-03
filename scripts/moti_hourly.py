@@ -32,4 +32,5 @@ if __name__ == '__main__':
                'auth_key', 'username', 'password']
     dl_args = subset_dict(vars(args), dl_args)
 
-    run_data_pipeline(download, normalize, dl_args, args.cache_file)
+    run_data_pipeline(download, normalize, dl_args, args.cache_file,
+                      args.connection_string)
