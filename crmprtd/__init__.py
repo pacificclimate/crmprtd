@@ -174,7 +174,7 @@ def run_data_pipeline(download_func, normalize_func, download_args):
     Session = sessionmaker(engine)
     sesh = Session()
 
-    observations = [align(sesh, row) for row in rows]
+    observations = [align(sesh, row) for row in rows if row]
     for ob in observations:
         print(ob)
     # insert(observations)
