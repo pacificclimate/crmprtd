@@ -2,7 +2,7 @@ PyCDS
 PyYAML
 SQLAlchemy
 lxml
-psycopg2
+psycopg2-binary
 python-dateutil
 pytz
 requests[security]
