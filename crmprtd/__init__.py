@@ -158,7 +158,6 @@ def run_data_pipeline(download_func, normalize_func, download_args):
        based on the network's format. The the fuction send the
        normalized rows through the align and insert phases of the
        pipeline.
-
     '''
     args = download_args
     download_iter = download_func(args)
