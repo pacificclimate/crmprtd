@@ -28,7 +28,7 @@ setup(
     url="http://www.pacificclimate.org/",
     author="James Hiebert",
     author_email="hiebert@uvic.ca",
-    packages=find_packages(),
+    packages=find_packages(exclude=("speed_test",)),
     scripts=["scripts/real_time_ec.py",
              "scripts/fetch.py",
              "scripts/hourly_wmb.py",
