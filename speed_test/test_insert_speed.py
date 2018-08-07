@@ -2,8 +2,6 @@ import timeit
 import os
 from datetime import datetime
 from statistics import mean
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from argparse import ArgumentParser
 from pycds import Obs
 import random
@@ -87,10 +85,10 @@ def generate_chunk_obs(sesh, num_obs, num_bad):
 
 
 def time_test(SETUP_CODE, TEST_CODE, num_iter):
-    times = timeit.repeat(setup = SETUP_CODE,
-                          stmt = TEST_CODE,
-                          repeat = num_iter,
-                          number = 1)
+    times = timeit.repeat(setup=SETUP_CODE,
+                          stmt=TEST_CODE,
+                          repeat=num_iter,
+                          number=1)
     return times
 
 
