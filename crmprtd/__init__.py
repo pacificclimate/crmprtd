@@ -1,5 +1,9 @@
 import time
 from functools import wraps
+import yaml
+from pkg_resources import resource_stream
+import logging
+import logging.config
 
 
 class Timer(object):
@@ -54,13 +58,20 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
 
 
 def setup_logging(log_conf, log, error_email, log_level, name):
-    log_c = yaml.load(log_conf)
+    if log_conf:
+        with open(log_conf, 'rb') as f:
+            log_c = yaml.load(f)
+    else:
+        log_c = yaml.load(resource_stream('crmprtd', '/data/logging.yaml'))
+
     if log:
         log_c['handlers']['file']['filename'] = log
     else:
         log = log_c['handlers']['file']['filename']
+
     if error_email:
         log_c['handlers']['mail']['toaddrs'] = error_email
+
     logging.config.dictConfig(log_c)
     log = logging.getLogger(name)
     if log_level:
