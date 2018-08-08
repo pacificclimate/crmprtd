@@ -62,7 +62,7 @@ def main(args):
                 raise IOError("HTTP {} error for {}".format(
                     req.status_code, req.url))
 
-            log.info("Saving data file", extra={'filename': fname})
+            log.info("Saving data file", extra={'fname': fname})
             with open(fname, 'wb') as f:
                 f.write(req.content)
 
@@ -127,8 +127,7 @@ if __name__ == '__main__':
                               '\n\tpostgresql+pg8000://scott:tiger@localhost'
                               '/mydatabase'))
     parser.add_argument('-y', '--log_conf',
-                        default=resource_filename(
-                            'crmprtd', '/data/logging.yaml'),
+                        default=None,
                         help=('YAML file to use to override the default '
                               'logging configuration'))
     parser.add_argument('-l', '--log',

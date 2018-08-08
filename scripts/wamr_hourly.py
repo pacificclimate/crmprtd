@@ -44,8 +44,7 @@ def main():
 
     # Logging options
     parser.add_argument('-L', '--log_conf',
-                        default=resource_stream(
-                            'crmprtd', '/data/logging.yaml'),
+                        default=None,
                         help=('YAML file to use to override the default '
                               'logging configuration'))
     parser.add_argument('-l', '--log',
@@ -100,8 +99,8 @@ def main():
     args = parser.parse_args()
 
     # Logging
-    log = setup_logging(args.log_level, args.log, args.error_email,
-                        'crmprtd.wamr')
+    log = setup_logging(args.log_conf, args.log_level, args.log,
+                        args.error_email, 'crmprtd.wamr')
     log.info('Starting WAMR rtd')
 
     # Database connection

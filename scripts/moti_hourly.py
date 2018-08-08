@@ -131,8 +131,7 @@ if __name__ == '__main__':
                               '\n\tpostgresql+pg8000://scott:tiger@localhost'
                               '/mydatabase'))
     parser.add_argument('-y', '--log_conf',
-                        default=resource_stream(
-                            'crmprtd', '/data/logging.yaml'),
+                        default=None,
                         help=('YAML file to use to override the default '
                               'logging configuration'))
     parser.add_argument('-l', '--log', help="log filename")

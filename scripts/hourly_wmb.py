@@ -176,8 +176,7 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--connection_string',
                         help='PostgreSQL connection string')
     parser.add_argument('-L', '--log_conf',
-                        default=resource_stream(
-                            'crmprtd', '/data/logging.yaml'),
+                        default=None,
                         help=('YAML file to use to override the default '
                               'logging configuration'))
     parser.add_argument('-l', '--log',
