@@ -22,8 +22,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Local
-from crmprtd.wamr import setup_logging, rows2db
-from crmprtd.wamr import file2rows, ftp2rows
+from crmprtd import setup_logging
+from crmprtd.wamr import rows2db, file2rows, ftp2rows
 
 
 def cache_rows(file_, rows, fieldnames):
@@ -100,7 +100,8 @@ def main():
     args = parser.parse_args()
 
     # Logging
-    log = setup_logging(args.log_level, args.log, args.error_email)
+    log = setup_logging(args.log_level, args.log, args.error_email,
+                        'crmprtd.wamr')
     log.info('Starting WAMR rtd')
 
     # Database connection

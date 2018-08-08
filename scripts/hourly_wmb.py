@@ -26,23 +26,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Local
-from crmprtd import retry
+from crmprtd import retry, setup_logging
 from crmprtd.wmb import ObsProcessor, DataLogger
 
 
 def main(args):
-    # Setup logging
-    log_conf = yaml.load(resource_stream('crmprtd', '/data/logging.yaml'))
-    if args.log:
-        log_conf['handlers']['file']['filename'] = args.log
-    else:
-        args.log = log_conf['handlers']['file']['filename']
-    if args.error_email:
-        log_conf['handlers']['mail']['toaddrs'] = args.error_email
-    logging.config.dictConfig(log_conf)
-    log = logging.getLogger('crmprtd.wmb')
-    if args.log_level:
-        log.setLevel(args.log_level)
+    log = setup_logging(args.log_conf, args.log, args.error_email,
+                        args.log_level, 'crmprtd.wmb')
+    log.info('Starting WMB rtd')
 
     data = []
 

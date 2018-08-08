@@ -16,23 +16,14 @@ from sqlalchemy.orm import sessionmaker
 import yaml
 
 # Local
+from crmprtd import setup_logging
 from crmprtd.ec import makeurl, ObsProcessor, parse_xml, extract_fname_from_url
 
 
 def main(args):
-    # Setup logging
-    with open(args.log_conf, 'rb') as f:
-        log_conf = yaml.load(f)
-    if args.log:
-        log_conf['handlers']['file']['filename'] = args.log
-    else:
-        args.log = log_conf['handlers']['file']['filename']
-    if args.error_email:
-        log_conf['handlers']['mail']['toaddrs'] = args.error_email
-    logging.config.dictConfig(log_conf)
-    log = logging.getLogger('crmprtd.ec')
-    if args.log_level:
-        log.setLevel(args.log_level)
+    log = setup_logging(args.log_conf, args.log, args.error_email,
+                        args.log_level, 'crmprtd.ec')
+    log.info('Starting EC rtd')
 
     try:
         if args.filename:
