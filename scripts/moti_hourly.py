@@ -3,12 +3,9 @@
 # Standard module
 import os
 import sys
-import logging
-import logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 import requests
-from pkg_resources import resource_stream
 
 # Installed libraries
 from lxml.etree import parse
@@ -19,6 +16,7 @@ from sqlalchemy.orm import sessionmaker
 # Local
 from crmprtd.moti import process
 from crmprtd import setup_logging
+
 
 def main(args):
     log = setup_logging(args.log_conf, args.log, args.error_email,

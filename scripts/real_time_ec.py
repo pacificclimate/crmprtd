@@ -3,17 +3,13 @@
 # Standard module
 import os
 import sys
-import logging
-import logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
-from pkg_resources import resource_filename
 
 # Installed libraries
 import requests
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-import yaml
 
 # Local
 from crmprtd import setup_logging

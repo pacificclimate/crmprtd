@@ -11,14 +11,11 @@
 # Standard module
 import sys
 import csv
-import logging
-import logging.config
 import os
 import ftplib
 
 from datetime import datetime
 from argparse import ArgumentParser
-from pkg_resources import resource_stream
 
 # Installed libraries
 import yaml

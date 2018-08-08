@@ -3,12 +3,10 @@ import sys
 import logging
 import logging.config
 import csv
-from pkg_resources import resource_stream
 import ftplib
 
 import pytz
 from dateutil.parser import parse
-import yaml
 from pint import UnitRegistry
 
 from crmprtd import retry

@@ -15,7 +15,6 @@ import os
 
 from datetime import datetime
 from argparse import ArgumentParser
-from pkg_resources import resource_stream
 
 # Installed libraries
 from sqlalchemy import create_engine
