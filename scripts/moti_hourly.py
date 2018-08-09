@@ -6,6 +6,7 @@ import sys
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 import requests
+import logging
 
 # Installed libraries
 from lxml.etree import parse
@@ -15,32 +16,32 @@ from sqlalchemy.orm import sessionmaker
 
 # Local
 from crmprtd.moti import process
-from crmprtd import setup_logging
+from crmprtd import setup_logging, common_script_arguments, \
+    common_auth_arguments
 
 
 def main(args):
-    log = setup_logging(args.log_conf, args.log, args.error_email,
-                        args.log_level, 'crmprtd.moti')
+    log = logging.getLogger('crmprtd.moti')
     log.info('Starting MOTIe rtd')
 
     # Pull auth from file or command line
     if args.bciduser or args.bcidpass:
         auth = (args.bciduser, args.bcidpass)
     else:
-        assert args.auth and args.auth_key, ("Must provide both the auth file "
+        assert args.auth_fname and args.auth_key, ("Must provide both the auth file "
                                              "and the key to use for this "
                                              "script (--auth_key)")
-        with open(args.auth, 'r') as f:
+        with open(args.auth_fname, 'r') as f:
             config = yaml.load(f)
         auth = (config[args.auth_key]['username'],
                 config[args.auth_key]['password'])
 
     try:
-        if args.filename:
+        if args.input_file:
             log.info("Opening local xml file for reading",
-                     extra={'file': args.filename})
-            fname = args.filename
-            xml_file = open(args.filename, 'r')
+                     extra={'filae': args.input_file})
+            fname = args.input_file
+            xml_file = open(args.input_file, 'r')
             log.debug("File opened sucessfully")
 
         else:
@@ -48,7 +49,7 @@ def main(args):
                 args.start_time = datetime.strptime(
                     args.start_time, '%Y/%m/%d %H:%M:%S')
                 args.end_time = datetime.strptime(
-                    args.end_time, '%Y/%m/%d %H:%M:%S')
+                        args.end_time, '%Y/%m/%d %H:%M:%S')
                 log.info('Starting manual run using timestamps',
                          extra={'start_time': args.start_time,
                                 'end_time': args.end_time})
@@ -107,7 +108,7 @@ def main(args):
     except Exception as e:
         sesh.rollback()
         log.critical('Serious errros with MOTIe rtd, see logs',
-                     extra={'log': args.log})
+                     extra={'log': args.log_filename})
         sys.exit(1)
     finally:
         sesh.commit()
@@ -115,38 +116,7 @@ def main(args):
 
 
 if __name__ == '__main__':
-
     parser = ArgumentParser()
-    parser.add_argument('-c', '--connection_string',
-                        help=('PostgreSQL connection string of form:'
-                              '\n\tdialect+driver://username:password@host:'
-                              'port/database\n'
-                              'Examples:'
-                              '\n\tpostgresql://scott:tiger@localhost/'
-                              'mydatabase'
-                              '\n\tpostgresql+psycopg2://scott:tiger@'
-                              'localhost/mydatabase'
-                              '\n\tpostgresql+pg8000://scott:tiger@localhost'
-                              '/mydatabase'))
-    parser.add_argument('-y', '--log_conf',
-                        default=None,
-                        help=('YAML file to use to override the default '
-                              'logging configuration'))
-    parser.add_argument('-l', '--log', help="log filename")
-    parser.add_argument('-e', '--error_email',
-                        help=('e-mail address to which the program should '
-                              'report error which require human intervention'))
-    parser.add_argument('--log_level',
-                        choices=['DEBUG', 'INFO',
-                                 'WARNING', 'ERROR', 'CRITICAL'],
-                        help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
-                              'CRITICAL.  Note that debug output by default '
-                              'goes directly to file'))
-    parser.add_argument('-C', '--cache_dir', required=True,
-                        help=('directory in which to put the downloaded file '
-                              'in the event of a post-download error'))
-    parser.add_argument('-f', '--filename',
-                        help='MPO-XML file to process')
     parser.add_argument('-S', '--start_time',
                         help=("Alternate time to use for downloading "
                               "(interpreted with "
@@ -155,23 +125,17 @@ if __name__ == '__main__':
                         help=("Alternate time to use for downloading "
                               "(interpreted with "
                               "strptime(format='Y/m/d H:M:S')"))
-    parser.add_argument('-i', '--station_id',
+    parser.add_argument('-s', '--station_id',
                         help="Station ID for which to download data")
-    parser.add_argument('--auth',
-                        help="Yaml file with plaintext usernames/passwords")
-    parser.add_argument('--auth_key',
-                        help=("Top level key which user/pass are stored in "
-                              "yaml file."))
     parser.add_argument('--bciduser',
-                        help=("The BCID username for data requests. Overrides "
-                              "auth file."))
+                    help=("The BCID username for data requests. Overrides "
+                          "auth file."))
     parser.add_argument('--bcidpass',
                         help=("The BCID password for data requests. Overrides "
                               "auth file."))
-    parser.add_argument('-D', '--diag', action="store_true", default=False,
-                        help="Turn on diagnostic mode (no commits)")
-    # parser.add_argument('-o', '--output_dir', dest='output_dir',
-    #                     help='directory in which to put the downloaded file')
-
+    parser = common_script_arguments(parser)
+    parser = common_auth_arguments(parser)
     args = parser.parse_args()
+    setup_logging(args.log_conf, args.log_filename, args.error_email,
+                  args.log_level, 'crmprtd.moti')
     main(args)

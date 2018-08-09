@@ -30,7 +30,7 @@ from crmprtd.wmb import ObsProcessor, DataLogger
 
 
 def main(args):
-    log = logging.getLogger('crmprtd.moti')
+    log = logging.getLogger('crmprtd.wmb')
     log.info('Starting WMB rtd')
 
     data = []
@@ -178,8 +178,6 @@ if __name__ == '__main__':
                         default='HourlyWeatherAllFields_WA.txt',
                         help=('Filename to open on the Wildfire Management '
                               'Branch\'s ftp site'))
-    parser.add_argument('-d', '--cache_dir',
-                    help='Directory in which to put the downloaded file')
     parser.add_argument('-a', '--archive_dir',
                     help=('Directory in which to put data that could not '
                           'be added to the database'))
