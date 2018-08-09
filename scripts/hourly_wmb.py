@@ -13,6 +13,7 @@ import sys
 import csv
 import os
 import ftplib
+import logging
 
 from datetime import datetime
 from argparse import ArgumentParser
@@ -23,13 +24,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Local
-from crmprtd import retry, setup_logging
+from crmprtd import retry, setup_logging, common_script_arguments, \
+    common_auth_arguments
 from crmprtd.wmb import ObsProcessor, DataLogger
 
 
 def main(args):
-    log = setup_logging(args.log_conf, args.log, args.error_email,
-                        args.log_level, 'crmprtd.wmb')
+    log = logging.getLogger('crmprtd.moti')
     log.info('Starting WMB rtd')
 
     data = []
@@ -38,20 +39,20 @@ def main(args):
     if args.username or args.password:
         auth = {'u': args.username, 'p': args.password}
     else:
-        assert args.auth and args.auth_key, ("Must provide both the auth file "
+        assert args.auth_fname and args.auth_key, ("Must provide both the auth file "
                                              "and the key to use for this "
                                              "script (--auth_key)")
-        with open(args.auth, 'r') as f:
+        with open(args.auth_fname, 'r') as f:
             config = yaml.load(f)
         auth = {'u': config[args.auth_key]['username'],
                 'p': config[args.auth_key]['password']}
 
     # Check for local file source
-    if args.archive_file:
+    if args.input_file:
         # adjust to full path
-        path = args.archive_file
-        if args.archive_file[0] != '/':
-            path = os.path.join(args.archive_dir, args.archive_file)
+        path = args.input_file
+        if args.input_file[0] != '/':
+            path = os.path.join(args.archive_dir, args.input_file)
         log.info('Loading local file', extra={'path': path})
 
         # open and read into data
@@ -108,7 +109,7 @@ def main(args):
         dl.add_row(data, 'db-connection error')
         data_archive = dl.archive(args.archive_dir)
         log.critical('Error with database connection, see logfile, data saved',
-                     extra={'log': args.log, 'data_archive': data_archive})
+                     extra={'log': args.log_filename, 'data_archive': data_archive})
         sys.exit(1)
 
     try:
@@ -126,7 +127,7 @@ def main(args):
         sesh.rollback()
         data_archive = dl.archive(args.archive_dir)
         log.critical('Error with database connection, see logfile, data saved',
-                     extra={'log': args.log, 'data_archive': data_archive})
+                     extra={'log': args.log_filename, 'data_archive': data_archive})
         sys.exit(1)
     finally:
         sesh.commit()
@@ -168,27 +169,7 @@ class FTPReader(object):
 
 
 if __name__ == '__main__':
-
     parser = ArgumentParser()
-    parser.add_argument('-c', '--connection_string',
-                        help='PostgreSQL connection string')
-    parser.add_argument('-L', '--log_conf',
-                        default=None,
-                        help=('YAML file to use to override the default '
-                              'logging configuration'))
-    parser.add_argument('-l', '--log',
-                        default=None,
-                        help='Override the default log filename')
-    parser.add_argument('-e', '--error_email',
-                        default=None,
-                        help=('Override the default e-mail address to which '
-                              'the program should report critical errors'))
-    parser.add_argument('--log_level',
-                        choices=['DEBUG', 'INFO',
-                                 'WARNING', 'ERROR', 'CRITICAL'],
-                        help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
-                              'CRITICAL.  Note that debug output by default '
-                              'goes directly to file'))
     parser.add_argument('-f', '--ftp_server',
                         default='BCFireweatherFTPp1.nrs.gov.bc.ca',
                         help=('Full uri to Wildfire Management Branch\'s ftp '
@@ -197,29 +178,14 @@ if __name__ == '__main__':
                         default='HourlyWeatherAllFields_WA.txt',
                         help=('Filename to open on the Wildfire Management '
                               'Branch\'s ftp site'))
-    parser.add_argument('--auth',
-                        help="Yaml file with plaintext usernames/passwords")
-    parser.add_argument('--auth_key',
-                        help=("Top level key which user/pass are stored in "
-                              "yaml file."))
-    parser.add_argument('--username',
-                        help=("The username for data requests. Overrides auth "
-                              "file."))
-    parser.add_argument('--password',
-                        help=("The password for data requests. Overrides auth "
-                              "file."))
-    parser.add_argument('-C', '--cache_dir',
-                        help='Directory in which to put the downloaded file')
+    parser.add_argument('-d', '--cache_dir',
+                    help='Directory in which to put the downloaded file')
     parser.add_argument('-a', '--archive_dir',
-                        help=('Directory in which to put data that could not '
-                              'be added to the database'))
-    parser.add_argument('-A', '--archive_file',
-                        default=None,
-                        help=('An archive file to parse INSTEAD OF '
-                              'downloading from ftp. Can be a local reference '
-                              'in the archive_dir or absolute file path'))
-    parser.add_argument('-D', '--diag',
-                        default=False, action="store_true",
-                        help="Turn on diagnostic mode (no commits)")
+                    help=('Directory in which to put data that could not '
+                          'be added to the database'))
+    parser = common_script_arguments(parser)
+    parser = common_auth_arguments(parser)
     args = parser.parse_args()
+    setup_logging(args.log_conf, args.log_filename, args.error_email,
+                  args.log_level, 'crmprtd.wmb')
     main(args)
