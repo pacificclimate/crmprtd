@@ -22,8 +22,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Local
-from crmprtd import setup_logging, common_script_arguments, \
-    common_auth_arguments
+from crmprtd import setup_logging, common_script_arguments
 from crmprtd.wamr import rows2db, file2rows, ftp2rows
 
 

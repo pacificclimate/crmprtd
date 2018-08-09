@@ -86,7 +86,7 @@ def common_script_arguments(parser):    # pragma: no cover
     parser.add_argument('-i', '--input_file',
                         help='Input file to process')
     parser.add_argument('-d', '--cache_dir',
-                    help='Directory in which to put the downloaded file')
+                        help='Directory in which to put the downloaded file')
     return parser
 
 

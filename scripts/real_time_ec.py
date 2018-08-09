@@ -13,8 +13,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Local
-from crmprtd import setup_logging, common_script_arguments, \
-    common_auth_arguments
+from crmprtd import setup_logging, common_script_arguments
 from crmprtd.ec import makeurl, ObsProcessor, parse_xml, extract_fname_from_url
 
 
@@ -131,5 +130,5 @@ if __name__ == '__main__':
     parser = common_script_arguments(parser)
     args = parser.parse_args()
     setup_logging(args.log_conf, args.log_filename, args.error_email,
-                        args.log_level, 'crmprtd.ec')
+                  args.log_level, 'crmprtd.ec')
     main(args)

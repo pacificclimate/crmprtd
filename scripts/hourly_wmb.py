@@ -39,9 +39,10 @@ def main(args):
     if args.username or args.password:
         auth = {'u': args.username, 'p': args.password}
     else:
-        assert args.auth_fname and args.auth_key, ("Must provide both the auth file "
-                                             "and the key to use for this "
-                                             "script (--auth_key)")
+        assert args.auth_fname and args.auth_key, ("Must provide both the "
+                                                   "auth file and the key to "
+                                                   "use for this script "
+                                                   "(--auth_key)")
         with open(args.auth_fname, 'r') as f:
             config = yaml.load(f)
         auth = {'u': config[args.auth_key]['username'],
@@ -109,7 +110,8 @@ def main(args):
         dl.add_row(data, 'db-connection error')
         data_archive = dl.archive(args.archive_dir)
         log.critical('Error with database connection, see logfile, data saved',
-                     extra={'log': args.log_filename, 'data_archive': data_archive})
+                     extra={'log': args.log_filename,
+                            'data_archive': data_archive})
         sys.exit(1)
 
     try:
@@ -127,7 +129,8 @@ def main(args):
         sesh.rollback()
         data_archive = dl.archive(args.archive_dir)
         log.critical('Error with database connection, see logfile, data saved',
-                     extra={'log': args.log_filename, 'data_archive': data_archive})
+                     extra={'log': args.log_filename,
+                            'data_archive': data_archive})
         sys.exit(1)
     finally:
         sesh.commit()
@@ -179,8 +182,8 @@ if __name__ == '__main__':
                         help=('Filename to open on the Wildfire Management '
                               'Branch\'s ftp site'))
     parser.add_argument('-a', '--archive_dir',
-                    help=('Directory in which to put data that could not '
-                          'be added to the database'))
+                        help=('Directory in which to put data that could not '
+                              'be added to the database'))
     parser = common_script_arguments(parser)
     parser = common_auth_arguments(parser)
     args = parser.parse_args()

@@ -28,9 +28,10 @@ def main(args):
     if args.bciduser or args.bcidpass:
         auth = (args.bciduser, args.bcidpass)
     else:
-        assert args.auth_fname and args.auth_key, ("Must provide both the auth file "
-                                             "and the key to use for this "
-                                             "script (--auth_key)")
+        assert args.auth_fname and args.auth_key, ("Must provide both the "
+                                                   "auth file and the key to "
+                                                   "use for this script "
+                                                   "(--auth_key)")
         with open(args.auth_fname, 'r') as f:
             config = yaml.load(f)
         auth = (config[args.auth_key]['username'],
@@ -128,8 +129,8 @@ if __name__ == '__main__':
     parser.add_argument('-s', '--station_id',
                         help="Station ID for which to download data")
     parser.add_argument('--bciduser',
-                    help=("The BCID username for data requests. Overrides "
-                          "auth file."))
+                        help=("The BCID username for data requests. Overrides "
+                              "auth file."))
     parser.add_argument('--bcidpass',
                         help=("The BCID password for data requests. Overrides "
                               "auth file."))
