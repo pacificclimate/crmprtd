@@ -8,11 +8,37 @@ failures. This phase needs to manage the database transactions for
 speed and reliability. This phase is common to all networks.
 """
 
+from crmprtd.db import mass_insert_obs
 
-def insert(sesh, observations):
-    successes, skips, failures = 0, 0, 0
-    return {
-        'successes': successes,
-        'skips': skips,
-        'failures': failures
-    }
+
+def chunks(list, chunk_size):
+    for i in range(0, len(list), chunk_size):
+        yield list[i:i+chunk_size]
+
+
+def insert(sesh, observations, chunk_size):
+    dbm = DBMetrics()
+
+    for chunk in chunks(obs, chunk_size):
+        try:
+            mass_insert_obs(sesh, chunk)
+        except Exception:
+            pass
+
+    return {'successes': dbm.successes,
+            'failures': dbm.failures,
+            'skips': dbm.skips}
+
+
+class DBMetrics(Object):
+    '''Keep track of database successes and failures during
+    the insertion process.
+    '''
+
+    def __init__(self):
+        self.successes = 0
+        self.failures = 0
+        self.skips = 0
+
+    def return_metrics(self):
+        return self.successes, self.failures, self.skips

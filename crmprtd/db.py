@@ -2,6 +2,7 @@ from math import floor
 import logging
 
 from sqlalchemy.exc import IntegrityError
+from crmprtd.insert import DBMetrics
 
 
 def split(tuple_):
@@ -14,7 +15,7 @@ def split(tuple_):
         return (tuple_[:i], tuple_[i:])
 
 
-def mass_insert_obs(sesh, obs, log=None):
+def mass_insert_obs(sesh, obs, dbm, log=None):
     '''This function implements a recursive Obs insert strategy to
        handle unique constraint errors on members of the set. The
        strategy used is to optimistically attempt to insert the entire
@@ -46,10 +47,12 @@ def mass_insert_obs(sesh, obs, log=None):
             log.warning("Failure, observation already exists",
                         extra={'obs': obs, 'exception': e})
             sesh.rollback()
+            dbm.failures += 1
             return 0
         else:
             log.debug("Success for single observation")
             sesh.commit()
+            dbm.successes += 1
             return 1
 
     # The happy case: add everything at once
@@ -69,10 +72,11 @@ def mass_insert_obs(sesh, obs, log=None):
             log.debug("Returning from split call", extra={'a_split': a,
                                                           'b_split': b,
                                                           'both': combined})
-            return a + b
+            return combined
         else:
             log.debug("Successfully inserted observations",
                       extra={'num_obs': len(obs)})
             sesh.commit()
+            dbm.successes += len(obs)
             return len(obs)
     return 0
