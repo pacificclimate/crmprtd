@@ -5,6 +5,7 @@ import os
 import sys
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
+import logging
 
 # Installed libraries
 import requests
@@ -12,20 +13,20 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # Local
-from crmprtd import setup_logging
+from crmprtd import setup_logging, common_script_arguments, \
+    common_auth_arguments
 from crmprtd.ec import makeurl, ObsProcessor, parse_xml, extract_fname_from_url
 
 
 def main(args):
-    log = setup_logging(args.log_conf, args.log, args.error_email,
-                        args.log_level, 'crmprtd.ec')
+    log = logging.getLogger('crmprtd.ec')
     log.info('Starting EC rtd')
 
     try:
-        if args.filename:
+        if args.input_file:
             log.debug("Opening local xml filefor reading",
-                      extra={'file': args.filename})
-            fname = args.filename
+                      extra={'file': args.input_file})
+            fname = args.input_file
             log.debug("File opened sucessfully")
         else:
 
@@ -77,7 +78,7 @@ def main(args):
 
     except Exception as e:
         log.critical('Critical errors have occured in the EC real time '
-                     'downloader', extra={'log_file': args.log,
+                     'downloader', extra={'log_file': args.log_filename,
                                           'data_archive': fname})
         sys.exit(1)
 
@@ -99,7 +100,7 @@ def main(args):
     except Exception as e:
         sesh.rollback()
         log.critical('Critical errors have occured in the EC real time '
-                     'downloader', extra={'log_file': args.log,
+                     'downloader', extra={'log_file': args.log_filename,
                                           'data_archive': fname})
         sys.exit(1)
 
@@ -109,42 +110,10 @@ def main(args):
 
 
 if __name__ == '__main__':
-
     parser = ArgumentParser()
-    parser.add_argument('-c', '--connection_string', required=True,
-                        help=('PostgreSQL connection string of form:'
-                              '\n\tdialect+driver://username:password@host:'
-                              'port/database\n'
-                              'Examples:'
-                              '\n\tpostgresql://scott:tiger@localhost/'
-                              'mydatabase'
-                              '\n\tpostgresql+psycopg2://scott:tiger@'
-                              'localhost/mydatabase'
-                              '\n\tpostgresql+pg8000://scott:tiger@localhost'
-                              '/mydatabase'))
-    parser.add_argument('-y', '--log_conf',
-                        default=None,
-                        help=('YAML file to use to override the default '
-                              'logging configuration'))
-    parser.add_argument('-l', '--log',
-                        help="log filename")
-    parser.add_argument('--log_level',
-                        choices=['DEBUG', 'INFO',
-                                 'WARNING', 'ERROR', 'CRITICAL'],
-                        help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
-                              'CRITICAL.  Note that debug output by default '
-                              'goes directly to file'))
-    parser.add_argument('-e', '--error_email',
-                        help=('e-mail address to which the program should '
-                              'report error which require human intervention'))
-    parser.add_argument('-C', '--cache_dir', required=True,
-                        help=('directory in which to put the downloaded file '
-                              'in the event of a post-download error'))
-    parser.add_argument('-f', '--filename',
-                        help='MPO-XML file to process')
     parser.add_argument('-p', '--province', required=True,
                         help='2 letter province code')
-    parser.add_argument('-L', '--language', default='e',
+    parser.add_argument('-g', '--language', default='e',
                         choices=['e', 'f'],
                         help="'e' (english) | 'f' (french)")
     parser.add_argument('-F', '--frequency', required=True,
@@ -159,8 +128,8 @@ if __name__ == '__main__':
                               'stations.  Stations are considered a match if '
                               'they have the same id, name, and are within '
                               'this threshold'))
-    parser.add_argument('-D', '--diag', default=False, action="store_true",
-                        help="Turn on diagnostic mode (no commits)")
-
+    parser = common_script_arguments(parser)
     args = parser.parse_args()
+    setup_logging(args.log_conf, args.log_filename, args.error_email,
+                        args.log_level, 'crmprtd.ec')
     main(args)
