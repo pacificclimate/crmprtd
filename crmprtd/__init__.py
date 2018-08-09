@@ -57,24 +57,70 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     return deco_retry
 
 
-def setup_logging(log_conf, log, error_email, log_level, name):
+def common_script_arguments(parser):    # pragma: no cover
+    parser.add_argument('-c', '--connection_string',
+                        help='PostgreSQL connection string')
+    parser.add_argument('-D', '--diag',
+                        default=False, action="store_true",
+                        help="Turn on diagnostic mode (no commits)")
+    parser.add_argument('-L', '--log_conf',
+                        default=None,
+                        help=('YAML file to use to override the default '
+                              'logging configuration'))
+    parser.add_argument('-l', '--log_filename',
+                        default=None,
+                        help='Override the default log filename')
+    parser.add_argument('-o', '--log_level',
+                        choices=['DEBUG', 'INFO',
+                                 'WARNING', 'ERROR', 'CRITICAL'],
+                        help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
+                              'CRITICAL.  Note that debug output by default '
+                              'goes directly to file'))
+    parser.add_argument('-m', '--error_email',
+                        default=None,
+                        help=('Override the default e-mail address to which '
+                              'the program should report critical errors'))
+    parser.add_argument('-C', '--cache_file',
+                        help='Full path of file in which to put downloaded '
+                              'observations')
+    parser.add_argument('-i', '--input_file',
+                        help='Input file to process')
+    parser.add_argument('-d', '--cache_dir',
+                    help='Directory in which to put the downloaded file')
+    return parser
+
+
+def common_auth_arguments(parser):     # pragma: no cover
+    parser.add_argument('--auth_fname',
+                        help="Yaml file with plaintext usernames/passwords")
+    parser.add_argument('--auth_key',
+                        help=("Top level key which user/pass are stored in "
+                              "yaml file."))
+    parser.add_argument('--username',
+                        help=("The username for data requests. Overrides auth "
+                              "file."))
+    parser.add_argument('--password',
+                        help=("The password for data requests. Overrides auth "
+                              "file."))
+    return parser
+
+
+def setup_logging(log_conf, log_filename, error_email, log_level, name):
     if log_conf:
         with open(log_conf, 'rb') as f:
-            log_c = yaml.load(f)
+            base_config = yaml.load(f)
     else:
-        log_c = yaml.load(resource_stream('crmprtd', '/data/logging.yaml'))
+        base_config = yaml.load(resource_stream('crmprtd',
+                                                '/data/logging.yaml'))
 
-    if log:
-        log_c['handlers']['file']['filename'] = log
-    else:
-        log = log_c['handlers']['file']['filename']
+    if log_filename:
+        base_config['handlers']['file']['filename'] = log_filename
 
     if error_email:
-        log_c['handlers']['mail']['toaddrs'] = error_email
+        base_config['handlers']['mail']['toaddrs'] = error_email
 
-    logging.config.dictConfig(log_c)
-    log = logging.getLogger(name)
     if log_level:
-        log.setLevel(log_level)
+        base_config['handlers']['file']['level'] = log_level
+        base_config['handlers']['console']['level'] = log_level
 
-    return log
+    logging.config.dictConfig(base_config)
