@@ -47,7 +47,7 @@ def closest_stns_within_threshold(sesh, network_name, lon, lat, threshold):
 
 
 def convert_unit(val, src_unit, dst_unit):
-    if src_unit != dst_unit:
+    if src_unit != dst_unit and src_unit != None:
         try:
             val = Q_(val, ureg.parse_expression(src_unit))  # src
             val = val.to(dst_unit).magnitude  # dest
