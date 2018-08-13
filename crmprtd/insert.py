@@ -8,15 +8,15 @@ failures. This phase needs to manage the database transactions for
 speed and reliability. This phase is common to all networks.
 """
 
-# FIXME: Organize imports
 from math import floor
-from pycds import Obs
 from sqlalchemy import and_
 import logging
-from crmprtd.db_exceptions import UniquenessError, InsertionError
 from sqlalchemy.exc import IntegrityError
 
-# FIXME: Figure out how to set up logging here
+from crmprtd.db_exceptions import UniquenessError, InsertionError
+from pycds import Obs
+
+
 log = logging.getLogger('crmprtd.insert')
 
 
@@ -88,7 +88,7 @@ def single_insert_obs(sesh, o, dbm):
         if not is_unique(sesh, o.history_id, o.vars_id, o.time):
             log.warning("Failure, observation already exists.")
             dbm.failures += 1
-            raise UniquenessError(q.first())
+            raise UniquenessError(o)
     except UniquenessError as e:
         log.warning("Failure, observation already exists.", extra={'e': e})
         dbm.failures += 1
