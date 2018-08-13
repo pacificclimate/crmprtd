@@ -82,7 +82,6 @@ def has_unique_obs(sesh, observations, num_samples):
 
 
 def single_insert_obs(sesh, o, dbm):
-    print('this is where its happening')
     # Check to see if this entry will be unique
     try:
         if not is_unique(sesh, o.history_id, o.vars_id, o.time):
