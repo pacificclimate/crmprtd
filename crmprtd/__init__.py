@@ -190,16 +190,10 @@ def run_data_pipeline(download_func, normalize_func, download_args,
     Session = sessionmaker(engine)
     sesh = Session()
 
-    observations = [align(sesh, row) for row in rows if row]
-<<<<<<< HEAD
-    for ob in observations:
-        print(ob)
-    # insert(observations)
-
+    observations = list(filter(lambda ob: ob is not None,
+                               [align(sesh, row) for row in rows]))
+    results = insert(sesh, observations, 4096, 50)
+    print(results)
 
 def subset_dict(a_dict, keys_wanted):
     return {key: a_dict[key] for key in keys_wanted if key in a_dict}
-=======
-    results = insert(sesh, observations, 4096, 50)
-    print(results)
->>>>>>> f1b4ee4... Structure changes for insert
