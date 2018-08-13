@@ -64,7 +64,8 @@ def unit_check(val, unit_obs, unit_db):
     if unit_obs == None and unit_db == None:
         return None
     else:
-        return convert_unit(val, unit_obs, unit_db)
+        val = convert_unit(val, unit_obs, unit_db)
+        return val
 
 
 def find_active_history(histories):
@@ -201,7 +202,7 @@ def align(sesh, obs_tuple):
         return None
 
     datum = unit_check(obs_tuple.val, obs_tuple.unit, variable.unit)
-    if not datum:
+    if datum == None:
         log.warning('Unable to confirm data units',
                     extra={'unit_obs': obs_tuple.unit,
                            'unit_db': variable.unit,
