@@ -4,7 +4,7 @@ import pytest
 import pytz
 
 from pycds import History, Obs
-from crmprtd.db import mass_insert_obs, split
+from crmprtd.insert import mass_insert_obs, split, DBMetrics
 
 
 @pytest.mark.parametrize(('label', 'days', 'expected'), [
@@ -26,7 +26,10 @@ def test_mass_insert_obs(test_session, label, days, expected):
                time=datetime(2017, 8, 6, d, tzinfo=pytz.utc))
            for d in days]
 
-    assert mass_insert_obs(test_session, obs) == expected
+    dbm = DBMetrics()
+    mass_insert_obs(test_session, obs, dbm)
+
+    assert dbm.successes == expected
 
 
 def test_mass_insert_obs_weird(test_session):
@@ -43,9 +46,18 @@ def test_mass_insert_obs_weird(test_session):
     test_session.expunge(x)
     test_session.expunge(y)
 
-    assert mass_insert_obs(test_session, []) == 0
-    assert mass_insert_obs(test_session, [x]) == 1
-    assert mass_insert_obs(test_session, [y]) == 0
+    dbm = DBMetrics()
+
+    mass_insert_obs(test_session, [], dbm)
+    assert dbm.successes == 0
+    dbm.clear()
+
+    mass_insert_obs(test_session, [x], dbm)
+    assert dbm.successes == 1
+    dbm.clear()
+
+    mass_insert_obs(test_session, [y], dbm)
+    assert dbm.successes == 0
 
 
 @pytest.mark.parametrize(('tuple', 'expected_a', 'expected_b'), [

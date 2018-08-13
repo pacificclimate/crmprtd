@@ -28,6 +28,10 @@ class DBMetrics(object):
         self.successes = 0
         self.failures = 0
 
+    def clear(self):
+        self.successes = 0
+        self.failures = 0
+
 
 def chunks(list, chunk_size):
     for i in range(0, len(list), chunk_size):
@@ -175,7 +179,7 @@ def mass_insert_obs(sesh, obs, dbm):
                                                           'both': combined})
             return combined
         else:
-            print("Successfully inserted observations",
+            log.info("Successfully inserted observations",
                       extra={'num_obs': len(obs)})
             sesh.commit()
             dbm.successes += len(obs)
