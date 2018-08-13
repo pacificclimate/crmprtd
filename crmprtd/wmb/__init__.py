@@ -5,7 +5,7 @@ from decimal import Decimal
 from sqlalchemy import and_
 
 from pycds import Obs
-from crmprtd.wmb_exceptions import InsertionError, UniquenessError
+from crmprtd.db_exceptions import InsertionError, UniquenessError
 
 log = logging.getLogger(__name__)
 

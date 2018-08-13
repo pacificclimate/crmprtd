@@ -56,6 +56,7 @@ from pkg_resources import resource_stream
 from collections import namedtuple
 from itertools import tee
 from crmprtd.align import align
+from crmprtd.insert import insert
 
 
 Row = namedtuple('Row', "time val variable_name unit network_name \
@@ -190,6 +191,7 @@ def run_data_pipeline(download_func, normalize_func, download_args,
     sesh = Session()
 
     observations = [align(sesh, row) for row in rows if row]
+<<<<<<< HEAD
     for ob in observations:
         print(ob)
     # insert(observations)
@@ -197,3 +199,7 @@ def run_data_pipeline(download_func, normalize_func, download_args,
 
 def subset_dict(a_dict, keys_wanted):
     return {key: a_dict[key] for key in keys_wanted if key in a_dict}
+=======
+    results = insert(sesh, observations, 4096, 50)
+    print(results)
+>>>>>>> f1b4ee4... Structure changes for insert

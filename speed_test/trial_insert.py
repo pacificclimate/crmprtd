@@ -1,16 +1,6 @@
-"""insert.py
-
-The insert module handles the Insert phase of the crmprtd
-pipeline. This phase simply consists of doing a mass insert of
-observations into the database. The phase needs to handle any unique
-constraint errors, and track and report on the successes and
-failures. This phase needs to manage the database transactions for
-speed and reliability. This phase is common to all networks.
-"""
-
 from pycds import Obs
 from sqlalchemy import and_
-from crmprtd.wmb_exceptions import UniquenessError, InsertionError
+from crmprtd.db_exceptions import UniquenessError, InsertionError
 from sqlalchemy.exc import IntegrityError
 from math import floor
 

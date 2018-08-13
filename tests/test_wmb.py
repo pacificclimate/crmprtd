@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pycds import Obs
 from crmprtd.wmb import insert_obs
-from crmprtd.wmb_exceptions import UniquenessError, InsertionError
+from crmprtd.db_exceptions import UniquenessError, InsertionError
 
 
 @pytest.mark.parametrize(('val', 'hid', 'd', 'vars_id', 'expected'), [

@@ -11,7 +11,7 @@ def generate_best_obs(num_obs):
     best_obs = []
     for i in range(num_obs):
         time = datetime.now()
-        best_obs.append(Obs(time=time, history_id=15, vars_id=7, datum=i))
+        best_obs.append(Obs(time=time, history_id=3, vars_id=7, datum=i))
     return best_obs
 
 

@@ -1,0 +1,85 @@
+# One by One
+Date: 2018-08-07 16:10:20.103572
+Test Parameters
+	Number of Observations:	30000
+	Type of Observations:	Best Case
+	Number of Iterations:	5
+Time Results
+	Mean:	78.4s
+	Max:	85.2s
+	Min:	69.1s
+
+Date: 2018-08-07 16:18:07.604951
+Test Parameters
+	Number of Observations:	30000
+	Type of Observations:	Worst Case
+	Number of Iterations:	5
+Time Results
+	Mean:	91.5s
+	Max:	97.3s
+	Min:	84.0s
+
+Date: 2018-08-07 16:25:19.015377
+Test Parameters
+	Number of Observations:	30000
+	Type of Observations:	Chunk Case
+	Number of Bad Observations:	8000
+	Number of Iterations:	5
+Time Results
+	Mean:	83.8s
+	Max:	84.9s
+	Min:	81.6s
+
+Date: 2018-08-07 16:32:02.466369
+Test Parameters
+	Number of Observations:	30000
+	Type of Observations:	Scatter Case
+	Number of Bad Observations:	8000
+	Number of Iterations:	5
+Time Results
+	Mean:	78.3s
+	Max:	79.0s
+	Min:	76.8s
+
+Date: 2018-08-08 10:01:19.861716
+Test Parameters
+	Number of Observations:	30000
+	Type of Observations:	Best Case
+	Number of Iterations:	5
+Time Results
+	Mean:	68.4s
+	Max:	74.5s
+	Min:	60.8s
+
+Date: 2018-08-08 10:08:23.203574
+Test Parameters
+	Number of Observations:	30000
+	Type of Observations:	Worst Case
+	Number of Iterations:	5
+Time Results
+	Mean:	82.6s
+	Max:	86.8s
+	Min:	79.4s
+
+Date: 2018-08-08 10:14:26.859410
+Test Parameters
+	Number of Observations:	30000
+	Type of Observations:	Chunk Case
+	Number of Bad Observations:	15000
+	Number of Iterations:	5
+Time Results
+	Mean:	70.4s
+	Max:	76.0s
+	Min:	62.5s
+
+Date: 2018-08-08 10:20:24.975244
+Test Parameters
+	Number of Observations:	30000
+	Type of Observations:	Scatter Case
+	Number of Bad Observations:	15000
+	Number of Iterations:	5
+Time Results
+	Mean:	69.4s
+	Max:	72.6s
+	Min:	63.4s
+

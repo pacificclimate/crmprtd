@@ -61,7 +61,7 @@ def convert_unit(val, src_unit, dst_unit):
 
 
 def unit_check(val, unit_obs, unit_db):
-    if not unit_obs and not unit_db:
+    if unit_obs == None and unit_db == None:
         return None
     else:
         return convert_unit(val, unit_obs, unit_db)
@@ -114,8 +114,7 @@ def create_station_and_history_entry(sesh, network_name, native_id, lat, lon):
 
     network = network.first()
     stn = Station(native_id=native_id, network=network)
-    with sesh.begin_nested():
-        sesh.add(stn)
+    sesh.add(stn)
     log.info('Created new station entry',
              extra={'native_id': stn.native_id, 'network_name': network.name})
 
@@ -123,8 +122,7 @@ def create_station_and_history_entry(sesh, network_name, native_id, lat, lon):
                    lat=lat,
                    lon=lon)
 
-    with sesh.begin_nested():
-        sesh.add(hist)
+    sesh.add(hist)
     log.warning('Created new history entry',
                 extra={'history': hist.id, 'network_name': network_name,
                        'native_id': stn.native_id, 'lat': lat, 'lon': lon})
