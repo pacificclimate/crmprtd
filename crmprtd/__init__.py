@@ -47,7 +47,6 @@ speed and reliability. This phase is common to all networks.
 """
 
 import io
-import time
 import logging
 import yaml
 from sqlalchemy import create_engine
@@ -61,17 +60,6 @@ from crmprtd.insert import insert
 
 Row = namedtuple('Row', "time val variable_name unit network_name \
                          station_id lat lon")
-
-
-class Timer(object):
-    def __enter__(self):
-        self.start = time.time()
-        return self
-
-    def __exit__(self, *args):
-        self.end = time.time()
-        self.run_time = self.end - self.start
-
 
 def common_script_arguments(parser):    # pragma: no cover
     parser.add_argument('-c', '--connection_string',
