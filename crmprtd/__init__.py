@@ -91,9 +91,11 @@ def common_script_arguments(parser):    # pragma: no cover
     parser.add_argument('-i', '--input_file',
                         help='Input file to process')
     parser.add_argument('--chunk_size', type=int,
+                        default=4096,
                         help='The size of observation chunks that will be '
                              'mass inserted into the database')
-    parser.add_argument('--sample_size', type=int
+    parser.add_argument('--sample_size', type=int,
+                        default=50,
                         help='Number of samples to be taken from observations '
                              'to determine which insertion strategy to use')
     return parser
