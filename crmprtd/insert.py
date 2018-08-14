@@ -11,6 +11,7 @@ speed and reliability. This phase is common to all networks.
 from math import floor
 from sqlalchemy import and_
 import logging
+import time
 from sqlalchemy.exc import IntegrityError
 
 from crmprtd.db_exceptions import UniquenessError, InsertionError
@@ -32,6 +33,15 @@ class DBMetrics(object):
         self.successes = 0
         self.failures = 0
 
+
+class Timer(object):
+    def __enter__(self):
+        self.start = time.time()
+        return self
+
+    def __exit__(self, *args):
+        self.end = time.time()
+        self.run_time = self.end - self.start
 
 def chunks(list, chunk_size):
     for i in range(0, len(list), chunk_size):
@@ -122,7 +132,7 @@ def split(tuple_):
         return (tuple_[:i], tuple_[i:])
 
 
-def mass_insert_obs(sesh, obs, dbm):
+def bisect_insert_strategy(sesh, obs, dbm):
     '''This function implements a recursive Obs insert strategy to
        handle unique constraint errors on members of the set. The
        strategy used is to optimistically attempt to insert the entire
@@ -171,7 +181,8 @@ def mass_insert_obs(sesh, obs, dbm):
             a, b = split(obs)
             log.debug("Splitings observations into a, b",
                       extra={'a_split': a, 'b_split': b})
-            a, b = mass_insert_obs(sesh, a, dbm), mass_insert_obs(sesh, b, dbm)
+            a = bisect_insert_strategy(sesh, a, dbm)
+            b = bisect_insert_strategy(sesh, b, dbm)
             combined = a + b
             log.debug("Returning from split call", extra={'a_split': a,
                                                           'b_split': b,
@@ -191,16 +202,22 @@ def insert(sesh, observations, chunk_size, num_samples):
 
     if has_unique_obs(sesh, observations, num_samples):
         log.info("Using Single Insert Strategy")
-        for ob in observations:
-            try:
-                single_insert_obs(sesh, ob, dbm)
-            except:
-                pass
+        with Timer() as tmr:
+            for ob in observations:
+                try:
+                    single_insert_obs(sesh, ob, dbm)
+                except:
+                    pass # FIXME: Better way to handle exception here?
     else:
         log.info("Using Chunk + Bisection Strategy")
-        for chunk in chunks(observations, chunk_size):
-            mass_insert_obs(sesh, chunk, dbm)
+        with Timer() as tmr:
+            for chunk in chunks(observations, chunk_size):
+                bisect_insert_strategy(sesh, chunk, dbm)
 
-
+    log.info('Data insertion complete',
+             extra={'successes': dbm.successes,
+                    'failures': dbm.failures,
+                    'insertions_per_sec': (dbm.successes/tmr.run_time)})
     return {'successes': dbm.successes,
-            'failures': dbm.failures}
+            'failures': dbm.failures,
+            'insertions_per_sec': (dbm.successes/tmr.run_time)}

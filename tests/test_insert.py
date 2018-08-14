@@ -5,7 +5,7 @@ import pytz
 
 from pycds import History, Obs
 from crmprtd.db_exceptions import UniquenessError
-from crmprtd.insert import mass_insert_obs, split, DBMetrics, chunks, \
+from crmprtd.insert import bisect_insert_strategy, split, DBMetrics, chunks, \
     get_sample_indices, is_unique, has_unique_obs, single_insert_obs
 
 
@@ -19,7 +19,7 @@ from crmprtd.insert import mass_insert_obs, split, DBMetrics, chunks, \
     # None
     ('none', [], 0)
 ])
-def test_mass_insert_obs(test_session, label, days, expected):
+def test_bisect_insert_strategy(test_session, label, days, expected):
     # Just pick a randon variable and history entry (doesn't matter which)
     history = test_session.query(History).first()
     variable = history.station.network.variables[0]
@@ -29,7 +29,7 @@ def test_mass_insert_obs(test_session, label, days, expected):
            for d in days]
 
     dbm = DBMetrics()
-    mass_insert_obs(test_session, obs, dbm)
+    bisect_insert_strategy(test_session, obs, dbm)
 
     assert dbm.successes == expected
 
@@ -50,15 +50,15 @@ def test_mass_insert_obs_weird(test_session):
 
     dbm = DBMetrics()
 
-    mass_insert_obs(test_session, [], dbm)
+    bisect_insert_strategy(test_session, [], dbm)
     assert dbm.successes == 0
     dbm.clear()
 
-    mass_insert_obs(test_session, [x], dbm)
+    bisect_insert_strategy(test_session, [x], dbm)
     assert dbm.successes == 1
     dbm.clear()
 
-    mass_insert_obs(test_session, [y], dbm)
+    bisect_insert_strategy(test_session, [y], dbm)
     assert dbm.successes == 0
 
 
