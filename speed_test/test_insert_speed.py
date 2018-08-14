@@ -165,8 +165,8 @@ from __main__ import generate_scatter_obs
 obs = generate_scatter_obs(sesh, %d, %d)
 """ % (observations, bad_observations)
 
-    # return [best_case, worst_case, chunk_case, scatter_case]
-    return [chunk_case, scatter_case]
+    return [best_case, worst_case, chunk_case, scatter_case]
+
 
 def get_test_code(chunk_size):
     one_by_one = """insert_with_one_by_one(sesh, obs)"""
