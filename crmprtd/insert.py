@@ -48,15 +48,15 @@ def chunks(list, chunk_size):
         yield list[i:i+chunk_size]
 
 
-def get_sample_indices(num_obs, num_samples):
-    if num_samples > num_obs:
-        num_samples = num_obs
+def get_sample_indices(num_obs, sample_size):
+    if sample_size > num_obs:
+        sample_size = num_obs
 
-    index_buffer = floor(num_obs/num_samples)
+    index_buffer = floor(num_obs/sample_size)
 
     sample_indices = [0]
     index = 0
-    for i in range(num_samples - 1):
+    for i in range(sample_size - 1):
         index += index_buffer
         sample_indices.append(index)
 
@@ -73,9 +73,9 @@ def is_unique(sesh, history_id, vars_id, time):
     return True
 
 
-def has_unique_obs(sesh, observations, num_samples):
+def has_unique_obs(sesh, observations, sample_size):
     sample_obs = []
-    sample_indices = get_sample_indices(len(observations), num_samples)
+    sample_indices = get_sample_indices(len(observations), sample_size)
 
     for index in sample_indices:
         sample_obs.append(observations[index])
@@ -85,7 +85,7 @@ def has_unique_obs(sesh, observations, num_samples):
         if not is_unique(sesh, sample.history_id, sample.vars_id, sample.time):
             already_exists += 1
 
-    if already_exists == num_samples:
+    if already_exists == sample_size:
         return False
 
     return True
@@ -197,10 +197,10 @@ def bisect_insert_strategy(sesh, obs, dbm):
     return 0
 
 
-def insert(sesh, observations, chunk_size, num_samples):
+def insert(sesh, observations, chunk_size, sample_size):
     dbm = DBMetrics()
 
-    if has_unique_obs(sesh, observations, num_samples):
+    if has_unique_obs(sesh, observations, sample_size):
         log.info("Using Single Insert Strategy")
         with Timer() as tmr:
             for ob in observations:
