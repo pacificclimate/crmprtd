@@ -90,6 +90,12 @@ def common_script_arguments(parser):    # pragma: no cover
                               'observations')
     parser.add_argument('-i', '--input_file',
                         help='Input file to process')
+    parser.add_argument('--chunk_size', type=int,
+                        help='The size of observation chunks that will be '
+                             'mass inserted into the database')
+    parser.add_argument('--sample_size', type=int
+                        help='Number of samples to be taken from observations '
+                             'to determine which insertion strategy to use')
     return parser
 
 
@@ -154,8 +160,16 @@ def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
     return io.BufferedReader(IterStream(), buffer_size=buffer_size)
 
 
+def get_insert_args(args):
+    return subset_dict(vars(args), ['chunk_size', 'sample_size'])
+
+
+def subset_dict(a_dict, keys_wanted):
+    return {key: a_dict[key] for key in keys_wanted if key in a_dict}
+
+
 def run_data_pipeline(download_func, normalize_func, download_args,
-                      cache_file, connection_string):
+                      cache_file, connection_string, insert_args):
     '''Executes all stages of the data processing pipeline.
 
        Downloads the data, according to the download arguments
@@ -180,8 +194,5 @@ def run_data_pipeline(download_func, normalize_func, download_args,
 
     observations = list(filter(lambda ob: ob is not None,
                                [align(sesh, row) for row in rows]))
-    results = insert(sesh, observations, 4096, 50)
+    results = insert(sesh, observations, **insert_args)
     print(results)
-
-def subset_dict(a_dict, keys_wanted):
-    return {key: a_dict[key] for key in keys_wanted if key in a_dict}
