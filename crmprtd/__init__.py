@@ -61,6 +61,7 @@ from crmprtd.insert import insert
 Row = namedtuple('Row', "time val variable_name unit network_name \
                          station_id lat lon")
 
+
 def common_script_arguments(parser):    # pragma: no cover
     parser.add_argument('-c', '--connection_string',
                         help='PostgreSQL connection string')

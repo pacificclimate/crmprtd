@@ -43,6 +43,7 @@ class Timer(object):
         self.end = time.time()
         self.run_time = self.end - self.start
 
+
 def chunks(list, chunk_size):
     for i in range(0, len(list), chunk_size):
         yield list[i:i+chunk_size]
@@ -190,7 +191,7 @@ def bisect_insert_strategy(sesh, obs, dbm):
             return combined
         else:
             log.info("Successfully inserted observations",
-                      extra={'num_obs': len(obs)})
+                     extra={'num_obs': len(obs)})
             sesh.commit()
             dbm.successes += len(obs)
             return len(obs)
@@ -206,8 +207,8 @@ def insert(sesh, observations, chunk_size, sample_size):
             for ob in observations:
                 try:
                     single_insert_obs(sesh, ob, dbm)
-                except:
-                    pass # FIXME: Better way to handle exception here?
+                except Exception:
+                    pass    # FIXME: Better way to handle exception here?
     else:
         log.info("Using Chunk + Bisection Strategy")
         with Timer() as tmr:

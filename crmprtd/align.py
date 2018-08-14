@@ -47,7 +47,7 @@ def closest_stns_within_threshold(sesh, network_name, lon, lat, threshold):
 
 
 def convert_unit(val, src_unit, dst_unit):
-    if src_unit != dst_unit and src_unit != None:
+    if src_unit != dst_unit and src_unit is not None:
         try:
             val = Q_(val, ureg.parse_expression(src_unit))  # src
             val = val.to(dst_unit).magnitude  # dest
@@ -61,7 +61,7 @@ def convert_unit(val, src_unit, dst_unit):
 
 
 def unit_check(val, unit_obs, unit_db):
-    if unit_obs == None and unit_db == None:
+    if unit_obs is None and unit_db is None:
         return None
     else:
         val = convert_unit(val, unit_obs, unit_db)
@@ -202,7 +202,7 @@ def align(sesh, obs_tuple):
         return None
 
     datum = unit_check(obs_tuple.val, obs_tuple.unit, variable.unit)
-    if datum == None:
+    if datum is None:
         log.warning('Unable to confirm data units',
                     extra={'unit_obs': obs_tuple.unit,
                            'unit_db': variable.unit,

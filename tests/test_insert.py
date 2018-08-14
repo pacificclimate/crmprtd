@@ -73,7 +73,8 @@ def test_split(tuple, expected_a, expected_b):
     assert test_b == expected_b
 
 
-@pytest.mark.parametrize(('list_size', 'chunk_size', 'expected_remainder_size'), [
+@pytest.mark.parametrize(('list_size', 'chunk_size',
+                          'expected_remainder_size'), [
     (500, 100, 0),
     (1000, 333, 1),
     (667, 99, 73)
@@ -89,6 +90,7 @@ def test_chunks(list_size, chunk_size, expected_remainder_size):
         else:
             assert len(chunk) == expected_remainder_size
 
+
 @pytest.mark.parametrize(('num_obs', 'num_samples', 'expected'), [
     (500, 10, [0, 50, 100, 150, 200, 250, 300, 350, 400, 450]),
     (10, 100, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
@@ -100,23 +102,24 @@ def test_get_sample_indices(num_obs, num_samples, expected):
 
 
 def test_is_unique(test_session):
-     history_id = 20
-     vars_id = 2
-     time = datetime(2012, 10, 10, 6, tzinfo=pytz.utc)
-     assert is_unique(test_session, history_id, vars_id, time)
+    history_id = 20
+    vars_id = 2
+    time = datetime(2012, 10, 10, 6, tzinfo=pytz.utc)
+    assert is_unique(test_session, history_id, vars_id, time)
 
 
 def test_is_unique_not_unique(test_session):
-     history_id = 20
-     vars_id = 2
-     time = datetime(2012, 9, 24, 6, tzinfo=pytz.utc)
-     assert not is_unique(test_session, history_id, vars_id, time)
+    history_id = 20
+    vars_id = 2
+    time = datetime(2012, 9, 24, 6, tzinfo=pytz.utc)
+    assert not is_unique(test_session, history_id, vars_id, time)
 
 
 def test_has_unique_obs(test_session):
     obs_list = []
     for i in range(50):
-        obs_list.append(Obs(history_id=20, vars_id=2, time=datetime.now(), datum=i))
+        obs_list.append(Obs(history_id=20, vars_id=2,
+                            time=datetime.now(), datum=i))
 
     assert has_unique_obs(test_session, obs_list, 5)
 
@@ -124,7 +127,10 @@ def test_has_unique_obs(test_session):
 def test_has_unique_obs_not_unique(test_session):
     obs_list = []
     for i in range(50):
-        obs_list.append(Obs(history_id=20, vars_id=2, time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc), datum=i))
+        obs_list.append(Obs(history_id=20,
+                            vars_id=2,
+                            time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc),
+                            datum=i))
 
     assert not has_unique_obs(test_session, obs_list, 5)
 
@@ -140,7 +146,8 @@ def test_single_insert_obs(test_session):
 
 
 def test_single_insert_obs_not_unique(test_session):
-    ob = Obs(history_id=20, vars_id=2, time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc), datum=10)
+    ob = Obs(history_id=20, vars_id=2,
+             time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc), datum=10)
     dbm = DBMetrics()
 
     with pytest.raises(UniquenessError):
