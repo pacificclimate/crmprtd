@@ -8,7 +8,7 @@ failures. This phase needs to manage the database transactions for
 speed and reliability. This phase is common to all networks.
 """
 
-from math import floor
+from math import floor, log
 from sqlalchemy import and_
 import logging
 import time
@@ -44,70 +44,62 @@ class Timer(object):
         self.run_time = self.end - self.start
 
 
-def chunks(list, chunk_size):
-    for i in range(0, len(list), chunk_size):
-        yield list[i:i+chunk_size]
+def pow_two_chunk(num):
+    return 2 ** floor(log(num, 2))
+
+
+def get_chunk_sizes(remainder):
+    chunk_list = []
+    while remainder != 0:
+        chunk_size = pow_to_chunk(remainder)
+        remainder -= chunk_size
+        chunk_list.append(chunk_size)
+    return chunk_list
+
+
+def chunks(obs):
+    pos = 0
+    for chunk_size in get_chunk_sizes(len(obs))
+        yield obs[pos:pos+chunk_size]
+        pos += chunk_size
 
 
 def get_sample_indices(num_obs, sample_size):
     if sample_size > num_obs:
         sample_size = num_obs
 
-    index_buffer = floor(num_obs/sample_size)
-
-    sample_indices = [0]
-    index = 0
-    for i in range(sample_size - 1):
-        index += index_buffer
-        sample_indices.append(index)
-
-    return sample_indices
+    return random.sample(range(num_obs), sample_size)
 
 
-def is_unique(sesh, history_id, vars_id, time):
+def ob_exists(sesh, history_id, vars_id, time):
     q = sesh.query(Obs.id).filter(
         and_(Obs.history_id == history_id, Obs.vars_id == vars_id,
              Obs.time == time))
     if q.count() > 0:
+        return True
+    else:
         return False
 
-    return True
 
-
-def has_unique_obs(sesh, observations, sample_size):
+def contains_all_duplicates(sesh, observations, sample_size):
     sample_obs = []
     sample_indices = get_sample_indices(len(observations), sample_size)
 
     for index in sample_indices:
         sample_obs.append(observations[index])
 
-    already_exists = 0
     for sample in sample_obs:
-        if not is_unique(sesh, sample.history_id, sample.vars_id, sample.time):
-            already_exists += 1
-
-    if already_exists == sample_size:
-        return False
+        if not obs_exist(sesh, sample.history_id, sample.vars_id, sample.time):
+            return False
 
     return True
 
 
 def single_insert_obs(sesh, o, dbm):
     # Check to see if this entry will be unique
-    try:
-        if not is_unique(sesh, o.history_id, o.vars_id, o.time):
-            log.warning("Failure, observation already exists.")
-            dbm.failures += 1
-            raise UniquenessError(o)
-    except UniquenessError as e:
-        log.warning("Failure, observation already exists.", extra={'e': e})
+    if not obs_exist(sesh, o.history_id, o.vars_id, o.time):
         dbm.failures += 1
-        raise e
-    except Exception as e:
-        log.warning("Failure, an error occured.", extra={'e': e})
-        dbm.failures += 1
-        raise InsertionError(obs_time=o.time, datum=o.datum,
-                             vars_id=o.vars_id, hid=o.history_id, e=e)
+        raise UniquenessError(o)
 
     # value does not exist in obs_raw, continue with insertion
     try:
@@ -201,14 +193,16 @@ def bisect_insert_strategy(sesh, obs, dbm):
 def insert(sesh, observations, chunk_size, sample_size):
     dbm = DBMetrics()
 
-    if has_unique_obs(sesh, observations, sample_size):
+    if contains_all_duplicates(sesh, observations, sample_size):
         log.info("Using Single Insert Strategy")
         with Timer() as tmr:
             for ob in observations:
                 try:
                     single_insert_obs(sesh, ob, dbm)
-                except Exception:
-                    pass    # FIXME: Better way to handle exception here?
+                except UniquenessError as e:
+                    log.warning('Observation already exists in database',
+                                extra={'exception': e})
+
     else:
         log.info("Using Chunk + Bisection Strategy")
         with Timer() as tmr:
