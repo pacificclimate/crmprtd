@@ -209,10 +209,7 @@ def insert(sesh, observations, chunk_size, sample_size):
             for chunk in chunks(observations, chunk_size):
                 bisect_insert_strategy(sesh, chunk, dbm)
 
-    log.info('Data insertion complete',
-             extra={'successes': dbm.successes,
-                    'failures': dbm.failures,
-                    'insertions_per_sec': (dbm.successes/tmr.run_time)})
+    log.info('Data insertion complete')
     return {'successes': dbm.successes,
             'failures': dbm.failures,
             'insertions_per_sec': (dbm.successes/tmr.run_time)}

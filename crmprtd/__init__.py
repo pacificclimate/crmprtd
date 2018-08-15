@@ -91,10 +91,6 @@ def common_script_arguments(parser):    # pragma: no cover
                               'observations')
     parser.add_argument('-i', '--input_file',
                         help='Input file to process')
-    parser.add_argument('--chunk_size', type=int,
-                        default=4096,
-                        help='The size of observation chunks that will be '
-                             'mass inserted into the database')
     parser.add_argument('--sample_size', type=int,
                         default=50,
                         help='Number of samples to be taken from observations '
@@ -163,10 +159,6 @@ def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
     return io.BufferedReader(IterStream(), buffer_size=buffer_size)
 
 
-def get_insert_args(args):
-    return subset_dict(vars(args), ['chunk_size', 'sample_size'])
-
-
 def subset_dict(a_dict, keys_wanted):
     return {key: a_dict[key] for key in keys_wanted if key in a_dict}
 
@@ -198,4 +190,9 @@ def run_data_pipeline(download_func, normalize_func, download_args,
     observations = [align(sesh, row) for row in rows]
     observations = [ob for ob in obs if ob]
     results = insert(sesh, observations, **insert_args)
-    print(results)
+
+    log = logging.getLogger(__name__)
+    log.info('Data insertion results',
+             extra={'successes': dbm.successes,
+                    'failures': dbm.failures,
+                    'insertions_per_sec': (dbm.successes/tmr.run_time)})
