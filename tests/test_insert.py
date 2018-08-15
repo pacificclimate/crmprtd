@@ -6,7 +6,7 @@ import pytz
 from pycds import History, Obs
 from crmprtd.db_exceptions import UniquenessError
 from crmprtd.insert import bisect_insert_strategy, split, DBMetrics, chunks, \
-    get_sample_indices, is_unique, has_unique_obs, single_insert_obs
+    get_sample_indices, obs_exist, has_unique_obs, single_insert_obs
 
 
 @pytest.mark.parametrize(('label', 'days', 'expected'), [
@@ -101,18 +101,18 @@ def test_get_sample_indices(num_obs, num_samples, expected):
         assert index in expected
 
 
-def test_is_unique(test_session):
+def test_obs_exist(test_session):
     history_id = 20
     vars_id = 2
     time = datetime(2012, 10, 10, 6, tzinfo=pytz.utc)
-    assert is_unique(test_session, history_id, vars_id, time)
+    assert obs_exist(test_session, history_id, vars_id, time)
 
 
-def test_is_unique_not_unique(test_session):
+def test_obs_exist_not_unique(test_session):
     history_id = 20
     vars_id = 2
     time = datetime(2012, 9, 24, 6, tzinfo=pytz.utc)
-    assert not is_unique(test_session, history_id, vars_id, time)
+    assert not obs_exist(test_session, history_id, vars_id, time)
 
 
 def test_has_unique_obs(test_session):
