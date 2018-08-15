@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 from crmprtd.moti.download import download
 from crmprtd.moti.normalize import normalize
 from crmprtd import common_script_arguments, common_auth_arguments, \
-    setup_logging, run_data_pipeline, subset_dict, get_insert_args
+    setup_logging, run_data_pipeline, subset_dict
 
 
 if __name__ == '__main__':
@@ -32,7 +32,5 @@ if __name__ == '__main__':
                'auth_key', 'username', 'password']
     dl_args = subset_dict(vars(args), dl_args)
 
-    ins_args = get_insert_args(args)
-
     run_data_pipeline(download, normalize, dl_args, args.cache_file,
-                      args.connection_string, ins_args)
+                      args.connection_string, args.sample_size)
