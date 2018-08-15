@@ -164,7 +164,7 @@ def subset_dict(a_dict, keys_wanted):
 
 
 def run_data_pipeline(download_func, normalize_func, download_args,
-                      cache_file, connection_string, insert_args):
+                      cache_file, connection_string, sample_size):
     '''Executes all stages of the data processing pipeline.
 
        Downloads the data, according to the download arguments
@@ -189,7 +189,7 @@ def run_data_pipeline(download_func, normalize_func, download_args,
 
     observations = [align(sesh, row) for row in rows]
     observations = [ob for ob in obs if ob]
-    results = insert(sesh, observations, **insert_args)
+    results = insert(sesh, observations, sample_size)
 
     log = logging.getLogger(__name__)
     log.info('Data insertion results',

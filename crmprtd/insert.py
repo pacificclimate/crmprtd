@@ -190,7 +190,7 @@ def bisect_insert_strategy(sesh, obs, dbm):
     return 0
 
 
-def insert(sesh, observations, chunk_size, sample_size):
+def insert(sesh, observations, sample_size):
     dbm = DBMetrics()
 
     if contains_all_duplicates(sesh, observations, sample_size):
@@ -206,7 +206,7 @@ def insert(sesh, observations, chunk_size, sample_size):
     else:
         log.info("Using Chunk + Bisection Strategy")
         with Timer() as tmr:
-            for chunk in chunks(observations, chunk_size):
+            for chunk in chunks(observations):
                 bisect_insert_strategy(sesh, chunk, dbm)
 
     log.info('Data insertion complete')
