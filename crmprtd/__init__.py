@@ -195,7 +195,7 @@ def run_data_pipeline(download_func, normalize_func, download_args,
     Session = sessionmaker(engine)
     sesh = Session()
 
-    observations = list(filter(lambda ob: ob is not None,
-                               [align(sesh, row) for row in rows]))
+    observations = [align(sesh, row) for row in rows]
+    observations = [ob for ob in obs if ob]
     results = insert(sesh, observations, **insert_args)
     print(results)
