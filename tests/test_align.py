@@ -3,7 +3,7 @@ from datetime import datetime
 from geoalchemy2.functions import ST_X, ST_Y
 
 from crmprtd.align import is_network, get_history, get_variable, unit_check, \
-    align, closest_stns_within_threshold, create_station_and_history_entry
+    align, closest_stns_within_threshold
 from crmprtd import Row
 from pycds import Station, History
 
@@ -162,9 +162,9 @@ def test_unit_check(test_session, network_name, variable_name, unit,
 def test_align_successes(test_session, obs_tuple, expected_hid, expected_time,
                          expeceted_vid, expected_datum):
     ob = align(test_session, obs_tuple)
-    assert ob.history.id == expected_hid
+    assert ob.history_id == expected_hid
     assert ob.time == expected_time
-    assert ob.variable.id == expeceted_vid
+    assert ob.vars_id == expeceted_vid
     assert ob.datum == expected_datum
 
 
