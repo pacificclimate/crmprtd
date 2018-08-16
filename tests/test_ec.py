@@ -5,10 +5,7 @@ from lxml.etree import LxmlError
 from lxml.etree import fromstring, parse, XSLT
 import pytest
 
-from crmprtd.ec import makeurl, extract_fname_from_url, ns, insert_obs, \
-    db_unit, OmMember
-
-from pycds import Obs
+from crmprtd.ec import makeurl, ns, OmMember
 
 
 @pytest.mark.parametrize(('label', 'args', 'expected'), [
@@ -66,17 +63,6 @@ def test_makeurl_no_time_daily():
 
     assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
                    'yesterday/yesterday_bc_{}_e.xml').format(t.strftime(fmt))
-
-
-@pytest.mark.parametrize(('url', 'fname'), [
-    (('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/'
-      'hourly_bc_2016011521_e.xml'),
-     'hourly_bc_2016011521_e.xml'),
-    ('http://pacificclimate.org/directory/of/files.zip', 'files.zip'),
-    ('http://this.com/it/a/filename.extension', 'filename.extension')
-])
-def test_url_to_fname(url, fname):
-    assert extract_fname_from_url(url) == fname
 
 
 @pytest.mark.parametrize(('x', 'expected'), [
@@ -185,96 +171,6 @@ def test_xsl_transform_cloud_cover(x, expected):
     assert e[0].attrib['value'] == expected
 
 
-@pytest.mark.parametrize(('net_var_name', 'unit'), [
-    ('total_precipitation', 'mm'),
-    ('air_temperature', 'Celsius')
-])
-def test_db_unit(ec_session, net_var_name, unit):
-    dbu = db_unit(ec_session, net_var_name)
-    assert dbu == unit
-
-
-@pytest.mark.parametrize(('et', 'hid', 'vname', 'vid'), [
-    (fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<om:member xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <om:Observation>
-    <om:metadata>
-      <set>
-        <general>
-          <author build="build.4063" name="MSC-DMS-PG-WXO-Summary" version="2.4"/>
-          <dataset name="mscobservation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/"/>
-          <phase name="product-wxo_xml-1.0/"/>
-          <id xlink:href="/data/msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
-          <parent xlink:href="/data/msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
-        </general>
-        <identification-elements>
-          <element name="station_name" uom="unitless" value="Stewart Airport"/>
-          <element name="latitude" uom="degree" value="55.933333"/>
-          <element name="longitude" uom="degree" value="-129.983333"/>
-          <element name="transport_canada_id" uom="unitless" value="ZST"/>
-          <element name="observation_date_utc" uom="unitless" value="2016-05-28T02:00:00.000Z"/>
-          <element name="observation_date_local_time" uom="unitless" value="2016-05-27T19:00:00.000 PDT"/>
-          <element name="climate_station_number" uom="unitless" value="1067741"/>
-          <element name="wmo_station_number" uom="unitless" value=""/>
-        </identification-elements>
-      </set>
-    </om:metadata>
-    <om:samplingTime>
-      <gml:TimeInstant>
-        <gml:timePosition>2016-05-28T02:00:00.000Z</gml:timePosition>
-      </gml:TimeInstant>
-    </om:samplingTime>
-    <om:resultTime>
-      <gml:TimeInstant>
-        <gml:timePosition>2016-05-28T02:00:00.000Z</gml:timePosition>
-      </gml:TimeInstant>
-    </om:resultTime>
-    <om:procedure xlink:href="msc/observation/atmospheric/surface_weather/wxo_dd_hour_summary-1.0-ascii/product-wxo_xml-1.0/20160528024500000/bc/intermediate/en"/>
-    <om:observedProperty gml:remoteSchema="/schema/point-observation/2.0.xsd"/>
-    <om:featureOfInterest>
-      <gml:FeatureCollection>
-        <gml:location>
-          <gml:Point>
-            <gml:pos>55.933333 -129.983333</gml:pos>
-          </gml:Point>
-        </gml:location>
-      </gml:FeatureCollection>
-    </om:featureOfInterest>
-    <om:result>
-      <elements>
-        <element name="present_weather" uom="code" value=""/>
-        <element name="mean_sea_level" uom="kPa" value="101.4"/>
-        <element name="tendency_amount" uom="kPa" value="-0.03"/>
-        <element name="tendency_characteristic" uom="code" value=""/>
-        <element name="horizontal_visibility" uom="km" value=""/>
-        <element name="air_temperature" uom="Celsius" value="13.8"/>
-        <element name="dew_point" uom="Celsius" value="7.4"/>
-        <element name="relative_humidity" uom="percent" value="65"/>
-        <element name="wind_speed" uom="km/h" value="16"/>
-        <element name="wind_direction" uom="code" value="SSW"/>
-        <element name="wind_gust_speed" uom="km/h" value="29"/>
-        <element name="total_cloud_cover" uom="code" value=""/>
-        <element name="wind_chill" uom="unitless" value=""/>
-        <element name="humidex" uom="unitless" value=""/>
-      </elements>
-    </om:result>
-  </om:Observation>
-</om:member>'''), 10001, 'air_temperature', 101) # noqa
-])
-def test_insert_duplicate_obs(ec_session, et, hid, vname, vid):
-    from copy import deepcopy
-    om1 = OmMember(et)
-    om2 = OmMember(deepcopy(et))
-    count1 = ec_session.query(Obs).count()
-    insert_obs(ec_session, om1, hid, vname, vid)
-    count2 = ec_session.query(Obs).count()
-    assert count2 == (count1 + 1)
-
-    insert_obs(ec_session, om2, hid, vname, vid)
-    count3 = ec_session.query(Obs).count()
-    assert count3 == count2
-
-
 def test_OmMember_index_error_handle(ec_session):
     et = fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:member xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -344,8 +240,3 @@ def test_OmMember_index_error_handle(ec_session):
     o = OmMember(et)
     with pytest.raises(LxmlError):
         o.member_unit('doese_not_exist')
-
-
-def test_db_unit_error_handle(ec_session):
-    test_val = db_unit(ec_session, 'not_a_var')
-    assert test_val is None

@@ -61,30 +61,3 @@ def url_generator(station, from_, to, report='7110', request='historic'):
         end = min(to, t + max_span)
         yield makeurl(report, request, station, start, end)
         t = end + timestep
-
-
-def slice_timesteps(start_date, end_date):
-    if not isinstance(start_date, datetime):
-        raise ValueError("start_date paramater is not a datetime, but must be")
-    if not isinstance(end_date, datetime):
-        raise ValueError("to_ paramater is not a datetime, but must be")
-    assert start_date.tzinfo and end_date.tzinfo, ("Dates must be localized "
-                                                   "and have tzinfo")
-
-    tz = pytz.timezone('America/Vancouver')
-    # The MoTI app seems to accept its parameters in localtime
-    start_date = start_date.astimezone(tz)
-    end_date = end_date.astimezone(tz)
-
-    # Truncate to nearest hour
-    start_date = start_date.replace(minute=0, second=0, microsecond=0)
-    end_date = end_date.replace(minute=0, second=0, microsecond=0)
-
-    max_span = timedelta(days=7)
-    timestep = timedelta(hours=1)
-    t = start_date
-    while t < end_date:
-        start = t
-        end = min(end_date, t + max_span)
-        yield (start, end)
-        t = end + timestep

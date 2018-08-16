@@ -4,7 +4,7 @@ from datetime import datetime
 from lxml.etree import parse, XSLT
 import pytz
 
-from crmprtd.moti import url_generator, slice_timesteps
+from crmprtd.moti import url_generator
 
 bctz = pytz.timezone('America/Vancouver')
 
@@ -161,14 +161,3 @@ def test_var_transforms_all(moti_sawr7100_large):
                      "humidity[@type='RELATIVE_HUMIDITY1']"))
     assert et.xpath(("/cmml/data/observation-series/observation/"
                      "snow[@type='HEIGHT_OF_SNOW']"))
-
-
-def test_timestep_slices():
-    d1 = bctz.localize(datetime(2010, 1, 1))
-    d2 = bctz.localize(datetime(2010, 1, 15))
-    results = [x for x in slice_timesteps(d1, d2)]
-    expected = [(bctz.localize(datetime(2010, 1, 1)),
-                bctz.localize(datetime(2010, 1, 8))),
-                (bctz.localize(datetime(2010, 1, 8, 1)),
-                bctz.localize(datetime(2010, 1, 15)))]
-    assert results == expected
