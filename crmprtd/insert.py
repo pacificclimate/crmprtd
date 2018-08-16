@@ -8,11 +8,12 @@ failures. This phase needs to manage the database transactions for
 speed and reliability. This phase is common to all networks.
 """
 
-from math import floor, log
+from math import floor, log as mathlog
 from sqlalchemy import and_
 import logging
 import time
 from sqlalchemy.exc import IntegrityError
+import random
 
 from crmprtd.db_exceptions import UniquenessError, InsertionError
 from pycds import Obs
@@ -45,13 +46,13 @@ class Timer(object):
 
 
 def pow_two_chunk(num):
-    return 2 ** floor(log(num, 2))
+    return 2 ** floor(mathlog(num, 2))
 
 
 def get_chunk_sizes(remainder):
     chunk_list = []
     while remainder != 0:
-        chunk_size = pow_to_chunk(remainder)
+        chunk_size = pow_two_chunk(remainder)
         remainder -= chunk_size
         chunk_list.append(chunk_size)
     return chunk_list
@@ -59,7 +60,7 @@ def get_chunk_sizes(remainder):
 
 def chunks(obs):
     pos = 0
-    for chunk_size in get_chunk_sizes(len(obs))
+    for chunk_size in get_chunk_sizes(len(obs)):
         yield obs[pos:pos+chunk_size]
         pos += chunk_size
 
@@ -71,8 +72,8 @@ def get_sample_indices(num_obs, sample_size):
     return random.sample(range(num_obs), sample_size)
 
 
-def ob_exists(sesh, history_id, vars_id, time):
-    q = sesh.query(Obs.id).filter(
+def obs_exist(sesh, history_id, vars_id, time):
+    q = sesh.query(Obs).filter(
         and_(Obs.history_id == history_id, Obs.vars_id == vars_id,
              Obs.time == time))
     if q.count() > 0:
@@ -97,9 +98,9 @@ def contains_all_duplicates(sesh, observations, sample_size):
 
 def single_insert_obs(sesh, o, dbm):
     # Check to see if this entry will be unique
-    if not obs_exist(sesh, o.history_id, o.vars_id, o.time):
+    if obs_exist(sesh, o.history_id, o.vars_id, o.time):
         dbm.failures += 1
-        raise UniquenessError(o)
+        raise UniquenessError(o.id)
 
     # value does not exist in obs_raw, continue with insertion
     try:
@@ -110,6 +111,7 @@ def single_insert_obs(sesh, o, dbm):
         return 1
     except Exception as e:
         log.warning("Failure, an error occured.", extra={'e': e})
+        sesh.rollback()
         dbm.failures += 1
         raise InsertionError(obs_time=o.time, datum=o.datum,
                              vars_id=o.vars_id, hid=o.history_id, e=e)
@@ -193,23 +195,35 @@ def bisect_insert_strategy(sesh, obs, dbm):
 def insert(sesh, observations, sample_size):
     dbm = DBMetrics()
 
-    if contains_all_duplicates(sesh, observations, sample_size):
-        log.info("Using Single Insert Strategy")
-        with Timer() as tmr:
-            for ob in observations:
-                try:
-                    single_insert_obs(sesh, ob, dbm)
-                except UniquenessError as e:
-                    log.warning('Observation already exists in database',
-                                extra={'exception': e})
+    ## TEST ##
+    q = sesh.query(Obs)
+    print('pre insert Num obs {}'.format(q.count()))
+    #
+    from datetime import datetime
+    ob = Obs(history_id=1818, vars_id=8, time=datetime.now(), datum=666)
+    single_insert_obs(sesh, ob, dbm)
 
-    else:
-        log.info("Using Chunk + Bisection Strategy")
-        with Timer() as tmr:
-            for chunk in chunks(observations):
-                bisect_insert_strategy(sesh, chunk, dbm)
+    q = sesh.query(Obs)
+    print('Num obs {}'.format(q.count()))
+    ## TEST ##
 
-    log.info('Data insertion complete')
-    return {'successes': dbm.successes,
-            'failures': dbm.failures,
-            'insertions_per_sec': (dbm.successes/tmr.run_time)}
+    # if contains_all_duplicates(sesh, observations, sample_size):
+    #     log.info("Using Single Insert Strategy")
+    #     with Timer() as tmr:
+    #         for ob in observations:
+    #             try:
+    #                 single_insert_obs(sesh, ob, dbm)
+    #             except UniquenessError as e:
+    #                 log.warning('Observation already exists in database',
+    #                             extra={'exception': e})
+    #
+    # else:
+    #     log.info("Using Chunk + Bisection Strategy")
+    #     with Timer() as tmr:
+    #         for chunk in chunks(observations):
+    #             bisect_insert_strategy(sesh, chunk, dbm)
+    #
+    # log.info('Data insertion complete')
+    # return {'successes': dbm.successes,
+    #         'failures': dbm.failures,
+    #         'insertions_per_sec': (dbm.successes/tmr.run_time)}

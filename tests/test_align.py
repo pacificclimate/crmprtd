@@ -3,7 +3,7 @@ from datetime import datetime
 from geoalchemy2.functions import ST_X, ST_Y
 
 from crmprtd.align import is_network, get_history, get_variable, unit_check, \
-    align, closest_stns_within_threshold
+    align, closest_stns_within_threshold, create_station_and_history_entry
 from crmprtd import Row
 from pycds import Station, History
 

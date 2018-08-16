@@ -6,7 +6,7 @@ import pytz
 from pycds import History, Obs
 from crmprtd.db_exceptions import UniquenessError
 from crmprtd.insert import bisect_insert_strategy, split, DBMetrics, chunks, \
-    get_sample_indices, obs_exist, has_unique_obs, single_insert_obs
+    get_sample_indices, obs_exist, contains_all_duplicates, single_insert_obs
 
 
 @pytest.mark.parametrize(('label', 'days', 'expected'), [
@@ -73,58 +73,52 @@ def test_split(tuple, expected_a, expected_b):
     assert test_b == expected_b
 
 
-@pytest.mark.parametrize(('list_size', 'chunk_size',
-                          'expected_remainder_size'), [
-    (500, 100, 0),
-    (1000, 333, 1),
-    (667, 99, 73)
+@pytest.mark.parametrize(('list_size', 'expected'), [
+    (1200, [1024, 128, 32, 16]),
+    (1201, [1024, 128, 32, 16, 1])
 ])
-def test_chunks(list_size, chunk_size, expected_remainder_size):
+def test_chunks(list_size, expected):
     test_list = []
     for i in range(list_size):
         test_list.append(i)
 
-    for chunk in chunks(test_list, chunk_size):
-        if len(chunk) == chunk_size:
-            assert len(chunk) == chunk_size
-        else:
-            assert len(chunk) == expected_remainder_size
+    for chunk in chunks(test_list):
+        assert len(chunk) in expected
 
 
 @pytest.mark.parametrize(('num_obs', 'num_samples', 'expected'), [
-    (500, 10, [0, 50, 100, 150, 200, 250, 300, 350, 400, 450]),
-    (10, 100, [0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+    (500, 10, 10),
+    (10, 500, 10)
 ])
 def test_get_sample_indices(num_obs, num_samples, expected):
     sample_indices = get_sample_indices(num_obs, num_samples)
-    for index in sample_indices:
-        assert index in expected
+    assert len(sample_indices) == expected
 
 
-def test_obs_exist(test_session):
+def test_obs_exist_not_in_db(test_session):
     history_id = 20
     vars_id = 2
     time = datetime(2012, 10, 10, 6, tzinfo=pytz.utc)
-    assert obs_exist(test_session, history_id, vars_id, time)
-
-
-def test_obs_exist_not_unique(test_session):
-    history_id = 20
-    vars_id = 2
-    time = datetime(2012, 9, 24, 6, tzinfo=pytz.utc)
     assert not obs_exist(test_session, history_id, vars_id, time)
 
 
-def test_has_unique_obs(test_session):
+def test_obs_exist_in_db(test_session):
+    history_id = 20
+    vars_id = 2
+    time = datetime(2012, 9, 24, 6, tzinfo=pytz.utc)
+    assert obs_exist(test_session, history_id, vars_id, time)
+
+
+def test_contains_all_duplicates_no_dup(test_session):
     obs_list = []
     for i in range(50):
         obs_list.append(Obs(history_id=20, vars_id=2,
                             time=datetime.now(), datum=i))
 
-    assert has_unique_obs(test_session, obs_list, 5)
+    assert not contains_all_duplicates(test_session, obs_list, 5)
 
 
-def test_has_unique_obs_not_unique(test_session):
+def test_contains_all_duplicates_all_dup(test_session):
     obs_list = []
     for i in range(50):
         obs_list.append(Obs(history_id=20,
@@ -132,7 +126,7 @@ def test_has_unique_obs_not_unique(test_session):
                             time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc),
                             datum=i))
 
-    assert not has_unique_obs(test_session, obs_list, 5)
+    assert contains_all_duplicates(test_session, obs_list, 5)
 
 
 def test_single_insert_obs(test_session):

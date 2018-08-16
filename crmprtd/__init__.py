@@ -186,13 +186,25 @@ def run_data_pipeline(download_func, normalize_func, download_args,
     engine = create_engine(connection_string)
     Session = sessionmaker(engine)
     sesh = Session()
+    from pycds import Obs
+    q = sesh.query(Obs)
+    print('post normalize Num obs {}'.format(q.count()))
 
-    observations = [align(sesh, row) for row in rows]
-    observations = [ob for ob in obs if ob]
+    ## TEST ##
+    observations = []
+    for i, row in enumerate(rows):
+        if i == 1000:
+            break
+        else:
+            observations.append(align(sesh, row))
+            q = sesh.query(Obs)
+            print('post align Num obs {}'.format(q.count()))
+    observations = [ob for ob in observations if ob]
+
+    ## TEST ##
+    # observations = [ob for ob in [align(sesh, row) for row in rows] if ob]
     results = insert(sesh, observations, sample_size)
 
     log = logging.getLogger(__name__)
     log.info('Data insertion results',
-             extra={'successes': dbm.successes,
-                    'failures': dbm.failures,
-                    'insertions_per_sec': (dbm.successes/tmr.run_time)})
+             extra={'results': results})

@@ -47,7 +47,7 @@ def closest_stns_within_threshold(sesh, network_name, lon, lat, threshold):
 
 
 def convert_unit(val, src_unit, dst_unit):
-    if src_unit != dst_unit and src_unit is not None:
+    if src_unit != dst_unit:
         try:
             val = Q_(val, ureg.parse_expression(src_unit))  # src
             val = val.to(dst_unit).magnitude  # dest
@@ -61,8 +61,11 @@ def convert_unit(val, src_unit, dst_unit):
 
 
 def unit_check(val, unit_obs, unit_db):
-    if unit_obs is None and unit_db is None:
+    if unit_db is None:
         return None
+    elif unit_obs is None:
+        print('Num obs in here')
+        return val
     else:
         return convert_unit(val, unit_obs, unit_db)
 
@@ -114,8 +117,9 @@ def create_station_and_history_entry(sesh, network_name, native_id, lat, lon):
 
     network = network.first()
     stn = Station(native_id=native_id, network=network)
-    with sesh.begin_nested():
-        sesh.add(stn)
+
+    # with sesh.begin_nested():
+    #     sesh.add(stn)
     log.info('Created new station entry',
              extra={'native_id': stn.native_id, 'network_name': network.name})
 
@@ -123,12 +127,20 @@ def create_station_and_history_entry(sesh, network_name, native_id, lat, lon):
                    lat=lat,
                    lon=lon)
 
-    with sesh.begin_nested():
-        sesh.add(hist)
+
+    # with sesh.begin_nested():
+    #     sesh.add(hist)
     log.warning('Created new history entry',
                 extra={'history': hist.id, 'network_name': network_name,
                        'native_id': stn.native_id, 'lat': lat, 'lon': lon})
-    sesh.commit()
+    try:
+        sesh.add(stn)
+        sesh.add(hist)
+    except Exception as e:
+        sesh.rollback()
+        log.warning('Unable to insert-----')
+    else:
+        sesh.commit()
     return hist
 
 
@@ -180,13 +192,27 @@ def align(sesh, obs_tuple):
                            'variable_name': obs_tuple.variable_name})
         return None
 
+    ## TEST ##
+    q = sesh.query(Obs)
+    print('pre db Num obs {}'.format(q.count()))
+    ## TEST ##
     if not is_network(sesh, obs_tuple.network_name):
         log.error('Network does not exist in db',
                   extra={'network_name': obs_tuple.network_name})
         return None
+    ## TEST ##
+    q = sesh.query(Obs)
+    print('post network check Num obs {}'.format(q.count()))
+    ## TEST ##
 
     history = get_history(sesh, obs_tuple.network_name, obs_tuple.station_id,
                           obs_tuple.lat, obs_tuple.lon)
+
+    ## TEST ##
+    q = sesh.query(Obs)
+    print('post get history Num obs {}'.format(q.count()))
+    ## TEST ##
+
     if not history:
         log.warning('Could not find history match',
                     extra={'network_name': obs_tuple.network_name,
@@ -195,6 +221,11 @@ def align(sesh, obs_tuple):
 
     variable = get_variable(sesh, obs_tuple.network_name,
                             obs_tuple.variable_name)
+
+    ## TEST ##
+    q = sesh.query(Obs)
+    print('post get var Num obs {}'.format(q.count()))
+    ## TEST ##
 
     # Necessary attributes for Obs object
     if not variable:
@@ -210,6 +241,11 @@ def align(sesh, obs_tuple):
                            'data': obs_tuple.val})
         return None
 
+    ## TEST ##
+    q = sesh.query(Obs)
+    print('post unit check Num obs {}'.format(q.count()))
+    ## TEST ##
+    print('datum {}'.format(datum))
     return Obs(history=history,
                time=obs_tuple.time,
                datum=datum,
