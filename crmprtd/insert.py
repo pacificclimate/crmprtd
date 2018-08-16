@@ -195,35 +195,23 @@ def bisect_insert_strategy(sesh, obs, dbm):
 def insert(sesh, observations, sample_size):
     dbm = DBMetrics()
 
-    ## TEST ##
-    q = sesh.query(Obs)
-    print('pre insert Num obs {}'.format(q.count()))
-    #
-    from datetime import datetime
-    ob = Obs(history_id=1818, vars_id=8, time=datetime.now(), datum=666)
-    single_insert_obs(sesh, ob, dbm)
+    if contains_all_duplicates(sesh, observations, sample_size):
+        log.info("Using Single Insert Strategy")
+        with Timer() as tmr:
+            for ob in observations:
+                try:
+                    single_insert_obs(sesh, ob, dbm)
+                except UniquenessError as e:
+                    log.warning('Observation already exists in database',
+                                extra={'exception': e})
 
-    q = sesh.query(Obs)
-    print('Num obs {}'.format(q.count()))
-    ## TEST ##
+    else:
+        log.info("Using Chunk + Bisection Strategy")
+        with Timer() as tmr:
+            for chunk in chunks(observations):
+                bisect_insert_strategy(sesh, chunk, dbm)
 
-    # if contains_all_duplicates(sesh, observations, sample_size):
-    #     log.info("Using Single Insert Strategy")
-    #     with Timer() as tmr:
-    #         for ob in observations:
-    #             try:
-    #                 single_insert_obs(sesh, ob, dbm)
-    #             except UniquenessError as e:
-    #                 log.warning('Observation already exists in database',
-    #                             extra={'exception': e})
-    #
-    # else:
-    #     log.info("Using Chunk + Bisection Strategy")
-    #     with Timer() as tmr:
-    #         for chunk in chunks(observations):
-    #             bisect_insert_strategy(sesh, chunk, dbm)
-    #
-    # log.info('Data insertion complete')
-    # return {'successes': dbm.successes,
-    #         'failures': dbm.failures,
-    #         'insertions_per_sec': (dbm.successes/tmr.run_time)}
+    log.info('Data insertion complete')
+    return {'successes': dbm.successes,
+            'failures': dbm.failures,
+            'insertions_per_sec': round(dbm.successes/tmr.run_time, 2)}
