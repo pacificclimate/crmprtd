@@ -33,4 +33,4 @@ if __name__ == '__main__':
     dl_args = subset_dict(vars(args), dl_args)
 
     run_data_pipeline(download, normalize, dl_args, args.cache_file,
-                      args.connection_string)
+                      args.connection_string, args.sample_size)

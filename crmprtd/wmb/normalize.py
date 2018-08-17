@@ -33,6 +33,8 @@ def normalize(file_stream):
         _, weather_date = data.pop(0)
 
         tz = pytz.timezone('Canada/Pacific')
+        hour = int(weather_date[-2:]) - 1
+        weather_date = weather_date[:-2] + str(hour)
         try:
             date = datetime.datetime.strptime(weather_date,
                                               "%Y%m%d%H").replace(tzinfo=tz)

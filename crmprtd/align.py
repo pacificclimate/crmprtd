@@ -14,6 +14,7 @@ from pint import UnitRegistry, UndefinedUnitError
 
 # local
 from pycds import Obs, History, Network, Variable, Station
+from crmprtd.db_exceptions import InsertionError
 
 
 log = logging.getLogger(__name__)
@@ -61,8 +62,10 @@ def convert_unit(val, src_unit, dst_unit):
 
 
 def unit_check(val, unit_obs, unit_db):
-    if not unit_obs and not unit_db:
+    if unit_db is None:
         return None
+    elif unit_obs is None:
+        return val
     else:
         return convert_unit(val, unit_obs, unit_db)
 
@@ -114,8 +117,7 @@ def create_station_and_history_entry(sesh, network_name, native_id, lat, lon):
 
     network = network.first()
     stn = Station(native_id=native_id, network=network)
-    with sesh.begin_nested():
-        sesh.add(stn)
+
     log.info('Created new station entry',
              extra={'native_id': stn.native_id, 'network_name': network.name})
 
@@ -123,12 +125,19 @@ def create_station_and_history_entry(sesh, network_name, native_id, lat, lon):
                    lat=lat,
                    lon=lon)
 
-    with sesh.begin_nested():
-        sesh.add(hist)
     log.warning('Created new history entry',
                 extra={'history': hist.id, 'network_name': network_name,
                        'native_id': stn.native_id, 'lat': lat, 'lon': lon})
-    sesh.commit()
+    try:
+        sesh.add(stn)
+        sesh.add(hist)
+    except Exception as e:
+        log.warning('Unable to insert new stn/hist entries',
+                    extra={'stn': stn, 'hist': hist, 'exception': e})
+        sesh.rollback()
+        raise InsertionError(native_id=stn.id, hid=hist.id, e=e)
+    else:
+        sesh.commit()
     return hist
 
 
@@ -187,6 +196,7 @@ def align(sesh, obs_tuple):
 
     history = get_history(sesh, obs_tuple.network_name, obs_tuple.station_id,
                           obs_tuple.lat, obs_tuple.lon)
+
     if not history:
         log.warning('Could not find history match',
                     extra={'network_name': obs_tuple.network_name,
@@ -203,14 +213,17 @@ def align(sesh, obs_tuple):
         return None
 
     datum = unit_check(obs_tuple.val, obs_tuple.unit, variable.unit)
-    if not datum:
+    if datum is None:
         log.warning('Unable to confirm data units',
                     extra={'unit_obs': obs_tuple.unit,
                            'unit_db': variable.unit,
                            'data': obs_tuple.val})
         return None
 
-    return Obs(history=history,
+    # Note: We are very specifically creating the Obs object here using the ids
+    # to avoid SQLAlchemy adding this object to the session as part of its
+    # cascading backref behaviour https://goo.gl/Lchhv6
+    return Obs(history_id=history.id,
                time=obs_tuple.time,
                datum=datum,
-               variable=variable)
+               vars_id=variable.id)

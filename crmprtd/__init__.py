@@ -47,7 +47,6 @@ speed and reliability. This phase is common to all networks.
 """
 
 import io
-import time
 import logging
 import yaml
 from sqlalchemy import create_engine
@@ -56,20 +55,11 @@ from pkg_resources import resource_stream
 from collections import namedtuple
 from itertools import tee
 from crmprtd.align import align
+from crmprtd.insert import insert
 
 
 Row = namedtuple('Row', "time val variable_name unit network_name \
                          station_id lat lon")
-
-
-class Timer(object):
-    def __enter__(self):
-        self.start = time.time()
-        return self
-
-    def __exit__(self, *args):
-        self.end = time.time()
-        self.run_time = self.end - self.start
 
 
 def common_script_arguments(parser):    # pragma: no cover
@@ -101,6 +91,11 @@ def common_script_arguments(parser):    # pragma: no cover
                               'observations')
     parser.add_argument('-i', '--input_file',
                         help='Input file to process')
+    parser.add_argument('--sample_size', type=int,
+                        default=50,
+                        help='Number of samples to be taken from observations '
+                             'when searching for duplicates '
+                             'to determine which insertion strategy to use')
     return parser
 
 
@@ -165,8 +160,12 @@ def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
     return io.BufferedReader(IterStream(), buffer_size=buffer_size)
 
 
+def subset_dict(a_dict, keys_wanted):
+    return {key: a_dict[key] for key in keys_wanted if key in a_dict}
+
+
 def run_data_pipeline(download_func, normalize_func, download_args,
-                      cache_file, connection_string):
+                      cache_file, connection_string, sample_size):
     '''Executes all stages of the data processing pipeline.
 
        Downloads the data, according to the download arguments
@@ -189,11 +188,9 @@ def run_data_pipeline(download_func, normalize_func, download_args,
     Session = sessionmaker(engine)
     sesh = Session()
 
-    observations = [align(sesh, row) for row in rows if row]
-    for ob in observations:
-        print(ob)
-    # insert(observations)
+    observations = [ob for ob in [align(sesh, row) for row in rows] if ob]
+    results = insert(sesh, observations, sample_size)
 
-
-def subset_dict(a_dict, keys_wanted):
-    return {key: a_dict[key] for key in keys_wanted if key in a_dict}
+    log = logging.getLogger(__name__)
+    log.info('Data insertion results',
+             extra={'results': results})
