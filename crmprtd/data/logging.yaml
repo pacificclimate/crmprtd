@@ -36,12 +36,12 @@ handlers:
   error:
     class: logging.StreamHandler
     level: ERROR
-    formatter: simple
+    formatter: json
     stream: ext://sys.stderr
   mail:
     class: logging.handlers.SMTPHandler
     level: CRITICAL
-    formatter: simple
+    formatter: json
     mailhost: smtp.uvic.ca
     fromaddr: noreply@pcic.uvic.ca
     toaddrs:

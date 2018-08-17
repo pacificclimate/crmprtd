@@ -69,11 +69,10 @@ def common_script_arguments(parser):    # pragma: no cover
                         default=False, action="store_true",
                         help="Turn on diagnostic mode (no commits)")
     parser.add_argument('-L', '--log_conf',
-                        default=resource_stream(
-                            'crmprtd', '/data/logging.yaml'),
+                        default=None,
                         help=('YAML file to use to override the default '
                               'logging configuration'))
-    parser.add_argument('-l', '--log',
+    parser.add_argument('-l', '--log_filename',
                         default=None,
                         help='Override the default log filename')
     parser.add_argument('-o', '--log_level',
@@ -114,20 +113,25 @@ def common_auth_arguments(parser):     # pragma: no cover
     return parser
 
 
-def setup_logging(log_conf, log, error_email, log_level, name):
-    log_c = yaml.load(log_conf)
-    if log:
-        log_c['handlers']['file']['filename'] = log
+def setup_logging(log_conf, log_filename, error_email, log_level, name):
+    if log_conf:
+        with open(log_conf, 'rb') as f:
+            base_config = yaml.load(f)
     else:
-        log = log_c['handlers']['file']['filename']
-    if error_email:
-        log_c['handlers']['mail']['toaddrs'] = error_email
-    logging.config.dictConfig(log_c)
-    log = logging.getLogger(name)
-    if log_level:
-        log.setLevel(log_level)
+        base_config = yaml.load(resource_stream('crmprtd',
+                                                '/data/logging.yaml'))
 
-    return log
+    if log_filename:
+        base_config['handlers']['file']['filename'] = log_filename
+
+    if error_email:
+        base_config['handlers']['mail']['toaddrs'] = error_email
+
+    if log_level:
+        base_config['handlers']['file']['level'] = log_level
+        base_config['handlers']['console']['level'] = log_level
+
+    logging.config.dictConfig(base_config)
 
 
 def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
