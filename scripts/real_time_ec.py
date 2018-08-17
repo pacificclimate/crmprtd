@@ -31,8 +31,8 @@ if __name__ == '__main__':
                               'this threshold'))
     parser = common_script_arguments(parser)
     args = parser.parse_args()
-    log = setup_logging(args.log_conf, args.log,
-                        args.error_email, args.log_level, 'crmprtd.ec')
+    setup_logging(args.log_conf, args.log_filename,
+                  args.error_email, args.log_level, 'crmprtd.ec')
 
     dl_args = ['time', 'frequency', 'province', 'language']
     dl_args = subset_dict(vars(args), dl_args)
