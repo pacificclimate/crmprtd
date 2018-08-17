@@ -1,9 +1,11 @@
 from crmprtd import setup_logging
+import logging
 from pkg_resources import resource_stream
 
 
 def test_setup_logging():
-    log = setup_logging(resource_stream('crmprtd', '/data/logging.yaml'),
-                        'mof.log', 'test@mail.com', 'INFO', 'crmprtd.wmb')
-    assert log.name == 'crmprtd.wmb'
-    assert log.level == 20
+    setup_logging(None, 'mof.log', 'test@mail.com', 'CRITICAL', 'test')
+    log = logging.getLogger('test')
+    assert log.name == 'test'
+    assert log.level == 0
+    assert log.parent.level == 50
