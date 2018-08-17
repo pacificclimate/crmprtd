@@ -120,7 +120,6 @@ def setup_logging(log_conf, log_filename, error_email, log_level, name):
         base_config['handlers']['mail']['toaddrs'] = error_email
 
     if log_level:
-        base_config['handlers']['file']['level'] = log_level
-        base_config['handlers']['console']['level'] = log_level
+        base_config['root']['level'] = log_level
 
     logging.config.dictConfig(base_config)
