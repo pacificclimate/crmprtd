@@ -1,6 +1,5 @@
 from crmprtd import setup_logging
 import logging
-from pkg_resources import resource_stream
 
 
 def test_setup_logging():
