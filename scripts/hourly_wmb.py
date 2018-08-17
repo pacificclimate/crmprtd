@@ -30,8 +30,8 @@ if __name__ == '__main__':
     parser = common_script_arguments(parser)
     parser = common_auth_arguments(parser)
     args = parser.parse_args()
-    setup_logging(args.log_conf, args.log, args.error_email, args.log_level,
-                  'crmprtd.wmb')
+    setup_logging(args.log_conf, args.log_filename, args.error_email,
+                  args.log_level, 'crmprtd.wmb')
 
     dl_args = ['username', 'password', 'auth_fname', 'auth_key', 'ftp_server',
                'ftp_file']

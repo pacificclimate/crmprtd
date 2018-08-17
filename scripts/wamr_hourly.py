@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     parser = common_script_arguments(parser)
     args = parser.parse_args()
-    setup_logging(args.log_conf, args.log, args.error_email, args.log_level,
+    setup_logging(args.log_conf, args.log_filename, args.error_email, args.log_level,
                   'crmprtd.wamr')
 
     dl_args = ['ftp_server', 'ftp_dir']
