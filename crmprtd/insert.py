@@ -76,10 +76,7 @@ def obs_exist(sesh, history_id, vars_id, time):
     q = sesh.query(Obs).filter(
         and_(Obs.history_id == history_id, Obs.vars_id == vars_id,
              Obs.time == time))
-    if q.count() > 0:
-        return True
-    else:
-        return False
+    return q.count() > 0
 
 
 def contains_all_duplicates(sesh, observations, sample_size):
@@ -140,7 +137,7 @@ def bisect_insert_strategy(sesh, obs, dbm):
        but in the optimal case it reduces the transactions to a constant
        1.
     '''
-    log.info("Begin mass observation insertion", extra={'num_obs': len(obs)})
+    log.debug("Begin mass observation insertion", extra={'num_obs': len(obs)})
 
     # Base cases
     if len(obs) < 1:

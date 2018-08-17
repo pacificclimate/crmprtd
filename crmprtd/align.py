@@ -220,6 +220,9 @@ def align(sesh, obs_tuple):
                            'data': obs_tuple.val})
         return None
 
+    # Note: We are very specifically creating the Obs object here using the ids
+    # to avoid SQLAlchemy adding this object to the session as part of its
+    # cascading backref behaviour https://goo.gl/Lchhv6
     return Obs(history_id=history.id,
                time=obs_tuple.time,
                datum=datum,

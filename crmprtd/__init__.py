@@ -94,6 +94,7 @@ def common_script_arguments(parser):    # pragma: no cover
     parser.add_argument('--sample_size', type=int,
                         default=50,
                         help='Number of samples to be taken from observations '
+                             'when searching for duplicates '
                              'to determine which insertion strategy to use')
     return parser
 
