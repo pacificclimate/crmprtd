@@ -24,10 +24,6 @@ def download_args(parser):
                         default=('pub/outgoing/AIR/Hourly_Raw_Air_Data/'
                                  'Meteorological/'),
                         help='FTP Directory containing WAMR\'s data files')
-    parser.add_argument('--outfile',
-                        default=None,
-                        help='File where the ouput of download() will be '
-                             'printed')
     return parser
 
 
