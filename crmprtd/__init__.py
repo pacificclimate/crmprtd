@@ -63,6 +63,27 @@ Row = namedtuple('Row', "time val variable_name unit network_name \
                          station_id lat lon")
 
 
+def logging_args(parser):
+    parser.add_argument('-L', '--log_conf',
+                        default=None,
+                        help=('YAML file to use to override the default '
+                              'logging configuration'))
+    parser.add_argument('-l', '--log_filename',
+                        default=None,
+                        help='Override the default log filename')
+    parser.add_argument('-o', '--log_level',
+                        choices=['DEBUG', 'INFO',
+                                 'WARNING', 'ERROR', 'CRITICAL'],
+                        help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
+                              'CRITICAL.  Note that debug output by default '
+                              'goes directly to file'))
+    parser.add_argument('-m', '--error_email',
+                        default=None,
+                        help=('Override the default e-mail address to which '
+                              'the program should report critical errors'))
+    return parser
+
+
 def common_script_arguments(parser):    # pragma: no cover
     parser.add_argument('-c', '--connection_string',
                         help='PostgreSQL connection string')
