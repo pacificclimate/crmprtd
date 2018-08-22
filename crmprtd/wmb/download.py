@@ -3,12 +3,14 @@ import os
 import logging
 import logging.config
 import ftplib
+import sys
 from tempfile import SpooledTemporaryFile
+from argparse import ArgumentParser
 
 # Local
 from crmprtd.download import retry, ftp_connect
 from crmprtd.download import FTPReader, extract_auth
-
+from crmprtd import logging_args, setup_logging, common_auth_arguments
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +39,11 @@ def download(username, password, auth_fname, auth_key, ftp_server, ftp_file):
                                                callback)
 
             tempfile.seek(0)
-            return tempfile.readlines()
+            # print module name for pipe
+            print("Network module name: wmb")
+            for line in tempfile.readlines():
+                print(line.strip('\n'))
+            sys.stdout.flush()
 
     except Exception as e:
         log.exception("Unable to process ftp")
@@ -56,3 +62,24 @@ class WMBFTPReader(FTPReader):
             return ftplib.FTP_TLS(host, user, password)
 
         self.connection = ftp_connect_with_retry(host, user, password)
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser = logging_args(parser)
+    parser = common_auth_arguments(parser)
+    parser.add_argument('-f', '--ftp_server',
+                        default='BCFireweatherFTPp1.nrs.gov.bc.ca',
+                        help=('Full uri to Wildfire Management Branch\'s ftp '
+                              'server'))
+    parser.add_argument('-F', '--ftp_file',
+                        default='HourlyWeatherAllFields_WA.txt',
+                        help=('Filename to open on the Wildfire Management '
+                              'Branch\'s ftp site'))
+    args = parser.parse_args()
+
+    setup_logging(args.log_conf, args.log_filename, args.error_email,
+                  args.log_level, 'crmprtd.wmb')
+
+    download(args.username, args.password, args.auth_fname, args.auth_key,
+             args.ftp_server, args.ftp_file)
