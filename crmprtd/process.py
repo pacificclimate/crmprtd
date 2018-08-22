@@ -24,21 +24,23 @@ def process_args(parser):
     return parser
 
 
-def get_stdin():
-    data = []
-    for line in sys.stdin:
-        # this retrieves the network name
-        if "Network module name:" in line:
-            line = line.strip('\n')
-            network = line[21:]
-        # allows logging from download phase
-        elif 'asctime' in line and 'levelname' in line:
-            line = line.strip('\n')
-            print(line)
-        else:
-            data.append(line)
+def get_network():
+    '''First line in stdout should contain a string with the network name.
+       This name corresponds to the module name that needs to be imported
+       dynamically.
+    '''
+    line = sys.stdin.readline()
+    if "Network module name:" in line:
+        line = line.strip('\n')
+        return line[21:]
+    else:
+        print('error no name given')
+        return None
 
-    return network, data
+
+def get_data():
+    for line in sys.stdin:
+        yield line
 
 
 def get_normalization_module(network):
@@ -52,7 +54,9 @@ def process(connection_string, sample_size):
        The the fuction send the normalized rows through the align
        and insert phases of the pipeline.
     '''
-    network, download_iter = get_stdin()
+    network = get_network()
+    download_iter = get_data()
+
     norm_mod = get_normalization_module(network)
 
     rows = [row for row in norm_mod.normalize(download_iter)]
