@@ -15,18 +15,6 @@ from crmprtd import logging_args, setup_logging
 log = logging.getLogger(__name__)
 
 
-def download_args(parser):
-    parser.add_argument('-f', '--ftp_server',
-                        default='ftp.env.gov.bc.ca',
-                        help=('Full hostname of Water and Air Monitoring and '
-                              'Reporting\'s ftp server'))
-    parser.add_argument('-F', '--ftp_dir',
-                        default=('pub/outgoing/AIR/Hourly_Raw_Air_Data/'
-                                 'Meteorological/'),
-                        help='FTP Directory containing WAMR\'s data files')
-    return parser
-
-
 def download(ftp_server, ftp_dir):
     '''Executes the first stage of the data processing pipeline.
 
@@ -90,7 +78,14 @@ class WAMRFTPReader(FTPReader):
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser = download_args(parser)
+    parser.add_argument('-f', '--ftp_server',
+                        default='ftp.env.gov.bc.ca',
+                        help=('Full hostname of Water and Air Monitoring and '
+                              'Reporting\'s ftp server'))
+    parser.add_argument('-F', '--ftp_dir',
+                        default=('pub/outgoing/AIR/Hourly_Raw_Air_Data/'
+                                 'Meteorological/'),
+                        help='FTP Directory containing WAMR\'s data files')
     parser = logging_args(parser)
     args = parser.parse_args()
 
