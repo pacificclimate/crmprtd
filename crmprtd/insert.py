@@ -26,15 +26,15 @@ class DBMetrics(object):
     '''Keep track of database metrics during the insertion process.
     '''
 
-    def __init__(self):
-        self.successes = 0
-        self.skips = 0
-        self.failures = 0
+    def __init__(self, successes, skips, failures):
+        self.successes = successes
+        self.skips = skips
+        self.failures = failures
 
-    def clear(self):
-        self.successes = 0
-        self.skips = 0
-        self.failures = 0
+    def __add__(self, another):
+        return DBMetrics(self.successes + another.successes,
+                         self.skips + another.skips,
+                         self.failures + another.failures)
 
 
 class Timer(object):
@@ -95,7 +95,8 @@ def contains_all_duplicates(sesh, observations, sample_size):
     return True
 
 
-def single_insert_obs(sesh, obs, dbm):
+def single_insert_obs(sesh, obs):
+    dbm = DBMetrics(0, 0, 0)
     for o in obs:
         if obs_exist(sesh, o.history_id, o.vars_id, o.time):
             dbm.skips += 1
@@ -109,13 +110,13 @@ def single_insert_obs(sesh, obs, dbm):
             sesh.commit()
             log.debug("Successfully inserted observation")
             dbm.successes += 1
-            return 1
         except Exception as e:
             log.warning("Failure, an error occured.", extra={'e': e})
             sesh.rollback()
             dbm.failures += 1
             raise InsertionError(obs_time=o.time, datum=o.datum,
                                  vars_id=o.vars_id, hid=o.history_id, e=e)
+    return dbm
 
 
 def split(tuple_):
@@ -128,7 +129,7 @@ def split(tuple_):
         return (tuple_[:i], tuple_[i:])
 
 
-def bisect_insert_strategy(sesh, obs, dbm):
+def bisect_insert_strategy(sesh, obs):
     '''This function implements a recursive Obs insert strategy to
        handle unique constraint errors on members of the set. The
        strategy used is to optimistically attempt to insert the entire
@@ -145,7 +146,7 @@ def bisect_insert_strategy(sesh, obs, dbm):
 
     # Base cases
     if len(obs) < 1:
-        return 0
+        return DBMetrics(0, 0, 0)
     elif len(obs) == 1:
         try:
             # Create a nested SAVEPOINT context manager to rollback to in the
@@ -157,19 +158,16 @@ def bisect_insert_strategy(sesh, obs, dbm):
             log.warning("Failure, observation already exists",
                         extra={'obs': obs, 'exception': e})
             sesh.rollback()
-            dbm.skips += 1
-            return 0
+            return DBMetrics(0, 1, 0)
         except InsertionError as e:
             log.warning("Failure occured during insertion",
                         extra={'obs': obs, 'exception': e})
             sesh.rollback()
-            dbm.failures += 1
-            return 0
+            return DBMetrics(0, 0, 1)
         else:
             log.debug("Success for single observation")
             sesh.commit()
-            dbm.successes += 1
-            return 1
+            return DBMetrics(1, 0, 0)
 
     # The happy case: add everything at once
     else:
@@ -180,38 +178,29 @@ def bisect_insert_strategy(sesh, obs, dbm):
         except IntegrityError:
             log.debug("Failed, splitting observations.")
             sesh.rollback()
+
             a, b = split(obs)
-            log.debug("Splitings observations into a, b",
-                      extra={'a_split': a, 'b_split': b})
-            a = bisect_insert_strategy(sesh, a, dbm)
-            b = bisect_insert_strategy(sesh, b, dbm)
-            combined = a + b
-            log.debug("Returning from split call", extra={'a_split': a,
-                                                          'b_split': b,
-                                                          'both': combined})
-            return combined
+            dbm_a = bisect_insert_strategy(sesh, a)
+            dbm_b = bisect_insert_strategy(sesh, b)
+            return dbm_a + dbm_b
         else:
             log.info("Successfully inserted observations",
                      extra={'num_obs': len(obs)})
             sesh.commit()
-            dbm.successes += len(obs)
-            return len(obs)
-    return 0
+            return DBMetrics(len(obs), 0, 0)
 
 
 def insert(sesh, observations, sample_size):
-    dbm = DBMetrics()
-
     if contains_all_duplicates(sesh, observations, sample_size):
         log.info("Using Single Insert Strategy")
         with Timer() as tmr:
-            single_insert_obs(sesh, observations, dbm)
+            dbm = single_insert_obs(sesh, observations)
 
     else:
         log.info("Using Chunk + Bisection Strategy")
         with Timer() as tmr:
             for chunk in chunks(observations):
-                bisect_insert_strategy(sesh, chunk, dbm)
+                dbm = bisect_insert_strategy(sesh, chunk)
 
     log.info('Data insertion complete')
     return {'successes': dbm.successes,
