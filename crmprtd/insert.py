@@ -28,10 +28,12 @@ class DBMetrics(object):
 
     def __init__(self):
         self.successes = 0
+        self.skips = 0
         self.failures = 0
 
     def clear(self):
         self.successes = 0
+        self.skips = 0
         self.failures = 0
 
 
@@ -96,7 +98,7 @@ def contains_all_duplicates(sesh, observations, sample_size):
 def single_insert_obs(sesh, obs, dbm):
     for o in obs:
         if obs_exist(sesh, o.history_id, o.vars_id, o.time):
-            dbm.failures += 1
+            dbm.skips += 1
             log.warning('Observation already exists in database',
                         extra={'obs_id': o.id})
             continue
@@ -155,6 +157,12 @@ def bisect_insert_strategy(sesh, obs, dbm):
             log.warning("Failure, observation already exists",
                         extra={'obs': obs, 'exception': e})
             sesh.rollback()
+            dbm.skips += 1
+            return 0
+        except InsertionError as e:
+            log.warning("Failure occured during insertion",
+                        extra={'obs': obs, 'exception': e})
+            sesh.rollback()
             dbm.failures += 1
             return 0
         else:
@@ -207,5 +215,6 @@ def insert(sesh, observations, sample_size):
 
     log.info('Data insertion complete')
     return {'successes': dbm.successes,
+            'skips': dbm.skips,
             'failures': dbm.failures,
             'insertions_per_sec': round(dbm.successes/tmr.run_time, 2)}
