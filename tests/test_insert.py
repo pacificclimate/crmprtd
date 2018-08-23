@@ -4,7 +4,6 @@ import pytest
 import pytz
 
 from pycds import History, Obs
-from crmprtd.db_exceptions import UniquenessError
 from crmprtd.insert import bisect_insert_strategy, split, DBMetrics, chunks, \
     get_sample_indices, obs_exist, contains_all_duplicates, single_insert_obs
 
@@ -130,7 +129,7 @@ def test_contains_all_duplicates_all_dup(test_session):
 
 
 def test_single_insert_obs(test_session):
-    ob = Obs(history_id=20, vars_id=2, time=datetime.now(), datum=10)
+    ob = [Obs(history_id=20, vars_id=2, time=datetime.now(), datum=10)]
     dbm = DBMetrics()
 
     single_insert_obs(test_session, ob, dbm)
@@ -140,9 +139,10 @@ def test_single_insert_obs(test_session):
 
 
 def test_single_insert_obs_not_unique(test_session):
-    ob = Obs(history_id=20, vars_id=2,
-             time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc), datum=10)
+    ob = [Obs(history_id=20, vars_id=2,
+              time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc), datum=10)]
     dbm = DBMetrics()
 
-    with pytest.raises(UniquenessError):
-        single_insert_obs(test_session, ob, dbm)
+    single_insert_obs(test_session, ob, dbm)
+
+    assert dbm.failures == 1

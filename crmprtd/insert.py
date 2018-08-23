@@ -15,7 +15,7 @@ import time
 from sqlalchemy.exc import IntegrityError
 import random
 
-from crmprtd.db_exceptions import UniquenessError, InsertionError
+from crmprtd.db_exceptions import InsertionError
 from pycds import Obs
 
 
@@ -93,25 +93,27 @@ def contains_all_duplicates(sesh, observations, sample_size):
     return True
 
 
-def single_insert_obs(sesh, o, dbm):
-    # Check to see if this entry will be unique
-    if obs_exist(sesh, o.history_id, o.vars_id, o.time):
-        dbm.failures += 1
-        raise UniquenessError(o.id)
+def single_insert_obs(sesh, obs, dbm):
+    for o in obs:
+        if obs_exist(sesh, o.history_id, o.vars_id, o.time):
+            dbm.failures += 1
+            log.warning('Observation already exists in database',
+                        extra={'obs_id': o.id})
+            continue
 
-    # value does not exist in obs_raw, continue with insertion
-    try:
-        sesh.add(o)
-        sesh.commit()
-        log.debug("Successfully inserted observation")
-        dbm.successes += 1
-        return 1
-    except Exception as e:
-        log.warning("Failure, an error occured.", extra={'e': e})
-        sesh.rollback()
-        dbm.failures += 1
-        raise InsertionError(obs_time=o.time, datum=o.datum,
-                             vars_id=o.vars_id, hid=o.history_id, e=e)
+        # value does not exist in obs_raw, continue with insertion
+        try:
+            sesh.add(o)
+            sesh.commit()
+            log.debug("Successfully inserted observation")
+            dbm.successes += 1
+            return 1
+        except Exception as e:
+            log.warning("Failure, an error occured.", extra={'e': e})
+            sesh.rollback()
+            dbm.failures += 1
+            raise InsertionError(obs_time=o.time, datum=o.datum,
+                                 vars_id=o.vars_id, hid=o.history_id, e=e)
 
 
 def split(tuple_):
@@ -195,12 +197,7 @@ def insert(sesh, observations, sample_size):
     if contains_all_duplicates(sesh, observations, sample_size):
         log.info("Using Single Insert Strategy")
         with Timer() as tmr:
-            for ob in observations:
-                try:
-                    single_insert_obs(sesh, ob, dbm)
-                except UniquenessError as e:
-                    log.warning('Observation already exists in database',
-                                extra={'exception': e})
+            single_insert_obs(sesh, observations, dbm)
 
     else:
         log.info("Using Chunk + Bisection Strategy")
