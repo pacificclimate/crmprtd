@@ -4,7 +4,6 @@ import logging
 import logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
-import pickle
 
 # Installed libraries
 import requests
@@ -47,9 +46,8 @@ def download(time, frequency, province, language):
             raise IOError(
                 "HTTP {} error for {}".format(req.status_code, req.url))
 
-        pickle.dump('Network module name: ec', sys.stdout.buffer)
         for line in req.iter_content(chunk_size=None):
-            pickle.dump(line, sys.stdout.buffer)
+            sys.stdout.buffer.write(line)
 
     except IOError:
         log.exception("Unable to download or open xml data")

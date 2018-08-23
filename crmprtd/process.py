@@ -4,7 +4,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import logging
 from argparse import ArgumentParser
-import pickle
 
 from crmprtd.align import align
 from crmprtd.insert import insert
@@ -23,43 +22,23 @@ def process_args(parser):
                         help='Number of samples to be taken from observations '
                              'when searching for duplicates '
                              'to determine which insertion strategy to use')
+    parser.add_argument('-N', '--network',
+                        help='The network from which the data is coming from. '
+                             'The name will be used for a dynamic import of '
+                             'the module\'s normalization function.')
     return parser
 
 
-def get_network():
-    '''First line in stdout should contain a string with the network name.
-       This name corresponds to the module name that needs to be imported
-       dynamically.
-    '''
-    network = pickle.load(sys.stdin.buffer)
-    if "Network module name:" in network:
-        network = network.strip('\n')
-        return network[21:]
-    else:
-        return None
-
-
 def get_data():
-    data = None
-    # gather until end of file
-    try:
-        data = pickle.load(sys.stdin.buffer)
-    except EOFError:
-        pass
-
-    t = type(data)
-    if t == list:
-        for datum in data:
-            yield datum
-    elif t == bytes:
-        yield data
+    for line in sys.stdin.buffer.readlines():
+        yield line
 
 
 def get_normalization_module(network):
     return import_module('crmprtd.{}.normalize'.format(network))
 
 
-def process(connection_string, sample_size):
+def process(connection_string, sample_size, network):
     '''Executes 3 stages of the data processing pipeline.
 
        Normalizes the data based on the network's format.
@@ -67,7 +46,7 @@ def process(connection_string, sample_size):
        and insert phases of the pipeline.
     '''
     log = logging.getLogger('crmprtd')
-    network = get_network()
+
     if network is None:
         log.error('No module name given, cannot continue pipeline',
                   extra={'network': network})
@@ -96,4 +75,4 @@ if __name__ == "__main__":
     setup_logging(args.log_conf, args.log_filename, args.error_email,
                   args.log_level, 'crmprtd')
 
-    process(args.connection_string, args.sample_size)
+    process(args.connection_string, args.sample_size, args.network)

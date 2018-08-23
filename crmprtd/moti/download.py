@@ -6,7 +6,6 @@ import logging
 import logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
-import pickle
 
 # Installed libraries
 import requests
@@ -61,9 +60,8 @@ def download(username, password, auth_fname, auth_key,
             raise IOError(
                 "HTTP {} error for {}".format(req.status_code, req.url))
 
-        pickle.dump('Network module name: moti', sys.stdout.buffer)
         for line in req.iter_content(chunk_size=None):
-            pickle.dump(line, sys.stdout.buffer)
+            sys.stdout.buffer.write(line)
 
     except IOError:
         log.exception("Unable to download or open xml data")

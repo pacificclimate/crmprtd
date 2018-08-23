@@ -6,7 +6,6 @@ import ftplib
 import sys
 from tempfile import SpooledTemporaryFile
 from argparse import ArgumentParser
-import pickle
 
 # Local
 from crmprtd.download import retry, ftp_connect
@@ -39,8 +38,8 @@ def download(username, password, auth_fname, auth_key, ftp_server, ftp_file):
                                                .format(filename),
                                                callback)
             tempfile.seek(0)
-            pickle.dump('Network module name: wmb', sys.stdout.buffer)
-            pickle.dump(tempfile.readlines(), sys.stdout.buffer)
+            for line in tempfile.readlines():
+                sys.stdout.buffer.write(line.encode('utf-8'))
 
     except Exception as e:
         log.exception("Unable to process ftp")
