@@ -4,7 +4,7 @@ import pytest
 import pytz
 
 from pycds import History, Obs
-from crmprtd.insert import bisect_insert_strategy, split, DBMetrics, chunks, \
+from crmprtd.insert import bisect_insert_strategy, split, chunks, \
     get_sample_indices, obs_exist, contains_all_duplicates, single_insert_obs
 
 
@@ -27,9 +27,7 @@ def test_bisect_insert_strategy(test_session, label, days, expected):
                time=datetime(2017, 8, 6, d, tzinfo=pytz.utc))
            for d in days]
 
-    dbm = DBMetrics()
-    bisect_insert_strategy(test_session, obs, dbm)
-
+    dbm = bisect_insert_strategy(test_session, obs)
     assert dbm.successes == expected
 
 
@@ -47,17 +45,13 @@ def test_mass_insert_obs_weird(test_session):
     test_session.expunge(x)
     test_session.expunge(y)
 
-    dbm = DBMetrics()
-
-    bisect_insert_strategy(test_session, [], dbm)
+    dbm = bisect_insert_strategy(test_session, [])
     assert dbm.successes == 0
-    dbm.clear()
 
-    bisect_insert_strategy(test_session, [x], dbm)
+    dbm = bisect_insert_strategy(test_session, [x])
     assert dbm.successes == 1
-    dbm.clear()
 
-    bisect_insert_strategy(test_session, [y], dbm)
+    dbm = bisect_insert_strategy(test_session, [y])
     assert dbm.successes == 0
 
 
@@ -130,9 +124,8 @@ def test_contains_all_duplicates_all_dup(test_session):
 
 def test_single_insert_obs(test_session):
     ob = [Obs(history_id=20, vars_id=2, time=datetime.now(), datum=10)]
-    dbm = DBMetrics()
-
-    single_insert_obs(test_session, ob, dbm)
+    dbm = single_insert_obs(test_session, ob)
+    assert dbm.successes == 1
 
     q = test_session.query(Obs)
     assert q.count() == 4
@@ -141,8 +134,5 @@ def test_single_insert_obs(test_session):
 def test_single_insert_obs_not_unique(test_session):
     ob = [Obs(history_id=20, vars_id=2,
               time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc), datum=10)]
-    dbm = DBMetrics()
-
-    single_insert_obs(test_session, ob, dbm)
-
-    assert dbm.failures == 1
+    dbm = single_insert_obs(test_session, ob)
+    assert dbm.skips == 1
