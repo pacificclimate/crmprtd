@@ -11,7 +11,7 @@ import requests
 
 # Local
 from crmprtd.ec import makeurl
-from crmprtd import common_script_arguments, setup_logging, logging_args
+from crmprtd import setup_logging, logging_args
 
 log = logging.getLogger(__name__)
 

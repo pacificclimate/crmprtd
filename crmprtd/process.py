@@ -66,6 +66,7 @@ def process(connection_string, sample_size):
        The the fuction send the normalized rows through the align
        and insert phases of the pipeline.
     '''
+    log = logging.getLogger('crmprtd')
     network = get_network()
     if network is None:
         log.error('No module name given, cannot continue pipeline',
@@ -83,8 +84,6 @@ def process(connection_string, sample_size):
 
     observations = [ob for ob in [align(sesh, row) for row in rows] if ob]
     results = insert(sesh, observations, sample_size)
-
-    log = logging.getLogger('crmprtd')
     log.info('Data insertion results', extra={'results': results})
 
 
