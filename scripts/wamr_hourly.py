@@ -2,9 +2,7 @@
 
 '''
 Script to download data from the BC Ministry of Environment Air Quality Branch
-
 Water and Air Monitoring and Reporting? (WAMR)
-
 This is largely lifted and modified from the hourly_wmb.py script
 '''
 
@@ -31,8 +29,8 @@ if __name__ == '__main__':
 
     parser = common_script_arguments(parser)
     args = parser.parse_args()
-    setup_logging(args.log_conf, args.log_filename, args.error_email, args.log_level,
-                  'crmprtd.wamr')
+    setup_logging(args.log_conf, args.log_filename,
+                  args.error_email, args.log_level, 'crmprtd.wamr')
 
     dl_args = ['ftp_server', 'ftp_dir']
     dl_args = subset_dict(vars(args), dl_args)
