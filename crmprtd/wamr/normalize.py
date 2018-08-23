@@ -16,6 +16,7 @@ def normalize(file_stream):
     log.info('Starting WAMR data normalization')
 
     for row in itertools.islice(file_stream, 1, None):
+        row = row.decode('utf-8')
         try:
             time, station_id, _, variable_name, \
                 _, _, _, unit, _, _, _, val = row.strip().split(',')
