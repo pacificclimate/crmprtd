@@ -35,7 +35,7 @@ setup(
         "scripts/moti_insert_files.py",
         "scripts/moti_infill_insert.py"
     ],
-    entry_points = {
+    entry_points={
         'console_scripts': [
             'download_ec=crmprtd.ec.download:main',
             'download_moti=crmprtd.moti.download:main',
