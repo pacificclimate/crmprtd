@@ -72,7 +72,7 @@ class WAMRFTPReader(FTPReader):
         self.connection.retrlines('NLST ' + data_path, callback)
 
 
-if __name__ == "__main__":
+def main():
     parser = ArgumentParser()
     parser.add_argument('-f', '--ftp_server',
                         default='ftp.env.gov.bc.ca',
@@ -89,3 +89,7 @@ if __name__ == "__main__":
                   args.log_level, 'crmprtd.wamr')
 
     download(args.ftp_server, args.ftp_dir)
+
+
+if __name__ == "__main__":
+    main()

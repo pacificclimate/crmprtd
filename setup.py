@@ -29,16 +29,21 @@ setup(
     author="James Hiebert",
     author_email="hiebert@uvic.ca",
     packages=find_packages(exclude=("speed_test",)),
-    scripts=["scripts/real_time_ec.py",
-             "scripts/fetch.py",
-             "scripts/hourly_wmb.py",
-             "scripts/wamr_hourly.py",
-             "scripts/ec_recovery.py",
-             "scripts/moti_hourly.py",
-             "scripts/moti_infill_download.py",
-             "scripts/moti_insert_files.py",
-             "scripts/moti_infill_insert.py"
-             ],
+    scripts=[
+        "scripts/ec_recovery.py",
+        "scripts/moti_infill_download.py",
+        "scripts/moti_insert_files.py",
+        "scripts/moti_infill_insert.py"
+    ],
+    entry_points = {
+        'console_scripts': [
+            'download_ec=crmprtd.ec.download:main',
+            'download_moti=crmprtd.moti.download:main',
+            'download_wamr=crmprtd.wamr.download:main',
+            'download_wmb=crmprtd.wmb.download:main',
+            'crmprtd_process=crmprtd.process:main',
+        ]
+    },
     package_data={
         'crmprtd': ["data/*.yaml", "data/*.xsl"],
     },
