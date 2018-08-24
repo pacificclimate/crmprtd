@@ -5,12 +5,14 @@ import sys
 import logging
 import logging.config
 from datetime import datetime, timedelta
+from argparse import ArgumentParser
 
 # Installed libraries
 import requests
 
 # Local
 from crmprtd.download import extract_auth
+from crmprtd import common_auth_arguments, logging_args, setup_logging
 
 log = logging.getLogger(__name__)
 
@@ -58,8 +60,33 @@ def download(username, password, auth_fname, auth_key,
             raise IOError(
                 "HTTP {} error for {}".format(req.status_code, req.url))
 
-        return req.iter_content(chunk_size=None)
+        for line in req.iter_content(chunk_size=None):
+            sys.stdout.buffer.write(line)
 
     except IOError:
         log.exception("Unable to download or open xml data")
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser = logging_args(parser)
+    parser = common_auth_arguments(parser)
+    parser.add_argument('-S', '--start_time',
+                        help=("Alternate time to use for downloading "
+                              "(interpreted with "
+                              "strptime(format='Y/m/d H:M:S')"))
+    parser.add_argument('-E', '--end_time',
+                        help=("Alternate time to use for downloading "
+                              "(interpreted with "
+                              "strptime(format='Y/m/d H:M:S')"))
+    parser.add_argument('-s', '--station_id',
+                        default=None,
+                        help="Station ID for which to download data")
+    args = parser.parse_args()
+
+    setup_logging(args.log_conf, args.log_filename, args.error_email,
+                  args.log_level, 'crmprtd.moti')
+
+    download(args.username, args.password, args.auth_fname, args.auth_key,
+             args.start_time, args.end_time, args.station_id)

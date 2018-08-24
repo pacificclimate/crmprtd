@@ -2,9 +2,7 @@
 
 '''
 Script to download data from the BC Ministry of Environment Air Quality Branch
-
 Water and Air Monitoring and Reporting? (WAMR)
-
 This is largely lifted and modified from the hourly_wmb.py script
 '''
 

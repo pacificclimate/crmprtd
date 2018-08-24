@@ -19,11 +19,13 @@ def normalize(file_stream):
     # set variable names using first row in file stream
     var_names = []
     for first_row in file_stream:
+        first_row = first_row.decode('utf-8')
         for var in clean_row(first_row):
             var_names.append(var)
         break
 
     for row in file_stream:
+        row = row.decode('utf-8')
         # assign variable name to value
         data = [(var_name, value)
                 for var_name, value in zip(var_names, clean_row(row))]
