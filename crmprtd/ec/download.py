@@ -69,10 +69,10 @@ if __name__ == '__main__':
                               "(interpreted using "
                               "format=YYYY/MM/DD HH:MM:SS)"))
     parser.add_argument('-T', '--threshold', default=1000,
-                        help=('Distance threshold to use when matching '
-                              'stations.  Stations are considered a match if '
-                              'they have the same id, name, and are within '
-                              'this threshold'))
+                        help=('Distance threshold (in meters) to use when '
+                              'matching stations. Stations are considered a '
+                              'match if they have the same id, name, and are '
+                              'within this threshold'))
     parser = logging_args(parser)
     args = parser.parse_args()
 
