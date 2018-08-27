@@ -40,6 +40,42 @@ def get_normalization_module(network):
     return import_module('crmprtd.{}.normalize'.format(network))
 
 
+def create_history_mapping(sesh, rows):
+    from pycds import History, Station, Network
+    '''Create a names -> history object map for the set of stations that are
+       contained in the rows
+    '''
+    # Each row (observation) is attributed with a station
+    # individually, so start by creating a set of unique stations in
+    # the file. Minimize round-trips to the database.
+    stn_ids = {row.station_id for row in rows}
+
+    def lookup_stn(ems_id):
+        q = sesh.query(History).join(Station).join(Network)\
+                .filter(Station.native_id == ems_id)
+        return q.all()
+    mapping = [(ems_id, lookup_stn(ems_id)) for ems_id in stn_ids]
+
+    # Filter out EMS_IDs for which we have no station metadata
+    return {ems_id: hist for ems_id, hist in mapping if hist}
+
+
+def create_variable_mapping(sesh, rows):
+    from pycds import Variable, Station, Network
+    '''Create a names -> history object map for the set of observations that are
+       contained in the rows
+    '''
+    var_names = {(row.variable_name, row.network_name) for row in rows}
+
+    def lookup_var(v, n):
+        q = sesh.query(Variable).join(Network)\
+                .filter(Network.name == n).filter(Variable.name == v)
+        return q.first()
+    mapping = [(var_name, lookup_var(var_name, net_name)) for var_name, net_name in var_names]
+
+    return {var_name: var_ for var_name, var_ in mapping if var_}
+
+
 def process(connection_string, sample_size, network):
     '''Executes 3 stages of the data processing pipeline.
 
@@ -63,6 +99,8 @@ def process(connection_string, sample_size, network):
     Session = sessionmaker(engine)
     sesh = Session()
 
+    history_mapping = create_history_mapping(sesh, rows)
+    variable_mapping = create_variable_mapping(sesh, rows)
     observations = [ob for ob in [align(sesh, row) for row in rows] if ob]
     results = insert(sesh, observations, sample_size)
     log.info('Data insertion results', extra={'results': results})
