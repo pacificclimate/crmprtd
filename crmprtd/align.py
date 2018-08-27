@@ -10,7 +10,7 @@ pycds.Obs objects. This phase is common to all networks.
 
 import logging
 from sqlalchemy import and_
-from pint import UnitRegistry, UndefinedUnitError
+from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
 
 # local
 from pycds import Obs, History, Network, Variable, Station
@@ -53,6 +53,12 @@ def convert_unit(val, src_unit, dst_unit):
             val = Q_(val, ureg.parse_expression(src_unit))  # src
             val = val.to(dst_unit).magnitude  # dest
         except UndefinedUnitError as e:
+            log.error('Unable to convert units',
+                      extra={'src_unit': src_unit,
+                             'dst_unit': dst_unit,
+                             'exception': e})
+            return None
+        except DimensionalityError as e:
             log.error('Unable to convert units',
                       extra={'src_unit': src_unit,
                              'dst_unit': dst_unit,
