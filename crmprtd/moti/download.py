@@ -68,7 +68,7 @@ def download(username, password, auth_fname, auth_key,
         sys.exit(1)
 
 
-if __name__ == "__main__":
+def main():
     parser = ArgumentParser()
     parser = logging_args(parser)
     parser = common_auth_arguments(parser)
@@ -90,3 +90,7 @@ if __name__ == "__main__":
 
     download(args.username, args.password, args.auth_fname, args.auth_key,
              args.start_time, args.end_time, args.station_id)
+
+
+if __name__ == "__main__":
+    main()

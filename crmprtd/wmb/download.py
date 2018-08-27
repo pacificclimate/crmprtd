@@ -60,7 +60,7 @@ class WMBFTPReader(FTPReader):
         self.connection = ftp_connect_with_retry(host, user, password)
 
 
-if __name__ == "__main__":
+def main():
     parser = ArgumentParser()
     parser = logging_args(parser)
     parser = common_auth_arguments(parser)
@@ -79,3 +79,7 @@ if __name__ == "__main__":
 
     download(args.username, args.password, args.auth_fname, args.auth_key,
              args.ftp_server, args.ftp_file)
+
+
+if __name__ == "__main__":
+    main()

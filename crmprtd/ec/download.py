@@ -54,7 +54,7 @@ def download(time, frequency, province, language):
         sys.exit(1)
 
 
-if __name__ == '__main__':
+def main():
     parser = ArgumentParser()
     parser.add_argument('-p', '--province', required=True,
                         help='2 letter province code')
@@ -80,3 +80,7 @@ if __name__ == '__main__':
                   args.log_level, 'crmprtd.ec')
 
     download(args.time, args.frequency, args.province, args.language)
+
+
+if __name__ == "__main__":
+    main()
