@@ -46,6 +46,12 @@ def normalize(file_stream):
 
         if unit == '% RH':
             unit = re.sub('% RH', '%', unit)
+        elif unit == '\u00b0C':
+            unit = re.sub('\u00b0C', 'celsius', unit)
+        elif unit == 'mb':
+            unit = re.sub('mb', 'millibar', unit)
+        elif unit == 'Deg':
+            unit = re.sub('Deg', 'degree', unit)
 
         yield Row(time=dt,
                   val=value,
