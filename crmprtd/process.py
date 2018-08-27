@@ -76,6 +76,12 @@ def create_variable_mapping(sesh, rows):
     return {var_name: var_ for var_name, var_ in mapping if var_}
 
 
+def get_mapping(sesh, rows):
+    history_mapping = create_history_mapping(sesh, rows)
+    variable_mapping = create_variable_mapping(sesh, rows)
+    return history_mapping, variable_mapping
+
+
 def process(connection_string, sample_size, network):
     '''Executes 3 stages of the data processing pipeline.
 
@@ -99,11 +105,18 @@ def process(connection_string, sample_size, network):
     Session = sessionmaker(engine)
     sesh = Session()
 
-    history_mapping = create_history_mapping(sesh, rows)
-    variable_mapping = create_variable_mapping(sesh, rows)
-    observations = [ob for ob in [align(sesh, row) for row in rows] if ob]
-    results = insert(sesh, observations, sample_size)
-    log.info('Data insertion results', extra={'results': results})
+    history_mapping, variable_mapping = get_mapping(sesh, rows)
+
+    # for k in history_mapping:
+    #     print(k)
+
+    for row in rows:
+        print(row.station_id)
+    # observations = [ob for ob in [align(sesh, row, history_mapping, variable_mapping) for row in rows] if ob]
+    # for ob in observations:
+    #     print(ob)
+    # results = insert(sesh, observations, sample_size)
+    # log.info('Data insertion results', extra={'results': results})
 
 
 def main():

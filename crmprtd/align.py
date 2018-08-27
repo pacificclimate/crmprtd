@@ -141,29 +141,33 @@ def create_station_and_history_entry(sesh, network_name, native_id, lat, lon):
     return hist
 
 
-def get_variable(sesh, network_name, variable_name):
-    variable = sesh.query(Variable).join(Network).filter(and_(
-        Network.name == network_name,
-        Variable.name == variable_name)).first()
+def get_variable(sesh, network_name, variable_name, variable_mapping):
+    # variable = sesh.query(Variable).join(Network).filter(and_(
+    #     Network.name == network_name,
+    #     Variable.name == variable_name)).first()
 
-    if not variable:
+    try:
+        variable = variable_mapping[variable_name]
+    except:
+    # if not variable:
         log.warning('Unable to match variable')
         return None
 
     return variable
 
 
-def get_history(sesh, network_name, native_id, lat, lon):
-    histories = sesh.query(History).join(Station).join(Network).filter(and_(
-        Network.name == network_name,
-        Station.native_id == native_id))
+def get_history(sesh, network_name, native_id, lat, lon, history_mapping):
+    # histories = sesh.query(History).join(Station).join(Network).filter(and_(
+    #     Network.name == network_name,
+    #     Station.native_id == native_id))
 
-    if histories.count() == 0:
+    histories = history_mapping[native_id]
+    if len(histories) == 0:
         return create_station_and_history_entry(sesh, network_name, native_id,
                                                 lat, lon)
-    elif histories.count() == 1:
-        return histories.one_or_none()
-    elif histories.count() >= 2:
+    elif len(histories) == 1:
+        return histories.pop()
+    elif len(histories) >= 2:
         return match_station(sesh, network_name, native_id, lat, lon,
                              histories)
 
@@ -179,7 +183,7 @@ def has_required_information(obs_tuple):
         and obs_tuple.val is not None and obs_tuple.variable_name is not None
 
 
-def align(sesh, obs_tuple):
+def align(sesh, obs_tuple, history_mapping, variable_mapping):
     # Without these items an Obs object cannot be produced
     if not has_required_information(obs_tuple):
         log.warning('Observation missing critical information',
@@ -195,7 +199,7 @@ def align(sesh, obs_tuple):
         return None
 
     history = get_history(sesh, obs_tuple.network_name, obs_tuple.station_id,
-                          obs_tuple.lat, obs_tuple.lon)
+                          obs_tuple.lat, obs_tuple.lon, history_mapping)
 
     if not history:
         log.warning('Could not find history match',
@@ -204,7 +208,7 @@ def align(sesh, obs_tuple):
         return None
 
     variable = get_variable(sesh, obs_tuple.network_name,
-                            obs_tuple.variable_name)
+                            obs_tuple.variable_name, variable_mapping)
 
     # Necessary attributes for Obs object
     if not variable:
