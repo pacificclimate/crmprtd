@@ -52,13 +52,7 @@ def convert_unit(val, src_unit, dst_unit):
         try:
             val = Q_(val, ureg.parse_expression(src_unit))  # src
             val = val.to(dst_unit).magnitude  # dest
-        except UndefinedUnitError as e:
-            log.error('Unable to convert units',
-                      extra={'src_unit': src_unit,
-                             'dst_unit': dst_unit,
-                             'exception': e})
-            return None
-        except DimensionalityError as e:
+        except (UndefinedUnitError, DimensionalityError) as e:
             log.error('Unable to convert units',
                       extra={'src_unit': src_unit,
                              'dst_unit': dst_unit,
