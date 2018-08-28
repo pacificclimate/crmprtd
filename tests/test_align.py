@@ -3,7 +3,8 @@ from datetime import datetime
 from geoalchemy2.functions import ST_X, ST_Y
 
 from crmprtd.align import is_network, get_history, get_variable, unit_check, \
-    align, closest_stns_within_threshold
+    align, closest_stns_within_threshold, create_history_mapping, \
+    create_variable_mapping, create_network_mapping
 from crmprtd import Row
 from pycds import Station, History
 
@@ -13,7 +14,8 @@ from pycds import Station, History
     ('WMB', False)
 ])
 def test_is_network(test_session, network_name, expected):
-    assert is_network(test_session, network_name) == expected
+    network_mapping = create_network_mapping(test_session)
+    assert is_network(network_mapping, network_name) == expected
 
 
 def test_get_history_with_no_matches(test_session):
@@ -27,8 +29,10 @@ def test_get_history_with_no_matches(test_session):
                     lat=None,
                     lon=None)
 
-    history = get_history(test_session, obs_tuple.network_name,
-                          obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
+    history_mapping = create_history_mapping(test_session, [obs_tuple])
+    history, update = get_history(test_session, obs_tuple.network_name,
+                                  obs_tuple.station_id, obs_tuple.lat,
+                                  obs_tuple.lon, history_mapping)
     assert history is not None
 
     q = test_session.query(Station)
@@ -48,8 +52,10 @@ def test_get_history_with_single_match(test_session):
                     lat=None,
                     lon=None)
 
-    history = get_history(test_session, obs_tuple.network_name,
-                          obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
+    history_mapping = create_history_mapping(test_session, [obs_tuple])
+    history, update = get_history(test_session, obs_tuple.network_name,
+                                  obs_tuple.station_id, obs_tuple.lat,
+                                  obs_tuple.lon, history_mapping)
     assert history is not None
 
     q = test_session.query(Station)
@@ -69,8 +75,10 @@ def test_get_history_with_multiple_matches_and_location(test_session):
                     lat=49.45,
                     lon=-123.7)
 
-    history = get_history(test_session, obs_tuple.network_name,
-                          obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
+    history_mapping = create_history_mapping(test_session, [obs_tuple])
+    history, update = get_history(test_session, obs_tuple.network_name,
+                                  obs_tuple.station_id, obs_tuple.lat,
+                                  obs_tuple.lon, history_mapping)
     assert history.id == 20
 
 
@@ -84,18 +92,38 @@ def test_get_history_with_multiple_matches_and_no_location(test_session):
                     lat=None,
                     lon=None)
 
-    history = get_history(test_session, obs_tuple.network_name,
-                          obs_tuple.station_id, obs_tuple.lat, obs_tuple.lon)
+    history_mapping = create_history_mapping(test_session, [obs_tuple])
+    history, update = get_history(test_session, obs_tuple.network_name,
+                                  obs_tuple.station_id, obs_tuple.lat,
+                                  obs_tuple.lon, history_mapping)
     assert history.id == 21
 
 
 def test_get_variable(test_session):
-    variable = get_variable(test_session, 'FLNRO-WMB', 'relative_humidity')
+    rows = [Row(time=None,
+                val=None,
+                variable_name='relative_humidity',
+                unit=None,
+                network_name='FLNRO-WMB',
+                station_id=None,
+                lat=None,
+                lon=None)]
+    variable_mapping = create_variable_mapping(test_session, rows)
+    variable = get_variable('FLNRO-WMB', 'relative_humidity', variable_mapping)
     assert variable.id == 3
 
 
 def test_get_variable_no_match(test_session):
-    variable = get_variable(test_session, 'FLNRO-WMB', 'humidity')
+    rows = [Row(time=None,
+                val=None,
+                variable_name='relative_humidity',
+                unit=None,
+                network_name='FLNRO-WMB',
+                station_id=None,
+                lat=None,
+                lon=None)]
+    variable_mapping = create_variable_mapping(test_session, rows)
+    variable = get_variable('FLNRO-WMB', 'humidity', variable_mapping)
     assert variable is None
 
 
@@ -106,7 +134,41 @@ def test_get_variable_no_match(test_session):
 ])
 def test_unit_check(test_session, network_name, variable_name, unit,
                     val, expected):
-    variable = get_variable(test_session, network_name, variable_name)
+    rows = [Row(time=None,
+                val=None,
+                variable_name='precipitation',
+                unit=None,
+                network_name='EC_raw',
+                station_id=None,
+                lat=None,
+                lon=None),
+            Row(time=None,
+                val=None,
+                variable_name='relative_humidity',
+                unit=None,
+                network_name='FLNRO-WMB',
+                station_id=None,
+                lat=None,
+                lon=None),
+            Row(time=None,
+                val=None,
+                variable_name='TEMP_MEAN',
+                unit=None,
+                network_name='ENV-AQN',
+                station_id=None,
+                lat=None,
+                lon=None),
+            Row(time=None,
+                val=None,
+                variable_name='no_unit',
+                unit=None,
+                network_name='ENV-AQN',
+                station_id=None,
+                lat=None,
+                lon=None)]
+
+    variable_mapping = create_variable_mapping(test_session, rows)
+    variable = get_variable(network_name, variable_name, variable_mapping)
     check_val = unit_check(val, unit, variable.unit)
     assert check_val == expected
 
@@ -161,7 +223,8 @@ def test_unit_check(test_session, network_name, variable_name, unit,
 ])
 def test_align_successes(test_session, obs_tuple, expected_hid, expected_time,
                          expeceted_vid, expected_datum):
-    ob = align(test_session, obs_tuple)
+    obs = align(test_session, [obs_tuple])
+    ob = next(iter(obs))
     assert ob.history_id == expected_hid
     assert ob.time == expected_time
     assert ob.vars_id == expeceted_vid
@@ -225,8 +288,8 @@ def test_align_successes(test_session, obs_tuple, expected_hid, expected_time,
          lon=None))
 ])
 def test_align_failures(test_session, obs_tuple):
-    ob = align(test_session, obs_tuple)
-    assert ob is None
+    obs = align(test_session, [obs_tuple])
+    assert len(obs) == 0
 
 
 def test_closest_stns_within_threshold(ec_session):
