@@ -9,7 +9,6 @@ pycds.Obs objects. This phase is common to all networks.
 """
 
 import logging
-from sqlalchemy import and_
 from pint import UnitRegistry, UndefinedUnitError
 
 # local
@@ -78,13 +77,18 @@ def find_active_history(histories):
         hist = matching_histories.pop(0)
         log.debug('Matched history',
                   extra={'station_name': hist.station_name})
-        return hist
+        return hist, False
 
     elif len(matching_histories) > 1:
         log.error('Multiple active stations in db',
                   extra={'num_active_stns': len(matching_histories),
                          'network_name': matching_histories[0].network_name})
-        return None
+        return None, False
+
+    elif len(matching_histories) == 0:
+        log.error('No active stations in db',
+                  extra={'num_active_stns': len(matching_histories)})
+        return None, False
 
 
 def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
@@ -100,7 +104,7 @@ def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
             if id == history.id:
                 log.debug('Matched history',
                           extra={'station_name': history.station_name})
-                return history
+                return history, False
 
 
 def match_station(sesh, network_name, native_id, lat, lon, histories):
@@ -138,96 +142,143 @@ def create_station_and_history_entry(sesh, network_name, native_id, lat, lon):
         raise InsertionError(native_id=stn.id, hid=hist.id, e=e)
     else:
         sesh.commit()
-    return hist
+    return hist, True
 
 
-def get_variable(sesh, network_name, variable_name, variable_mapping):
-    # variable = sesh.query(Variable).join(Network).filter(and_(
-    #     Network.name == network_name,
-    #     Variable.name == variable_name)).first()
-
-    try:
-        variable = variable_mapping[variable_name]
-    except:
-    # if not variable:
+def get_variable(network_name, variable_name, variable_mapping):
+    if variable_name in variable_mapping:
+        return variable_mapping[variable_name]
+    else:
         log.warning('Unable to match variable')
         return None
 
-    return variable
-
 
 def get_history(sesh, network_name, native_id, lat, lon, history_mapping):
-    # histories = sesh.query(History).join(Station).join(Network).filter(and_(
-    #     Network.name == network_name,
-    #     Station.native_id == native_id))
+    """Returns a pycds history obj and an update boolean.  If a new history
+       obj is created the history_mapping variable will need to be updated for
+       next loop.
+    """
+    if native_id in history_mapping:
+        histories = history_mapping[native_id]
 
-    histories = history_mapping[native_id]
-    if len(histories) == 0:
+        if len(histories) == 1:
+            return next(iter(histories)), False
+        elif len(histories) >= 2:
+            return match_station(sesh, network_name, native_id, lat, lon,
+                                 histories)
+    else:
         return create_station_and_history_entry(sesh, network_name, native_id,
                                                 lat, lon)
-    elif len(histories) == 1:
-        return histories.pop()
-    elif len(histories) >= 2:
-        return match_station(sesh, network_name, native_id, lat, lon,
-                             histories)
 
 
-def is_network(sesh, network_name):
-    network = sesh.query(Network).filter(
-        Network.name == network_name)
-    return network.count() != 0
+def is_network(network_mapping, network_name):
+    if network_name in network_mapping:
+        return True
+    else:
+        return False
 
 
-def has_required_information(obs_tuple):
-    return obs_tuple.network_name is not None and obs_tuple.time is not None \
-        and obs_tuple.val is not None and obs_tuple.variable_name is not None
+def has_required_information(row_tuple):
+    return row_tuple.network_name is not None and row_tuple.time is not None \
+        and row_tuple.val is not None and row_tuple.variable_name is not None
 
 
-def align(sesh, obs_tuple, history_mapping, variable_mapping):
-    # Without these items an Obs object cannot be produced
-    if not has_required_information(obs_tuple):
-        log.warning('Observation missing critical information',
-                    extra={'network_name': obs_tuple.network_name,
-                           'time': obs_tuple.time,
-                           'val': obs_tuple.val,
-                           'variable_name': obs_tuple.variable_name})
-        return None
+def create_history_mapping(sesh, rows):
+    '''Create a names -> history object map for the set of stations that are
+       contained in the rows
+    '''
+    # Each row (observation) is attributed with a station
+    # individually, so start by creating a set of unique stations in
+    # the file. Minimize round-trips to the database.
+    stn_ids = {row.station_id for row in rows}
 
-    if not is_network(sesh, obs_tuple.network_name):
-        log.error('Network does not exist in db',
-                  extra={'network_name': obs_tuple.network_name})
-        return None
+    def lookup_stn(id):
+        q = sesh.query(History).join(Station).join(Network)\
+                .filter(Station.native_id == id)
+        return q.all()
+    mapping = [(id, lookup_stn(id)) for id in stn_ids]
 
-    history = get_history(sesh, obs_tuple.network_name, obs_tuple.station_id,
-                          obs_tuple.lat, obs_tuple.lon, history_mapping)
+    # Filter out ids for which we have no station metadata
+    return {id: hist for id, hist in mapping if hist}
 
-    if not history:
-        log.warning('Could not find history match',
-                    extra={'network_name': obs_tuple.network_name,
-                           'native_id': obs_tuple.station_id})
-        return None
 
-    variable = get_variable(sesh, obs_tuple.network_name,
-                            obs_tuple.variable_name, variable_mapping)
+def create_variable_mapping(sesh, rows):
+    '''Create a names -> history object map for the set of observations that are
+       contained in the rows
+    '''
+    var_names = {(row.variable_name, row.network_name) for row in rows}
 
-    # Necessary attributes for Obs object
-    if not variable:
-        log.warning('Could not retrieve necessary information from db',
-                    extra={'history': history, 'variable': variable})
-        return None
+    def lookup_var(v, n):
+        q = sesh.query(Variable).join(Network)\
+                .filter(Network.name == n).filter(Variable.name == v)
+        return q.first()
+    mapping = [(var_name, lookup_var(var_name, net_name))
+               for var_name, net_name in var_names]
 
-    datum = unit_check(obs_tuple.val, obs_tuple.unit, variable.unit)
-    if datum is None:
-        log.warning('Unable to confirm data units',
-                    extra={'unit_obs': obs_tuple.unit,
-                           'unit_db': variable.unit,
-                           'data': obs_tuple.val})
-        return None
+    return {var_name: var_ for var_name, var_ in mapping if var_}
 
-    # Note: We are very specifically creating the Obs object here using the ids
-    # to avoid SQLAlchemy adding this object to the session as part of its
-    # cascading backref behaviour https://goo.gl/Lchhv6
-    return Obs(history_id=history.id,
-               time=obs_tuple.time,
-               datum=datum,
-               vars_id=variable.id)
+
+def create_network_mapping(sesh):
+    q = sesh.query(Network)
+    return {network.name: network for network in q.all()}
+
+
+def align(sesh, rows):
+    aligned = []
+    history_mapping = create_history_mapping(sesh, rows)
+    variable_mapping = create_variable_mapping(sesh, rows)
+    network_mapping = create_network_mapping(sesh)
+
+    for row_tuple in rows:
+        # Without these items an Obs object cannot be produced
+        if not has_required_information(row_tuple):
+            log.warning('Observation missing critical information',
+                        extra={'network_name': row_tuple.network_name,
+                               'time': row_tuple.time,
+                               'val': row_tuple.val,
+                               'variable_name': row_tuple.variable_name})
+            continue
+
+        if not is_network(network_mapping, row_tuple.network_name):
+            log.error('Network does not exist in db',
+                      extra={'network_name': row_tuple.network_name})
+            continue
+
+        history, updated = get_history(sesh, row_tuple.network_name,
+                                       row_tuple.station_id, row_tuple.lat,
+                                       row_tuple.lon, history_mapping)
+
+        if updated:
+            history_mapping = create_history_mapping(sesh, rows)
+
+        if not history:
+            log.warning('Could not find history match',
+                        extra={'network_name': row_tuple.network_name,
+                               'native_id': row_tuple.station_id})
+            continue
+
+        variable = get_variable(row_tuple.network_name,
+                                row_tuple.variable_name, variable_mapping)
+
+        # Necessary attributes for Obs object
+        if not variable:
+            log.warning('Could not retrieve necessary information from db',
+                        extra={'history': history, 'variable': variable})
+            continue
+
+        datum = unit_check(row_tuple.val, row_tuple.unit, variable.unit)
+        if datum is None:
+            log.warning('Unable to confirm data units',
+                        extra={'unit_obs': row_tuple.unit,
+                               'unit_db': variable.unit,
+                               'data': row_tuple.val})
+            continue
+
+        # Note: We are very specifically creating the Obs object here using the
+        # ids to avoid SQLAlchemy adding this object to the session as part of
+        # its cascading backref behaviour https://goo.gl/Lchhv6
+        aligned.append(Obs(history_id=history.id,
+                           time=row_tuple.time,
+                           datum=datum,
+                           vars_id=variable.id))
+    return aligned
