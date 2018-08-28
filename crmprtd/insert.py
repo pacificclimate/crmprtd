@@ -199,8 +199,9 @@ def insert(sesh, observations, sample_size):
     else:
         log.info("Using Chunk + Bisection Strategy")
         with Timer() as tmr:
+            dbm = DBMetrics(0, 0, 0)
             for chunk in chunks(observations):
-                dbm = bisect_insert_strategy(sesh, chunk)
+                dbm += bisect_insert_strategy(sesh, chunk)
 
     log.info('Data insertion complete')
     return {'successes': dbm.successes,

@@ -44,8 +44,15 @@ def normalize(file_stream):
                       extra={'time': time})
             continue
 
-        if unit == '% RH':
-            unit = re.sub('% RH', '%', unit)
+        substitutions = [
+            ('% RH', '%'),
+            ('\u00b0C', 'celsius'),
+            ('mb', 'millibar'),
+            ('Deg', 'degree')
+        ]
+        for src, dest in substitutions:
+            if unit == src:
+                unit = re.sub(src, dest, unit)
 
         yield Row(time=dt,
                   val=value,
