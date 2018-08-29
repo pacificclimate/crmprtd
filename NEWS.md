@@ -1,5 +1,14 @@
 # News / Release Notes
 
+## 1.0.0
+*29-August-2018*
+
+* Complete refactor of entire code base.
+* Execution of pipeline has been restructured.
+    * download.py (for each network) can be called directly.
+    * download.py output can be piped to a file or to process.py.
+    * process.py handles the final 3 stages of data pipeline (normalize, align, insert).
+
 ## 0.3.0
 
 *12-August-2018*
