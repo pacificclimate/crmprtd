@@ -98,10 +98,12 @@ def test_session(crmp_session, caplog):
                                  '49.4579966666667)'))
     warfield = History(station_name='Warfield Elementary',
                        sdate='2005-01-12')
+    arkham = History(station_name='Arkham Asylum')
 
     stations = [
         Station(native_id='11091', network=moti, histories=[brandy_hist]),
-        Station(native_id='1029', network=wmb, histories=[five_mile_hist]),
+        Station(native_id='1029', network=wmb,
+                histories=[five_mile_hist, arkham]),
         Station(native_id='2100160', network=ec, histories=[beaver_air_hist]),
         Station(native_id='1067742', network=ec, histories=[stewart_air_hist]),
         Station(native_id='1047172', network=ec,
@@ -116,8 +118,10 @@ def test_session(crmp_session, caplog):
     wmb_humitidy = Variable(name='relative_humidity',
                             unit='percent', network=wmb)
     wamr_temp = Variable(name='TEMP_MEAN', unit='celsius', network=wamr)
+    bad_var = Variable(name='no_unit', network=wamr)
 
-    crmp_session.add_all([moti_air_temp, ec_precip, wmb_humitidy, wamr_temp])
+    crmp_session.add_all([moti_air_temp, ec_precip, wmb_humitidy,
+                          wamr_temp, bad_var])
 
     obs = [
         Obs(history=sechelt1, datum=2.5, variable=ec_precip,
