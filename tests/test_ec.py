@@ -50,6 +50,9 @@ def test_makeurl(label, args, expected):
 def test_makeurl_no_time_hourly():
     url = makeurl(freq='hourly')
     fmt = '%Y%m%d%H'
+
+    # FIXME: This test can actually fail if the hour boundary rolls over
+    # between recording the time here and running the test below
     t = datetime.utcnow()
 
     assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
