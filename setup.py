@@ -41,6 +41,7 @@ setup(
             'download_moti=crmprtd.moti.download:main',
             'download_wamr=crmprtd.wamr.download:main',
             'download_wmb=crmprtd.wmb.download:main',
+            'download_asp=crmprtd.asp.download:main',
             'crmprtd_process=crmprtd.process:main',
         ]
     },

@@ -3,6 +3,7 @@
     source = crmprtd
     omit =
         crmprtd/db_excptions
+        crmprtd/asp/download.py
         crmprtd/ec/download.py
         crmprtd/moti/download.py
         crmprtd/wamr/download.py
