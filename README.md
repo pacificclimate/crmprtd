@@ -20,21 +20,39 @@ The most common usage pattern for the `crmprtd` is to configure a number of scri
 
 Many of the data sources require authentication. For most scripts, credentials can be provided as command line arguments, or more preferrably, entries in a yaml config file. A sample version of this file can be see [here](https://github.com/pacificclimate/crmprtd/blob/master/auth.yaml). This is then sources by passing the file location with the `--auth` argument and the key with the `--auth_key` argument.
 
+Each network has a `[network_name]/download.py` script which will download data.  The output of this script can be piped into a file or into `process.py`.  `process.py` will take the data and run it through a series of formatting changes and checks before inserting the data into the database.
+
 ### FLNRO-WMB
 
-`hourly_wmb.py`
+`wmb/download.py > filename`
+or
+`wmb/download.py | process.py`
+or
+`wmb/download.py | tee filename | process.py`
 
 ### EC
 
-`real_time_ec.py`
+`ec/download.py > filename`
+or
+`ec/download.py | process.py`
+or
+`ec/download.py | tee filename | process.py`
 
 ### MoTIe
 
-`moti_hourly.py`
+`moti/download.py > filename`
+or
+`moti/download.py | process.py`
+or
+`moti/download.py | tee filename | process.py`
 
 ### ENV-AQN
 
-`wamr_hourly.py`
+`wamr/download.py > filename`
+or
+`wamr/download.py | process.py`
+or
+`wamr/download.py | tee filename | process.py`
 
 
 ## Testing
