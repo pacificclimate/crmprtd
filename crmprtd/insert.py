@@ -100,8 +100,8 @@ def single_insert_obs(sesh, obs):
     for o in obs:
         if obs_exist(sesh, o.history_id, o.vars_id, o.time):
             dbm.skips += 1
-            log.warning('Observation already exists in database',
-                        extra={'obs_id': o.id})
+            log.debug('Observation already exists in database',
+                      extra={'obs_id': o.id})
             continue
 
         # value does not exist in obs_raw, continue with insertion
@@ -155,8 +155,8 @@ def bisect_insert_strategy(sesh, obs):
             with sesh.begin_nested():
                 sesh.add(obs[0])
         except IntegrityError as e:
-            log.warning("Failure, observation already exists",
-                        extra={'obs': obs, 'exception': e})
+            log.debug("Failure, observation already exists",
+                      extra={'obs': obs, 'exception': e})
             sesh.rollback()
             return DBMetrics(0, 1, 0)
         except InsertionError as e:

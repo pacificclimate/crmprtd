@@ -147,7 +147,6 @@ def get_variable(sesh, network_name, variable_name):
         Variable.name == variable_name)).first()
 
     if not variable:
-        log.warning('Unable to match variable')
         return None
 
     return variable
@@ -182,7 +181,7 @@ def has_required_information(obs_tuple):
 def align(sesh, obs_tuple):
     # Without these items an Obs object cannot be produced
     if not has_required_information(obs_tuple):
-        log.warning('Observation missing critical information',
+        log.debug('Observation missing critical information',
                     extra={'network_name': obs_tuple.network_name,
                            'time': obs_tuple.time,
                            'val': obs_tuple.val,
@@ -198,9 +197,9 @@ def align(sesh, obs_tuple):
                           obs_tuple.lat, obs_tuple.lon)
 
     if not history:
-        log.warning('Could not find history match',
-                    extra={'network_name': obs_tuple.network_name,
-                           'native_id': obs_tuple.station_id})
+        log.debug('Could not find history match',
+                  extra={'network_name': obs_tuple.network_name,
+                         'native_id': obs_tuple.station_id})
         return None
 
     variable = get_variable(sesh, obs_tuple.network_name,
@@ -208,16 +207,18 @@ def align(sesh, obs_tuple):
 
     # Necessary attributes for Obs object
     if not variable:
-        log.warning('Could not retrieve necessary information from db',
-                    extra={'history': history, 'variable': variable})
+        log.debug('Variable is not tracked by crmp',
+                  extra={'variable': obs_tuple.variable_name,
+                         'network_name': obs_tuple.network_name})
         return None
 
     datum = unit_check(obs_tuple.val, obs_tuple.unit, variable.unit)
     if datum is None:
-        log.warning('Unable to confirm data units',
-                    extra={'unit_obs': obs_tuple.unit,
-                           'unit_db': variable.unit,
-                           'data': obs_tuple.val})
+        log.debug('Unable to confirm data units',
+                  extra={'unit_obs': obs_tuple.unit,
+                         'unit_db': variable.unit,
+                         'data': obs_tuple.val,
+                         'network_name': obs_tuple.network_name})
         return None
 
     # Note: We are very specifically creating the Obs object here using the ids
