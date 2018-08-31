@@ -138,6 +138,12 @@ def test_session(crmp_session, caplog):
 
 
 @pytest.fixture(scope='function')
+def test_session_url(test_session):
+    with testing.postgresql.Postgresql() as pg:
+        yield pg.url()
+
+
+@pytest.fixture(scope='function')
 def test_data():
     lines = '''station_code,weather_date,precipitation,temperature,relative_humidity,wind_speed,wind_direction,ffmc,isi,fwi,rn_1_pluvio1,snow_depth,snow_depth_quality,precip_pluvio1_status,precip_pluvio1_total,rn_1_pluvio2,precip_pluvio2_status,precip_pluvio2_total,rn_1_RIT,precip_RIT_Status,precip_RIT_total,precip_rgt,solar_radiation_LICOR,solar_radiation_CM3
 11,2018052711,.00,14.2,55,10.4,167,81.160995,2.1806495,5.5260615,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
