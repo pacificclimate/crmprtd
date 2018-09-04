@@ -49,7 +49,7 @@ handlers:
     subject: 'Errors with crmprtd daemon'
   file:
     class: logging.handlers.RotatingFileHandler
-    level: DEBUG
+    level: INFO
     formatter: json
     backupCount: 10
     maxBytes: 10000000
