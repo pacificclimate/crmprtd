@@ -198,8 +198,8 @@ def align(sesh, obs_tuple):
 
     if not history:
         log.warning('Could not find history match',
-                  extra={'network_name': obs_tuple.network_name,
-                         'native_id': obs_tuple.station_id})
+                    extra={'network_name': obs_tuple.network_name,
+                           'native_id': obs_tuple.station_id})
         return None
 
     variable = get_variable(sesh, obs_tuple.network_name,
