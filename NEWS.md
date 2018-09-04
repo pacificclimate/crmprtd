@@ -1,5 +1,13 @@
 # News / Release Notes
 
+## 1.0.1
+
+*04-September-2018*
+
+* Makes logs less noisy by demoting duplicate obs (insert phase) from
+  warning level to debug and demoting untracked variables (align
+  phase) from warning to debug.
+
 ## 1.0.0
 *29-August-2018*
 
