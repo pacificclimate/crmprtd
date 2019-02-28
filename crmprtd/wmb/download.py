@@ -26,7 +26,8 @@ def main():
     setup_logging(args.log_conf, args.log_filename, args.error_email,
                   args.log_level, 'crmprtd.wmb')
 
-    auth = extract_auth(args.username, args.password, args.auth_fname,
+    auth_file = open(args.auth_fname, 'r')
+    auth = extract_auth(args.username, args.password, auth_file,
                         args.auth_key)
 
     ftp_download(args.ftp_path, args.ftp_file, auth=auth, use_tls=True)

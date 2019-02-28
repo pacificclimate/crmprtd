@@ -1,3 +1,5 @@
+from io import StringIO
+
 import pytest
 
 from crmprtd.download import extract_auth
@@ -10,8 +12,8 @@ from crmprtd.download import extract_auth
     (None, None, {'u': 'user_from_file', 'p': 'pw_from_file'})
 ))
 def test_extract_auth(user, password, expected):
-    yaml = '''my_test:
+    yaml = StringIO('''my_test:
   username: user_from_file
   password: pw_from_file
-'''
+''')
     assert extract_auth(user, password, yaml, 'my_test') == expected

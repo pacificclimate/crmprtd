@@ -22,8 +22,8 @@ def download(username, password, auth_fname, auth_key,
     log.info('Starting MOTIe rtd')
 
     try:
-        auth_yaml = open(auth_fname, 'r').read() if auth_fname else None
-        auth = extract_auth(username, password, auth_yaml, auth_key)
+        auth_file = open(auth_fname, 'r')
+        auth = extract_auth(username, password, auth_file, auth_key)
 
         if start_time and end_time:
             start_time = datetime.strptime(

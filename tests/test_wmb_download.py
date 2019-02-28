@@ -1,8 +1,9 @@
+import os
 import logging
 
 import pytest
 
-from crmprtd.download import ftp_download
+from crmprtd.download import ftp_download, extract_auth
 from crmprtd import setup_logging
 
 
@@ -16,9 +17,12 @@ def test_setup_logging():
 
 @pytest.mark.network
 def test_wmb_download(capsys):
+    auth_fname = os.environ.get('CRMPRTD_AUTH', 'auth.yaml')
+    auth_file = open(auth_fname, 'r')
+    auth = extract_auth(None, None, auth_file, 'wmb')
     ftp_download('BCFireweatherFTPp1.nrs.gov.bc.ca/',
                  'HourlyWeatherAllFields_WA.txt',
-                 {'u': 'a_username', 'p': 'a_password'},
+                 auth,
                  use_tls=True)
     captured = capsys.readouterr()
     assert captured
