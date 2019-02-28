@@ -18,4 +18,4 @@ before_install:
 install:
   - pip install -r requirements.txt -r test_requirements.txt
   - pip install .
-script: py.test -v --tb=short --cov --flake8
+script: py.test -v --tb=short --cov --flake8 -m "not network"
