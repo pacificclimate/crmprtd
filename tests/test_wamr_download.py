@@ -1,11 +1,11 @@
 import pytest
 
-from crmprtd.wamr.download import download
+from crmprtd.download import ftp_download
 
 
 @pytest.mark.network
 def test_wamr_download(capsys):
-    download('ftp.env.gov.bc.ca', 'pub/outgoing/AIR/Hourly_Raw_Air_Data/'
-             'Meteorological/')
+    ftp_download('ftp.env.gov.bc.ca/pub/outgoing/AIR/Hourly_Raw_Air_Data/'
+                 'Meteorological/', auth=None, use_tls=False)
     captured = capsys.readouterr()
     assert captured

@@ -1,11 +1,15 @@
+import os
 import sys
 import time
 import ftplib
 import logging
 import csv
 from functools import wraps
+from tempfile import SpooledTemporaryFile
 
 import yaml
+
+log = logging.getLogger(__name__)
 
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
@@ -49,15 +53,15 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     return deco_retry
 
 
-def ftp_connect(ReaderClass, host, path, log, auth=None):
+def ftp_connect(host, path, log, auth=None, filename=None, use_tls=True):
     log.info('Fetching file from FTP')
     log.info('Listing.', extra={'host': host, 'path': path})
 
     user, password = (auth['u'], auth['p']) if auth else (None, None)
 
     try:
-        ftpreader = ReaderClass(host, user,
-                                password, path, log)
+        ftpreader = FTPReader(host, user, password, path, log,
+                              filename, use_tls)
         log.info('Opened a connection to host', extra={'host': host})
     except ftplib.all_errors as e:
         log.critical('Unable to load data from ftp source', exc_info=True)
@@ -66,16 +70,62 @@ def ftp_connect(ReaderClass, host, path, log, auth=None):
     return ftpreader
 
 
+def ftp_download(ftp_path, ftp_file=None, auth=None, use_tls=True):
+    log.info('Starting FTP Download')
+
+    ftp_host, path = ftp_path.split('/', 1)
+
+    try:
+        # Connect FTP server and retrieve file
+        ftpreader = ftp_connect(ftp_host, path, log, auth,
+                                ftp_file, use_tls)
+
+        with SpooledTemporaryFile(
+                max_size=int(os.environ.get('CRMPRTD_MAX_CACHE', 2**20)),
+                mode='r+') as tempfile:
+            def callback(line):
+                tempfile.write('{}\n'.format(line))
+
+            for filename in ftpreader.filenames:
+                log.info("Downloading %s", filename)
+                ftpreader.connection.retrlines('RETR {}'
+                                               .format(filename),
+                                               callback)
+            tempfile.seek(0)
+            for line in tempfile.readlines():
+                sys.stdout.buffer.write(line.encode('utf-8'))
+
+    except Exception as e:
+        log.exception("Unable to process ftp")
+
+
 class FTPReader(object):
     '''Glue between the FTP class methods (which are callback based)
        and the csv.DictReader class (which is iteration based)
     '''
+    def __init__(self, host, user, password, data_path, log=None,
+                 filename=None, use_tls=True):
 
-    def __init__(self):
-        '''WAMR and WMB need to implement slight variats of this for their
-        connections.
-        '''
-        raise NotImplementedError
+        @retry(ftplib.error_temp, tries=4, delay=3, backoff=2, logger=log)
+        def ftp_connect_with_retry(host, user, password):
+            if use_tls:
+                return ftplib.FTP_TLS(host, user, password)
+            else:
+                con = ftplib.FTP(host)
+                con.login(user, password)
+                return con
+
+        self.connection = ftp_connect_with_retry(host, user, password)
+
+        if filename:
+            self.filenames = [filename]
+        else:
+            self.filenames = []
+            
+            def callback(line):
+                self.filenames.append(line)
+
+            self.connection.retrlines('NLST ' + data_path, callback)
 
     def csv_reader(self, log=None):
         # Just store the lines in memory

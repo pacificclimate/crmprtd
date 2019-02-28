@@ -1,76 +1,12 @@
-import ftplib
 import logging
-import os
-import sys
-
-from tempfile import SpooledTemporaryFile
 from argparse import ArgumentParser
 
 # Local
-from crmprtd.download import retry, ftp_connect
-from crmprtd.download import FTPReader
+from crmprtd.download import ftp_download
 from crmprtd import logging_args, setup_logging
 
 
 log = logging.getLogger(__name__)
-
-
-def download(ftp_server, ftp_dir):
-    '''Executes the first stage of the data processing pipeline.
-
-       Downloads the data, according to the download arguments
-       provided (generally from the command line) and outputs the data
-       to stdout.
-    '''
-    log.info('Starting WAMR rtd')
-
-    try:
-        # Connect FTP server and retrieve file
-        ftpreader = ftp_connect(WAMRFTPReader, ftp_server, ftp_dir,
-                                log)
-
-        with SpooledTemporaryFile(
-                max_size=int(os.environ.get('CRMPRTD_MAX_CACHE', 2**20)),
-                mode='r+') as tempfile:
-
-            def callback(line):
-                tempfile.write('{}\n'.format(line))
-
-            for filename in ftpreader.filenames:
-
-                log.info("Downloading %s", filename)
-                ftpreader.connection.retrlines('RETR {}'
-                                               .format(filename),
-                                               callback)
-
-            tempfile.seek(0)
-            for line in tempfile.readlines():
-                sys.stdout.buffer.write(line.encode('utf-8'))
-
-    except Exception as e:
-        log.exception("Unable to process ftp")
-
-
-class WAMRFTPReader(FTPReader):
-    '''Glue between the FTP class methods (which are callback based)
-       and the csv.DictReader class (which is iteration based)
-    '''
-
-    def __init__(self, host, user, password, data_path, log=None):
-        self.filenames = []
-
-        @retry(ftplib.error_temp, tries=4, delay=3, backoff=2, logger=log)
-        def ftp_connect_with_retry(host, user, password):
-            con = ftplib.FTP(host)
-            con.login(user, password)
-            return con
-
-        self.connection = ftp_connect_with_retry(host, user, password)
-
-        def callback(line):
-            self.filenames.append(line)
-
-        self.connection.retrlines('NLST ' + data_path, callback)
 
 
 def main():
@@ -89,7 +25,7 @@ def main():
     setup_logging(args.log_conf, args.log_filename, args.error_email,
                   args.log_level, 'crmprtd.wamr')
 
-    download(args.ftp_server, args.ftp_dir)
+    ftp_download(args.ftp_server, args.ftp_dir)
 
 
 if __name__ == "__main__":
