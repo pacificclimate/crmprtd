@@ -12,6 +12,7 @@ from crmprtd import Row
 
 log = logging.getLogger(__name__)
 
+
 def decoder(binary_stream):
     for line in binary_stream:
         yield line.decode('utf-8')
@@ -34,7 +35,7 @@ def csv_normalizer(network_name, fieldnames, substitutions=[], skip_rows=0):
     '''
     def normalize(file_stream):
         log.info('Starting {} data normalization'.format(network_name))
- 
+
         file_stream = decoder(file_stream)
         reader = csv.DictReader(
             itertools.islice(file_stream, skip_rows, None),
