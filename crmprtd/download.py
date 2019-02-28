@@ -121,7 +121,7 @@ class FTPReader(object):
             self.filenames = [filename]
         else:
             self.filenames = []
-            
+
             def callback(line):
                 self.filenames.append(line)
 
