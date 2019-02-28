@@ -45,7 +45,7 @@ setup(
         ]
     },
     package_data={
-        'crmprtd': ["data/*.yaml", "data/*.xsl"],
+        'crmprtd': ["data/*.yaml", "data/*.xsl", "data/*.csv"],
     },
     install_requires=['lxml',
                       'psycopg2',
