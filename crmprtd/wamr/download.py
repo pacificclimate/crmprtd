@@ -25,7 +25,8 @@ def main():
     setup_logging(args.log_conf, args.log_filename, args.error_email,
                   args.log_level, 'crmprtd.wamr')
 
-    ftp_download(args.ftp_server, args.ftp_dir)
+    ftp_path = '{}/{}'.format(args.ftp_server, args.ftp_dir)
+    ftp_download(ftp_path, use_tls=False)
 
 
 if __name__ == "__main__":
