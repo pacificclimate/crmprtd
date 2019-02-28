@@ -33,20 +33,21 @@ def download(ftp_server, ftp_dir):
                 max_size=int(os.environ.get('CRMPRTD_MAX_CACHE', 2**20)),
                 mode='r+') as tempfile:
 
+            def callback(line):
+                tempfile.write('{}\n'.format(line))
+
             for filename in ftpreader.filenames:
 
-                def callback(line):
-                    tempfile.write('{}\n'.format(line))
-
                 log.info("Downloading %s", filename)
-                ftpreader.connection.retrlines('RETR {}'.format(filename),
+                ftpreader.connection.retrlines('RETR {}'
+                                               .format(filename),
                                                callback)
 
             tempfile.seek(0)
             for line in tempfile.readlines():
                 sys.stdout.buffer.write(line.encode('utf-8'))
 
-    except Exception:
+    except Exception as e:
         log.exception("Unable to process ftp")
 
 
