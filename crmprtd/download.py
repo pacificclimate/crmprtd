@@ -161,4 +161,4 @@ def https_download(url, scheme='https', log=None, auth=None, payload={}):
                                         resp.url))
 
     for line in resp.iter_content(chunk_size=None):
-        sys.stdout.buffer.write(line.encode('utf-8'))
+        sys.stdout.buffer.write(line)
