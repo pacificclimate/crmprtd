@@ -5,12 +5,10 @@ import logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
-# Installed libraries
-import requests
-
 # Local
 from crmprtd.ec import makeurl
 from crmprtd import setup_logging, logging_args
+from crmprtd.download import https_download
 
 log = logging.getLogger(__name__)
 

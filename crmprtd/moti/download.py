@@ -7,11 +7,8 @@ import logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
-# Installed libraries
-import requests
-
 # Local
-from crmprtd.download import extract_auth
+from crmprtd.download import extract_auth, https_download
 from crmprtd import common_auth_arguments, logging_args, setup_logging
 
 log = logging.getLogger(__name__)
