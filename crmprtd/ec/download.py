@@ -32,22 +32,11 @@ def download(time, frequency, province, language):
             log.info("Starting automatic run "
                      "using timestamp {0}".format(time))
 
-        # Configure requests to use retry
-        s = requests.Session()
-        a = requests.adapters.HTTPAdapter(max_retries=3)
-        s.mount('https://', a)
-
         # Construct and download the xml
         url = makeurl(frequency, province, language, time)
 
-        log.info("Downloading {0}".format(url))
-        req = s.get(url)
-        if req.status_code != 200:
-            raise IOError(
-                "HTTP {} error for {}".format(req.status_code, req.url))
-
-        for line in req.iter_content(chunk_size=None):
-            sys.stdout.buffer.write(line)
+        scheme, _ = url.split(':', 1)
+        https_download(url, scheme, log)
 
     except IOError:
         log.exception("Unable to download or open xml data")
