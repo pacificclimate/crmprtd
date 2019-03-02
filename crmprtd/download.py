@@ -6,6 +6,7 @@ import csv
 from functools import wraps
 
 import yaml
+import requests
 
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
@@ -125,3 +126,39 @@ def extract_auth(username, password, auth_yaml, auth_key):
             'u': config[auth_key]['username'],
             'p': config[auth_key]['password']
         }
+
+
+def https_download(url, scheme='https', log=None, auth=None, payload={}):
+    '''Sends an HTTP(S) request to the provided URL and writes the
+       response to sys.stdout
+
+       url(str): the full URL to the resource to download
+       scheme(str): one of "http" or "https"
+       log: A logging object to which to write logs
+       auth(dict): username/passwords contained in a dict with two keys
+                   'u' and 'p'
+       payload(dict):
+    '''
+
+    if not log:
+        log = logging.get_logger(__name__)
+
+    if auth:
+        auth = (auth['u'], auth['p'])
+
+    # Configure requests to use retry
+    s = requests.Session()
+    a = requests.adapters.HTTPAdapter(max_retries=3)
+    s.mount('{}://'.format(scheme), a)
+    log.info("Downloading {0}".format(url))
+    resp = s.get(url, params=payload, auth=auth)
+
+    log.info('{}: {}'.format(resp.status_code, resp.url))
+
+    if resp.status_code != 200:
+        raise IOError(
+            "{} {} error for {}".format(scheme.upper(), resp.status_code,
+                                        resp.url))
+
+    for line in resp.iter_content(chunk_size=None):
+        sys.stdout.buffer.write(line.encode('utf-8'))
