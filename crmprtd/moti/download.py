@@ -64,7 +64,8 @@ def download(username, password, auth_fname, auth_key,
 
 
 def main():
-    parser = ArgumentParser()
+    desc = globals()['__doc__']
+    parser = ArgumentParser(description=desc)
     parser = logging_args(parser)
     parser = common_auth_arguments(parser)
     parser.add_argument('-S', '--start_time',
