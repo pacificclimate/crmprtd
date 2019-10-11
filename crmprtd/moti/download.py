@@ -1,12 +1,13 @@
 '''Downloads the BC Ministry of Transportation and Infrastructure (MoTI) data.
 
-The BC Ministry of Transportation and Infrastructure, Avalache Safety Program network
-
+The BC Ministry of Transportation and Infrastructure, Avalache Safety
+Program network
 
 It is recommended to run this script once per one or two weeks to
 collect all available data (plus, presumably some duplicate data from
 the last run). If the script is run less than once per month, you will
 miss data.
+
 '''
 
 
