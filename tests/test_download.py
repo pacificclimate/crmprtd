@@ -1,6 +1,6 @@
 import pytest
 
-from crmprtd.download import extract_auth
+from crmprtd.download import extract_auth, https_download
 
 
 @pytest.mark.parametrize(('user', 'password', 'expected'), (
@@ -15,3 +15,10 @@ def test_extract_auth(user, password, expected):
   password: pw_from_file
 '''
     assert extract_auth(user, password, yaml, 'my_test') == expected
+
+
+def test_https_download(requests_mock, capsys):
+    requests_mock.get('https://test.com', text='data')
+    https_download('https://test.com')
+    captured = capsys.readouterr()
+    assert captured.out == 'data'

@@ -121,7 +121,7 @@ def extract_auth(username, password, auth_yaml, auth_key):
         assert auth_yaml and auth_key, ("Must provide both the auth file "
                                         "and the key to use for this "
                                         "script (--auth_key)")
-        config = yaml.load(auth_yaml)
+        config = yaml.safe_load(auth_yaml)
         return {
             'u': config[auth_key]['username'],
             'p': config[auth_key]['password']
@@ -141,7 +141,7 @@ def https_download(url, scheme='https', log=None, auth=None, payload={}):
     '''
 
     if not log:
-        log = logging.get_logger(__name__)
+        log = logging.getLogger(__name__)
 
     if auth:
         auth = (auth['u'], auth['p'])
