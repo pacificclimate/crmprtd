@@ -138,10 +138,10 @@ def common_auth_arguments(parser):     # pragma: no cover
 def setup_logging(log_conf, log_filename, error_email, log_level, name):
     if log_conf:
         with open(log_conf, 'rb') as f:
-            base_config = yaml.load(f)
+            base_config = yaml.safe_load(f)
     else:
-        base_config = yaml.load(resource_stream('crmprtd',
-                                                '/data/logging.yaml'))
+        base_config = yaml.safe_load(resource_stream('crmprtd',
+                                                     '/data/logging.yaml'))
 
     if log_filename:
         base_config['handlers']['file']['filename'] = log_filename
