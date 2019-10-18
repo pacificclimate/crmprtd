@@ -2,3 +2,4 @@
 exclude =
     # Does not contain python code
     tests/ec_data.py
+    tests/swob_data.py
