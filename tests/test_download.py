@@ -22,3 +22,11 @@ def test_https_download(requests_mock, capsys):
     https_download('https://test.com')
     captured = capsys.readouterr()
     assert captured.out == 'data'
+    https_download('https://test.com', auth={'u': 'foo', 'p': None})
+    assert captured.out == 'data'
+
+
+def test_https_download_404(requests_mock):
+    requests_mock.register_uri('GET', 'https://test.com', status_code=404)
+    with pytest.raises(IOError):
+        https_download('https://test.com')
