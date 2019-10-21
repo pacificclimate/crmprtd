@@ -1,6 +1,7 @@
 from pkg_resources import resource_filename
 from datetime import datetime
 from io import StringIO
+import sys
 
 import logging
 import logging.config
@@ -13,10 +14,11 @@ from lxml.etree import parse, fromstring, XSLT
 import testing.postgresql
 import pytz
 import csv
+import requests
 
 import pycds
 from pycds import Network, Station, Contact, History, Variable, Obs
-import sys
+from .swob_data import network_listing, day_listing, station_listing
 
 
 def pytest_runtest_setup():
@@ -510,3 +512,33 @@ def ec_xml_single_obs():
     xsl = resource_filename('crmprtd', 'data/ec_xform.xsl')
     transform = XSLT(parse(xsl))
     return transform(x)
+
+
+@pytest.fixture(scope='function')
+def swob_urls(requests_mock):
+    def make_404(request):
+        resp = requests.Response()
+        resp.status_code = 404
+        return resp
+
+    requests_mock.add_matcher(make_404)
+    requests_mock.register_uri(
+        'GET',
+        'https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/',
+        text=network_listing,
+        status_code=200
+    )
+    requests_mock.register_uri(
+        'GET',
+        'https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/'
+        '20191015/',
+        text=day_listing,
+        status_code=200
+    )
+    requests_mock.register_uri(
+        'GET',
+        'https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/'
+        '20191015/1d06p/',
+        text=station_listing,
+        status_code=200
+    )

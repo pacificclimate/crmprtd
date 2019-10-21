@@ -6,6 +6,8 @@ import urllib.parse
 from lxml import html
 import requests
 
+from crmprtd.download import https_download
+
 
 log = logging.getLogger(__name__)
 
@@ -62,6 +64,12 @@ def match_date(url, date):
     has_a_date = re.compile(r'[0-9]{8}')
     has_this_date = re.compile(date.strftime('%Y%m%d'))
     return bool(has_a_date.search(url)) == bool(has_this_date.search(url))
+
+
+def download(base_url, date):
+    urls = get_url_list(base_url, date)
+    for url in urls:
+        https_download(url, log=log)
 
 
 def split_multi_xml_stream(stream):

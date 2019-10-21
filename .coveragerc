@@ -10,4 +10,4 @@
         speed_test/
 
 [report]
-    fail_under = 79
+    fail_under = 78.5
