@@ -4,7 +4,9 @@ import pytest
 import requests
 
 from .swob_data import network_listing, day_listing, station_listing
+from .swob_data import multi_xml_string
 from crmprtd.ec_swob.download import match_date, get_url_list
+from crmprtd.ec_swob.download import split_multi_xml_stream
 
 
 @pytest.mark.parametrize(('url', 'expected'), (
@@ -49,3 +51,11 @@ def test_get_url_list(requests_mock):
         datetime(2019, 10, 15, 1)
     )
     assert list(rv)
+
+
+def test_split_multi_xml_stream():
+    s = multi_xml_string
+    strings = list(split_multi_xml_stream(s))
+    assert len(strings) == 4
+    assert strings[0] == \
+        '<?xml version="1.0" encoding="UTF-8" standalone="no"?><foo />'

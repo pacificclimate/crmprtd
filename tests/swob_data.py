@@ -107,3 +107,13 @@ station_listing = '''
 <hr></pre>
 </body></html>
 '''
+
+multi_xml_string = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<foo />
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<bar />
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<blah />
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<stuff />
+'''.splitlines()

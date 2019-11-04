@@ -23,7 +23,7 @@ def get_url_list(
     sesh = requests.Session()
 
     # Match something like this: 2019-10-18-1600-bc-env-asw-1a02p-AUTO-swob.xml
-    search_pattern = re.compile('{}.*swob\.xml'.
+    search_pattern = re.compile(r'{}.*swob\.xml'.
                                 format(date.strftime('%Y-%m-%d-%H')))
 
     while queue:
@@ -62,3 +62,12 @@ def match_date(url, date):
     has_a_date = re.compile(r'[0-9]{8}')
     has_this_date = re.compile(date.strftime('%Y%m%d'))
     return bool(has_a_date.search(url)) == bool(has_this_date.search(url))
+
+
+def split_multi_xml_stream(stream):
+    string = ''.join(stream)
+    matches = re.split(r'(<\?xml.*?\?>)', string)
+    matches = matches[1:]
+    for _ in range(len(matches) // 2):
+        rv = matches.pop(0) + matches.pop(0)
+        yield rv
