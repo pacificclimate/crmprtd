@@ -2,6 +2,7 @@ import re
 import datetime
 import logging
 import urllib.parse
+from io import BytesIO
 
 from lxml import html
 import requests
@@ -73,9 +74,9 @@ def download(base_url, date):
 
 
 def split_multi_xml_stream(stream):
-    string = ''.join(stream)
-    matches = re.split(r'(<\?xml.*?\?>)', string)
+    string = b''.join(stream)
+    matches = re.split(b'(<\?xml.*?\?>)', string)
     matches = matches[1:]
     for _ in range(len(matches) // 2):
-        rv = matches.pop(0) + matches.pop(0)
+        rv = BytesIO(matches.pop(0) + matches.pop(0))
         yield rv

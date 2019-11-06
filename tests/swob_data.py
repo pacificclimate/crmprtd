@@ -108,7 +108,7 @@ station_listing = '''
 </body></html>
 '''
 
-multi_xml_string = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+multi_xml_bytes = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <foo />
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <bar />

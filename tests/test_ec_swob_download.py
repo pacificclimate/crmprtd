@@ -1,8 +1,9 @@
+import io
 from datetime import datetime
 
 import pytest
 
-from .swob_data import multi_xml_string
+from .swob_data import multi_xml_bytes
 from crmprtd.ec_swob.download import match_date, get_url_list
 from crmprtd.ec_swob.download import split_multi_xml_stream
 
@@ -26,8 +27,9 @@ def test_get_url_list(swob_urls):
 
 
 def test_split_multi_xml_stream():
-    s = multi_xml_string
+    s = multi_xml_bytes
     strings = list(split_multi_xml_stream(s))
     assert len(strings) == 4
-    assert strings[0] == \
-        '<?xml version="1.0" encoding="UTF-8" standalone="no"?><foo />'
+    assert strings[0].getvalue() == \
+        b'<?xml version="1.0" encoding="UTF-8" standalone="no"?><foo />'
+    assert isinstance(strings[0], io.IOBase)
