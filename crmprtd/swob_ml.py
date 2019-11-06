@@ -8,7 +8,7 @@ from dateutil.parser import parse as dateparse
 # Local
 from pkg_resources import resource_stream
 from crmprtd import Row, iterable_to_stream
-from crmprtd.ec import ns, OmMember
+from crmprtd.ec import ns, OmMember, no_ns_element
 
 
 log = logging.getLogger(__name__)
@@ -39,8 +39,10 @@ def normalize(file_stream, network_name,
         for var in vars:
             try:
                 ele = om.member.xpath(
-                        "./om:Observation/om:result//mpo:element[@name='%s']" %
-                        var, namespaces=ns)[0]
+                        "./om:Observation/om:result//"
+                        "{}[@name='{}']".format(
+                            no_ns_element('element'), var
+                        ), namespaces=ns)[0]
                 val = float(ele.get('value'))
             # This shouldn't every be empty based on our xpath for selecting
             # elements, however I think that it _could_ be non-numeric and
@@ -53,8 +55,11 @@ def normalize(file_stream, network_name,
             try:
                 log.debug("Finding Station attributes")
                 station_id = member.xpath(
-                    ".//mpo:identification-elements/mpo:element[@name='{}']"
-                    .format(station_id_attr), namespaces=ns)[0].get('value')
+                    ".//{}/{}[@name='{}']".format(
+                        no_ns_element('identification-elements'),
+                        no_ns_element('element'),
+                        station_id_attr
+                    ), namespaces=ns)[0].get('value')
                 lat, lon = map(float, member.xpath(
                     './/gml:pos', namespaces=ns)[0].text.split())
                 obs_time = member.xpath(

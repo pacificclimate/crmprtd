@@ -13,6 +13,12 @@ ns = {
 }
 
 
+def no_ns_element(name):
+    '''returns the xpath string to search for and element of name "name"
+       without a namespace'''
+    return "*[local-name()='{}']".format(name)
+
+
 def makeurl(freq='daily', province='BC', language='e', time=datetime.utcnow()):
     """Construct a URL for fetching the data file
     freq: daily|hourly
@@ -37,9 +43,14 @@ class OmMember(object):
            If v is not one of the elements, raises LxmlError
         '''
         try:
-            return self.member.xpath("./om:Observation/om:result/mpo:elements"
-                                     "/mpo:element[@name='%s']" %
-                                     v, namespaces=ns)[0].get('uom')
+            xpath = (
+                "./om:Observation/om:result/{}/{}"
+                "[@name='{}']".format(
+                    no_ns_element('elements'),
+                    no_ns_element('element'),
+                    v)
+            )
+            return self.member.xpath(xpath, namespaces=ns)[0].get('uom')
         except IndexError:
             raise LxmlError(
                 "%s is not one of the mpo:elements in this om:member" % v)
@@ -47,6 +58,11 @@ class OmMember(object):
     def observed_vars(self):
         '''Returns the names of all quantities specified by this member
         '''
-        return [e.get('name') for e in self.member.xpath(
-                ".//om:result/mpo:elements/mpo:element[@name!=''][@value!='']",
-                namespaces=ns)]
+        return [
+            e.get('name') for e in self.member.xpath(
+                ".//om:result/{}/{}[@name!=''][@value!='']".format(
+                    no_ns_element('elements'),
+                    no_ns_element('element')
+                ),
+                namespaces=ns)
+        ]
