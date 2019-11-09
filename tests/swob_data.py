@@ -117,3 +117,374 @@ multi_xml_bytes = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <stuff />
 '''.splitlines()
+
+
+multi_xml_download = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<om:ObservationCollection xmlns:om="http://www.opengis.net/om/1.0" xmlns="http://dms.ec.gc.ca/schema/point-observation/2.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <om:member>
+    <om:Observation>
+      <om:metadata>
+        <set>
+          <general>
+            <author build="build.21" name="MSC-DMS-PG-SWOB" version="2.8"/>
+            <dataset name="partners/observation/atmospheric/surface_weather/bc_env_snowwx-1.0-ascii"/>
+            <phase name="product_generic_swob-xml-2.0"/>
+            <id xlink:href="/data/partners/observation/atmospheric/surface_weather/bc_env_snowwx-1.0-ascii/product_generic_swob-xml-2.0/201911051300/bc_env-asw_1a01p/1a01p/orig/data_60"/>
+            <parent xlink:href="/data/partners/observation/atmospheric/surface_weather/bc_env_snowwx-1.0-ascii/decoded_enhanced-xml-2.0/201911051300/bc_env-asw_1a01p/1a01p/orig/data_60"/>
+          </general>
+          <identification-elements>
+            <element name="stn_nam" uom="unitless" value="Yellowhead Lake"/>
+            <element name="nesdis_id" uom="unitless" value="43485654"/>
+            <element name="msc_id" uom="unitless" value="BC_ENV-ASW_1A01P"/>
+            <element name="lat" uom="°" value="52.906300"/>
+            <element name="long" uom="°" value="-118.547800"/>
+            <element name="stn_elev" uom="m" value="1860.000"/>
+            <element name="date_tm" uom="datetime" value="2019-11-05T13:00:00.000Z"/>
+            <element name="data_pvdr" uom="unitless" value="BC-ENV"/>
+            <element name="data_attrib_not" uom="unitless" value="Observational data provided by the Government of British Columbia: Ministry of Environment (BC-ENV). All rights reserved. | Données d’observation fournies par le Gouvernement de la Colombie-Britannique: Ministère de l’Environnement (CB-ENV). Tous droits réservés."/>
+          </identification-elements>
+        </set>
+      </om:metadata>
+      <om:samplingTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2019-11-05T13:00:00.000Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:samplingTime>
+      <om:resultTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2019-11-05T13:29:24.151Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:resultTime>
+      <om:procedure xlink:href="/metadata/partners/mr/sfc_wx_cfg/bc_env_snowwx/instance-xml-2.0/bc_env-asw_1a01p/43485654?version=1.2"/>
+      <om:observedProperty gml:remoteSchema="/schema/point-observation/2.0.xsd"/>
+      <om:featureOfInterest>
+        <gml:FeatureCollection>
+          <gml:location>
+            <gml:Point>
+              <gml:pos>52.9063 -118.5478</gml:pos>
+            </gml:Point>
+          </gml:location>
+        </gml:FeatureCollection>
+      </om:featureOfInterest>
+      <om:result>
+        <elements>
+          <element name="air_temp_1" uom="°C" value="-3.2">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_1hr_ago_1" uom="°C" value="-2.2">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_2hrs_ago_1" uom="°C" value="-0.4">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_2" uom="°C" value="-3.1">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_1hr_ago_2" uom="°C" value="-1.5">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_2hrs_ago_2" uom="°C" value="-0.1">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_wtr_equiv" uom="mm" value="21.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_wtr_equiv_1hr_ago" uom="mm" value="20.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_wtr_equiv_2hrs_ago" uom="mm" value="20.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth" uom="cm" value="21">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_1hr_ago" uom="cm" value="18">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_2hrs_ago" uom="cm" value="16">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="cum_pcpn_amt" uom="mm" value="488.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="cum_pcpn_amt_1hr_ago" uom="mm" value="486.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="cum_pcpn_amt_2hrs_ago" uom="mm" value="485.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="batry_volt" uom="V" value="12.6"/>
+          <element name="batry_volt_1hr_ago" uom="V" value="12.6"/>
+          <element name="batry_volt_2hrs_ago" uom="V" value="12.6"/>
+          <element name="solr_volt" uom="V" value="0.00"/>
+          <element name="solr_volt_1hr_ago" uom="V" value="0.00"/>
+          <element name="solr_volt_2hrs_ago" uom="V" value="0.00"/>
+          <element name="trans_batry_volt" uom="V" value="12.0"/>
+          <element name="trans_batry_volt_1hr_ago" uom="V" value="12.0"/>
+          <element name="trans_batry_volt_2hrs_ago" uom="V" value="12.0"/>
+          <element name="pcpn_amt_pst12hrs" uom="mm" value="7.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst3hrs" uom="mm" value="3.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst1hr" uom="mm" value="2.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst6hrs" uom="mm" value="4.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst24hrs" uom="mm" value="9.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+        </elements>
+      </om:result>
+    </om:Observation>
+  </om:member>
+</om:ObservationCollection>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<om:ObservationCollection xmlns:om="http://www.opengis.net/om/1.0" xmlns="http://dms.ec.gc.ca/schema/point-observation/2.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <om:member>
+    <om:Observation>
+      <om:metadata>
+        <set>
+          <general>
+            <author build="build.21" name="MSC-DMS-PG-SWOB" version="2.8"/>
+            <dataset name="partners/observation/atmospheric/surface_weather/bc_env_snowwx-1.0-ascii"/>
+            <phase name="product_generic_swob-xml-2.0"/>
+            <id xlink:href="/data/partners/observation/atmospheric/surface_weather/bc_env_snowwx-1.0-ascii/product_generic_swob-xml-2.0/201911051300/bc_env-asw_1a01p/1a01p/orig/data_60"/>
+            <parent xlink:href="/data/partners/observation/atmospheric/surface_weather/bc_env_snowwx-1.0-ascii/decoded_enhanced-xml-2.0/201911051300/bc_env-asw_1a01p/1a01p/orig/data_60"/>
+          </general>
+          <identification-elements>
+            <element name="stn_nam" uom="unitless" value="Yellowhead Lake"/>
+            <element name="nesdis_id" uom="unitless" value="43485654"/>
+            <element name="msc_id" uom="unitless" value="BC_ENV-ASW_1A01P"/>
+            <element name="lat" uom="°" value="52.906300"/>
+            <element name="long" uom="°" value="-118.547800"/>
+            <element name="stn_elev" uom="m" value="1860.000"/>
+            <element name="date_tm" uom="datetime" value="2019-11-05T13:00:00.000Z"/>
+            <element name="data_pvdr" uom="unitless" value="BC-ENV"/>
+            <element name="data_attrib_not" uom="unitless" value="Observational data provided by the Government of British Columbia: Ministry of Environment (BC-ENV). All rights reserved. | Données d’observation fournies par le Gouvernement de la Colombie-Britannique: Ministère de l’Environnement (CB-ENV). Tous droits réservés."/>
+          </identification-elements>
+        </set>
+      </om:metadata>
+      <om:samplingTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2019-11-05T13:00:00.000Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:samplingTime>
+      <om:resultTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2019-11-05T13:29:24.151Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:resultTime>
+      <om:procedure xlink:href="/metadata/partners/mr/sfc_wx_cfg/bc_env_snowwx/instance-xml-2.0/bc_env-asw_1a01p/43485654?version=1.2"/>
+      <om:observedProperty gml:remoteSchema="/schema/point-observation/2.0.xsd"/>
+      <om:featureOfInterest>
+        <gml:FeatureCollection>
+          <gml:location>
+            <gml:Point>
+              <gml:pos>52.9063 -118.5478</gml:pos>
+            </gml:Point>
+          </gml:location>
+        </gml:FeatureCollection>
+      </om:featureOfInterest>
+      <om:result>
+        <elements>
+          <element name="air_temp_1" uom="°C" value="-3.2">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_1hr_ago_1" uom="°C" value="-2.2">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_2hrs_ago_1" uom="°C" value="-0.4">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_2" uom="°C" value="-3.1">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_1hr_ago_2" uom="°C" value="-1.5">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_2hrs_ago_2" uom="°C" value="-0.1">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_wtr_equiv" uom="mm" value="21.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_wtr_equiv_1hr_ago" uom="mm" value="20.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_wtr_equiv_2hrs_ago" uom="mm" value="20.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth" uom="cm" value="21">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_1hr_ago" uom="cm" value="18">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_2hrs_ago" uom="cm" value="16">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="cum_pcpn_amt" uom="mm" value="488.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="cum_pcpn_amt_1hr_ago" uom="mm" value="486.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="cum_pcpn_amt_2hrs_ago" uom="mm" value="485.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="batry_volt" uom="V" value="12.6"/>
+          <element name="batry_volt_1hr_ago" uom="V" value="12.6"/>
+          <element name="batry_volt_2hrs_ago" uom="V" value="12.6"/>
+          <element name="solr_volt" uom="V" value="0.00"/>
+          <element name="solr_volt_1hr_ago" uom="V" value="0.00"/>
+          <element name="solr_volt_2hrs_ago" uom="V" value="0.00"/>
+          <element name="trans_batry_volt" uom="V" value="12.0"/>
+          <element name="trans_batry_volt_1hr_ago" uom="V" value="12.0"/>
+          <element name="trans_batry_volt_2hrs_ago" uom="V" value="12.0"/>
+          <element name="pcpn_amt_pst12hrs" uom="mm" value="7.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst3hrs" uom="mm" value="3.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst1hr" uom="mm" value="2.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst6hrs" uom="mm" value="4.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst24hrs" uom="mm" value="9.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+        </elements>
+      </om:result>
+    </om:Observation>
+  </om:member>
+</om:ObservationCollection>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<om:ObservationCollection xmlns:om="http://www.opengis.net/om/1.0" xmlns="http://dms.ec.gc.ca/schema/point-observation/2.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <om:member>
+    <om:Observation>
+      <om:metadata>
+        <set>
+          <general>
+            <author build="build.21" name="MSC-DMS-PG-SWOB" version="2.8"/>
+            <dataset name="partners/observation/atmospheric/surface_weather/bc_env_snowwx-1.0-ascii"/>
+            <phase name="product_generic_swob-xml-2.0"/>
+            <id xlink:href="/data/partners/observation/atmospheric/surface_weather/bc_env_snowwx-1.0-ascii/product_generic_swob-xml-2.0/201911051300/bc_env-asw_1a01p/1a01p/orig/data_60"/>
+            <parent xlink:href="/data/partners/observation/atmospheric/surface_weather/bc_env_snowwx-1.0-ascii/decoded_enhanced-xml-2.0/201911051300/bc_env-asw_1a01p/1a01p/orig/data_60"/>
+          </general>
+          <identification-elements>
+            <element name="stn_nam" uom="unitless" value="Yellowhead Lake"/>
+            <element name="nesdis_id" uom="unitless" value="43485654"/>
+            <element name="msc_id" uom="unitless" value="BC_ENV-ASW_1A01P"/>
+            <element name="lat" uom="°" value="52.906300"/>
+            <element name="long" uom="°" value="-118.547800"/>
+            <element name="stn_elev" uom="m" value="1860.000"/>
+            <element name="date_tm" uom="datetime" value="2019-11-05T13:00:00.000Z"/>
+            <element name="data_pvdr" uom="unitless" value="BC-ENV"/>
+            <element name="data_attrib_not" uom="unitless" value="Observational data provided by the Government of British Columbia: Ministry of Environment (BC-ENV). All rights reserved. | Données d’observation fournies par le Gouvernement de la Colombie-Britannique: Ministère de l’Environnement (CB-ENV). Tous droits réservés."/>
+          </identification-elements>
+        </set>
+      </om:metadata>
+      <om:samplingTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2019-11-05T13:00:00.000Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:samplingTime>
+      <om:resultTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2019-11-05T13:29:24.151Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:resultTime>
+      <om:procedure xlink:href="/metadata/partners/mr/sfc_wx_cfg/bc_env_snowwx/instance-xml-2.0/bc_env-asw_1a01p/43485654?version=1.2"/>
+      <om:observedProperty gml:remoteSchema="/schema/point-observation/2.0.xsd"/>
+      <om:featureOfInterest>
+        <gml:FeatureCollection>
+          <gml:location>
+            <gml:Point>
+              <gml:pos>52.9063 -118.5478</gml:pos>
+            </gml:Point>
+          </gml:location>
+        </gml:FeatureCollection>
+      </om:featureOfInterest>
+      <om:result>
+        <elements>
+          <element name="air_temp_1" uom="°C" value="-3.2">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_1hr_ago_1" uom="°C" value="-2.2">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_2hrs_ago_1" uom="°C" value="-0.4">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_2" uom="°C" value="-3.1">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_1hr_ago_2" uom="°C" value="-1.5">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="air_temp_2hrs_ago_2" uom="°C" value="-0.1">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_wtr_equiv" uom="mm" value="21.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_wtr_equiv_1hr_ago" uom="mm" value="20.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_wtr_equiv_2hrs_ago" uom="mm" value="20.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth" uom="cm" value="21">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_1hr_ago" uom="cm" value="18">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="snw_dpth_2hrs_ago" uom="cm" value="16">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="cum_pcpn_amt" uom="mm" value="488.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="cum_pcpn_amt_1hr_ago" uom="mm" value="486.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="cum_pcpn_amt_2hrs_ago" uom="mm" value="485.0">
+            <qualifier name="qa_summary" uom="unitless" value="100"/>
+          </element>
+          <element name="batry_volt" uom="V" value="12.6"/>
+          <element name="batry_volt_1hr_ago" uom="V" value="12.6"/>
+          <element name="batry_volt_2hrs_ago" uom="V" value="12.6"/>
+          <element name="solr_volt" uom="V" value="0.00"/>
+          <element name="solr_volt_1hr_ago" uom="V" value="0.00"/>
+          <element name="solr_volt_2hrs_ago" uom="V" value="0.00"/>
+          <element name="trans_batry_volt" uom="V" value="12.0"/>
+          <element name="trans_batry_volt_1hr_ago" uom="V" value="12.0"/>
+          <element name="trans_batry_volt_2hrs_ago" uom="V" value="12.0"/>
+          <element name="pcpn_amt_pst12hrs" uom="mm" value="7.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst3hrs" uom="mm" value="3.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst1hr" uom="mm" value="2.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst6hrs" uom="mm" value="4.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+          <element name="pcpn_amt_pst24hrs" uom="mm" value="9.0">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+        </elements>
+      </om:result>
+    </om:Observation>
+  </om:member>
+</om:ObservationCollection>'''.encode('utf-8').splitlines()

@@ -9,6 +9,7 @@ from dateutil.parser import parse as dateparse
 from pkg_resources import resource_stream
 from crmprtd import Row, iterable_to_stream
 from crmprtd.ec import ns, OmMember, no_ns_element
+from crmprtd.ec_swob.download import split_multi_xml_stream
 
 
 log = logging.getLogger(__name__)
@@ -27,6 +28,12 @@ def parse_xml(iterable, xsl=None):
 
 def normalize(file_stream, network_name,
               station_id_attr='climate_station_number'):
+    for xml_file in split_multi_xml_stream(file_stream):
+        yield from normalize_xml(xml_file, network_name, station_id_attr)
+
+
+def normalize_xml(file_stream, network_name,
+                  station_id_attr='climate_station_number'):
     et = parse_xml(file_stream)
 
     members = et.xpath('//om:member', namespaces=ns)
