@@ -4,6 +4,10 @@
     omit =
         crmprtd/db_excptions
         crmprtd/ec/download.py
+        crmprtd/bc_env_snow/download.py
+        crmprtd/bc_env_ag/download.py
+        crmprtd/bc_tran/download.py
+        crmprtd/bc_forestry/download.py
         crmprtd/moti/download.py
         crmprtd/wamr/download.py
         crmprtd/wmb/download.py

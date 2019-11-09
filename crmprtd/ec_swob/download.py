@@ -3,11 +3,13 @@ import datetime
 import logging
 import urllib.parse
 from io import BytesIO
+from argparse import ArgumentParser
 
 from lxml import html
 import requests
 
 from crmprtd.download import https_download
+from crmprtd import logging_args, setup_logging
 
 
 log = logging.getLogger(__name__)
@@ -80,3 +82,43 @@ def split_multi_xml_stream(stream):
     for _ in range(len(matches) // 2):
         rv = BytesIO(matches.pop(0) + matches.pop(0))
         yield rv
+
+
+def main(partner):
+    '''Main download function to use for download scripts for the EC_SWOB
+    provincial partners (e.g. bc-env-snow, bc-env-aq, bc-forestry and
+    bc-tran).
+
+    Args:
+        partner (str): The partner abbreviation found in the SWOB URL
+        (e.g. bc-tran)
+
+    Returns:
+        No return value. Produces side-effect of sending downloaded
+        XML files to STDOUT
+
+    '''
+    parser = ArgumentParser()
+    parser = logging_args(parser)
+    parser.add_argument('-d', '--date',
+                        help=("Alternate date to use for downloading "
+                              "(interpreted with "
+                              "strptime(format='Y/m/d H:M:S')"))
+    args = parser.parse_args()
+
+    setup_logging(args.log_conf, args.log_filename, args.error_email,
+                  args.log_level, 'crmprtd.{}'.format(partner))
+
+    if not args.date:
+        dl_date = datetime.datetime.now()
+    else:
+        dl_date = datetime.datetime.strptime(args.date, '%Y/%m/%d %H:%M:%S')
+
+    download(
+        'https://dd.weather.gc.ca/observations/swob-ml/partners/{}/'
+        .format(partner), dl_date
+    )
+
+
+if __name__ == '__main__':
+    main('bc-env-snow')
