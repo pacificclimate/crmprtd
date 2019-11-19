@@ -13,7 +13,7 @@ def test_with_container(String pyimage) {
             sh 'pip install .'
 
             // Tests
-            sh 'py.test -v'
+            sh 'py.test -v --tb=short --cov --flake8'
         }
     }
 }
