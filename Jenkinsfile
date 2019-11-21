@@ -60,7 +60,7 @@ node {
         }
     }
 
-    if (BRANCH_NAME != 'master') {
+    if (BRANCH_NAME == 'master') {
         stage('Push to PYPI') {
             push_to_pypi()
         }
