@@ -33,8 +33,8 @@ def push_to_pypi() {
             // Build
             sh 'python setup.py sdist'
 
+            // Release
             withCredentials([usernamePassword(credentialsId: 'PCIC_PYPI_CREDS', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                // Release
                 sh "twine upload --repository-url https://pypi.pacificclimate.org/ --skip-existing -u $USERNAME -p $PASSWORD dist/*"
             }
         }
@@ -60,8 +60,10 @@ node {
         }
     }
 
-    stage('Push to PYPI') {
-        push_to_pypi()
+    if (BRANCH_NAME != 'master') {
+        stage('Push to PYPI') {
+            push_to_pypi()
+        }
     }
 
     stage('Clean Workspace') {
