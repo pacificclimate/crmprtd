@@ -18,16 +18,23 @@ def test_with_container(String pyimage) {
     }
 }
 
+
 def build_release_package() {
     withDockerServer([uri: PCIC_DOCKER]) {
         def pytainer = docker.image('crmprtd-python35')
 
         pytainer.inside {
+            // get twine
+            sh 'pip install twine'
+
             // Build
             sh 'python setup.py sdist'
 
-            // Release
-            // sh 'python setup.py sdist upload -r something'
+            withCredentials([usernamePassword(credentialsId: 'PCIC_PYPI_CREDS', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                // Release
+                sh "twine upload --repository-url https://pypi.pacificclimate.org/simple/ -u $USERNAME -p $PASSWORD dist/*"
+            }
+
         }
     }
 }
