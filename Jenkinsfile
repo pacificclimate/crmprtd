@@ -19,7 +19,10 @@ def test_with_container(String pyimage) {
 }
 
 
-def build_release_package() {
+/**
+ * Build and release package to pypi
+ */
+def push_to_pypi() {
     withDockerServer([uri: PCIC_DOCKER]) {
         def pytainer = docker.image('crmprtd-python35')
 
@@ -32,9 +35,8 @@ def build_release_package() {
 
             withCredentials([usernamePassword(credentialsId: 'PCIC_PYPI_CREDS', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                 // Release
-                sh "twine upload --repository-url https://pypi.pacificclimate.org/simple/ -u $USERNAME -p $PASSWORD dist/*"
+                sh "twine upload --repository-url https://pypi.pacificclimate.org/ --skip-existing -u $USERNAME -p $PASSWORD dist/*"
             }
-
         }
     }
 }
@@ -58,8 +60,8 @@ node {
         }
     }
 
-    stage('Build Package') {
-        build_release_package()
+    stage('Push to PYPI') {
+        push_to_pypi()
     }
 
     stage('Clean Workspace') {
