@@ -44,8 +44,7 @@ def push_to_pypi() {
 
 node {
     stage('Code Collection') {
-        // checkout scm
-        git(url: 'https://github.com/pacificclimate/crmprtd.git')
+        checkout scm
     }
 
     stage('Testing') {
