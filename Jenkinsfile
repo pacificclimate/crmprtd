@@ -46,7 +46,10 @@ def push_to_pypi() {
 
 node {
     stage('Code Collection') {
+        // The default checkout procedure runs with `git fetch --no-tags` so we
+        // perform an additional fetch to gather the tags.
         checkout scm
+        sh 'git fetch'
     }
 
     stage('Testing') {
@@ -61,7 +64,9 @@ node {
         }
     }
 
-    if (BRANCH_NAME == 'master') {
+    String tag = sh (script: 'git tag --contains', returnStdout: true).trim()
+
+    if (BRANCH_NAME == 'master' && !tag.isEmpty()) {
         stage('Push to PYPI') {
             push_to_pypi()
         }
