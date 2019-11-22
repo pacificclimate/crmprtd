@@ -9,8 +9,10 @@ def test_with_container(String pyimage) {
 
         pytainer.inside {
             // Installs
-            sh 'pip install -r requirements.txt -r test_requirements.txt -i http://tools.pacificclimate.org/pypiserver/ --trusted-host tools.pacificclimate.org'
-            sh 'pip install .'
+            withEnv(['PIP_INDEX_URL=https://pypi.pacificclimate.org/simple']) {
+                sh 'pip install -r requirements.txt -r test_requirements.txt'
+                sh 'pip install .'
+            }
 
             // Tests
             sh 'py.test -v --tb=short --cov --flake8'
