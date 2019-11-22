@@ -28,10 +28,10 @@ def push_to_pypi() {
 
         pytainer.inside {
             // get twine
-            sh 'pip install twine'
+            sh 'pip install twine wheel'
 
             // Build
-            sh 'python setup.py sdist'
+            sh 'python setup.py sdist bdist_wheel'
 
             // Release
             withCredentials([usernamePassword(credentialsId: 'PCIC_PYPI_CREDS', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
