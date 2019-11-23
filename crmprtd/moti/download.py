@@ -7,11 +7,8 @@ import logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
-# Installed libraries
-import requests
-
 # Local
-from crmprtd.download import extract_auth
+from crmprtd.download import extract_auth, https_download
 from crmprtd import common_auth_arguments, logging_args, setup_logging
 
 log = logging.getLogger(__name__)
@@ -48,20 +45,8 @@ def download(username, password, auth_fname, auth_key,
         else:
             payload = {}
 
-        # Configure requests to use retry
-        s = requests.Session()
-        a = requests.adapters.HTTPAdapter(max_retries=3)
-        s.mount('https://', a)
-        req = s.get('https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110',
-                    params=payload, auth=(auth['u'], auth['p']))
-
-        log.info('{}: {}'.format(req.status_code, req.url))
-        if req.status_code != 200:
-            raise IOError(
-                "HTTP {} error for {}".format(req.status_code, req.url))
-
-        for line in req.iter_content(chunk_size=None):
-            sys.stdout.buffer.write(line)
+        url = 'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110'
+        https_download(url, 'https', log, auth, payload)
 
     except IOError:
         log.exception("Unable to download or open xml data")

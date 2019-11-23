@@ -57,7 +57,8 @@ setup(
                       'pint'
                       ],
     tests_require=['pytest',
-                   'pysqlite'],
+                   'pysqlite'
+                   'requests_mock'],
     cmdclass={'test': PyTest},
     include_package_data=True,
     classifiers=["Programming Language :: Python :: 3 :: Only"]
