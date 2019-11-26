@@ -1,16 +1,24 @@
 # crmprtd
 
 [![Build Status](https://travis-ci.org/pacificclimate/crmprtd.svg?branch=master)](https://travis-ci.org/pacificclimate/crmprtd)
-[![Code Health](https://landscape.io/github/pacificclimate/crmprtd/master/landscape.svg?style=flat)](https://landscape.io/github/pacificclimate/crmprtd/master)
 
 Utility to download near real time weather data and insert it into PCIC's database
 
 ## Installation
 
+For production usage, install the latest tagged release from PCIC's PyPI server.
+
 ```bash
+pip install -i https://pypi.pacificclimate.org/simple crmprtd
+```
+
+Or for development, clone the repo and install it from your local source tree.
+
+```bash
+git clone git@github.com:pacificclimate/crmprtd
 virtualenv venv
 source venv/bin/activate
-pip install -r requirements.txt -i http://tools.pacificclimate.org/pypiserver/ --trusted-host tools.pacificclimate.org
+pip install -r requirements.txt -i https://pypi.pacificclimate.org/simple
 pip install .
 ```
 
@@ -18,42 +26,56 @@ pip install .
 
 The most common usage pattern for the `crmprtd` is to configure a number of scripts to run on an hourly or daily basis.
 
-Many of the data sources require authentication. For most scripts, credentials can be provided as command line arguments, or more preferrably, entries in a yaml config file. A sample version of this file can be see [here](https://github.com/pacificclimate/crmprtd/blob/master/auth.yaml). This is then sources by passing the file location with the `--auth` argument and the key with the `--auth_key` argument.
+Some of the data sources require authentication. For most scripts, credentials can be provided as command line arguments, or more preferrably, entries in a yaml config file. A sample version of this file can be see [here](https://github.com/pacificclimate/crmprtd/blob/master/auth.yaml). This is then sources by passing the file location with the `--auth` argument and the key with the `--auth_key` argument.
 
-Each network has a `[network_name]/download.py` script which will download data.  The output of this script can be piped into a file or into `process.py`.  `process.py` will take the data and run it through a series of formatting changes and checks before inserting the data into the database.
+Each network has a `download_[network_name]` script which will download data.  The standard output stream of this script can be redirected into a file or piped into `crmprtd_process`.  `crmprtd_process` will take the data and run it through a series of formatting changes and checks before inserting the data into the database.
 
-### FLNRO-WMB
+A list of all available network modules can be found in the online help for `crmprtd_process`:
 
-`wmb/download.py > filename`
-or
-`wmb/download.py | process.py`
-or
-`wmb/download.py | tee filename | process.py`
+```bash
+(env) james@basalt:~/code/git/crmprtd$ crmprtd_process -h
+usage: crmprtd_process [-h] -c CONNECTION_STRING [-D]
+                       [--sample_size SAMPLE_SIZE]
+                       [-N {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,ec,moti,wamr,wmb}]
+                       [-L LOG_CONF] [-l LOG_FILENAME]
+                       [-o {DEBUG,INFO,WARNING,ERROR,CRITICAL}]
+                       [-m ERROR_EMAIL]
 
-### EC
+optional arguments:
+...
+  -N {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,ec,moti,wamr,wmb}, --network {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,ec,moti,wamr,wmb}
+                        The network from which the data is coming from. The
+                        name will be used for a dynamic import of the module's
+                        normalization function.
+```
 
-`ec/download.py > filename`
-or
-`ec/download.py | process.py`
-or
-`ec/download.py | tee filename | process.py`
+### Input/Output Streams
 
-### MoTIe
+Connecting the I/O of the download scripts to cache files and the processing scripts is as easy as using unix pipes and I/O redirects. For example, fetching the SWOB-ML for the BC Forestry data and processing it, looks like this:
 
-`moti/download.py > filename`
-or
-`moti/download.py | process.py`
-or
-`moti/download.py | tee filename | process.py`
+```bash
+download_bc_forestry > cache_filename
+crmprtd_process -N bc_forestry < cache_filename
+# Or
+download_bc_forestry | crmprtd_process -N bc_forestry
+# Or
+download_bc_forestry | tee cache_filename | crmprtd_process -N bc_forestry
+```
 
-### ENV-AQN
+More generally:
 
-`wamr/download.py > filename`
-or
-`wamr/download.py | process.py`
-or
-`wamr/download.py | tee filename | process.py`
+```bash
+download_[network_name] > cache_filename
+crmprtd_process -N [network_name] < cache_filename
+# Or
+download_[network_name] | crmprtd_process -N [network_name]
+# Or
+download_[network_name] | tee cache_filename | crmprtd_process -N [network_name]
+```
 
+### Logging
+
+One thing to be aware of when using pipes and stdout is that you need to ensure that no logging or debugging output from the download script goes to standard out. The default console logger sends logging output to the standard error stream. However, this is configurable, so the user must take care to *not* configure the logging output to go to standard out, lest it get mixed up with the data output stream.
 
 ## Testing
 
@@ -77,5 +99,6 @@ git tag -a -m"x.x.x" x.x.x
 git push --follow-tags
   ```
 1. Build and release the new package
-  - `python setup.py sdist`, then copy the `dist/<package_name>.tar.gz` to the pypiserver, OR
+  - `pip install wheel`
+  - `python setup.py sdist bdist_wheel`, then copy the `dist/*` to the pypiserver, OR
   - `python setup.py sdist upload -r <server>` if you have that set up in your `.pypirc` file
