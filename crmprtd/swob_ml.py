@@ -26,14 +26,21 @@ def parse_xml(iterable, xsl=None):
     return transform(et)
 
 
+def identity(x):
+    return x
+
+
 def normalize(file_stream, network_name,
-              station_id_attr='climate_station_number'):
+              station_id_attr='climate_station_number',
+              station_id_xform=identity):
     for xml_file in split_multi_xml_stream(file_stream):
-        yield from normalize_xml(xml_file, network_name, station_id_attr)
+        yield from normalize_xml(xml_file, network_name, station_id_attr,
+                                 station_id_xform)
 
 
 def normalize_xml(file_stream, network_name,
-                  station_id_attr='climate_station_number'):
+                  station_id_attr='climate_station_number',
+                  station_id_xform=identity):
     et = parse_xml(file_stream)
 
     members = et.xpath('//om:member', namespaces=ns)
@@ -67,6 +74,8 @@ def normalize_xml(file_stream, network_name,
                         no_ns_element('element'),
                         station_id_attr
                     ), namespaces=ns)[0].get('value')
+                station_id = station_id_xform(station_id)
+
                 lat, lon = map(float, member.xpath(
                     './/gml:pos', namespaces=ns)[0].text.split())
                 obs_time = member.xpath(
