@@ -14,7 +14,6 @@ def process_args(parser):
     parser.add_argument('-c', '--connection_string',
                         help='PostgreSQL connection string',
                         required=True)
-    # FIXME: I do not think this arg gets used anywhere
     parser.add_argument('-D', '--diag',
                         default=False, action="store_true",
                         help="Turn on diagnostic mode (no commits)")
@@ -40,7 +39,7 @@ def get_normalization_module(network):
     return import_module('crmprtd.{}.normalize'.format(network))
 
 
-def process(connection_string, sample_size, network):
+def process(connection_string, sample_size, network, is_diagnostic=False):
     '''Executes 3 stages of the data processing pipeline.
 
        Normalizes the data based on the network's format.
@@ -63,7 +62,15 @@ def process(connection_string, sample_size, network):
     Session = sessionmaker(engine)
     sesh = Session()
 
-    observations = [ob for ob in [align(sesh, row) for row in rows] if ob]
+    observations = [
+        ob for ob in [align(sesh, row, is_diagnostic) for row in rows] if ob
+    ]
+
+    if is_diagnostic:
+        for obs in observations:
+            log.info(obs)
+        return
+
     results = insert(sesh, observations, sample_size)
     log.info('Data insertion results', extra={'results': results})
 
@@ -77,7 +84,7 @@ def main():
     setup_logging(args.log_conf, args.log_filename, args.error_email,
                   args.log_level, 'crmprtd')
 
-    process(args.connection_string, args.sample_size, args.network)
+    process(args.connection_string, args.sample_size, args.network, args.diag)
 
 
 if __name__ == "__main__":

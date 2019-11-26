@@ -111,7 +111,8 @@ def match_station(sesh, network_name, native_id, lat, lon, histories):
         return find_active_history(histories)
 
 
-def create_station_and_history_entry(sesh, network_name, native_id, lat, lon):
+def create_station_and_history_entry(sesh, network_name, native_id, lat, lon,
+                                     diagnostic=False):
     network = sesh.query(Network).filter(
         Network.name == network_name)
 
@@ -152,7 +153,7 @@ def get_variable(sesh, network_name, variable_name):
     return variable
 
 
-def get_history(sesh, network_name, native_id, lat, lon):
+def get_history(sesh, network_name, native_id, lat, lon, diagnostic=False):
     log.debug("Searching for native_id = %s", native_id)
     histories = sesh.query(History).join(Station).join(Network).filter(and_(
         Network.name == network_name,
@@ -160,6 +161,9 @@ def get_history(sesh, network_name, native_id, lat, lon):
 
     if histories.count() == 0:
         log.debug("Cound not find native_id %s", native_id)
+        if diagnostic:
+            log.debug("In diagnostic mode. Returning from get_history")
+            return
         return create_station_and_history_entry(sesh, network_name, native_id,
                                                 lat, lon)
     elif histories.count() == 1:
@@ -182,7 +186,7 @@ def has_required_information(obs_tuple):
         and obs_tuple.val is not None and obs_tuple.variable_name is not None
 
 
-def align(sesh, obs_tuple):
+def align(sesh, obs_tuple, diagnostic=False):
     # Without these items an Obs object cannot be produced
     if not has_required_information(obs_tuple):
         log.debug('Observation missing critical information',
@@ -198,7 +202,7 @@ def align(sesh, obs_tuple):
         return None
 
     history = get_history(sesh, obs_tuple.network_name, obs_tuple.station_id,
-                          obs_tuple.lat, obs_tuple.lon)
+                          obs_tuple.lat, obs_tuple.lon, diagnostic)
 
     if not history:
         log.warning('Could not find history match',
