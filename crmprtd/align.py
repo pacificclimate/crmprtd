@@ -153,16 +153,20 @@ def get_variable(sesh, network_name, variable_name):
 
 
 def get_history(sesh, network_name, native_id, lat, lon):
+    log.debug("Searching for native_id = %s", native_id)
     histories = sesh.query(History).join(Station).join(Network).filter(and_(
         Network.name == network_name,
         Station.native_id == native_id))
 
     if histories.count() == 0:
+        log.debug("Cound not find native_id %s", native_id)
         return create_station_and_history_entry(sesh, network_name, native_id,
                                                 lat, lon)
     elif histories.count() == 1:
+        log.debug("Found exactly one matching history_id")
         return histories.one_or_none()
     elif histories.count() >= 2:
+        log.debug("Found multiple history entries. Searching for match.")
         return match_station(sesh, network_name, native_id, lat, lon,
                              histories)
 
@@ -207,9 +211,8 @@ def align(sesh, obs_tuple):
 
     # Necessary attributes for Obs object
     if not variable:
-        log.debug('Variable is not tracked by crmp',
-                  extra={'variable': obs_tuple.variable_name,
-                         'network_name': obs_tuple.network_name})
+        log.debug('Variable "%s" from network "%s" is not tracked by crmp',
+                  obs_tuple.variable_name, obs_tuple.network_name)
         return None
 
     datum = unit_check(obs_tuple.val, obs_tuple.unit, variable.unit)
