@@ -151,6 +151,7 @@ def setup_logging(log_conf, log_filename, error_email, log_level, name):
 
     if log_level:
         base_config['root']['level'] = log_level
+        base_config['loggers']['crmprtd']['level'] = log_level
 
     logging.config.dictConfig(base_config)
 
