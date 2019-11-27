@@ -1,5 +1,14 @@
 # News / Release Notes
 
+## 2.0.0
+
+*27-November-2019*
+
+* Adds four new network feeds via an Environment Canada XML partner feed
+* Adds full use of diagnostic (no database commit) mode
+* Drops support for Python 3.4
+* Adds support for Python 3.7
+
 ## 1.0.1
 
 *04-September-2018*
