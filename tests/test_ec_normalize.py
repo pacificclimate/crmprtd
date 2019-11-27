@@ -80,7 +80,7 @@ def test_normalize_good_data():
         assert row.network_name is not None
 
 
-def test_normalize_bad_stn():
+def test_normalize_no_station_id():
     lines = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
@@ -100,7 +100,6 @@ def test_normalize_bad_stn():
             <element name="transport_canada_id" uom="unitless" value="YXX"/>
             <element name="observation_date_utc" uom="unitless" value="2016-05-28T02:00:00.000Z"/>
             <element name="observation_date_local_time" uom="unitless" value="2016-05-27T19:00:00.000 PDT"/>
-            <element name="climate_station_number" uom="unitless" value="1100031"/>
             <element name="wmo_station_number" uom="unitless" value="71108"/>
           </identification-elements>
         </set>

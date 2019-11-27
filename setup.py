@@ -37,6 +37,10 @@ setup(
     ],
     entry_points={
         'console_scripts': [
+            'download_bc_env_snow=crmprtd.bc_env_snow.download:main',
+            'download_bc_env_aq=crmprtd.bc_env_aq.download:main',
+            'download_bc_forestry=crmprtd.bc_forestry.download:main',
+            'download_bc_tran=crmprtd.bc_tran.download:main',
             'download_ec=crmprtd.ec.download:main',
             'download_moti=crmprtd.moti.download:main',
             'download_wamr=crmprtd.wamr.download:main',
