@@ -63,6 +63,9 @@ setup(
     tests_require=['pytest',
                    'pysqlite'
                    'requests_mock'],
+    extras_require={
+        'jsonlogger': 'python-json-logger',
+    },
     cmdclass={'test': PyTest},
     include_package_data=True,
     classifiers=["Programming Language :: Python :: 3 :: Only"]
