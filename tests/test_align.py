@@ -3,7 +3,7 @@ from datetime import datetime
 from geoalchemy2.functions import ST_X, ST_Y
 
 from crmprtd.align import is_network, get_history, get_variable, unit_check, \
-    align, closest_stns_within_threshold
+    align, closest_stns_within_threshold, convert_unit
 from crmprtd import Row
 from pycds import Station, History
 
@@ -253,3 +253,8 @@ def test_closest_stns_within_threshold_bad_data(ec_session):
     # Just search for the good station and ensure there are not errors
     x = closest_stns_within_threshold(ec_session, 'EC_raw', x, y, 1)
     assert len(x) > 0
+
+
+def test_convert_unit():
+    x = 42
+    assert convert_unit(x, "\u00b0C", "celsius") == x
