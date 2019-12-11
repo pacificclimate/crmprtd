@@ -1,5 +1,12 @@
 # News / Release Notes
 
+## 2.0.1
+
+*10-December-2019*
+
+* Adds extra "celsius" aliases for units conversion
+* Adds an install option to log in JSON format
+
 ## 2.0.0
 
 *27-November-2019*
