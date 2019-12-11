@@ -10,6 +10,8 @@ For production usage, install the latest tagged release from PCIC's PyPI server.
 
 ```bash
 pip install -i https://pypi.pacificclimate.org/simple crmprtd
+# or with JSON logging functionality
+pip install -i https://pypi.pacificclimate.org/simple crmprtd[jsonlogger]
 ```
 
 Or for development, clone the repo and install it from your local source tree.
