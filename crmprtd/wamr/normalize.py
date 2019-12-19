@@ -48,7 +48,6 @@ def normalize(file_stream):
             ('% RH', '%'),
             ('\u00b0C', 'celsius'),
             ('mb', 'millibar'),
-            ('Deg', 'degree')
         ]
         for src, dest in substitutions:
             if unit == src:
