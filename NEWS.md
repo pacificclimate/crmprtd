@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 2.0.2
+
+*19-December-2019*
+
+* Moves WAMR's "celsius" aliases into align to be handled by pint
+
 ## 2.0.1
 
 *10-December-2019*
