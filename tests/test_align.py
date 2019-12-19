@@ -255,7 +255,11 @@ def test_closest_stns_within_threshold_bad_data(ec_session):
     assert len(x) > 0
 
 
-@pytest.mark.parametrize(('alias'), ('Deg.', 'Deg', '\u00b0C'))
-def test_convert_unit(alias):
+@pytest.mark.parametrize(('alias', 'dest'), (
+    ('Deg.', 'degree'),
+    ('Deg', 'degree'),
+    ('\u00b0C', 'celsius')
+))
+def test_convert_unit(alias, dest):
     x = 42
-    assert convert_unit(x, alias, "celsius") == x
+    assert convert_unit(x, alias, dest) == x
