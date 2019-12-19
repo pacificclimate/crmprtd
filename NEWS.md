@@ -1,5 +1,13 @@
 # News / Release Notes
 
+## 2.0.3
+
+*19-December-2019*
+
+* Fixes mistake in WAMR units (the author mistook "Deg." for
+  temperature degrees when it's actually wind direction degrees
+  (unitless)
+
 ## 2.0.2
 
 *19-December-2019*

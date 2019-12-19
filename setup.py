@@ -3,7 +3,7 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-__version__ = (2, 0, 2)
+__version__ = (2, 0, 3)
 
 
 class PyTest(TestCommand):
