@@ -9,9 +9,9 @@ node {
     stage('Testing') {
         def requirements = ['requirements.txt', 'test_requirements.txt']
         def testArgs = '-v --tb=short --cov --flake8'
-        def params = [containerData: 'crmprtd', egg: false]
+        def optParams = [containerData: 'crmprtd', egg: false]
 
-        runPythonTestSuite('crmprtd-python35', requirements, testArgs, containerArgs)
+        runPythonTestSuite('crmprtd-python35', requirements, testArgs, optParams)
 
         // parallel "Python 3.5": {
         //     runPythonTestSuite('crmprtd-python35', requirements, testArgs)
