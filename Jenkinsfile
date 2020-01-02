@@ -9,7 +9,7 @@ node {
     stage('Testing') {
         def requirements = ['requirements.txt', 'test_requirements.txt']
         def testArgs = '-v --tb=short --cov --flake8'
-        def containerArgs = [containerData: 'crmprtd']
+        def params = [containerData: 'crmprtd', egg: false]
 
         runPythonTestSuite('crmprtd-python35', requirements, testArgs, containerArgs)
 
