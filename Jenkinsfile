@@ -3,13 +3,14 @@
 
 node {
     stage('Code Collection') {
+        cleanWs()
         codeCollection()
     }
 
     stage('Testing') {
         def requirements = ['requirements.txt', 'test_requirements.txt']
         def testArgs = '-v --tb=short --cov --flake8'
-        def optParams = [containerData: 'crmprtd', egg: false]
+        def optParams = [containerData: 'crmprtd']
 
         runPythonTestSuite('crmprtd-python35', requirements, testArgs, optParams)
 
