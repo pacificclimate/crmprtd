@@ -7,11 +7,16 @@ node {
     }
 
     stage('Testing') {
-        parallel "Python 3.6": {
-            test_with_container('crmprtd-python36')
+        def requirements = ['requirements.txt', 'test_requirements.txt']
+        def testArgs = '-v --tb=short --cov --flake8'
+        parallel "Python 3.5": {
+            runPythonTestSuite('crmprtd-python35', requirements, testArgs)
+        },
+        "Python 3.6": {
+            runPythonTestSuite('crmprtd-python36', requirements, testArgs)
         },
         "Python 3.7": {
-            runPythonTestSuite('crmprtd-python37')
+            runPythonTestSuite('crmprtd-python37', requirements, testArgs)
         }
     }
 
