@@ -60,6 +60,7 @@ def normalize_xml(file_stream, network_name,
                 val = ele.get('value')
                 # Ignore missing values. We don't record them.
                 if val == 'MSNG':
+                    log.debug('Ignoring missing obs with value \'MSNG\'')
                     continue
                 val = float(val)
             # This shouldn't ever be empty based on our xpath for selecting

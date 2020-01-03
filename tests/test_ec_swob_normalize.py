@@ -1,3 +1,5 @@
+import re
+import logging
 from collections import Iterable
 
 import pytest
@@ -22,11 +24,14 @@ def test_normalize(function):
         assert True
 
 
-def test_normalize_missing_values():
+def test_normalize_missing_values(caplog):
     # The test data here has 3 missing values that shouldn't generate anything
     # and 1 actual value that should
     iterator = norm_tran(MSNG_values_xml)
     assert isinstance(iterator, Iterable)
     assert next(iterator)
-    with pytest.raises(StopIteration):
+    with pytest.raises(StopIteration), caplog.at_level(
+            logging.DEBUG, logger="crmprtd.swob_ml"):
         next(iterator)
+        # There should be 3 DEBUG log messages about skipping a MSNG value
+        assert re.search(r'(Ignoring.*){3}', caplog.text)
