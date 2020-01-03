@@ -488,3 +488,74 @@ multi_xml_download = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
     </om:Observation>
   </om:member>
 </om:ObservationCollection>'''.encode('utf-8').splitlines()
+
+MSNG_values_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<om:ObservationCollection xmlns:om="http://www.opengis.net/om/1.0" xmlns="http://dms.ec.gc.ca/schema/point-observation/2.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <om:member>
+    <om:Observation>
+      <om:metadata>
+        <set>
+          <general>
+            <author build="build.24" name="MSC-DMS-PG-SWOB" version="3.0"/>
+            <dataset name="partners/observation/atmospheric/surface_weather/bc_tran-1.0-csv"/>
+            <phase name="product_generic_swob-xml-2.0"/>
+            <id xlink:href="/data/partners/observation/atmospheric/surface_weather/bc_tran-1.0-csv/product_generic_swob-xml-2.0/20200103000000000/bc_tran_11091/11091/orig/data_60"/>
+            <parent xlink:href="/data/partners/observation/atmospheric/surface_weather/bc_tran-1.0-csv/decoded_enhanced-xml-2.0/20200103000000000/bc_tran_11091/11091/orig/data_60"/>
+          </general>
+          <identification-elements>
+            <element name="data_pvdr" uom="unitless" value="BC-TRAN"/>
+            <element name="data_attrib_not" uom="unitless" value="Observational data provided by the Government of British Columbia: Ministry of Transportation and Infrastructure (BC-TRAN). All rights reserved. | Données d’observation fournies par le Gouvernement de la Colombie-Britannique: Ministère des Transports et de l’Infrastructure (CB-TRAN). Tous droits réservés."/>
+            <element name="stn_id" uom="unitless" value="11091"/>
+            <element name="stn_nam" uom="unitless" value="BRANDWYINE"/>
+            <element name="stn_shrt_nam" uom="unitless" value="BRNWRW"/>
+            <element name="lat" uom="°" value="50.054170"/>
+            <element name="long" uom="°" value="-123.118060"/>
+            <element name="stn_elev" uom="m" value="496.000"/>
+            <element name="msc_id" uom="unitless" value="BC_TRAN_11091"/>
+            <element name="date_tm" uom="datetime" value="2020-01-03T00:00:00.000Z"/>
+            <element name="last_reset_date_tm" uom="datetime" value="2020-01-02T14:00:00.000Z"/>
+          </identification-elements>
+        </set>
+      </om:metadata>
+      <om:samplingTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2020-01-03T00:00:00.000Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:samplingTime>
+      <om:resultTime>
+        <gml:TimeInstant>
+          <gml:timePosition>2020-01-03T00:10:34.920Z</gml:timePosition>
+        </gml:TimeInstant>
+      </om:resultTime>
+      <om:procedure xlink:href="/metadata/partners/mr/sfc_wx_cfg/bc_tran/instance-xml-2.0/bc_tran_11091/11091?version=1.2"/>
+      <om:observedProperty gml:remoteSchema="/schema/point-observation/2.0.xsd"/>
+      <om:featureOfInterest>
+        <gml:FeatureCollection>
+          <gml:location>
+            <gml:Point>
+              <gml:pos>50.05417 -123.11806</gml:pos>
+            </gml:Point>
+          </gml:location>
+        </gml:FeatureCollection>
+      </om:featureOfInterest>
+      <om:result>
+        <elements>
+          <element name="pcpn_amt_pst3hrs" uom="mm" value="MSNG">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="4"/>
+          </element>
+          <element name="pcpn_amt_pst6hrs" uom="mm" value="MSNG">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="4"/>
+          </element>
+          <element name="pcpn_amt_pst24hrs" uom="mm" value="MSNG">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="4"/>
+          </element>
+          <element name="mslp" uom="hPa" value="1012.7">
+            <qualifier code-src="std_code_src" code-type="data_flags" name="data_flag" uom="code" value="1"/>
+          </element>
+        </elements>
+      </om:result>
+    </om:Observation>
+  </om:member>
+</om:ObservationCollection>
+
+'''.encode('utf-8').splitlines()

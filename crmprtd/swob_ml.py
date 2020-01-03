@@ -57,9 +57,14 @@ def normalize_xml(file_stream, network_name,
                         "{}[@name='{}']".format(
                             no_ns_element('element'), var
                         ), namespaces=ns)[0]
-                val = float(ele.get('value'))
-            # This shouldn't every be empty based on our xpath for selecting
-            # elements, however I think that it _could_ be non-numeric and
+                val = ele.get('value')
+                # Ignore missing values. We don't record them.
+                if val == 'MSNG':
+                    log.debug('Ignoring missing obs with value \'MSNG\'')
+                    continue
+                val = float(val)
+            # This shouldn't ever be empty based on our xpath for selecting
+            # elements, however it could be non-numeric and
             # still be valid XML
             except ValueError as e:
                 log.error('Unable to convert value',
