@@ -1,3 +1,19 @@
+'''Downloads meteorological data from Environment and Climate Change Canada.
+
+Environment and Climate Change Canada (ECCC) post two sets of XML
+files containing weather observations, one for daily variables
+(e.g. daily high temperature) and one for hourly variables. They post
+a new file every hour or day, depending on the temporal resolution.
+Each new file containing only the data for that time range. Only the
+previous month's worth of data is available.
+
+It is recommended to run this script once per hour with the "-F
+hourly" flag or once per day with the "-F daily" flag. There is
+sufficient overlap between the time resolution and the historical data
+available that only the most severe outtages (over a month) would
+result in data loss.
+'''
+
 # Standard module
 import sys
 import logging
@@ -42,7 +58,8 @@ def download(time, frequency, province, language):
 
 
 def main():
-    parser = ArgumentParser()
+    desc = globals()['__doc__']
+    parser = ArgumentParser(description=desc)
     parser.add_argument('-p', '--province', required=True,
                         help='2 letter province code')
     parser.add_argument('-g', '--language', default='e',
@@ -54,7 +71,9 @@ def main():
     parser.add_argument('-t', '--time',
                         help=("Alternate *UTC* time to use for downloading "
                               "(interpreted using "
-                              "format=YYYY/MM/DD HH:MM:SS)"))
+                              "format=YYYY/MM/DD HH:MM:SS)."
+                              "Defaults to the previous hour/day (depending on"
+                              " --frequency)."))
     parser.add_argument('-T', '--threshold', default=1000,
                         help=('Distance threshold (in meters) to use when '
                               'matching stations. Stations are considered a '
