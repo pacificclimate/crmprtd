@@ -2,7 +2,7 @@ from collections import Iterable
 
 import pytest
 
-from .swob_data import multi_xml_download
+from .swob_data import multi_xml_download, MSNG_values_xml
 from crmprtd.bc_env_aq.normalize import normalize as norm_aq
 from crmprtd.bc_env_snow.normalize import normalize as norm_snow
 from crmprtd.bc_forestry.normalize import normalize as norm_forest
@@ -20,3 +20,13 @@ def test_normalize(function):
     assert isinstance(iterator, Iterable)
     for x in iterator:
         assert True
+
+
+def test_normalize_missing_values():
+    # The test data here has 3 missing values that shouldn't generate anything
+    # and 1 actual value that should
+    iterator = norm_tran(MSNG_values_xml)
+    assert isinstance(iterator, Iterable)
+    assert next(iterator)
+    with pytest.raises(StopIteration):
+        next(iterator)
