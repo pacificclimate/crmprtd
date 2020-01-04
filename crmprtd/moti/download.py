@@ -1,13 +1,20 @@
 '''Downloads the BC Ministry of Transportation and Infrastructure (MoTI) data.
 
 The BC Ministry of Transportation and Infrastructure, Avalache Safety
-Program network
+Program network has an application which returns meteorological data
+upon request. By default the application returns all data available
+from the previous hour. It *is* possible to request data for up to the
+previous week, however you need to explicitly limit the query to a
+specific station id. I.e. you cannot specify a time range without a
+priori information. Also see:
+https://github.com/pacificclimate/crmprtd/issues/52.
 
-It is recommended to run this script once per one or two weeks to
-collect all available data (plus, presumably some duplicate data from
-the last run). If the script is run less than once per month, you will
-miss data.
-
+It is recommend to run this script, time parameter free every hour to
+collect the bulk of the data. It is further recommended to do an
+additional run once per one or two weeks with the aid of a station
+list to fill in any gaps that may have arisen from outages or data
+that came in late. If the script is run less than once per month, you
+will miss data.
 '''
 
 
@@ -72,11 +79,13 @@ def main():
     parser.add_argument('-S', '--start_time',
                         help=("Alternate time to use for downloading "
                               "(interpreted with "
-                              "strptime(format='Y/m/d H:M:S')"))
+                              "strptime(format='Y/m/d H:M:S'). "
+                              "Defaults to one day prior to now"))
     parser.add_argument('-E', '--end_time',
                         help=("Alternate time to use for downloading "
                               "(interpreted with "
-                              "strptime(format='Y/m/d H:M:S')"))
+                              "strptime(format='Y/m/d H:M:S'). "
+                              "Defaults to now."))
     parser.add_argument('-s', '--station_id',
                         default=None,
                         help="Station ID for which to download data")
