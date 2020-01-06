@@ -1,7 +1,7 @@
 # Installed libraries
 import pytz
 import logging
-import datetime
+from datetime import datetime
 
 # Local
 from crmprtd import Row
@@ -35,11 +35,16 @@ def normalize(file_stream):
         _, weather_date = data.pop(0)
 
         tz = pytz.timezone('Canada/Pacific')
+        # The date's provided are in 1-24 hour format *roll*
         hour = int(weather_date[-2:]) - 1
         weather_date = weather_date[:-2] + str(hour)
         try:
-            date = datetime.datetime.strptime(weather_date,
-                                              "%Y%m%d%H").replace(tzinfo=tz)
+            # Timezone information isn't provided by WMB, but the
+            # observations appear to be in local time. The max time
+            # value found in a request is the most recent hour local
+            # time. Hopefully assuming this will suffice.
+            date = datetime.strptime(weather_date, "%Y%m%d%H")
+            date = tz.localize(date).astimezone(pytz.utc)
         except ValueError:
             log.error('Unable to convert date', extra={'date': weather_date})
             continue
