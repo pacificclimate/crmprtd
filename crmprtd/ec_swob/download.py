@@ -1,3 +1,18 @@
+'''Downloads partner's weather from Environment and Climate Change Canada.
+
+Environment and Climate Change Canada (ECCC) has a section of its
+SWOB-ML feed of XML files dedicated to its provincial partners (mostly
+from BC). It posts a series of XML files, one file per station per
+hour (further details can be found here:
+https://dd.weather.gc.ca/observations/doc/README_SWOB.txt). ECCC
+appears to maintain the partner data for only 4 to 6 days.
+
+It is recommended to run this script once per hour and maintain
+constant monitoring for outtages and errors as even a short outtage
+could result in data loss.
+
+'''
+
 import re
 import datetime
 import logging
@@ -98,7 +113,8 @@ def main(partner):
         XML files to STDOUT
 
     '''
-    parser = ArgumentParser()
+    desc = globals()['__doc__']
+    parser = ArgumentParser(description=desc)
     parser = logging_args(parser)
     parser.add_argument('-d', '--date',
                         help=("Alternate date to use for downloading "

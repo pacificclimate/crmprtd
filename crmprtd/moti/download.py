@@ -1,4 +1,22 @@
-#!/usr/bin/env python
+'''Downloads the BC Ministry of Transportation and Infrastructure (MoTI) data.
+
+The BC Ministry of Transportation and Infrastructure, Avalache Safety
+Program network has an application which returns meteorological data
+upon request. By default the application returns all data available
+from the previous hour. It *is* possible to request data for up to the
+previous week, however you need to explicitly limit the query to a
+specific station id. I.e. you cannot specify a time range without a
+priori information. Also see:
+https://github.com/pacificclimate/crmprtd/issues/52.
+
+It is recommend to run this script, time parameter free every hour to
+collect the bulk of the data. It is further recommended to do an
+additional run once per one or two weeks with the aid of a station
+list to fill in any gaps that may have arisen from outages or data
+that came in late. If the script is run less than once per month, you
+will miss data.
+'''
+
 
 # Standard module
 import sys
@@ -54,17 +72,20 @@ def download(username, password, auth_fname, auth_key,
 
 
 def main():
-    parser = ArgumentParser()
+    desc = globals()['__doc__']
+    parser = ArgumentParser(description=desc)
     parser = logging_args(parser)
     parser = common_auth_arguments(parser)
     parser.add_argument('-S', '--start_time',
                         help=("Alternate time to use for downloading "
                               "(interpreted with "
-                              "strptime(format='Y/m/d H:M:S')"))
+                              "strptime(format='Y/m/d H:M:S'). "
+                              "Defaults to one day prior to now"))
     parser.add_argument('-E', '--end_time',
                         help=("Alternate time to use for downloading "
                               "(interpreted with "
-                              "strptime(format='Y/m/d H:M:S')"))
+                              "strptime(format='Y/m/d H:M:S'). "
+                              "Defaults to now."))
     parser.add_argument('-s', '--station_id',
                         default=None,
                         help="Station ID for which to download data")

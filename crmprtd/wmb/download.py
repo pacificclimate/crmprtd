@@ -1,3 +1,15 @@
+'''Downloads meteorological data from BC's Wildfire Management Branch
+
+The BC Wildfire Service (FLNRORD-WMB) posts a rolling window (one day)
+of weather data once every hour.
+
+It is recommended to run this script once per hour to collect all
+available data (plus, presumably duplicate data from the last run),
+supplemented with aggressive monitoring and alerting for errors. If
+the script is run less than daily or there are any outages lasting
+greater than 24 hours, you will miss data.
+'''
+
 # Standard module
 import os
 import logging
@@ -61,7 +73,8 @@ class WMBFTPReader(FTPReader):
 
 
 def main():
-    parser = ArgumentParser()
+    desc = globals()['__doc__']
+    parser = ArgumentParser(description=desc)
     parser = logging_args(parser)
     parser = common_auth_arguments(parser)
     parser.add_argument('-f', '--ftp_server',

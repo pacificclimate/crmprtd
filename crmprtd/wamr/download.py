@@ -1,3 +1,15 @@
+'''Downloads the BC Weather and Air Monitoring and Reporting (WAMR) data.
+
+The BC Ministry of Environment, Air Quality Network (AQN) (also known
+as WAMR) branch posts a rolling window (one month) of weather data
+once every day.
+
+It is recommended to run this script once per one or two weeks to
+collect all available data (plus, presumably some duplicate data from
+the last run). If the script is run less than once per month, you will
+miss data.
+'''
+
 import ftplib
 import logging
 import os
@@ -73,7 +85,8 @@ class WAMRFTPReader(FTPReader):
 
 
 def main():
-    parser = ArgumentParser()
+    desc = globals()['__doc__']
+    parser = ArgumentParser(description=desc)
     parser.add_argument('-f', '--ftp_server',
                         default='ftp.env.gov.bc.ca',
                         help=('Full hostname of Water and Air Monitoring and '
