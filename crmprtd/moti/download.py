@@ -36,34 +36,35 @@ def download(username, password, auth_fname, auth_key,
              start_time, end_time, station_id):
     log.info('Starting MOTIe rtd')
 
+    auth_yaml = open(auth_fname, 'r').read() if auth_fname else None
+    auth = extract_auth(username, password, auth_yaml, auth_key)
+
+    if start_time and end_time:
+        start_time = datetime.strptime(
+            start_time, '%Y/%m/%d %H:%M:%S')
+        end_time = datetime.strptime(
+            end_time, '%Y/%m/%d %H:%M:%S')
+        log.info("Starting manual run using timestamps {0} {1}".format(
+            start_time, end_time))
+        # Requests of longer than 7 days not allowed by MoTI
+        assert end_time - start_time <= timedelta(7)
+    else:
+        deltat = timedelta(1)  # go back a day
+        start_time = datetime.utcnow() - deltat
+        end_time = datetime.utcnow()
+        log.info("Starting automatic run "
+                 "using timestamps {0} {1}".format(start_time,
+                                                   end_time))
+
+    if station_id:
+        payload = {'request': 'historic', 'station': station_id,
+                   'from': start_time, 'to': end_time}
+    else:
+        payload = {}
+
+    url = 'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110'
+
     try:
-        auth_yaml = open(auth_fname, 'r').read() if auth_fname else None
-        auth = extract_auth(username, password, auth_yaml, auth_key)
-
-        if start_time and end_time:
-            start_time = datetime.strptime(
-                start_time, '%Y/%m/%d %H:%M:%S')
-            end_time = datetime.strptime(
-                end_time, '%Y/%m/%d %H:%M:%S')
-            log.info("Starting manual run using timestamps {0} {1}".format(
-                start_time, end_time))
-            # Requests of longer than 7 days not allowed by MoTI
-            assert end_time - start_time <= timedelta(7)
-        else:
-            deltat = timedelta(1)  # go back a day
-            start_time = datetime.utcnow() - deltat
-            end_time = datetime.utcnow()
-            log.info("Starting automatic run "
-                     "using timestamps {0} {1}".format(start_time,
-                                                       end_time))
-
-        if station_id:
-            payload = {'request': 'historic', 'station': station_id,
-                       'from': start_time, 'to': end_time}
-        else:
-            payload = {}
-
-        url = 'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110'
         https_download(url, 'https', log, auth, payload)
 
     except IOError:
@@ -80,7 +81,7 @@ def main():
                         help=("Alternate time to use for downloading "
                               "(interpreted with "
                               "strptime(format='Y/m/d H:M:S'). "
-                              "Defaults to one day prior to now"))
+                              "Defaults to one hour prior to now"))
     parser.add_argument('-E', '--end_time',
                         help=("Alternate time to use for downloading "
                               "(interpreted with "
