@@ -3,18 +3,18 @@
 The BC Ministry of Transportation and Infrastructure, Avalache Safety
 Program network has an application which returns meteorological data
 upon request. By default the application returns all data available
-from the previous hour. It *is* possible to request data for up to the
-previous week, however you need to explicitly limit the query to a
-specific station id. I.e. you cannot specify a time range without a
-priori information. Also see:
+from the previous hour. It *is* possible to request any data, however
+the time range is limited to 7 days and you need to explicitly limit
+the query to a specific station id. I.e. you cannot specify a time
+range without a priori information. Also see:
 https://github.com/pacificclimate/crmprtd/issues/52.
 
 It is recommend to run this script, time parameter free every hour to
 collect the bulk of the data. It is further recommended to do an
 additional run once per one or two weeks with the aid of a station
 list to fill in any gaps that may have arisen from outages or data
-that came in late. If the script is run less than once per month, you
-will miss data.
+that came in late. Gaps can be filled in at any time, so there is
+little risk of missing data.
 '''
 
 
