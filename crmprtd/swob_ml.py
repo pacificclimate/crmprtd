@@ -1,4 +1,5 @@
 # Standard module
+import pytz
 import logging
 
 # Installed libraries
@@ -99,7 +100,7 @@ def normalize_xml(file_stream, network_name,
                 continue
 
             try:
-                date = dateparse(obs_time)
+                date = dateparse(obs_time).astimezone(pytz.utc)
             except ValueError as e:
                 log.error('Unable to parse date', extra={'exception': e})
                 continue

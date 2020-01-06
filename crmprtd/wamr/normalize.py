@@ -38,7 +38,13 @@ def normalize(file_stream):
 
         try:
             tz = pytz.timezone('Canada/Pacific')
-            dt = parse(time).replace(tzinfo=tz)
+            # Timezone information is not available from the text
+            # string provided. However, the date field in WAMR's feed
+            # is always titled "DATE_PST" (even during times of
+            # DST). There's not really enough information available
+            # from the network, so we'll have to assume that this
+            # covers it.
+            dt = tz.localize(parse(time)).astimezone(pytz.utc)
         except ValueError:
             log.error('Unable to convert date string to datetime',
                       extra={'time': time})

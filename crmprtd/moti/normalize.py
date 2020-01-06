@@ -47,9 +47,11 @@ def normalize(iterable):
                             "observation")
                 continue
 
-            tz = pytz.timezone('Canada/Pacific')
             try:
-                date = dateparse(time).replace(tzinfo=tz)
+                # MoTI gives us an ISO formatted time string with
+                # timezone info attached so it should be sufficient to
+                # simply parse it and display it as UTC.
+                date = dateparse(time).astimezone(pytz.utc)
             except ValueError as e:
                 log.warning('Unable to convert value to datetime',
                             extra={'time': time})

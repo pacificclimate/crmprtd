@@ -14,8 +14,9 @@ def test_normalize_good_data():
     assert len(rows) == 17
     for row in rows:
         assert row.station_id == '11'
-        assert row.time == datetime.strptime('2018052710',
-                                             "%Y%m%d%H").replace(tzinfo=tz)
+        assert row.time == tz.localize(
+            datetime.strptime('2018052710', "%Y%m%d%H")
+        )
         assert row.variable_name is not None
         assert row.val is not None
         assert row.network_name is not None
@@ -38,8 +39,9 @@ def test_normalize_bad_value():
     tz = pytz.timezone('Canada/Pacific')
     for row in rows:
         assert row.station_id == '11'
-        assert row.time == datetime.strptime('2018052710',
-                                             "%Y%m%d%H").replace(tzinfo=tz)
+        assert row.time == tz.localize(
+            datetime.strptime('2018052710', "%Y%m%d%H")
+        )
         assert row.variable_name is not None
         assert row.val is not None
         assert row.network_name is not None
