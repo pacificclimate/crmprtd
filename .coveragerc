@@ -8,10 +8,13 @@
         crmprtd/bc_env_aq/download.py
         crmprtd/bc_tran/download.py
         crmprtd/bc_forestry/download.py
-        crmprtd/moti/download.py
         crmprtd/wamr/download.py
         crmprtd/wmb/download.py
         speed_test/
 
 [report]
-    fail_under = 77.0
+    fail_under = 80.0
+exclude_lines =
+    pragma: no cover
+    main()
+    if __name__ == .__main__.:

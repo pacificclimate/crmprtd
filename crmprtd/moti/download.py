@@ -27,7 +27,7 @@ from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
 # Local
-from crmprtd.download import extract_auth, https_download
+import crmprtd.download
 from crmprtd import common_auth_arguments, logging_args, setup_logging
 
 log = logging.getLogger(__name__)
@@ -44,12 +44,17 @@ def verify_date(datestring, default, label='start_time'):
         return default
 
 
+def utcnow():
+    return datetime.utcnow()
+
+
 def download(username, password, auth_fname, auth_key,
              start_time, end_time, station_id):
     log.info('Starting MOTIe rtd')
 
     auth_yaml = open(auth_fname, 'r').read() if auth_fname else None
-    auth = extract_auth(username, password, auth_yaml, auth_key)
+    auth = crmprtd.download.extract_auth(username, password, auth_yaml,
+                                         auth_key)
 
     if start_time or end_time:
         if not station_id:
@@ -58,9 +63,9 @@ def download(username, password, auth_fname, auth_key,
                 "range for an individual station. Please either specify a "
                 "station id (-s) or omit the time arguments")
 
-        now = datetime.datetime.utcnow()
+        now = utcnow()
         start_time = verify_date(
-            start_time, now - timedelta(days=0, seconds=60), 'start_time')
+            start_time, now - timedelta(days=0, seconds=3600), 'start_time')
         end_time = verify_date(end_time, now, 'end_time')
 
         log.info("Starting manual run using timestamps {0} {1}".format(
@@ -82,14 +87,14 @@ def download(username, password, auth_fname, auth_key,
     url = 'https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110'
 
     try:
-        https_download(url, 'https', log, auth, payload)
+        crmprtd.download.https_download(url, 'https', log, auth, payload)
 
     except IOError:
         log.exception("Unable to download or open xml data")
         sys.exit(1)
 
 
-def main():
+def main():  # pragma: no cover
     desc = globals()['__doc__']
     parser = ArgumentParser(description=desc)
     parser = logging_args(parser)
