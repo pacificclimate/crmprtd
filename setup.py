@@ -68,5 +68,8 @@ setup(
     },
     cmdclass={'test': PyTest},
     include_package_data=True,
-    classifiers=["Programming Language :: Python :: 3 :: Only"]
+    classifiers=[
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+    ]
 )
