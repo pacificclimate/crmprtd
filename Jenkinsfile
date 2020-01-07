@@ -22,7 +22,7 @@ node {
         }
     }
 
-    if (pypiPublishable()) {
+    if (isPypiPublishable()) {
         stage('Push to PYPI') {
             publishPythonPackage('crmprtd-python35', 'PCIC_PYPI_CREDS')
         }
