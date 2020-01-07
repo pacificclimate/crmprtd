@@ -8,7 +8,7 @@ node {
 
     stage('Testing') {
         def requirements = ['requirements.txt', 'test_requirements.txt']
-        def pypytestArgs = '-v --tb=short --cov --flake8'
+        def pytestArgs = '-v --tb=short --cov --flake8'
         def options = [containerData: 'crmprtd']
 
         parallel "Python 3.5": {
