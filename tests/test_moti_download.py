@@ -33,10 +33,6 @@ defaults = {
 }
 
 
-def mock_now():
-    return now
-
-
 @pytest.mark.parametrize('stime etime station_id expected_payload'.split(), (
     # ('stime', 'etime', 'station_id', 'expected'),
     (None, None, None, {}),
