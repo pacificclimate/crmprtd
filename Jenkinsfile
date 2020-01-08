@@ -53,10 +53,7 @@ node {
     }
 
     stage('Testing') {
-        parallel "Python 3.5": {
-            test_with_container('crmprtd-python35')
-        },
-        "Python 3.6": {
+        parallel "Python 3.6": {
             test_with_container('crmprtd-python36')
         },
         "Python 3.7": {
