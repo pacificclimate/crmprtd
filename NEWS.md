@@ -1,5 +1,15 @@
 # News / Release Notes
 
+## 3.0.0
+
+*08-January-2020*
+
+* Drops support for Python 3.5
+* Demotes faux-observations with value "MSNG" to log level DEBUG
+* Makes timezone handling consistent across all normalize modules
+* Corrects time range selection in the download_moti script
+* Documents difference in time selection for each network's download script
+
 ## 2.0.3
 
 *19-December-2019*
