@@ -80,7 +80,8 @@ def download(username, password, auth_fname, auth_key,
 
         fmt = '%Y-%m-%d/%H'
         payload = {'request': 'historic', 'station': station_id,
-                   'from': start_time.strftime(fmt), 'to': end_time.strftime(fmt)}
+                   'from': start_time.strftime(fmt),
+                   'to': end_time.strftime(fmt)}
     else:
         log.info("Starting an automatic run to MOTI's SAWR service")
         payload = {}
