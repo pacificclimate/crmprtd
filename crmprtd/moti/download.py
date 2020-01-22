@@ -78,8 +78,10 @@ def download(username, password, auth_fname, auth_key,
                 "days are not permitted by MoTI's SAWR service"
                 .format(request_length))
 
+        fmt = '%Y-%m-%d/%H'
         payload = {'request': 'historic', 'station': station_id,
-                   'from': start_time, 'to': end_time}
+                   'from': start_time.strftime(fmt),
+                   'to': end_time.strftime(fmt)}
     else:
         log.info("Starting an automatic run to MOTI's SAWR service")
         payload = {}

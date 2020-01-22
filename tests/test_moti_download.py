@@ -26,10 +26,12 @@ def test_verify_date_exception(datestring):
 now = datetime.datetime.now().replace(microsecond=0)
 one_hour_ago = now - datetime.timedelta(seconds=3600)
 now_string = now.strftime('%Y/%m/%d %H:%M:%S')
+moti_fmt = '%Y-%m-%d/%H'
 defaults = {
     'request': 'historic',
     'station': 'the_koots',
-    'from': one_hour_ago, 'to': now
+    'from': one_hour_ago.strftime(moti_fmt),
+    'to': now.strftime(moti_fmt)
 }
 
 
@@ -42,7 +44,7 @@ defaults = {
     (now_string, now_string, 'the_koots', {
         'request': 'historic',
         'station': 'the_koots',
-        'from': now, 'to': now
+        'from': now.strftime(moti_fmt), 'to': now.strftime(moti_fmt)
     })
 ))
 @pytest.mark.filterwarnings("ignore:Parameter")
