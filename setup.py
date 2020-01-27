@@ -33,7 +33,8 @@ setup(
         "scripts/ec_recovery.py",
         "scripts/moti_infill_download.py",
         "scripts/moti_insert_files.py",
-        "scripts/moti_infill_insert.py"
+        "scripts/moti_infill_insert.py",
+        "scripts/infill_all.py"
     ],
     entry_points={
         'console_scripts': [
