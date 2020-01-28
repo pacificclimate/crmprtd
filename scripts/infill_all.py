@@ -2,19 +2,19 @@
 '''
 
 import datetime
+import logging
 from argparse import ArgumentParser
 from warnings import warn
+from subprocess import run
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from pycds import Station, Network
 
 from crmprtd import logging_args, setup_logging
-from crmprtd.ec.download import download as ec_download
-from crmprtd.moti.download import download as moti_download
-from crmprtd.wmb.download import download as wmb_download
-from crmprtd.wamr.download import download as wamr_download
-from crmprtd.ec_swob.download import download as swob_download
+
+
+logger = logging.getLogger(__name__)
 
 
 def main():
@@ -34,7 +34,6 @@ def main():
                         help='PostgreSQL connection string',
                         required=True)
 
-
     parser = logging_args(parser)
     args = parser.parse_args()
 
@@ -42,30 +41,40 @@ def main():
                   args.log_level, 'infill_all')
     s = datetime.datetime.strptime(args.start_time, '%Y/%m/%d %H:%M:%S')
     e = datetime.datetime.strptime(args.end_time, '%Y/%m/%d %H:%M:%S')
-    infill(s, e, args.auth_fname)
+    infill(s, e, args.auth_fname, args.connection_string)
+
+
+def download_and_process(download_args, network_name, connection_string):
+    proc = [f"download_{network_name}"] + download_args
+    logger.debug(' '.join(proc))
+    dl_proc = run(proc, capture_output=True)
+    process = ["crmprtd_process", f"-c {connection_string}",
+               f"-N {network_name}"]
+    logger.debug(' '.join(process))
+    run(process, stdin=dl_proc.stdout)
 
 
 def infill(start_time, end_time, auth_fname, connection_string):
 
-    weekly_ranges = list(datetime_range(start_time, end_time, resolution='week'))
+    weekly_ranges = list(
+        datetime_range(start_time, end_time, resolution='week')
+    )
     daily_ranges = list(datetime_range(start_time, end_time, resolution='day'))
-    hourly_ranges = list(datetime_range(start_time, end_time, resolution='hour'))
+    hourly_ranges = list(
+        datetime_range(start_time, end_time, resolution='hour')
+    )
 
     # Unfortunately most of the download functions only accepts a time
     # *string* :(
     time_fmt = '%Y/%m/%d %H:%M:%S'
 
-    process = ["crmprtd_process", f"-c {connection_string}"]
-    
     # EC
     for freq, times in zip(('daily', 'hourly'), (daily_ranges, hourly_ranges)):
         for province in ('YT', 'BC'):
             for time in times:
-                proc = ["download_ec", f"-p {province}", f"-F {freq}", "-g e",
-                        f"-t {time.strftime(time_fmt)}"]
-                print(proc.join(' '))
-                dl_proc = run(proc, capture_output=True)
-                process_proc = run(process + ["-N ec"], stdin=dl_proc.stdout)
+                dl_args = [f"-p {province}", f"-F {freq}", "-g e",
+                           f"-t {time.strftime(time_fmt)}"]
+                download_and_process(dl_args, "ec", connection_string)
 
     # MOTI
     # Query all of the stations
@@ -76,17 +85,19 @@ def infill(start_time, end_time, auth_fname, connection_string):
         for station in stations:
             start = interval_start.strftime(time_fmt)
             end = interval_end.strftime(time_fmt)
-            print(f"moti_download('', '', {auth_fname}, 'moti',"
-                          f"{start}, {end}, {station})")
+            dl_args = [f"--auth_fname {auth_fname}",
+                       "--auth_key moti", f"-S {start}" f"-E {end}",
+                       f"-s {station}"]
+            download_and_process(dl_args, "moti", connection_string)
 
     warning_msg = {
         "disjoint":
-                "{} cannot be infilled since the period of infilling is "
-                "outside the currently offered data (the previous {}).",
+            "{} cannot be infilled since the period of infilling is "
+            "outside the currently offered data (the previous {}).",
         "not_contained":
-                "{} infilling may miss some data since the requested infilling"
-                " period is larger than the currently offered period of record "
-                "(the previous {})."
+            "{} infilling may miss some data since the requested infilling"
+            " period is larger than the currently offered period of record "
+            "(the previous {})."
     }
     now = datetime.datetime.now()
 
@@ -99,9 +110,9 @@ def infill(start_time, end_time, auth_fname, connection_string):
     else:
         if not interval_contains((start_time, end_time), last_month):
             warn(warning_msg['not_contained'].format("WAMR", "one_month"))
-        print("wamr_download('ftp.env.gov.bc.ca', 'pub/outgoing/AIR/'"
-                      "'Hourly_Raw_Air_Data/Meteorological/')")
-        
+        dl_args = []
+        download_and_process(dl_args, 'wamr', connection_string)
+
     # WMB
     yesterday = (now - datetime.timedelta(days=1), now)
     # Check that the interval overlaps with the last day
@@ -112,21 +123,14 @@ def infill(start_time, end_time, auth_fname, connection_string):
         if not interval_contains((start_time, end_time), yesterday):
             warn(warning_msg['not_contained'].format("WMB", "day"))
         # Run it
-        print(f"wmb_download("
-            f"'', '', {auth_fname}, 'wmb',"
-            f"'BCFireweatherFTPp1.nrs.gov.bc.ca',"
-            f"'HourlyWeatherAllFields_WA.txt'"
-              f")")
+        dl_args = [f"--auth_fname {auth_fname}", "--auth_key wmb"]
+        download_and_process(dl_args, 'wmb', connection_string)
 
     # EC_SWOB
     for partner in ('bc_env_snow', 'bc_tran', 'bc_forestry'):
-        print(partner)
         for hour in hourly_ranges:
-            print(hour)
-            print(f"swob_download("
-                f"f'https://dd.weather.gc.ca/observations/swob-ml/partners/{partner}/',"
-                f"{hour.strftime(time_fmt)}"
-                  f")")
+            dl_args = [f"-d {hour.strftime(time_fmt)}"]
+            download_and_process(dl_args, partner, connection_string)
 
 
 def round_datetime(d, resolution='hour', direction='down'):
@@ -155,7 +159,7 @@ def datetime_range(start, end, resolution='hour'):
         raise ValueError
     kwargs = {resolution + 's': 1}
     step = datetime.timedelta(**kwargs)
-    
+
     # Don't round down to the week... just the day and end at the actual end
     if resolution == 'week':
         start = round_datetime(start, 'day', direction='down')
@@ -164,7 +168,6 @@ def datetime_range(start, end, resolution='hour'):
         start = round_datetime(start, resolution, direction='down')
         end = round_datetime(end, resolution, direction='up')
 
-    i = 0
     t = start
     while t < end:
         yield t
