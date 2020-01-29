@@ -5,7 +5,7 @@ import datetime
 import logging
 from argparse import ArgumentParser
 from warnings import warn
-from subprocess import run
+from subprocess import run, PIPE
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -47,11 +47,11 @@ def main():
 def download_and_process(download_args, network_name, connection_string):
     proc = [f"download_{network_name}"] + download_args
     logger.debug(' '.join(proc))
-    dl_proc = run(proc, capture_output=True)
+    dl_proc = run(proc, stdout=PIPE)
     process = ["crmprtd_process", f"-c {connection_string}",
                f"-N {network_name}"]
     logger.debug(' '.join(process))
-    run(process, stdin=dl_proc.stdout)
+    run(process, input=dl_proc.stdout)
 
 
 def infill(start_time, end_time, auth_fname, connection_string):
