@@ -6,6 +6,7 @@ import logging
 from argparse import ArgumentParser
 from warnings import warn
 from subprocess import run, PIPE
+import itertools
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -37,24 +38,31 @@ def main():
     parser = logging_args(parser)
     args = parser.parse_args()
 
-    setup_logging(args.log_conf, args.log_filename, args.error_email,
-                  args.log_level, 'infill_all')
+    log_args = [args.log_conf, args.log_filename, args.error_email,
+                args.log_level, 'infill_all']
+    setup_logging(*log_args)
     s = datetime.datetime.strptime(args.start_time, '%Y/%m/%d %H:%M:%S')
     e = datetime.datetime.strptime(args.end_time, '%Y/%m/%d %H:%M:%S')
-    infill(s, e, args.auth_fname, args.connection_string)
+
+    log_args = [(x, y) for (x, y) in zip(["-L", "-l", "-m", "-o"], log_args) if y]
+    log_args = list(itertools.chain(*log_args))
+
+    infill(s, e, args.auth_fname, args.connection_string, log_args)
 
 
-def download_and_process(download_args, network_name, connection_string):
-    proc = [f"download_{network_name}"] + download_args
+def download_and_process(download_args, network_name, connection_string,
+                         log_args):
+    proc = [f"download_{network_name}"] + log_args + download_args
     logger.debug(' '.join(proc))
     dl_proc = run(proc, stdout=PIPE)
-    process = ["crmprtd_process", f"-c {connection_string}",
-               f"-N {network_name}"]
+    process = ["crmprtd_process", "-c", connection_string,
+               "-N", network_name] + log_args
     logger.debug(' '.join(process))
     run(process, input=dl_proc.stdout)
 
 
-def infill(start_time, end_time, auth_fname, connection_string):
+def infill(start_time, end_time, auth_fname, connection_string,
+           log_args):
 
     weekly_ranges = list(
         datetime_range(start_time, end_time, resolution='week')
@@ -85,10 +93,10 @@ def infill(start_time, end_time, auth_fname, connection_string):
         for station in stations:
             start = interval_start.strftime(time_fmt)
             end = interval_end.strftime(time_fmt)
-            dl_args = [f"--auth_fname {auth_fname}",
-                       "--auth_key moti", f"-S {start}" f"-E {end}",
-                       f"-s {station}"]
-            download_and_process(dl_args, "moti", connection_string)
+            dl_args = ["--auth_fname", auth_fname,
+                       "--auth_key", "moti", "-S", start, "-E", end,
+                       "-s", station]
+            download_and_process(dl_args, "moti", connection_string, log_args)
 
     warning_msg = {
         "disjoint":
@@ -111,7 +119,7 @@ def infill(start_time, end_time, auth_fname, connection_string):
         if not interval_contains((start_time, end_time), last_month):
             warn(warning_msg['not_contained'].format("WAMR", "one_month"))
         dl_args = []
-        download_and_process(dl_args, 'wamr', connection_string)
+        download_and_process(dl_args, 'wamr', connection_string, log_args)
 
     # WMB
     yesterday = (now - datetime.timedelta(days=1), now)
@@ -123,14 +131,14 @@ def infill(start_time, end_time, auth_fname, connection_string):
         if not interval_contains((start_time, end_time), yesterday):
             warn(warning_msg['not_contained'].format("WMB", "day"))
         # Run it
-        dl_args = [f"--auth_fname {auth_fname}", "--auth_key wmb"]
-        download_and_process(dl_args, 'wmb', connection_string)
+        dl_args = ["--auth_fname", auth_fname, "--auth_key", "wmb"]
+        download_and_process(dl_args, 'wmb', connection_string, log_args)
 
     # EC_SWOB
     for partner in ('bc_env_snow', 'bc_tran', 'bc_forestry'):
         for hour in hourly_ranges:
-            dl_args = [f"-d {hour.strftime(time_fmt)}"]
-            download_and_process(dl_args, partner, connection_string)
+            dl_args = ["-d", hour.strftime(time_fmt)]
+            download_and_process(dl_args, partner, connection_string, log_args)
 
 
 def round_datetime(d, resolution='hour', direction='down'):
