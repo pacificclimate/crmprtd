@@ -36,6 +36,9 @@ def main():
     parser.add_argument('-c', '--connection_string',
                         help='PostgreSQL connection string',
                         required=True)
+    parser.add_argument('-N', '--networks', nargs='*',
+                        default='ec moti wamr wmb ec_swob',
+                        help="Set of networks for which to infill")
 
     parser = logging_args(parser)
     args = parser.parse_args()
@@ -52,7 +55,8 @@ def main():
                 if y]
     log_args = list(itertools.chain(*log_args))
 
-    infill(s, e, args.auth_fname, args.connection_string, log_args)
+    infill(args.networks, s, e, args.auth_fname, args.connection_string,
+           log_args)
 
 
 def download_and_process(download_args, network_name, connection_string,
@@ -66,7 +70,7 @@ def download_and_process(download_args, network_name, connection_string,
     run(process, input=dl_proc.stdout)
 
 
-def infill(start_time, end_time, auth_fname, connection_string,
+def infill(networks, start_time, end_time, auth_fname, connection_string,
            log_args):
 
     weekly_ranges = list(
@@ -82,28 +86,33 @@ def infill(start_time, end_time, auth_fname, connection_string,
     time_fmt = '%Y/%m/%d %H:%M:%S'
 
     # EC
-    for freq, times in zip(('daily', 'hourly'), (daily_ranges, hourly_ranges)):
-        for province in ('YT', 'BC'):
-            for time in times:
-                time = time.astimezone(pytz.utc)  # EC files are named in UTC
-                dl_args = ["-p", province, "-F", freq, "-g" "e",
-                           "-t", time.strftime(time_fmt)]
-                download_and_process(dl_args, "ec", connection_string,
-                                     log_args)
+    if 'ec' in networks:
+        for freq, times in zip(
+                ('daily', 'hourly'), (daily_ranges, hourly_ranges)):
+            for province in ('YT', 'BC'):
+                for time in times:
+                    # EC files are named in UTC
+                    time = time.astimezone(pytz.utc)
+                    dl_args = ["-p", province, "-F", freq, "-g" "e",
+                               "-t", time.strftime(time_fmt)]
+                    download_and_process(dl_args, "ec", connection_string,
+                                         log_args)
 
     # MOTI
-    # Query all of the stations
-    stations = get_moti_stations(connection_string)
-    # Divide range into 7 day intervals
-    for interval_start, interval_end in zip(
-            weekly_ranges[:-1], weekly_ranges[1:]):
-        for station in stations:
-            start = interval_start.strftime(time_fmt)
-            end = interval_end.strftime(time_fmt)
-            dl_args = ["--auth_fname", auth_fname,
-                       "--auth_key", "moti", "-S", start, "-E", end,
-                       "-s", station]
-            download_and_process(dl_args, "moti", connection_string, log_args)
+    if 'moti' in networks:
+        # Query all of the stations
+        stations = get_moti_stations(connection_string)
+        # Divide range into 7 day intervals
+        for interval_start, interval_end in zip(
+                weekly_ranges[:-1], weekly_ranges[1:]):
+            for station in stations:
+                start = interval_start.strftime(time_fmt)
+                end = interval_end.strftime(time_fmt)
+                dl_args = ["--auth_fname", auth_fname,
+                           "--auth_key", "moti", "-S", start, "-E", end,
+                           "-s", station]
+                download_and_process(dl_args, "moti", connection_string,
+                                     log_args)
 
     warning_msg = {
         "disjoint":
@@ -117,36 +126,40 @@ def infill(start_time, end_time, auth_fname, connection_string,
     now = datetime.datetime.now()
 
     # WAMR
-    # Check that the interval overlaps with the last month
-    last_month = (now - datetime.timedelta(days=30), now)
-    # Warn if not
-    if not interval_overlaps((start_time, end_time), last_month):
-        warn(warning_msg['disjoin'].format("WAMR", "one month"))
-    else:
-        if not interval_contains((start_time, end_time), last_month):
-            warn(warning_msg['not_contained'].format("WAMR", "one_month"))
-        dl_args = []
-        download_and_process(dl_args, 'wamr', connection_string, log_args)
+    if 'wamr' in networks:
+        # Check that the interval overlaps with the last month
+        last_month = (now - datetime.timedelta(days=30), now)
+        # Warn if not
+        if not interval_overlaps((start_time, end_time), last_month):
+            warn(warning_msg['disjoint'].format("WAMR", "one month"))
+        else:
+            if not interval_contains((start_time, end_time), last_month):
+                warn(warning_msg['not_contained'].format("WAMR", "one_month"))
+            dl_args = []
+            download_and_process(dl_args, 'wamr', connection_string, log_args)
 
     # WMB
-    yesterday = (now - datetime.timedelta(days=1), now)
-    # Check that the interval overlaps with the last day
-    # Warn if not
-    if not interval_overlaps((start_time, end_time), yesterday):
-        warn(warning_msg['disjoint'].format("WMB", "day"))
-    else:
-        if not interval_contains((start_time, end_time), yesterday):
-            warn(warning_msg['not_contained'].format("WMB", "day"))
-        # Run it
-        dl_args = ["--auth_fname", auth_fname, "--auth_key", "wmb"]
-        download_and_process(dl_args, 'wmb', connection_string, log_args)
+    if 'wmb' in networks:
+        yesterday = (now - datetime.timedelta(days=1), now)
+        # Check that the interval overlaps with the last day
+        # Warn if not
+        if not interval_overlaps((start_time, end_time), yesterday):
+            warn(warning_msg['disjoint'].format("WMB", "day"))
+        else:
+            if not interval_contains((start_time, end_time), yesterday):
+                warn(warning_msg['not_contained'].format("WMB", "day"))
+            # Run it
+            dl_args = ["--auth_fname", auth_fname, "--auth_key", "wmb"]
+            download_and_process(dl_args, 'wmb', connection_string, log_args)
 
     # EC_SWOB
-    for partner in ('bc_env_snow', 'bc_tran', 'bc_forestry'):
-        for hour in hourly_ranges:
-            hour = hour.astimezone(pytz.utc)  # EC files are named in UTC
-            dl_args = ["-d", hour.strftime(time_fmt)]
-            download_and_process(dl_args, partner, connection_string, log_args)
+    if 'ec_swob' in networks:
+        for partner in ('bc_env_snow', 'bc_tran', 'bc_forestry'):
+            for hour in hourly_ranges:
+                hour = hour.astimezone(pytz.utc)  # EC files are named in UTC
+                dl_args = ["-d", hour.strftime(time_fmt)]
+                download_and_process(dl_args, partner, connection_string,
+                                     log_args)
 
 
 def round_datetime(d, resolution='hour', direction='down'):
