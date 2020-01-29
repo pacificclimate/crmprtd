@@ -1,4 +1,17 @@
-'''Infill crmprtd data for *all* networks for some time range
+'''Infill crmprtd data for *all* networks for some time range.
+
+This script can be used to infill some missed data for any set of
+networks that are available in crmprtd. The script is minimally
+configurable for ease of use. Simply give it a start time and end
+time, and based on the network, it will compute whether it can make a
+request for that time range. If it can, it will go out and download
+all of the data for that time range, and the process it into the
+database.
+
+Only four parameters are required: a start time, end time, auth
+details (for MoTI and WMB) and a database connection. Optionally you
+can configure the loggging, and select a subset of available networks
+to infill.
 '''
 
 import datetime
@@ -32,7 +45,12 @@ def main():
                               "(interpreted with "
                               "strptime(format='Y/m/d H:M:S')."))
     parser.add_argument('-a', '--auth_fname',
-                        help="Yaml file with plaintext usernames/passwords")
+                        help="Yaml file with plaintext usernames/passwords. "
+                             "For simplicity the auth keys are *not* "
+                             "configurable (unlike the download scripts. The "
+                             "supplied file must contain keys with names "
+                             "'moti' and 'wmb' if you want to infill those "
+                             "networks.")
     parser.add_argument('-c', '--connection_string',
                         help='PostgreSQL connection string',
                         required=True)
@@ -61,6 +79,9 @@ def main():
 
 def download_and_process(download_args, network_name, connection_string,
                          log_args):
+    '''Open two subprocesses: download_{network} and crmprtd_process and
+    pipe the output from the first to the second. Returns None.
+    '''
     proc = [f"download_{network_name}"] + log_args + download_args
     logger.debug(' '.join(proc))
     dl_proc = run(proc, stdout=PIPE)
@@ -72,7 +93,8 @@ def download_and_process(download_args, network_name, connection_string,
 
 def infill(networks, start_time, end_time, auth_fname, connection_string,
            log_args):
-
+    '''Setup and delegate all of the infilling processes
+    '''
     weekly_ranges = list(
         datetime_range(start_time, end_time, resolution='week')
     )
@@ -163,6 +185,16 @@ def infill(networks, start_time, end_time, auth_fname, connection_string,
 
 
 def round_datetime(d, resolution='hour', direction='down'):
+    """Round a datetime up or down to the last/next hour/day
+
+    Args:
+        d (datetime.datetime): datetime value to round
+        resolution (string): 'hour' or 'day'
+        direction (string): 'up' or 'down'
+
+    Returns:
+       A rounded datetime
+    """
     d = d.replace(minute=0, second=0, microsecond=0)
     if resolution == 'day':
         d = d.replace(hour=0)
@@ -184,6 +216,29 @@ def round_datetime(d, resolution='hour', direction='down'):
 
 
 def datetime_range(start, end, resolution='hour'):
+    '''Discretizes a time interval by the specified interval/resolution
+
+    Takes a time interval, extends it to cover the full range
+    (rounding the start time down and rounding the end time up), and
+    yields a sequence of discrete time steps at the resolution
+    provided.
+
+    The 'week' resolution behaves slightly different since its usage
+    is currently constrained to the MoTI time parameters and their
+    particularities. (MoTI allows you to specify a full time range
+    rather than discrete days/hours). Using the week resoultion rounds
+    the beginning time step down to the nearest day and then just uses
+    the end time as is.
+
+    Args:
+        start (datetime.datetime): The beginnng of the range
+        end (datetime.datetime): The end of the range
+        resolution (string): 'hour', 'day', or 'week'
+
+    Yields:
+        A sequence of datetimes, covering the range.
+
+    '''
     if resolution not in ('hour', 'day', 'week'):
         raise ValueError
     kwargs = {resolution + 's': 1}
@@ -192,7 +247,7 @@ def datetime_range(start, end, resolution='hour'):
     # Don't round down to the week... just the day and end at the actual end
     if resolution == 'week':
         start = round_datetime(start, 'day', direction='down')
-        # Otherwise, make a rounded timeseries to the day or hour
+    # Otherwise, make a rounded timeseries to the day or hour
     else:
         start = round_datetime(start, resolution, direction='down')
         end = round_datetime(end, resolution, direction='up')
@@ -215,6 +270,7 @@ def interval_overlaps(a, b):
 
 
 def get_moti_stations(connection_string):
+    '''Query the database and return all native_ids available for MoTI'''
     engine = create_engine(connection_string)
     Session = sessionmaker(engine)
     sesh = Session()
