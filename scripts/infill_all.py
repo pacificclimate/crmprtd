@@ -44,7 +44,8 @@ def main():
     s = datetime.datetime.strptime(args.start_time, '%Y/%m/%d %H:%M:%S')
     e = datetime.datetime.strptime(args.end_time, '%Y/%m/%d %H:%M:%S')
 
-    log_args = [(x, y) for (x, y) in zip(["-L", "-l", "-m", "-o"], log_args) if y]
+    log_args = [(x, y) for (x, y) in zip(["-L", "-l", "-m", "-o"], log_args)
+                if y]
     log_args = list(itertools.chain(*log_args))
 
     infill(s, e, args.auth_fname, args.connection_string, log_args)
@@ -80,9 +81,10 @@ def infill(start_time, end_time, auth_fname, connection_string,
     for freq, times in zip(('daily', 'hourly'), (daily_ranges, hourly_ranges)):
         for province in ('YT', 'BC'):
             for time in times:
-                dl_args = [f"-p {province}", f"-F {freq}", "-g e",
-                           f"-t {time.strftime(time_fmt)}"]
-                download_and_process(dl_args, "ec", connection_string)
+                dl_args = ["-p", province, "-F", freq, "-g" "e",
+                           "-t", time.strftime(time_fmt)]
+                download_and_process(dl_args, "ec", connection_string,
+                                     log_args)
 
     # MOTI
     # Query all of the stations
