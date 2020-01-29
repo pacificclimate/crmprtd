@@ -11,6 +11,8 @@ import itertools
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from pycds import Station, Network
+from dateutil.tz import tzlocal
+import pytz
 
 from crmprtd import logging_args, setup_logging
 
@@ -41,8 +43,10 @@ def main():
     log_args = [args.log_conf, args.log_filename, args.error_email,
                 args.log_level, 'infill_all']
     setup_logging(*log_args)
-    s = datetime.datetime.strptime(args.start_time, '%Y/%m/%d %H:%M:%S')
-    e = datetime.datetime.strptime(args.end_time, '%Y/%m/%d %H:%M:%S')
+
+    fmt = '%Y/%m/%d %H:%M:%S'
+    s = datetime.datetime.strptime(args.start_time, fmt).astimezone(tzlocal())
+    e = datetime.datetime.strptime(args.end_time, fmt).astimezone(tzlocal())
 
     log_args = [(x, y) for (x, y) in zip(["-L", "-l", "-m", "-o"], log_args)
                 if y]
@@ -81,6 +85,7 @@ def infill(start_time, end_time, auth_fname, connection_string,
     for freq, times in zip(('daily', 'hourly'), (daily_ranges, hourly_ranges)):
         for province in ('YT', 'BC'):
             for time in times:
+                time = time.astimezone(pytz.utc)  # EC files are named in UTC
                 dl_args = ["-p", province, "-F", freq, "-g" "e",
                            "-t", time.strftime(time_fmt)]
                 download_and_process(dl_args, "ec", connection_string,
@@ -139,6 +144,7 @@ def infill(start_time, end_time, auth_fname, connection_string,
     # EC_SWOB
     for partner in ('bc_env_snow', 'bc_tran', 'bc_forestry'):
         for hour in hourly_ranges:
+            hour = hour.astimezone(pytz.utc)  # EC files are named in UTC
             dl_args = ["-d", hour.strftime(time_fmt)]
             download_and_process(dl_args, partner, connection_string, log_args)
 
