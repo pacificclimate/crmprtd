@@ -11,14 +11,11 @@ node {
         def pytestArgs = '-v --tb=short --cov --flake8'
         def options = [containerData: 'crmprtd']
 
-        parallel "Python 3.5": {
-            runPythonTestSuite('crmprtd-python35', requirements, pytestArgs, options)
-        },
-        "Python 3.6": {
-            runPythonTestSuite('crmprtd-python36', requirements, pytestArgs, options)
+        parallel "Python 3.6": {
+            runPythonTestSuite('crmprtd-test36', requirements, pytestArgs, options)
         },
         "Python 3.7": {
-            runPythonTestSuite('crmprtd-python37', requirements, pytestArgs, options)
+            runPythonTestSuite('crmprtd-test37', requirements, pytestArgs, options)
         }
     }
 
