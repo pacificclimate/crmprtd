@@ -124,7 +124,7 @@ def infill(networks, start_time, end_time, auth_fname, connection_string,
     if 'moti' in networks:
         # Query all of the stations
         stations = get_moti_stations(connection_string)
-        # Divide range into 7 day intervals
+        # Divide range into 6 day intervals
         for interval_start, interval_end in zip(
                 weekly_ranges[:-1], weekly_ranges[1:]):
             for station in stations:
@@ -228,7 +228,9 @@ def datetime_range(start, end, resolution='hour'):
     particularities. (MoTI allows you to specify a full time range
     rather than discrete days/hours). Using the week resoultion rounds
     the beginning time step down to the nearest day and then just uses
-    the end time as is.
+    the end time as is. During initial testing, we found that using
+    the full 7 day time range resulted in many HTTP 500 errors, so
+    we're using a conservative "week" of 6 days.
 
     Args:
         start (datetime.datetime): The beginnng of the range
@@ -241,7 +243,11 @@ def datetime_range(start, end, resolution='hour'):
     '''
     if resolution not in ('hour', 'day', 'week'):
         raise ValueError
-    kwargs = {resolution + 's': 1}
+    kwargs = {
+        'hour': {'hours': 1},
+        'day': {'days': 1},
+        'week': {'days': 6},
+    }[resolution]
     step = datetime.timedelta(**kwargs)
 
     # Don't round down to the week... just the day and end at the actual end
