@@ -1,3 +1,7 @@
+# -- DISCLAIMER --
+# This Dockerfile is used by Jenkins to create a test environment.
+# It does NOT create a containerized instance of crmprtd.
+
 FROM ubuntu:18.04
 
 # Set version for the build stage
