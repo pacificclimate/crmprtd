@@ -49,8 +49,8 @@ def main():
                              "For simplicity the auth keys are *not* "
                              "configurable (unlike the download scripts. The "
                              "supplied file must contain keys with names "
-                             "'moti' and 'wmb' if you want to infill those "
-                             "networks.")
+                             "'moti', 'moti2' and 'wmb' if you want to infill "
+                             "those networks.")
     parser.add_argument('-c', '--connection_string',
                         help='PostgreSQL connection string',
                         required=True)
@@ -122,19 +122,28 @@ def infill(networks, start_time, end_time, auth_fname, connection_string,
 
     # MOTI
     if 'moti' in networks:
+
         # Query all of the stations
         stations = get_moti_stations(connection_string)
-        # Divide range into 6 day intervals
-        for interval_start, interval_end in zip(
-                weekly_ranges[:-1], weekly_ranges[1:]):
-            for station in stations:
-                start = interval_start.strftime(time_fmt)
-                end = interval_end.strftime(time_fmt)
-                dl_args = ["--auth_fname", auth_fname,
-                           "--auth_key", "moti", "-S", start, "-E", end,
-                           "-s", station]
-                download_and_process(dl_args, "moti", connection_string,
-                                     log_args)
+
+        # MoTI has an insane config where each user has a specific set
+        # of stations associated with it. PCIC wants *all* the
+        # stations which is too many for one request, so we have two
+        # users with half of the stations. This way of requesting the
+        # data will get many "skips", but at least we'll get all of
+        # the data.
+        for auth_key in ('moti', 'moti2'):
+            # Divide range into 6 day intervals
+            for interval_start, interval_end in zip(
+                    weekly_ranges[:-1], weekly_ranges[1:]):
+                for station in stations:
+                    start = interval_start.strftime(time_fmt)
+                    end = interval_end.strftime(time_fmt)
+                    dl_args = ["--auth_fname", auth_fname,
+                               "--auth_key", auth_key, "-S", start, "-E", end,
+                               "-s", station]
+                    download_and_process(dl_args, "moti", connection_string,
+                                         log_args)
 
     warning_msg = {
         "disjoint":
