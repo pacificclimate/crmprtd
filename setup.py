@@ -33,7 +33,7 @@ setup(
         "scripts/ec_recovery.py",
         "scripts/moti_infill_download.py",
         "scripts/moti_insert_files.py",
-        "scripts/moti_infill_insert.py"
+        "scripts/moti_infill_insert.py",
     ],
     entry_points={
         'console_scripts': [
@@ -46,6 +46,7 @@ setup(
             'download_wamr=crmprtd.wamr.download:main',
             'download_wmb=crmprtd.wmb.download:main',
             'crmprtd_process=crmprtd.process:main',
+            'crmprtd_infill_all=scripts.infill_all:main'
         ]
     },
     package_data={
