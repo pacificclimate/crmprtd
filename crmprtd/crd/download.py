@@ -30,11 +30,11 @@ def xnor(sdate, edate):  # pragma: no cover
 
 def verify_dates(sdate, edate):
     assert xnor(sdate, edate), \
-    "Date range must include both ends of the range or neither"
+        "Date range must include both ends of the range or neither"
 
     timediff = edate - sdate
     assert timediff > timedelta(0) and timediff <= timedelta(days=28), \
-    "Date range cannot be negative and must be no more than 28 days"
+        "Date range cannot be negative and must be no more than 28 days"
 
 
 def make_url(client_id, sdate=None, edate=None):
@@ -44,7 +44,8 @@ def make_url(client_id, sdate=None, edate=None):
     if sdate and edate:
         time_range = f"{sdate.strftime(date_fmt)}-{edate.strftime(date_fmt)}"
 
-    return f"https://webservices.crd.bc.ca/weatherdata/{client_id}/{time_range}"
+    return (f"https://webservices.crd.bc.ca/weatherdata/{client_id}/"
+            f"{time_range}")
 
 
 def download(client_id, start_date, end_date):  # pragma: no cover

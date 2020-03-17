@@ -24,9 +24,9 @@ def test_verify_dates(sdate, edate):
 @pytest.mark.parametrize(("sdate", "edate", "expected"), [
     (None, None, "https://webservices.crd.bc.ca/weatherdata/PCIC/"),
     (parse("2019/06/06"), parse("2019/06/07"),
-      "https://webservices.crd.bc.ca/weatherdata/PCIC/201906060000-201906070000")
+     "https://webservices.crd.bc.ca/weatherdata/PCIC/"
+     "201906060000-201906070000")
 ])
 def test_make_url(sdate, edate, expected):
     result = make_url("PCIC", sdate, edate)
     assert result == expected
-    #"https://webservices.crd.bc.ca/weatherdata/{client_id}/{time_range}"
