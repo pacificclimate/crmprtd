@@ -32,9 +32,10 @@ def verify_dates(sdate, edate):
     assert xnor(sdate, edate), \
         "Date range must include both ends of the range or neither"
 
-    timediff = edate - sdate
-    assert timediff > timedelta(0) and timediff <= timedelta(days=28), \
-        "Date range cannot be negative and must be no more than 28 days"
+    if sdate and edate:
+        timediff = edate - sdate
+        assert timediff > timedelta(0) and timediff <= timedelta(days=28), \
+            "Date range cannot be negative and must be no more than 28 days"
 
 
 def make_url(client_id, sdate=None, edate=None):
