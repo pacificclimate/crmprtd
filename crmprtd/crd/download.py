@@ -69,7 +69,7 @@ def main():  # pragma: no cover
                         type=dateutil.parser.parse,
                         help=("Optional start time to use for downloading "
                               "(interpreted with dateutil.parser.parse)."
-                              "Defaults to one hour prior to now"))
+                              "Defaults to one day prior to now"))
     parser.add_argument('-E', '--end_time',
                         type=dateutil.parser.parse,
                         help=("Optional end time to use for downloading "
