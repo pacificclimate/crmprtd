@@ -73,7 +73,9 @@ def process(connection_string, sample_size, network, is_diagnostic=False):
         return
 
     results = insert(sesh, observations, sample_size)
-    log.info('Data insertion results', extra={'results': results})
+    log.info('Data insertion results', extra={
+        'results': results, 'network': network
+    })
 
 
 def main():
