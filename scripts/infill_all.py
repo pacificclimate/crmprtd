@@ -154,7 +154,7 @@ def infill(networks, start_time, end_time, auth_fname, connection_string,
             " period is larger than the currently offered period of record "
             "(the previous {})."
     }
-    now = datetime.datetime.now()
+    now = datetime.datetime.now().astimezone(tzlocal())
 
     # WAMR
     if 'wamr' in networks:
