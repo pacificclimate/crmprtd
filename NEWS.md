@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 3.1.1
+
+*24-March-2020*
+
+* Fixes continuous integration issue
+
 ## 3.1.0
 
 *24-March-2020*
