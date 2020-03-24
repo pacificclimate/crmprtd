@@ -55,7 +55,7 @@ def main():
                         help='PostgreSQL connection string',
                         required=True)
     parser.add_argument('-N', '--networks', nargs='*',
-                        default='ec moti wamr wmb ec_swob',
+                        default='crd ec moti wamr wmb ec_swob',
                         help="Set of networks for which to infill")
 
     parser = logging_args(parser)
@@ -95,6 +95,9 @@ def infill(networks, start_time, end_time, auth_fname, connection_string,
            log_args):
     '''Setup and delegate all of the infilling processes
     '''
+    monthly_ranges = list(
+        datetime_range(start_time, end_time, resolution='month')
+    )
     weekly_ranges = list(
         datetime_range(start_time, end_time, resolution='week')
     )
@@ -106,6 +109,17 @@ def infill(networks, start_time, end_time, auth_fname, connection_string,
     # Unfortunately most of the download functions only accepts a time
     # *string* :(
     time_fmt = '%Y/%m/%d %H:%M:%S'
+
+    # CRD
+    # Divide range into 28 day intervals
+    for interval_start, interval_end in zip(
+            monthly_ranges[:-1], monthly_ranges[1:]):
+        start = interval_start.strftime(time_fmt)
+        end = interval_end.strftime(time_fmt)
+        dl_args = ["-S", start, "-E", end, "--auth_fname", auth_fname,
+                   "--auth_key", "crd"]
+        download_and_process(dl_args, "crd", connection_string,
+                             log_args)
 
     # EC
     if 'ec' in networks:
@@ -241,26 +255,30 @@ def datetime_range(start, end, resolution='hour'):
     the full 7 day time range resulted in many HTTP 500 errors, so
     we're using a conservative "week" of 6 days.
 
+    The loosely defined 'month' resolution returns 28 day intervals
+    (for CRD).
+
     Args:
         start (datetime.datetime): The beginnng of the range
         end (datetime.datetime): The end of the range
-        resolution (string): 'hour', 'day', or 'week'
+        resolution (string): 'hour', 'day', 'week' or 'month'
 
     Yields:
         A sequence of datetimes, covering the range.
 
     '''
-    if resolution not in ('hour', 'day', 'week'):
+    if resolution not in ('hour', 'day', 'week', 'month'):
         raise ValueError
     kwargs = {
         'hour': {'hours': 1},
         'day': {'days': 1},
         'week': {'days': 6},
+        'month': {'days': 28},
     }[resolution]
     step = datetime.timedelta(**kwargs)
 
     # Don't round down to the week... just the day and end at the actual end
-    if resolution == 'week':
+    if resolution in ('week', 'month'):
         start = round_datetime(start, 'day', direction='down')
     # Otherwise, make a rounded timeseries to the day or hour
     else:

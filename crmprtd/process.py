@@ -24,7 +24,8 @@ def process_args(parser):
                              'to determine which insertion strategy to use')
     parser.add_argument('-N', '--network',
                         choices=['bc_env_aq', 'bc_env_snow', 'bc_forestry',
-                                 'bc_tran', 'ec', 'moti', 'wamr', 'wmb'],
+                                 'bc_tran', 'crd', 'ec', 'moti', 'wamr',
+                                 'wmb'],
                         help='The network from which the data is coming from. '
                              'The name will be used for a dynamic import of '
                              'the module\'s normalization function.')
