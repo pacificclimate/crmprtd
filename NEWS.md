@@ -1,5 +1,15 @@
 # News / Release Notes
 
+## 3.1.0
+
+*24-March-2020*
+
+* Adds new network support for the Capital Regional District (CRD)
+* Logs network name to data insertion log entries
+* Adds a globally usable infilling script that infills each network between
+  an arbitrary time range
+* Fixes date formatting in download_moti HTTP parameters (GH Issue #58)
+
 ## 3.0.0
 
 *08-January-2020*
