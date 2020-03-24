@@ -116,7 +116,8 @@ def infill(networks, start_time, end_time, auth_fname, connection_string,
             monthly_ranges[:-1], monthly_ranges[1:]):
         start = interval_start.strftime(time_fmt)
         end = interval_end.strftime(time_fmt)
-        dl_args = ["-S", start, "-E", end, "-c", "XXXXXX"]
+        dl_args = ["-S", start, "-E", end, "--auth_fname", auth_fname,
+                   "--auth_key", "crd"]
         download_and_process(dl_args, "crd", connection_string,
                              log_args)
 

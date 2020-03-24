@@ -9,6 +9,11 @@ It is recommended to run this script once per one or two weeks to
 collect all available data (plus, presumably some duplicate data from
 the last run). If the script is run less than once per month, you will
 miss data.
+
+Downloading doesn't require authentication, per se, but each user of
+CRD's data has a unique and pseudo-secret client ID. This client id
+can be supplied as the username in the authentication file or via the
+--username paramenter. No password is necessary.
 '''
 
 import sys
@@ -19,7 +24,7 @@ from datetime import timedelta
 import dateutil.parser
 
 import crmprtd.download
-from crmprtd import logging_args, setup_logging
+from crmprtd import logging_args, setup_logging, common_auth_arguments
 
 log = logging.getLogger(__name__)
 
@@ -63,8 +68,7 @@ def main():  # pragma: no cover
     desc = globals()['__doc__']
     parser = ArgumentParser(description=desc)
     parser = logging_args(parser)
-    parser.add_argument('-c', '--client_id', required=True,
-                        help=("Mandatory client ID provided by CRD"))
+    parser = common_auth_arguments(parser)
     parser.add_argument('-S', '--start_time',
                         type=dateutil.parser.parse,
                         help=("Optional start time to use for downloading "
@@ -82,7 +86,11 @@ def main():  # pragma: no cover
 
     verify_dates(args.start_time, args.end_time)
 
-    download(args.client_id, args.start_time, args.end_time)
+    auth_yaml = open(args.auth_fname, 'r').read() if args.auth_fname else None
+    auth = crmprtd.download.extract_auth(args.username, None,
+                                         auth_yaml, args.auth_key)
+
+    download(auth['u'], args.start_time, args.end_time)
 
 
 if __name__ == "__main__":
