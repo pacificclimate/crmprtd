@@ -111,15 +111,16 @@ def infill(networks, start_time, end_time, auth_fname, connection_string,
     time_fmt = '%Y/%m/%d %H:%M:%S'
 
     # CRD
-    # Divide range into 28 day intervals
-    for interval_start, interval_end in zip(
-            monthly_ranges[:-1], monthly_ranges[1:]):
-        start = interval_start.strftime(time_fmt)
-        end = interval_end.strftime(time_fmt)
-        dl_args = ["-S", start, "-E", end, "--auth_fname", auth_fname,
-                   "--auth_key", "crd"]
-        download_and_process(dl_args, "crd", connection_string,
-                             log_args)
+    if 'crd' in networks:
+        # Divide range into 28 day intervals
+        for interval_start, interval_end in zip(
+                monthly_ranges[:-1], monthly_ranges[1:]):
+            start = interval_start.strftime(time_fmt)
+            end = interval_end.strftime(time_fmt)
+            dl_args = ["-S", start, "-E", end, "--auth_fname", auth_fname,
+                       "--auth_key", "crd"]
+            download_and_process(dl_args, "crd", connection_string,
+                                 log_args)
 
     # EC
     if 'ec' in networks:
