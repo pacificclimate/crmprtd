@@ -12,16 +12,16 @@ node {
         def options = [containerData: 'crmprtd']
 
         parallel "Python 3.6": {
-            runPythonTestSuite('pcic/crmprtd-test-env:python-3.6', requirements, pytestArgs, options)
+            runPythonTestSuite('pcic/test-env:python3.6', requirements, pytestArgs, options)
         },
         "Python 3.7": {
-            runPythonTestSuite('pcic/crmprtd-test-env:python-3.7', requirements, pytestArgs, options)
+            runPythonTestSuite('pcic/test-env:python3.7', requirements, pytestArgs, options)
         }
     }
 
     if (isPypiPublishable()) {
         stage('Push to PYPI') {
-            publishPythonPackage('pcic/crmprtd-test-env:python-3.6', 'PCIC_PYPI_CREDS')
+            publishPythonPackage('pcic/test-env:python3.6', 'PCIC_PYPI_CREDS')
         }
     }
 
