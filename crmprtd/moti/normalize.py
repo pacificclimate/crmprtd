@@ -28,6 +28,9 @@ def normalize(iterable):
     et = transform(et)
 
     obs_series = et.xpath("//observation-series")
+    if len(obs_series) == 0:
+        log.warning("Empty observation series: xpath search "
+                    "'//observation-series' return no results")
     for series in obs_series:
         try:
             stn_id = series.xpath(

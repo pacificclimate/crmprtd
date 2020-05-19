@@ -278,3 +278,28 @@ def test_normalize_bad_value():
 </cmml>''' # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
+
+
+def test_normalize_empty_data():
+    lines = b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+  <head>
+    <product operational-mode="official">
+      <title>Observation from BC Meteorological Stations</title>
+      <field>meteorological </field>
+      <category>observation</category>
+      <creation-date refresh-frequency="PT1H">2020-04-29T11:44:13-07:00</creation-date>
+    </product>
+    <source>
+      <production-center>British Columbia Ministry of Transportation
+        <sub-center>AWP</sub-center>
+      </production-center>
+    </source>
+  </head>
+  <data>
+    <observation-series>
+    </observation-series>
+  </data>
+</cmml>''' # noqa
+    rows = [row for row in normalize(BytesIO(lines))]
+    assert len(rows) == 0
