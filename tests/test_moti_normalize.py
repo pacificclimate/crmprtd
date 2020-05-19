@@ -280,7 +280,7 @@ def test_normalize_bad_value():
     assert len(rows) == 0
 
 
-def test_normalize_empty_data():
+def test_normalize_empty_data(caplog):
     lines = b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
@@ -303,3 +303,5 @@ def test_normalize_empty_data():
 </cmml>''' # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
+    assert "WARNING  Empty observation series:" in caplog.text
+    assert "ERROR    Could not detect the station id:" not in caplog.text
