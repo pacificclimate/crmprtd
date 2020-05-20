@@ -27,11 +27,11 @@ def normalize(iterable):
     et = xmlparse(file_stream)
     et = transform(et)
     obs_series = et.xpath("//observation-series")
-    if not len(obs_series[0]):
-        log.warning("Empty observation series: xpath search "
-                    "'//observation-series' return no results")
-        return
     for series in obs_series:
+        if not len(series):
+            log.warning("Empty observation series: xpath search "
+                        "'//observation-series' return no results")
+            continue
         try:
             stn_id = series.xpath(
                         "./origin/id[@type='client']")[0].text.strip()
