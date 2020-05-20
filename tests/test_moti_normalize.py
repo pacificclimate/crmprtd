@@ -1,6 +1,8 @@
 from crmprtd.moti.normalize import normalize
 from io import BytesIO
 
+import pytest
+
 
 def test_normalize_good_data():
     lines = b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
@@ -19,6 +21,7 @@ def test_normalize_good_data():
     </source>
   </head>
   <data>
+    <observation-series />
     <observation-series>
       <origin type="station">
         <id type="client">11091 </id>
@@ -278,3 +281,35 @@ def test_normalize_bad_value():
 </cmml>''' # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
+
+
+@pytest.mark.parametrize(('empty'), (
+    '<observation-series />',
+    '''<observation-series>
+     </observation-series>''',
+    '<observation-series></observation-series>',
+))
+def test_normalize_empty_data(empty, caplog):
+    lines = f'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+  <head>
+    <product operational-mode="official">
+      <title>Observation from BC Meteorological Stations</title>
+      <field>meteorological </field>
+      <category>observation</category>
+      <creation-date refresh-frequency="PT1H">2020-04-29T11:44:13-07:00</creation-date>
+    </product>
+    <source>
+      <production-center>British Columbia Ministry of Transportation
+        <sub-center>AWP</sub-center>
+      </production-center>
+    </source>
+  </head>
+  <data>
+    {empty}
+  </data>
+</cmml>'''.encode('utf-8') # noqa
+    rows = [row for row in normalize(BytesIO(lines))]
+    assert len(rows) == 0
+    assert "WARNING  Empty observation series:" in caplog.text
+    assert "ERROR    Could not detect the station id:" not in caplog.text
