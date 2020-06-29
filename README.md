@@ -1,6 +1,7 @@
 # crmprtd
 
 ![Python CI](https://github.com/pacificclimate/crmprtd/workflows/Python%20CI/badge.svg?branch=master)
+![Pypi Publishing](https://github.com/pacificclimate/crmprtd/workflows/Pypi%20Publishing/badge.svg?branch=master)
 
 Utility to download near real time weather data and insert it into PCIC's database
 
