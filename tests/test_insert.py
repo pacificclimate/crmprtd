@@ -8,7 +8,6 @@ from crmprtd.insert import bisect_insert_strategy, split, chunks, \
     get_sample_indices, obs_exist, contains_all_duplicates, single_insert_obs
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(('label', 'days', 'expected'), [
     # Each obs is for a unique time
     # All should be inserted
@@ -32,7 +31,6 @@ def test_bisect_insert_strategy(test_session, label, days, expected):
     assert dbm.successes == expected
 
 
-@pytest.mark.slow
 def test_mass_insert_obs_weird(test_session):
     history = test_session.query(History).first()
     variable = history.station.network.variables[0]
@@ -90,7 +88,6 @@ def test_get_sample_indices(num_obs, num_samples, expected):
     assert len(sample_indices) == expected
 
 
-@pytest.mark.slow
 def test_obs_exist_not_in_db(test_session):
     history_id = 20
     vars_id = 2
@@ -98,7 +95,6 @@ def test_obs_exist_not_in_db(test_session):
     assert not obs_exist(test_session, history_id, vars_id, time)
 
 
-@pytest.mark.slow
 def test_obs_exist_in_db(test_session):
     history_id = 20
     vars_id = 2
@@ -106,7 +102,6 @@ def test_obs_exist_in_db(test_session):
     assert obs_exist(test_session, history_id, vars_id, time)
 
 
-@pytest.mark.slow
 def test_contains_all_duplicates_no_dup(test_session):
     obs_list = []
     for i in range(50):
@@ -116,7 +111,6 @@ def test_contains_all_duplicates_no_dup(test_session):
     assert not contains_all_duplicates(test_session, obs_list, 5)
 
 
-@pytest.mark.slow
 def test_contains_all_duplicates_all_dup(test_session):
     obs_list = []
     for i in range(50):
@@ -128,7 +122,6 @@ def test_contains_all_duplicates_all_dup(test_session):
     assert contains_all_duplicates(test_session, obs_list, 5)
 
 
-@pytest.mark.slow
 def test_single_insert_obs(test_session):
     ob = [Obs(history_id=20, vars_id=2, time=datetime.now(), datum=10)]
     dbm = single_insert_obs(test_session, ob)
@@ -138,7 +131,6 @@ def test_single_insert_obs(test_session):
     assert q.count() == 4
 
 
-@pytest.mark.slow
 def test_single_insert_obs_not_unique(test_session):
     ob = [Obs(history_id=20, vars_id=2,
               time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc), datum=10)]

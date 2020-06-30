@@ -8,7 +8,6 @@ from crmprtd import Row
 from pycds import Station, History
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(('network_name', 'expected'), [
     ('FLNRO-WMB', True),
     ('WMB', False)
@@ -17,7 +16,6 @@ def test_is_network(test_session, network_name, expected):
     assert is_network(test_session, network_name) == expected
 
 
-@pytest.mark.slow
 def test_get_history_with_no_matches(test_session):
     # this observation will not match any in test session
     obs_tuple = Row(time=datetime.now(),
@@ -40,7 +38,6 @@ def test_get_history_with_no_matches(test_session):
     assert q.count() == 9
 
 
-@pytest.mark.slow
 def test_get_history_with_single_match(test_session):
     obs_tuple = Row(time=datetime.now(),
                     val=123,
@@ -62,7 +59,6 @@ def test_get_history_with_single_match(test_session):
     assert q.count() == 8
 
 
-@pytest.mark.slow
 def test_get_history_with_multiple_matches_and_location(test_session):
     obs_tuple = Row(time=datetime.now(),
                     val=123,
@@ -78,7 +74,6 @@ def test_get_history_with_multiple_matches_and_location(test_session):
     assert history.id == 20
 
 
-@pytest.mark.slow
 def test_get_history_with_multiple_matches_and_no_location(test_session):
     obs_tuple = Row(time=datetime.now(),
                     val=123,
@@ -94,19 +89,16 @@ def test_get_history_with_multiple_matches_and_no_location(test_session):
     assert history.id == 21
 
 
-@pytest.mark.slow
 def test_get_variable(test_session):
     variable = get_variable(test_session, 'FLNRO-WMB', 'relative_humidity')
     assert variable.id == 3
 
 
-@pytest.mark.slow
 def test_get_variable_no_match(test_session):
     variable = get_variable(test_session, 'FLNRO-WMB', 'humidity')
     assert variable is None
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(('network_name', 'variable_name',
                           'unit', 'val', 'expected'), [
     ('FLNRO-WMB', 'relative_humidity', 'percent', 10, 10),
@@ -119,7 +111,6 @@ def test_unit_check(test_session, network_name, variable_name, unit,
     assert check_val == expected
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(('obs_tuple', 'expected_hid', 'expected_time',
                           'expeceted_vid', 'expected_datum'), [
     # use match_station_with_active to match
@@ -177,7 +168,6 @@ def test_align_successes(test_session, obs_tuple, expected_hid, expected_time,
     assert ob.datum == expected_datum
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize(('obs_tuple'), [
     # unit convertion failure
     (Row(time=datetime.now(),
@@ -239,14 +229,12 @@ def test_align_failures(test_session, obs_tuple):
     assert ob is None
 
 
-@pytest.mark.slow
 def test_closest_stns_within_threshold(ec_session):
     x = closest_stns_within_threshold(ec_session, 'EC_raw',
                                       -123.7, 49.45, 1000)
     assert len(x) > 0
 
 
-@pytest.mark.slow
 def test_closest_stns_within_threshold_bad_data(ec_session):
     # https://github.com/pacificclimate/crmprtd/issues/8
 

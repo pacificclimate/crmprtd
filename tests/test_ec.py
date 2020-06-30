@@ -174,7 +174,6 @@ def test_xsl_transform_cloud_cover(x, expected):
     assert e[0].attrib['value'] == expected
 
 
-@pytest.mark.slow
 def test_OmMember_index_error_handle(ec_session):
     et = fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:member xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
