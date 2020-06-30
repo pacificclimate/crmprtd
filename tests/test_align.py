@@ -16,6 +16,7 @@ from pycds import Station, History
 def test_is_network(test_session, network_name, expected):
     assert is_network(test_session, network_name) == expected
 
+
 @pytest.mark.slow
 def test_get_history_with_no_matches(test_session):
     # this observation will not match any in test session
