@@ -1,5 +1,12 @@
 # News / Release Notes
 
+## 3.1.2
+
+*24-March-2020*
+
+* Updates continuous integration tooling
+* Adds more robust check for empty data
+
 ## 3.1.1
 
 *24-March-2020*
