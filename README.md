@@ -1,6 +1,7 @@
 # crmprtd
 
-[![Build Status](https://travis-ci.org/pacificclimate/crmprtd.svg?branch=master)](https://travis-ci.org/pacificclimate/crmprtd)
+![Python CI](https://github.com/pacificclimate/crmprtd/workflows/Python%20CI/badge.svg?branch=master)
+![Pypi Publishing](https://github.com/pacificclimate/crmprtd/workflows/Pypi%20Publishing/badge.svg?branch=master)
 
 Utility to download near real time weather data and insert it into PCIC's database
 
@@ -94,13 +95,10 @@ py.test -v tests
 1. Increment `__version__` in `setup.py`
 1. Summarize release changes in `NEWS.md`
 1. Commit these changes, then tag the release
-  ```bash
+```bash
 git add setup.py NEWS.md
 git commit -m"Bump to version x.x.x"
 git tag -a -m"x.x.x" x.x.x
 git push --follow-tags
-  ```
-1. Build and release the new package
-  - `pip install wheel`
-  - `python setup.py sdist bdist_wheel`, then copy the `dist/*` to the pypiserver, OR
-  - `python setup.py sdist upload -r <server>` if you have that set up in your `.pypirc` file
+```
+1. Our Github Actions [workflow](https://github.com/pacificclimate/crmprtd/blob/i71-action-best-practices/.github/workflows/python-ci.yml) will build and release the package
