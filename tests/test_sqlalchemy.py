@@ -1,9 +1,10 @@
 import logging
 import logging.config
-
+import pytest
 from pycds import Network
 
 
+@pytest.mark.slow
 def test_nested_transactions_1(crmp_session):
     fake_network = Network(name='Fake Network')
 
@@ -18,6 +19,7 @@ def test_nested_transactions_1(crmp_session):
         raise e
 
 
+@pytest.mark.slow
 def test_nested_transactions_2(crmp_session):
     fake_network = Network(name='Fake Network')
     with crmp_session.begin_nested():
@@ -26,6 +28,7 @@ def test_nested_transactions_2(crmp_session):
         logging.debug('added moti network')
 
 
+@pytest.mark.slow
 def test_nested_transactions_3(crmp_session):
     fake_network = Network(name='Fake Network')
     try:
