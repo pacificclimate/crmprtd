@@ -1,9 +1,11 @@
+# Standard libraries
+import logging
+import re
+import csv
+
 # Installed libraries
 import pytz
-import logging
-import itertools
 from dateutil.parser import parse
-import re
 
 # Local
 from crmprtd import Row
@@ -15,15 +17,13 @@ log = logging.getLogger(__name__)
 def normalize(file_stream):
     log.info('Starting WAMR data normalization')
 
-    for row in itertools.islice(file_stream, 1, None):
-        row = row.decode('utf-8')
-        try:
-            time, station_id, _, variable_name, \
-                _, _, _, unit, _, _, _, val = row.strip().split(',')
-        except ValueError as e:
-            log.error('Unable to retrieve items.',
-                      extra={'exception': e, 'row': row})
-            continue
+    reader = csv.DictReader(file_stream.getvalue().decode('utf-8')
+                            .splitlines())
+    for row in reader:
+        keys_of_interest = ('DATE_PST', 'STATION_NAME', 'UNIT',
+                            'PARAMETER', 'REPORTED_VALUE')
+        time, station_id, unit, variable_name, val = (
+            row[k] for k in keys_of_interest)
 
         # skip over empty values
         if not val:
