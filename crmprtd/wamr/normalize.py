@@ -38,7 +38,7 @@ def normalize(file_stream):
         unit = get_one_of((unit, units))
 
         # skip over empty values
-        if not val:
+        if val == '':
             continue
 
         try:
