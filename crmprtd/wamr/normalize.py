@@ -14,16 +14,29 @@ from crmprtd import Row
 log = logging.getLogger(__name__)
 
 
+def get_one_of(elements):
+    for e in elements:
+        if e:
+            return e
+    raise ValueError(f"No elements of {e} have a truthy value")
+
+
 def normalize(file_stream):
     log.info('Starting WAMR data normalization')
 
     reader = csv.DictReader(file_stream.getvalue().decode('utf-8')
                             .splitlines())
     for row in reader:
-        keys_of_interest = ('DATE_PST', 'STATION_NAME', 'UNIT',
-                            'PARAMETER', 'REPORTED_VALUE')
-        time, station_id, unit, variable_name, val = (
-            row[k] for k in keys_of_interest)
+        keys_of_interest = ('DATE_PST', 'STATION_NAME', 'UNIT', 'UNITS',
+                            'PARAMETER', 'REPORTED_VALUE',
+                            'LONGITUDE', 'LATITUDE')
+        time, station_id, unit, units, variable_name, val, lon, lat  = (
+            row[k] if k in row else None for k in keys_of_interest)
+
+
+        # Circa May 2020, BC ENV changed their units column from UNIT
+        # to UNITS. Ensure that we have at least one of these.
+        unit = get_one_of((unit, units))
 
         # skip over empty values
         if not val:
@@ -65,5 +78,5 @@ def normalize(file_stream):
                   unit=unit,
                   network_name='ENV-AQN',
                   station_id=station_id,
-                  lat=None,
-                  lon=None)
+                  lat=lat,
+                  lon=lon)

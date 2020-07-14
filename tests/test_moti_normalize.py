@@ -1,5 +1,6 @@
 from crmprtd.moti.normalize import normalize
 from io import BytesIO
+import logging
 
 import pytest
 
