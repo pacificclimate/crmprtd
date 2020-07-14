@@ -30,9 +30,8 @@ def normalize(file_stream):
         keys_of_interest = ('DATE_PST', 'STATION_NAME', 'UNIT', 'UNITS',
                             'PARAMETER', 'REPORTED_VALUE',
                             'LONGITUDE', 'LATITUDE')
-        time, station_id, unit, units, variable_name, val, lon, lat  = (
+        time, station_id, unit, units, variable_name, val, lon, lat = (
             row[k] if k in row else None for k in keys_of_interest)
-
 
         # Circa May 2020, BC ENV changed their units column from UNIT
         # to UNITS. Ensure that we have at least one of these.
