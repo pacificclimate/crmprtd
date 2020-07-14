@@ -1,9 +1,11 @@
+# Standard libraries
+import logging
+import re
+import csv
+
 # Installed libraries
 import pytz
-import logging
-import itertools
 from dateutil.parser import parse
-import re
 
 # Local
 from crmprtd import Row
@@ -12,21 +14,31 @@ from crmprtd import Row
 log = logging.getLogger(__name__)
 
 
+def get_one_of(elements):
+    for e in elements:
+        if e:
+            return e
+    raise ValueError(f"No elements of {e} have a truthy value")
+
+
 def normalize(file_stream):
     log.info('Starting WAMR data normalization')
 
-    for row in itertools.islice(file_stream, 1, None):
-        row = row.decode('utf-8')
-        try:
-            time, station_id, _, variable_name, \
-                _, _, _, unit, _, _, _, val = row.strip().split(',')
-        except ValueError as e:
-            log.error('Unable to retrieve items.',
-                      extra={'exception': e, 'row': row})
-            continue
+    reader = csv.DictReader(file_stream.getvalue().decode('utf-8')
+                            .splitlines())
+    for row in reader:
+        keys_of_interest = ('DATE_PST', 'STATION_NAME', 'UNIT', 'UNITS',
+                            'PARAMETER', 'REPORTED_VALUE',
+                            'LONGITUDE', 'LATITUDE')
+        time, station_id, unit, units, variable_name, val, lon, lat = (
+            row[k] if k in row else None for k in keys_of_interest)
+
+        # Circa May 2020, BC ENV changed their units column from UNIT
+        # to UNITS. Ensure that we have at least one of these.
+        unit = get_one_of((unit, units))
 
         # skip over empty values
-        if not val:
+        if val == '':
             continue
 
         try:
@@ -65,5 +77,5 @@ def normalize(file_stream):
                   unit=unit,
                   network_name='ENV-AQN',
                   station_id=station_id,
-                  lat=None,
-                  lon=None)
+                  lat=lat,
+                  lon=lon)

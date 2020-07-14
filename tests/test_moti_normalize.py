@@ -1,5 +1,6 @@
 from crmprtd.moti.normalize import normalize
 from io import BytesIO
+import logging
 
 import pytest
 
@@ -311,5 +312,7 @@ def test_normalize_empty_data(empty, caplog):
 </cmml>'''.encode('utf-8') # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
-    assert "WARNING  Empty observation series:" in caplog.text
-    assert "ERROR    Could not detect the station id:" not in caplog.text
+    for record in caplog.records:
+        assert record.levelno != logging.ERROR
+        if record.levelno == logging.WARNING:
+            assert "Empty observation series:" in caplog.text
