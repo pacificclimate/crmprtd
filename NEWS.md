@@ -1,8 +1,14 @@
 # News / Release Notes
 
+## 3.1.3
+
+*15-July-2020*
+
+* Handles new (and different) fields in the WAMR stream
+
 ## 3.1.2
 
-*24-March-2020*
+*30-June-2020*
 
 * Updates continuous integration tooling
 * Adds more robust check for empty data
