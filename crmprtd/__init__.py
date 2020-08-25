@@ -46,7 +46,6 @@ failures. This phase needs to manage the database transactions for
 speed and reliability. This phase is common to all networks.
 """
 
-import io
 import logging
 import logging.config
 import yaml
@@ -154,36 +153,6 @@ def setup_logging(log_conf, log_filename, error_email, log_level, name):
         base_config['loggers']['crmprtd']['level'] = log_level
 
     logging.config.dictConfig(base_config)
-
-
-def iterable_to_stream(iterable, buffer_size=io.DEFAULT_BUFFER_SIZE):
-    """
-    Lets you use an iterable (e.g. a generator) that yields
-    bytestrings as a read-only input stream.
-
-    The stream implements Python 3's newer I/O API (available in
-    Python 2's io module).  For efficiency, the stream is buffered.
-
-    From: goo.gl/Yxm5vz
-
-    """
-    class IterStream(io.RawIOBase):
-        def __init__(self):
-            self.leftover = None
-
-        def readable(self):
-            return True
-
-        def readinto(self, b):
-            try:
-                length = len(b)  # We're supposed to return at most this much
-                chunk = self.leftover or next(iterable)
-                output, self.leftover = chunk[:length], chunk[length:]
-                b[:len(output)] = output
-                return len(output)
-            except StopIteration:
-                return 0    # indicate EOF
-    return io.BufferedReader(IterStream(), buffer_size=buffer_size)
 
 
 def subset_dict(a_dict, keys_wanted):

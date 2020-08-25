@@ -116,7 +116,7 @@ multi_xml_bytes = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blah />
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <stuff />
-'''.splitlines()
+'''
 
 
 multi_xml_download = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -487,7 +487,7 @@ multi_xml_download = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''.encode('utf-8').splitlines()
+</om:ObservationCollection>'''.encode('utf-8')
 
 MSNG_values_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns:om="http://www.opengis.net/om/1.0" xmlns="http://dms.ec.gc.ca/schema/point-observation/2.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -558,4 +558,4 @@ MSNG_values_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
   </om:member>
 </om:ObservationCollection>
 
-'''.encode('utf-8').splitlines()
+'''.encode('utf-8')
