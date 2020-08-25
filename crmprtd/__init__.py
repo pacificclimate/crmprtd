@@ -28,8 +28,10 @@ Normalize: This phase consists of performing network specific text
 transformations and extraction of information to the weather
 observations. This may include XML XSLT transformations, unit or
 variable name rewrites according to mapping rules, etc. The input to
-this phase is simply a file stream and the output is simply a stream
-of tuples (time, val, variable name, unit, network name, station id, lat,
+this phase is an open file-like object opened in binary mode
+(https://docs.python.org/3/library/io.html#binary-i-o) (e.g. a BytesIO
+object or sys.stdin.buffer) and the output is simply a stream of
+tuples (time, val, variable name, unit, network name, station id, lat,
 lon) in native types. The idea of this phase is that it requires no
 access to the database, just network specific knowledge.
 
