@@ -8,7 +8,7 @@ from dateutil.parser import parse as dateparse
 
 # Local
 from pkg_resources import resource_stream
-from crmprtd import Row, iterable_to_stream
+from crmprtd import Row
 from crmprtd.ec import ns, OmMember, no_ns_element
 from crmprtd.ec_swob.download import split_multi_xml_stream
 
@@ -16,13 +16,12 @@ from crmprtd.ec_swob.download import split_multi_xml_stream
 log = logging.getLogger(__name__)
 
 
-def parse_xml(iterable, xsl=None):
+def parse_xml(stream, xsl=None):
     if xsl is None:
         xsl = resource_stream('crmprtd', 'data/ec_xform.xsl')
 
     # Parse and transform the xml
-    file = iterable_to_stream(iterable)
-    et = parse(file)
+    et = parse(stream)
     transform = XSLT(parse(xsl))
     return transform(et)
 

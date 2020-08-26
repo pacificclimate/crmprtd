@@ -7,15 +7,14 @@ import logging
 from datetime import datetime
 
 # Local
-from crmprtd import Row, iterable_to_stream
+from crmprtd import Row
 
 
 log = logging.getLogger(__name__)
 
 
-def normalize(iterable):
+def normalize(stream):
     log.info('Starting CRD data normalization')
-    stream = iterable_to_stream(iterable)
 
     tz = pytz.timezone('Canada/Pacific')
 

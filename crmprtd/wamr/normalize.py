@@ -1,4 +1,5 @@
 # Standard libraries
+import io
 import logging
 import re
 import csv
@@ -24,8 +25,8 @@ def get_one_of(elements):
 def normalize(file_stream):
     log.info('Starting WAMR data normalization')
 
-    reader = csv.DictReader(file_stream.getvalue().decode('utf-8')
-                            .splitlines())
+    string_stream = io.StringIO(file_stream.read().decode('utf-8'))
+    reader = csv.DictReader(string_stream)
     for row in reader:
         keys_of_interest = ('DATE_PST', 'STATION_NAME', 'UNIT', 'UNITS',
                             'PARAMETER', 'REPORTED_VALUE',
@@ -33,13 +34,13 @@ def normalize(file_stream):
         time, station_id, unit, units, variable_name, val, lon, lat = (
             row[k] if k in row else None for k in keys_of_interest)
 
-        # Circa May 2020, BC ENV changed their units column from UNIT
-        # to UNITS. Ensure that we have at least one of these.
-        unit = get_one_of((unit, units))
-
         # skip over empty values
         if val == '':
             continue
+
+        # Circa May 2020, BC ENV changed their units column from UNIT
+        # to UNITS. Ensure that we have at least one of these.
+        unit = get_one_of((unit, units))
 
         try:
             value = float(val)

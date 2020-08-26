@@ -32,11 +32,6 @@ def process_args(parser):
     return parser
 
 
-def get_data():
-    for line in sys.stdin.buffer.readlines():
-        yield line
-
-
 def get_normalization_module(network):
     return import_module('crmprtd.{}.normalize'.format(network))
 
@@ -55,10 +50,10 @@ def process(connection_string, sample_size, network, is_diagnostic=False):
                   extra={'network': network})
         raise Exception('No module name given')
 
-    download_iter = get_data()
+    download_stream = sys.stdin.buffer
     norm_mod = get_normalization_module(network)
 
-    rows = [row for row in norm_mod.normalize(download_iter)]
+    rows = [row for row in norm_mod.normalize(download_stream)]
 
     engine = create_engine(connection_string)
     Session = sessionmaker(engine)
