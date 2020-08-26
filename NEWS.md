@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 3.1.4
+
+*26-August-2020*
+
+* Standardizes the interface between the download and normalize phases (GH Issue #75)
+
 ## 3.1.3
 
 *15-July-2020*
