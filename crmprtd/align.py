@@ -24,7 +24,7 @@ Q_ = ureg.Quantity
 # latest release of pint (0.9). This can be removed once we incorporate pint's
 # next release.
 for def_ in (
-        "degreeC = degC; offset: 273.15",
+        "degreeC = degC; offset: 273.15 = °C = celsius = Celsius",
         "degreeF = 5 / 9 * kelvin; offset: 255.372222",
         "degreeK = degK; offset: 0",
         "degree = π / 180 * radian = deg = Deg = arcdeg = arcdegree = "

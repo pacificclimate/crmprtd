@@ -258,7 +258,8 @@ def test_closest_stns_within_threshold_bad_data(ec_session):
 @pytest.mark.parametrize(('alias', 'dest'), (
     ('Deg.', 'degree'),
     ('Deg', 'degree'),
-    ('\u00b0C', 'celsius')
+    ('\u00b0C', 'celsius'),
+    ('Celsius', 'celsius'),
 ))
 def test_convert_unit(alias, dest):
     x = 42
