@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 3.1.5
+
+*03-September-2020*
+
+* Handles temperature units from the CRD
+
 ## 3.1.4
 
 *26-August-2020*
