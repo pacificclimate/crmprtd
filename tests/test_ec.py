@@ -4,9 +4,9 @@ from lxml.etree import LxmlError
 
 from lxml.etree import fromstring, parse, XSLT
 import pytest
+from pytest_mock import mocker
 
 from crmprtd.ec import makeurl, ns, OmMember
-
 
 @pytest.mark.parametrize(('label', 'args', 'expected'), [
     ('daily-BC-EN',
@@ -47,16 +47,14 @@ def test_makeurl(label, args, expected):
     assert makeurl(**args) == expected
 
 
-def test_makeurl_no_time_hourly():
-    url = makeurl(freq='hourly')
-    fmt = '%Y%m%d%H'
-
-    # FIXME: This test can actually fail if the hour boundary rolls over
-    # between recording the time here and running the test below
-    t = datetime.utcnow()
-
-    assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
-                   'hourly/hourly_bc_{}_e.xml').format(t.strftime(fmt))
+@pytest.fixture()
+def test_makeurl_no_time_hourly(mocker):
+  with mocker.patch('crmprtd.ec.datetime') as mock_t:
+      mock_t.utcnow.return_value = datetime(2016, 1, 15, 21)
+      #mock_t.side_effect = lambda *args, **kw: datetime(*args, **kw)
+      url = makeurl(freq='hourly')
+      assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                   'hourly/hourly_bc_{}_e.xml').format('2016011521')
 
 
 def test_makeurl_no_time_daily():
