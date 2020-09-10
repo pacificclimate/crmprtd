@@ -4,7 +4,6 @@ from lxml.etree import LxmlError
 
 from lxml.etree import fromstring, parse, XSLT
 import pytest
-from pytest_mock import mocker
 
 from crmprtd.ec import makeurl, ns, OmMember
 
