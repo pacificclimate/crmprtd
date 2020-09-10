@@ -7,6 +7,7 @@ import pytest
 
 from crmprtd.ec import makeurl, ns, OmMember
 
+
 @pytest.mark.parametrize(('label', 'args', 'expected'), [
     ('daily-BC-EN',
      {'freq': 'daily',
@@ -48,11 +49,11 @@ def test_makeurl(label, args, expected):
 
 @pytest.fixture()
 def test_makeurl_no_time_hourly(mocker):
-  with mocker.patch('crmprtd.ec.datetime') as mock_t:
-      mock_t.utcnow.return_value = datetime(2016, 1, 15, 21)
-      url = makeurl(freq='hourly')
-      assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
-                   'hourly/hourly_bc_{}_e.xml').format('2016011521')
+    with mocker.patch('crmprtd.ec.datetime') as mock_t:
+        mock_t.utcnow.return_value = datetime(2016, 1, 15, 21)
+        url = makeurl(freq='hourly')
+        assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                        'hourly/hourly_bc_{}_e.xml').format('2016011521')
 
 
 def test_makeurl_no_time_daily():
