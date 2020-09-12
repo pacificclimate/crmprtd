@@ -47,16 +47,13 @@ def test_makeurl(label, args, expected):
     assert makeurl(**args) == expected
 
 
-def test_makeurl_no_time_hourly():
-    url = makeurl(freq='hourly')
-    fmt = '%Y%m%d%H'
-
-    # FIXME: This test can actually fail if the hour boundary rolls over
-    # between recording the time here and running the test below
-    t = datetime.utcnow()
+def test_makeurl_no_time_hourly(mocker):
+    with mocker.patch('crmprtd.ec.now',
+                      return_value=datetime(2016, 1, 15, 21)):
+        url = makeurl(freq='hourly')
 
     assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
-                   'hourly/hourly_bc_{}_e.xml').format(t.strftime(fmt))
+                   'hourly/hourly_bc_2016011521_e.xml')
 
 
 def test_makeurl_no_time_daily():
