@@ -48,18 +48,22 @@ def test_makeurl(label, args, expected):
 
 
 def test_makeurl_no_time_hourly(mocker):
-    with mocker.patch('crmprtd.ec.now',
-                      return_value=datetime(2016, 1, 15, 21)):
+    t = datetime(2016, 1, 15, 21)
+    fmt = '%Y%m%d%H'
+
+    with mocker.patch('crmprtd.ec.now', return_value=t):
         url = makeurl(freq='hourly')
 
     assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
-                   'hourly/hourly_bc_2016011521_e.xml')
+                   'hourly/hourly_bc_{}_e.xml').format(t.strftime(fmt))
 
 
-def test_makeurl_no_time_daily():
-    url = makeurl()
+def test_makeurl_no_time_daily(mocker):
+    t = datetime(2016, 1, 15, 21)
     fmt = '%Y%m%d'
-    t = datetime.utcnow()
+
+    with mocker.patch('crmprtd.ec.now', return_value=t):
+        url = makeurl()
 
     assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
                    'yesterday/yesterday_bc_{}_e.xml').format(t.strftime(fmt))
