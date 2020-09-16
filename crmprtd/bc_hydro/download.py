@@ -2,8 +2,11 @@
 
 import pysftp
 from tempfile import TemporaryDirectory, SpooledTemporaryFile
+import logging
 import os
+import sys
 from zipfile import ZipFile
+from argparse import ArgumentParser
 
 from crmprtd import logging_args, setup_logging, common_auth_arguments
 
@@ -23,7 +26,8 @@ def download(username, auth_key, ftp_server, ftp_dir):
                     mode='r+') as tempfile:
 
                 for filename in os.listdir(os.getcwd()):
-                    try:
+                    name, extension = os.path.splitext(filename)
+                    if extension == '.zip':
                         zip_file = ZipFile(filename, 'r')
                         zip_file.extractall()
                         for txt_file in os.listdir(os.getcwd()):
@@ -31,17 +35,15 @@ def download(username, auth_key, ftp_server, ftp_dir):
                             if extension == '.txt':
                                 file = open(txt_file, mode='r')
                                 tempfile.write(file.read())
-                                os.remove(os.getcwd() + '/' + txt_file)
-                        
-                    except:                    
-                        # Not a zip file
-                        pass
+                                os.remove(os.getcwd() + '/' + txt_file)                
                         
                 tempfile.seek(0)
                 for line in tempfile.readlines():
                     sys.stdout.buffer.write(line.encode('utf-8'))
+
     except Exception as e:
         log.exception("Unable to process ftp")
+
 
 def main():
     desc = globals()['__doc__']
@@ -50,10 +52,11 @@ def main():
     parser = common_auth_arguments(parser)
     parser.add_argument('-f', '--ftp_server',
                         default='sftp2.bchydro.com',
-                        help=('Full uri to BC Hydro\'s ftp server')
+                        help=('Full uri to BC Hydro\'s ftp '
+                              'server'))
     parser.add_argument('-F', '--ftp_dir',
                         default=('pcic'),
-                        help='FTP Directory containing BC hydro\'s data files')
+                        help=('FTP Directory containing BC hydro\'s data files'))
     args = parser.parse_args()
 
     setup_logging(args.log_conf, args.log_filename, args.error_email,
