@@ -30,6 +30,11 @@ def download(username, gpg_private_key, ftp_server, ftp_dir, start_date, end_dat
     try:
         sftp = pysftp.Connection(ftp_server, username=username,
                                  private_key=gpg_private_key)
+    except AuthenticationException:
+        log.exception("Invalid Authentication")
+        sys.exit(1)
+
+    try:
         with TemporaryDirectory() as tmp_dir:
             os.chdir(os.path.expanduser(tmp_dir))
             range = DateRange(int(start_date), int(end_date), sftp)
@@ -43,8 +48,9 @@ def download(username, gpg_private_key, ftp_server, ftp_dir, start_date, end_dat
                         sys.stdout.buffer.write(txt_file.read())
                         
 
-    except Exception as e:
-        log.exception("Unable to process ftp")
+    except IOError:
+        log.exception("Unable to download or open files")
+        sys.exit(1)
 
 class DateRange():
 
