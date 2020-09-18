@@ -59,16 +59,21 @@ def process(connection_string, sample_size, network, is_diagnostic=False):
     Session = sessionmaker(engine)
     sesh = Session()
 
-    observations = [
-        ob for ob in [align(sesh, row, is_diagnostic) for row in rows] if ob
-    ]
+    try:
+        observations = [
+            ob for ob in [align(sesh, row, is_diagnostic) for row in rows] if ob
+        ]
 
-    if is_diagnostic:
-        for obs in observations:
-            log.info(obs)
-        return
+        if is_diagnostic:
+            for obs in observations:
+                log.info(obs)
+            return
 
-    results = insert(sesh, observations, sample_size)
+        results = insert(sesh, observations, sample_size)
+
+    except Exception as e:
+        log.exception("Materialized view functions not in search path")
+
     log.info('Data insertion results', extra={
         'results': results, 'network': network
     })
