@@ -73,7 +73,7 @@ def process(connection_string, sample_size, network, is_diagnostic=False):
 
         results = insert(sesh, observations, sample_size)
 
-    except exc.ProgrammingError as e:
+    except exc.ProgrammingError:
         log.exception("Materialized view functions not in user's search path")
 
     log.info('Data insertion results', extra={
