@@ -4,6 +4,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import logging
 from argparse import ArgumentParser
+from sqlalchemy import exc
 
 from crmprtd.align import align
 from crmprtd.insert import insert
@@ -61,7 +62,8 @@ def process(connection_string, sample_size, network, is_diagnostic=False):
 
     try:
         observations = [
-            ob for ob in [align(sesh, row, is_diagnostic) for row in rows] if ob
+            ob for ob in [align(sesh, row, is_diagnostic)
+                          for row in rows] if ob
         ]
 
         if is_diagnostic:
@@ -71,8 +73,8 @@ def process(connection_string, sample_size, network, is_diagnostic=False):
 
         results = insert(sesh, observations, sample_size)
 
-    except Exception as e:
-        log.exception("Materialized view functions not in search path")
+    except exc.ProgrammingError as e:
+        log.exception("Materialized view functions not in user's search path")
 
     log.info('Data insertion results', extra={
         'results': results, 'network': network
