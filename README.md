@@ -7,6 +7,13 @@ Utility to download near real time weather data and insert it into PCIC's databa
 
 ## Installation
 
+A `Makefile` handles the project installation:
+```bash
+make
+```
+
+If you do not wish you to use `make`, follow the instructions below.
+
 For production usage, install the latest tagged release from PCIC's PyPI server.
 
 ```bash
