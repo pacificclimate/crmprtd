@@ -10,6 +10,7 @@ Utility to download near real time weather data and insert it into PCIC's databa
 A `Makefile` handles the project installation:
 ```bash
 make
+source /tmp/crmprtd-venv/bin/activate
 ```
 
 If you do not wish you to use `make`, follow the instructions below.
