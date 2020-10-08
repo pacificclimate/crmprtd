@@ -36,7 +36,7 @@ def makeurl(freq='daily', province='BC', language='e', time=None):
     freq = 'yesterday' if freq == 'daily' else freq
     fname = '{}_{}_{}_{}.xml'.format(
         freq, province.lower(), time.strftime(fmt), language)
-    str = 'http://dd.weatheroffice.ec.gc.ca/observations/xml/'
+    str = 'https://dd.weather.gc.ca/observations/xml/'
     return str + '{}/{}/{}'.format(province.upper(), freq, fname)
 
 

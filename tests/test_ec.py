@@ -14,32 +14,32 @@ from crmprtd.ec import makeurl, ns, OmMember
       'province': 'BC',
       'language': 'e',
       'time': datetime(2016, 1, 15, 21)},
-     ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/'
+     ('https://dd.weather.gc.ca/observations/xml/BC/yesterday/'
       'yesterday_bc_20160115_e.xml')
      ), ('hourly-BC-EN',
          {'freq': 'hourly',
           'province': 'BC',
           'language': 'e',
           'time': datetime(2016, 1, 15, 21)},
-         ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/'
+         ('https://dd.weather.gc.ca/observations/xml/BC/hourly/'
           'hourly_bc_2016011521_e.xml')
          ), ('nofreq-BC-EN',
              {'province': 'BC',
               'language': 'e',
               'time': datetime(2016, 1, 15, 21)},
-             ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/'
+             ('https://dd.weather.gc.ca/observations/xml/BC/yesterday/'
               'yesterday_bc_20160115_e.xml')
              ), ('hourly-noprov-EN',
                  {'freq': 'hourly',
                   'language': 'e',
                   'time': datetime(2016, 1, 15, 21)},
-                 ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                 ('https://dd.weather.gc.ca/observations/xml/BC/'
                   'hourly/hourly_bc_2016011521_e.xml')
                  ), ('hourly-BC-nolang',
                      {'freq': 'hourly',
                       'province': 'BC',
                       'time': datetime(2016, 1, 15, 21)},
-                     ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+                     ('https://dd.weather.gc.ca/observations/xml/BC/'
                       'hourly/hourly_bc_2016011521_e.xml')
                      )
 ])
@@ -54,7 +54,7 @@ def test_makeurl_no_time_hourly(mocker):
     with mocker.patch('crmprtd.ec.now', return_value=t):
         url = makeurl(freq='hourly')
 
-    assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+    assert url == ('https://dd.weather.gc.ca/observations/xml/BC/'
                    'hourly/hourly_bc_{}_e.xml').format(t.strftime(fmt))
 
 
@@ -65,7 +65,7 @@ def test_makeurl_no_time_daily(mocker):
     with mocker.patch('crmprtd.ec.now', return_value=t):
         url = makeurl()
 
-    assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
+    assert url == ('https://dd.weather.gc.ca/observations/xml/BC/'
                    'yesterday/yesterday_bc_{}_e.xml').format(t.strftime(fmt))
 
 
