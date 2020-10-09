@@ -36,6 +36,6 @@ jobs:
       env:
         TZ: Canada/Pacific
       run: |
-        py.test -m "not slow or not online" -v --tb=short
+        py.test -m "not slow and not online" -v --tb=short
     - name: Code format check
       run: black . --check
