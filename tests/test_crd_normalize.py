@@ -7,7 +7,7 @@ from crmprtd.crd.normalize import normalize
 
 
 def test_normalize_good_data():
-    lines = b'''{
+    lines = b"""{
     "HEADER": {
         "_units": {
             "RainUnit": "millimetre",
@@ -32,8 +32,8 @@ def test_normalize_good_data():
     ],
     "ERROR": ""
 }
-''' # noqa
-    tz = pytz.timezone('Canada/Pacific')
+"""  # noqa
+    tz = pytz.timezone("Canada/Pacific")
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 2
     for row in rows:

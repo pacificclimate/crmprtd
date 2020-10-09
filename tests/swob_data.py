@@ -1,5 +1,5 @@
 # https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/
-network_listing = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+network_listing = """<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <html>
  <head>
   <title>Index of /observations/swob-ml/partners/bc-env-snow</title>
@@ -22,9 +22,9 @@ network_listing = '''<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <img src="/icons/folder.gif" alt="[DIR]"> <a href="20191018/">20191018/</a>                       2019-10-18 00:44    -   
 <hr></pre>
 </body></html>
-'''
+"""
 # https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/20191015/
-day_listing = '''
+day_listing = """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <html>
  <head>
@@ -69,9 +69,9 @@ day_listing = '''
 <img src="/icons/folder.gif" alt="[DIR]"> <a href="4b18p/">4b18p/</a>                                      2019-10-15 23:27    -   
 <hr></pre>
 </body></html>
-'''
+"""
 # https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/20191015/1d06p/
-station_listing = '''
+station_listing = """
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <html>
  <head>
@@ -106,9 +106,9 @@ station_listing = '''
 <img src="/icons/unknown.gif" alt="[   ]"> <a href="2019-10-15-2300-bc-env-asw-1d06p-AUTO-swob.xml">2019-10-15-2300-bc-env-asw-1d06p-AUTO-swob.xml</a>       2019-10-15 23:03  5.6K  
 <hr></pre>
 </body></html>
-'''
+"""
 
-multi_xml_bytes = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+multi_xml_bytes = b"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <foo />
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <bar />
@@ -116,10 +116,10 @@ multi_xml_bytes = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <blah />
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <stuff />
-'''
+"""
 
 
-multi_xml_download = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+multi_xml_download = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns:om="http://www.opengis.net/om/1.0" xmlns="http://dms.ec.gc.ca/schema/point-observation/2.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -487,9 +487,11 @@ multi_xml_download = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>'''.encode('utf-8')
+</om:ObservationCollection>""".encode(
+    "utf-8"
+)
 
-MSNG_values_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+MSNG_values_xml = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns:om="http://www.opengis.net/om/1.0" xmlns="http://dms.ec.gc.ca/schema/point-observation/2.0" xmlns:gml="http://www.opengis.net/gml" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -558,4 +560,6 @@ MSNG_values_xml = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
   </om:member>
 </om:ObservationCollection>
 
-'''.encode('utf-8')
+""".encode(
+    "utf-8"
+)

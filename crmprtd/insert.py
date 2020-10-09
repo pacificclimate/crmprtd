@@ -1,4 +1,3 @@
-
 """insert.py
 The insert module handles the Insert phase of the crmprtd
 pipeline. This phase simply consists of doing a mass insert of
@@ -19,12 +18,11 @@ from crmprtd.db_exceptions import InsertionError
 from pycds import Obs
 
 
-log = logging.getLogger('crmprtd.insert')
+log = logging.getLogger("crmprtd.insert")
 
 
 class DBMetrics(object):
-    '''Keep track of database metrics during the insertion process.
-    '''
+    """Keep track of database metrics during the insertion process."""
 
     def __init__(self, successes, skips, failures):
         self.successes = successes
@@ -32,9 +30,11 @@ class DBMetrics(object):
         self.failures = failures
 
     def __add__(self, another):
-        return DBMetrics(self.successes + another.successes,
-                         self.skips + another.skips,
-                         self.failures + another.failures)
+        return DBMetrics(
+            self.successes + another.successes,
+            self.skips + another.skips,
+            self.failures + another.failures,
+        )
 
 
 class Timer(object):
@@ -63,7 +63,7 @@ def get_chunk_sizes(remainder):
 def chunks(obs):
     pos = 0
     for chunk_size in get_chunk_sizes(len(obs)):
-        yield obs[pos:pos+chunk_size]
+        yield obs[pos : pos + chunk_size]
         pos += chunk_size
 
 
@@ -76,8 +76,8 @@ def get_sample_indices(num_obs, sample_size):
 
 def obs_exist(sesh, history_id, vars_id, time):
     q = sesh.query(Obs).filter(
-        and_(Obs.history_id == history_id, Obs.vars_id == vars_id,
-             Obs.time == time))
+        and_(Obs.history_id == history_id, Obs.vars_id == vars_id, Obs.time == time)
+    )
     return q.count() > 0
 
 
@@ -100,8 +100,7 @@ def single_insert_obs(sesh, obs):
     for o in obs:
         if obs_exist(sesh, o.history_id, o.vars_id, o.time):
             dbm.skips += 1
-            log.debug('Observation already exists in database',
-                      extra={'obs_id': o.id})
+            log.debug("Observation already exists in database", extra={"obs_id": o.id})
             continue
 
         # value does not exist in obs_raw, continue with insertion
@@ -111,11 +110,12 @@ def single_insert_obs(sesh, obs):
             log.debug("Successfully inserted observation")
             dbm.successes += 1
         except Exception as e:
-            log.warning("Failure, an error occured.", extra={'e': e})
+            log.warning("Failure, an error occured.", extra={"e": e})
             sesh.rollback()
             dbm.failures += 1
-            raise InsertionError(obs_time=o.time, datum=o.datum,
-                                 vars_id=o.vars_id, hid=o.history_id, e=e)
+            raise InsertionError(
+                obs_time=o.time, datum=o.datum, vars_id=o.vars_id, hid=o.history_id, e=e
+            )
     return dbm
 
 
@@ -130,19 +130,19 @@ def split(tuple_):
 
 
 def bisect_insert_strategy(sesh, obs):
-    '''This function implements a recursive Obs insert strategy to
-       handle unique constraint errors on members of the set. The
-       strategy used is to optimistically attempt to insert the entire
-       set and in the event of a unique constraint error, it will
-       divide the set into two and try again on each set (which will
-       presumably have a lower probability of failing).
+    """This function implements a recursive Obs insert strategy to
+    handle unique constraint errors on members of the set. The
+    strategy used is to optimistically attempt to insert the entire
+    set and in the event of a unique constraint error, it will
+    divide the set into two and try again on each set (which will
+    presumably have a lower probability of failing).
 
-       In the degenerative case (all observations are duplicates), this
-       strategy will require up to n *additional* transactions,
-       but in the optimal case it reduces the transactions to a constant
-       1.
-    '''
-    log.debug("Begin mass observation insertion", extra={'num_obs': len(obs)})
+    In the degenerative case (all observations are duplicates), this
+    strategy will require up to n *additional* transactions,
+    but in the optimal case it reduces the transactions to a constant
+    1.
+    """
+    log.debug("Begin mass observation insertion", extra={"num_obs": len(obs)})
 
     # Base cases
     if len(obs) < 1:
@@ -155,13 +155,16 @@ def bisect_insert_strategy(sesh, obs):
             with sesh.begin_nested():
                 sesh.add(obs[0])
         except IntegrityError as e:
-            log.debug("Failure, observation already exists",
-                      extra={'obs': obs, 'exception': e})
+            log.debug(
+                "Failure, observation already exists",
+                extra={"obs": obs, "exception": e},
+            )
             sesh.rollback()
             return DBMetrics(0, 1, 0)
         except InsertionError as e:
-            log.warning("Failure occured during insertion",
-                        extra={'obs': obs, 'exception': e})
+            log.warning(
+                "Failure occured during insertion", extra={"obs": obs, "exception": e}
+            )
             sesh.rollback()
             return DBMetrics(0, 0, 1)
         else:
@@ -173,7 +176,7 @@ def bisect_insert_strategy(sesh, obs):
     else:
         try:
             with sesh.begin_nested():
-                log.debug("New SAVEPOINT", extra={'num_obs': len(obs)})
+                log.debug("New SAVEPOINT", extra={"num_obs": len(obs)})
                 sesh.add_all(obs)
         except IntegrityError:
             log.debug("Failed, splitting observations.")
@@ -184,8 +187,7 @@ def bisect_insert_strategy(sesh, obs):
             dbm_b = bisect_insert_strategy(sesh, b)
             return dbm_a + dbm_b
         else:
-            log.info("Successfully inserted observations",
-                     extra={'num_obs': len(obs)})
+            log.info("Successfully inserted observations", extra={"num_obs": len(obs)})
             sesh.commit()
             return DBMetrics(len(obs), 0, 0)
 
@@ -203,8 +205,10 @@ def insert(sesh, observations, sample_size):
             for chunk in chunks(observations):
                 dbm += bisect_insert_strategy(sesh, chunk)
 
-    log.info('Data insertion complete')
-    return {'successes': dbm.successes,
-            'skips': dbm.skips,
-            'failures': dbm.failures,
-            'insertions_per_sec': round(dbm.successes/tmr.run_time, 2)}
+    log.info("Data insertion complete")
+    return {
+        "successes": dbm.successes,
+        "skips": dbm.skips,
+        "failures": dbm.failures,
+        "insertions_per_sec": round(dbm.successes / tmr.run_time, 2),
+    }

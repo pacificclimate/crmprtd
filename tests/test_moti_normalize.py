@@ -6,7 +6,7 @@ import pytest
 
 
 def test_normalize_good_data():
-    lines = b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -46,16 +46,16 @@ def test_normalize_good_data():
       </observation>
     </observation-series>
   </data>
-</cmml>''' # noqa
+</cmml>"""  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 4
     for row in rows:
-        assert row.station_id == '11091'
-        assert row.network_name == 'MoTIe'
+        assert row.station_id == "11091"
+        assert row.network_name == "MoTIe"
 
 
 def test_normalize_missing_stn_indexerror():
-    lines = b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -85,13 +85,13 @@ def test_normalize_missing_stn_indexerror():
       </observation>
     </observation-series>
   </data>
-</cmml>''' # noqa
+</cmml>"""  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
 
 
 def test_normalize_missing_time():
-    lines = b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -130,7 +130,7 @@ def test_normalize_missing_time():
       </observation>
     </observation-series>
   </data>
-</cmml>''' # noqa
+</cmml>"""  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 2
     for row in rows:
@@ -138,7 +138,7 @@ def test_normalize_missing_time():
 
 
 def test_normalize_bad_time(moti_sawr7110_xml):
-    lines = b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -169,13 +169,13 @@ def test_normalize_bad_time(moti_sawr7110_xml):
       </observation>
     </observation-series>
   </data>
-</cmml>''' # noqa
+</cmml>"""  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
 
 
 def test_normalize_missing_var_name():
-    lines = b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -203,13 +203,13 @@ def test_normalize_missing_var_name():
       </observation>
     </observation-series>
   </data>
-</cmml>''' # noqa
+</cmml>"""  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
 
 
 def test_normalize_missing_value():
-    lines = b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -239,17 +239,17 @@ def test_normalize_missing_value():
       </observation>
     </observation-series>
   </data>
-</cmml>''' # noqa
+</cmml>"""  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 1
-    row, = rows
+    (row,) = rows
     assert row.time is not None
     assert row.val == 964
-    assert row.variable_name == 'ATMOSPHERIC_PRESSURE'
+    assert row.variable_name == "ATMOSPHERIC_PRESSURE"
 
 
 def test_normalize_bad_value():
-    lines = b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -279,19 +279,25 @@ def test_normalize_bad_value():
       </observation>
     </observation-series>
   </data>
-</cmml>''' # noqa
+</cmml>"""  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
 
 
-@pytest.mark.parametrize(('empty'), (
-    '<observation-series />',
-    '''<observation-series>
-     </observation-series>''',
-    '<observation-series></observation-series>',
-))
+@pytest.mark.parametrize(
+    ("empty"),
+    (
+        pytest.param("<observation-series />", marks=pytest.mark.online),
+        pytest.param(
+            """<observation-series>
+     </observation-series>""",
+            marks=pytest.mark.online,
+        ),
+        "<observation-series></observation-series>",
+    ),
+)
 def test_normalize_empty_data(empty, caplog):
-    lines = f'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    lines = f"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -309,7 +315,9 @@ def test_normalize_empty_data(empty, caplog):
   <data>
     {empty}
   </data>
-</cmml>'''.encode('utf-8') # noqa
+</cmml>""".encode(
+        "utf-8"
+    )  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
     for record in caplog.records:

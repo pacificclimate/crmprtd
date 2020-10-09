@@ -14,9 +14,9 @@ log = logging.getLogger(__name__)
 
 
 def normalize(stream):
-    log.info('Starting CRD data normalization')
+    log.info("Starting CRD data normalization")
 
-    tz = pytz.timezone('Canada/Pacific')
+    tz = pytz.timezone("Canada/Pacific")
 
     data = json.load(stream)
 
@@ -41,11 +41,13 @@ def normalize(stream):
             if val is None or val == -9999:
                 continue
 
-            yield Row(time=date,
-                      val=val,
-                      variable_name=var_name,
-                      unit=units[f"{var_name}Unit"],
-                      network_name="CRD",
-                      station_id=record["StationName"],
-                      lat=None,
-                      lon=None)
+            yield Row(
+                time=date,
+                val=val,
+                variable_name=var_name,
+                unit=units[f"{var_name}Unit"],
+                network_name="CRD",
+                station_id=record["StationName"],
+                lat=None,
+                lon=None,
+            )

@@ -28,8 +28,8 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     :param logger: logger to use. If None, print
     :type logger: logging.Logger instance
     """
-    def deco_retry(f):
 
+    def deco_retry(f):
         @wraps(f)
         def f_retry(*args, **kwargs):
             mtries, mdelay = tries, delay
@@ -46,43 +46,44 @@ def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
                     mtries -= 1
                     mdelay *= backoff
             return f(*args, **kwargs)
+
         return f_retry  # true decorator
+
     return deco_retry
 
 
 def ftp_connect(ReaderClass, host, path, log, auth=None):
-    log.info('Fetching file from FTP')
-    log.info('Listing.', extra={'host': host, 'path': path})
+    log.info("Fetching file from FTP")
+    log.info("Listing.", extra={"host": host, "path": path})
 
-    user, password = (auth['u'], auth['p']) if auth else (None, None)
+    user, password = (auth["u"], auth["p"]) if auth else (None, None)
 
     try:
-        ftpreader = ReaderClass(host, user,
-                                password, path, log)
-        log.info('Opened a connection to host', extra={'host': host})
+        ftpreader = ReaderClass(host, user, password, path, log)
+        log.info("Opened a connection to host", extra={"host": host})
     except ftplib.all_errors as e:
-        log.critical('Unable to load data from ftp source', exc_info=True)
+        log.critical("Unable to load data from ftp source", exc_info=True)
         sys.exit(1)
 
     return ftpreader
 
 
 class FTPReader(object):
-    '''Glue between the FTP class methods (which are callback based)
-       and the csv.DictReader class (which is iteration based)
-    '''
+    """Glue between the FTP class methods (which are callback based)
+    and the csv.DictReader class (which is iteration based)
+    """
 
     def __init__(self):
-        '''WAMR and WMB need to implement slight variats of this for their
+        """WAMR and WMB need to implement slight variats of this for their
         connections.
-        '''
+        """
         raise NotImplementedError
 
     def csv_reader(self, log=None):
         # Just store the lines in memory
         # It's non-ideal but neither classes support coroutine send/yield
         if not log:
-            log = logging.getLogger('__name__')
+            log = logging.getLogger("__name__")
         lines = []
 
         def callback(line):
@@ -91,7 +92,7 @@ class FTPReader(object):
         for filename in self.filenames:
             log.info("Downloading %s", filename)
             # FIXME: This line has some kind of race condition with this
-            self.connection.retrlines('RETR {}'.format(filename), callback)
+            self.connection.retrlines("RETR {}".format(filename), callback)
 
         r = csv.DictReader(lines)
         return r
@@ -104,61 +105,61 @@ class FTPReader(object):
 
 
 def extract_auth(username, password, auth_yaml, auth_key):
-    '''Extract auth information
+    """Extract auth information
 
     Use either the username/password provided or pull the info out from the
     provided yaml file
-    '''
+    """
+
     def none_to_empty_string(s):
-        return s if s else ''
+        return s if s else ""
 
     if username or password:
         return {
-            'u': none_to_empty_string(username),
-            'p': none_to_empty_string(password)
+            "u": none_to_empty_string(username),
+            "p": none_to_empty_string(password),
         }
     else:
-        assert auth_yaml and auth_key, ("Must provide both the auth file "
-                                        "and the key to use for this "
-                                        "script (--auth_key)")
+        assert auth_yaml and auth_key, (
+            "Must provide both the auth file "
+            "and the key to use for this "
+            "script (--auth_key)"
+        )
         config = yaml.safe_load(auth_yaml)
-        return {
-            'u': config[auth_key]['username'],
-            'p': config[auth_key]['password']
-        }
+        return {"u": config[auth_key]["username"], "p": config[auth_key]["password"]}
 
 
-def https_download(url, scheme='https', log=None, auth=None, payload={}):
-    '''Sends an HTTP(S) request to the provided URL and writes the
-       response to sys.stdout
+def https_download(url, scheme="https", log=None, auth=None, payload={}):
+    """Sends an HTTP(S) request to the provided URL and writes the
+    response to sys.stdout
 
-       url(str): the full URL to the resource to download
-       scheme(str): one of "http" or "https"
-       log: A logging object to which to write logs
-       auth(dict): username/passwords contained in a dict with two keys
-                   'u' and 'p'
-       payload(dict):
-    '''
+    url(str): the full URL to the resource to download
+    scheme(str): one of "http" or "https"
+    log: A logging object to which to write logs
+    auth(dict): username/passwords contained in a dict with two keys
+                'u' and 'p'
+    payload(dict):
+    """
 
     if not log:
         log = logging.getLogger(__name__)
 
     if auth:
-        auth = (auth['u'], auth['p'])
+        auth = (auth["u"], auth["p"])
 
     # Configure requests to use retry
     s = requests.Session()
     a = requests.adapters.HTTPAdapter(max_retries=3)
-    s.mount('{}://'.format(scheme), a)
+    s.mount("{}://".format(scheme), a)
     log.info("Downloading {0}".format(url))
     resp = s.get(url, params=payload, auth=auth)
 
-    log.info('{}: {}'.format(resp.status_code, resp.url))
+    log.info("{}: {}".format(resp.status_code, resp.url))
 
     if resp.status_code != 200:
         raise IOError(
-            "{} {} error for {}".format(scheme.upper(), resp.status_code,
-                                        resp.url))
+            "{} {} error for {}".format(scheme.upper(), resp.status_code, resp.url)
+        )
 
     for line in resp.iter_content(chunk_size=None):
         sys.stdout.buffer.write(line)

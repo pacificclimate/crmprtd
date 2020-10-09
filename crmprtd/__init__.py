@@ -60,99 +60,133 @@ from crmprtd.align import align
 from crmprtd.insert import insert
 
 
-Row = namedtuple('Row', "time val variable_name unit network_name \
-                         station_id lat lon")
+Row = namedtuple(
+    "Row",
+    "time val variable_name unit network_name \
+                         station_id lat lon",
+)
 
 
 def logging_args(parser):
-    parser.add_argument('-L', '--log_conf',
-                        default=None,
-                        help=('YAML file to use to override the default '
-                              'logging configuration'))
-    parser.add_argument('-l', '--log_filename',
-                        default=None,
-                        help='Override the default log filename')
-    parser.add_argument('-o', '--log_level',
-                        choices=['DEBUG', 'INFO',
-                                 'WARNING', 'ERROR', 'CRITICAL'],
-                        help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
-                              'CRITICAL.  Note that debug output by default '
-                              'goes directly to file'))
-    parser.add_argument('-m', '--error_email',
-                        default=None,
-                        help=('Override the default e-mail address to which '
-                              'the program should report critical errors'))
+    parser.add_argument(
+        "-L",
+        "--log_conf",
+        default=None,
+        help=("YAML file to use to override the default " "logging configuration"),
+    )
+    parser.add_argument(
+        "-l", "--log_filename", default=None, help="Override the default log filename"
+    )
+    parser.add_argument(
+        "-o",
+        "--log_level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help=(
+            "Set log level: DEBUG, INFO, WARNING, ERROR, "
+            "CRITICAL.  Note that debug output by default "
+            "goes directly to file"
+        ),
+    )
+    parser.add_argument(
+        "-m",
+        "--error_email",
+        default=None,
+        help=(
+            "Override the default e-mail address to which "
+            "the program should report critical errors"
+        ),
+    )
     return parser
 
 
-def common_script_arguments(parser):    # pragma: no cover
-    parser.add_argument('-c', '--connection_string',
-                        help='PostgreSQL connection string')
-    parser.add_argument('-D', '--diag',
-                        default=False, action="store_true",
-                        help="Turn on diagnostic mode (no commits)")
-    parser.add_argument('-L', '--log_conf',
-                        default=None,
-                        help=('YAML file to use to override the default '
-                              'logging configuration'))
-    parser.add_argument('-l', '--log_filename',
-                        default=None,
-                        help='Override the default log filename')
-    parser.add_argument('-o', '--log_level',
-                        choices=['DEBUG', 'INFO',
-                                 'WARNING', 'ERROR', 'CRITICAL'],
-                        help=('Set log level: DEBUG, INFO, WARNING, ERROR, '
-                              'CRITICAL.  Note that debug output by default '
-                              'goes directly to file'))
-    parser.add_argument('-m', '--error_email',
-                        default=None,
-                        help=('Override the default e-mail address to which '
-                              'the program should report critical errors'))
-    parser.add_argument('-C', '--cache_file',
-                        help='Full path of file in which to put downloaded '
-                              'observations')
-    parser.add_argument('-i', '--input_file',
-                        help='Input file to process')
-    parser.add_argument('--sample_size', type=int,
-                        default=50,
-                        help='Number of samples to be taken from observations '
-                             'when searching for duplicates '
-                             'to determine which insertion strategy to use')
+def common_script_arguments(parser):  # pragma: no cover
+    parser.add_argument(
+        "-c", "--connection_string", help="PostgreSQL connection string"
+    )
+    parser.add_argument(
+        "-D",
+        "--diag",
+        default=False,
+        action="store_true",
+        help="Turn on diagnostic mode (no commits)",
+    )
+    parser.add_argument(
+        "-L",
+        "--log_conf",
+        default=None,
+        help=("YAML file to use to override the default " "logging configuration"),
+    )
+    parser.add_argument(
+        "-l", "--log_filename", default=None, help="Override the default log filename"
+    )
+    parser.add_argument(
+        "-o",
+        "--log_level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help=(
+            "Set log level: DEBUG, INFO, WARNING, ERROR, "
+            "CRITICAL.  Note that debug output by default "
+            "goes directly to file"
+        ),
+    )
+    parser.add_argument(
+        "-m",
+        "--error_email",
+        default=None,
+        help=(
+            "Override the default e-mail address to which "
+            "the program should report critical errors"
+        ),
+    )
+    parser.add_argument(
+        "-C",
+        "--cache_file",
+        help="Full path of file in which to put downloaded " "observations",
+    )
+    parser.add_argument("-i", "--input_file", help="Input file to process")
+    parser.add_argument(
+        "--sample_size",
+        type=int,
+        default=50,
+        help="Number of samples to be taken from observations "
+        "when searching for duplicates "
+        "to determine which insertion strategy to use",
+    )
     return parser
 
 
-def common_auth_arguments(parser):     # pragma: no cover
-    parser.add_argument('--auth_fname',
-                        help="Yaml file with plaintext usernames/passwords")
-    parser.add_argument('--auth_key',
-                        help=("Top level key which user/pass are stored in "
-                              "yaml file."))
-    parser.add_argument('--username',
-                        help=("The username for data requests. Overrides auth "
-                              "file."))
-    parser.add_argument('--password',
-                        help=("The password for data requests. Overrides auth "
-                              "file."))
+def common_auth_arguments(parser):  # pragma: no cover
+    parser.add_argument(
+        "--auth_fname", help="Yaml file with plaintext usernames/passwords"
+    )
+    parser.add_argument(
+        "--auth_key", help=("Top level key which user/pass are stored in " "yaml file.")
+    )
+    parser.add_argument(
+        "--username", help=("The username for data requests. Overrides auth " "file.")
+    )
+    parser.add_argument(
+        "--password", help=("The password for data requests. Overrides auth " "file.")
+    )
     return parser
 
 
 def setup_logging(log_conf, log_filename, error_email, log_level, name):
     if log_conf:
-        with open(log_conf, 'rb') as f:
+        with open(log_conf, "rb") as f:
             base_config = yaml.safe_load(f)
     else:
-        base_config = yaml.safe_load(resource_stream('crmprtd',
-                                                     '/data/logging.yaml'))
+        base_config = yaml.safe_load(resource_stream("crmprtd", "/data/logging.yaml"))
 
     if log_filename:
-        base_config['handlers']['file']['filename'] = log_filename
+        base_config["handlers"]["file"]["filename"] = log_filename
 
     if error_email:
-        base_config['handlers']['mail']['toaddrs'] = error_email
+        base_config["handlers"]["mail"]["toaddrs"] = error_email
 
     if log_level:
-        base_config['root']['level'] = log_level
-        base_config['loggers']['crmprtd']['level'] = log_level
+        base_config["root"]["level"] = log_level
+        base_config["loggers"]["crmprtd"]["level"] = log_level
 
     logging.config.dictConfig(base_config)
 
@@ -161,21 +195,27 @@ def subset_dict(a_dict, keys_wanted):
     return {key: a_dict[key] for key in keys_wanted if key in a_dict}
 
 
-def run_data_pipeline(download_func, normalize_func, download_args,
-                      cache_file, connection_string, sample_size):
-    '''Executes all stages of the data processing pipeline.
+def run_data_pipeline(
+    download_func,
+    normalize_func,
+    download_args,
+    cache_file,
+    connection_string,
+    sample_size,
+):
+    """Executes all stages of the data processing pipeline.
 
-       Downloads the data, according to the download arguments
-       provided (generally from the command line), normalizes the data
-       based on the network's format. The the fuction send the
-       normalized rows through the align and insert phases of the
-       pipeline.
-    '''
+    Downloads the data, according to the download arguments
+    provided (generally from the command line), normalizes the data
+    based on the network's format. The the fuction send the
+    normalized rows through the align and insert phases of the
+    pipeline.
+    """
     download_iter = download_func(**download_args)
 
     if cache_file:
         download_iter, cache_iter = tee(download_iter)
-        with open(cache_file, 'w') as f:
+        with open(cache_file, "w") as f:
             for chunk in cache_iter:
                 f.write(chunk)
 
@@ -189,5 +229,4 @@ def run_data_pipeline(download_func, normalize_func, download_args,
     results = insert(sesh, observations, sample_size)
 
     log = logging.getLogger(__name__)
-    log.info('Data insertion results',
-             extra={'results': results})
+    log.info("Data insertion results", extra={"results": results})

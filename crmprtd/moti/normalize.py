@@ -13,40 +13,43 @@ from dateutil.parser import parse as dateparse
 from crmprtd import Row
 
 
-xsl = resource_filename('crmprtd', 'data/moti.xsl')
+xsl = resource_filename("crmprtd", "data/moti.xsl")
 transform = XSLT(xmlparse(xsl))
-ns = {
-    'xsi': "http://www.w3.org/2001/XMLSchema-instance"
-}
+ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}
 log = logging.getLogger(__name__)
 
 
 def normalize(file_stream):
-    log.info('Starting MOTI data normalization')
+    log.info("Starting MOTI data normalization")
     et = xmlparse(file_stream)
     et = transform(et)
     obs_series = et.xpath("//observation-series")
     for series in obs_series:
         if not len(series):
-            log.warning("Empty observation series: xpath search "
-                        "'//observation-series' return no results")
+            log.warning(
+                "Empty observation series: xpath search "
+                "'//observation-series' return no results"
+            )
             continue
         try:
-            stn_id = series.xpath(
-                        "./origin/id[@type='client']")[0].text.strip()
+            stn_id = series.xpath("./origin/id[@type='client']")[0].text.strip()
         except IndexError as e:
-            log.error("Could not detect the station id: xpath search "
-                      "'//observation-series/origin/id[@type='client']' "
-                      "return no results", extra={'exception': e})
+            log.error(
+                "Could not detect the station id: xpath search "
+                "'//observation-series/origin/id[@type='client']' "
+                "return no results",
+                extra={"exception": e},
+            )
             continue
 
-        members = series.xpath('./observation', namespaces=ns)
+        members = series.xpath("./observation", namespaces=ns)
         for member in members:
             # get time and convert to datetime
-            time = member.get('valid-time')
+            time = member.get("valid-time")
             if not time:
-                log.warning("Could not find a valid-time attribute for this "
-                            "observation")
+                log.warning(
+                    "Could not find a valid-time attribute for this " "observation"
+                )
                 continue
 
             try:
@@ -55,37 +58,42 @@ def normalize(file_stream):
                 # simply parse it and display it as UTC.
                 date = dateparse(time).astimezone(pytz.utc)
             except ValueError as e:
-                log.warning('Unable to convert value to datetime',
-                            extra={'time': time})
+                log.warning("Unable to convert value to datetime", extra={"time": time})
                 continue
 
             for obs in member.iterchildren():
-                variable_name = obs.get('type')
+                variable_name = obs.get("type")
                 if variable_name is None:
                     continue
 
                 try:
-                    value_element = obs.xpath('./value')[0]
+                    value_element = obs.xpath("./value")[0]
                 except IndexError as e:
-                    log.warning("Could not find the actual value for "
-                                "observation. xpath search './value' "
-                                "returned no results",
-                                extra={'variable_name': variable_name})
+                    log.warning(
+                        "Could not find the actual value for "
+                        "observation. xpath search './value' "
+                        "returned no results",
+                        extra={"variable_name": variable_name},
+                    )
                     continue
 
                 try:
                     value = float(value_element.text)
                 except ValueError:
-                    log.error("Could not convert value to a number. "
-                              "Skipping this observation.",
-                              extra={'value': value_element})
+                    log.error(
+                        "Could not convert value to a number. "
+                        "Skipping this observation.",
+                        extra={"value": value_element},
+                    )
                     continue
 
-                yield Row(time=date,
-                          val=value,
-                          variable_name=variable_name,
-                          unit=value_element.get('units'),
-                          network_name='MoTIe',
-                          station_id=stn_id,
-                          lat=None,
-                          lon=None)
+                yield Row(
+                    time=date,
+                    val=value,
+                    variable_name=variable_name,
+                    unit=value_element.get("units"),
+                    network_name="MoTIe",
+                    station_id=stn_id,
+                    lat=None,
+                    lon=None,
+                )
