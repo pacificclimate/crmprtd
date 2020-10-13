@@ -36,8 +36,8 @@ def makeurl(freq='daily', province='BC', language='e', time=None):
     freq = 'yesterday' if freq == 'daily' else freq
     fname = '{}_{}_{}_{}.xml'.format(
         freq, province.lower(), time.strftime(fmt), language)
-    str = 'https://dd.weather.gc.ca/observations/xml/'
-    return str + '{}/{}/{}'.format(province.upper(), freq, fname)
+    base_url = 'https://dd.weather.gc.ca/observations/xml/'
+    return base_url + '{}/{}/{}'.format(province.upper(), freq, fname)
 
 
 class OmMember(object):
