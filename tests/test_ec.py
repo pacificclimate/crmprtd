@@ -10,6 +10,7 @@ from crmprtd.ec import makeurl, ns, OmMember
 
 baseurl = 'https://dd.weather.gc.ca'
 
+
 @pytest.mark.parametrize(('label', 'args', 'expected'), [
     ('daily-BC-EN',
      {'freq': 'daily',
