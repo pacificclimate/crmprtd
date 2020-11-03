@@ -29,7 +29,7 @@ from crmprtd.download import https_download
 log = logging.getLogger(__name__)
 
 
-def download(time, frequency, province, language):
+def download(time, frequency, province, language, baseurl):
     log.info('Starting EC rtd')
 
     try:
@@ -47,7 +47,7 @@ def download(time, frequency, province, language):
                      "using timestamp {0}".format(time))
 
         # Construct and download the xml
-        url = makeurl(frequency, province, language, time)
+        url = makeurl(frequency, province, language, time, baseurl)
 
         scheme, _ = url.split(':', 1)
         https_download(url, scheme, log)
@@ -79,13 +79,17 @@ def main():
                               'matching stations. Stations are considered a '
                               'match if they have the same id, name, and are '
                               'within this threshold'))
+    parser.add_argument('-b', '--baseurl', default='https://dd.weather.gc.ca',
+                        help=('Base URL (scheme and hostname components) for'
+                              'the meteorological observations service'))
     parser = logging_args(parser)
     args = parser.parse_args()
 
     setup_logging(args.log_conf, args.log_filename, args.error_email,
                   args.log_level, 'crmprtd.ec')
 
-    download(args.time, args.frequency, args.province, args.language)
+    download(args.time, args.frequency, args.province, args.language,
+             args.baseurl)
 
 
 if __name__ == "__main__":

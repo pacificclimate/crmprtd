@@ -8,39 +8,40 @@ import pytest
 from crmprtd.ec import makeurl, ns, OmMember
 
 
+baseurl = 'https://dd.weather.gc.ca'
+
+
 @pytest.mark.parametrize(('label', 'args', 'expected'), [
     ('daily-BC-EN',
      {'freq': 'daily',
       'province': 'BC',
       'language': 'e',
       'time': datetime(2016, 1, 15, 21)},
-     ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/'
-      'yesterday_bc_20160115_e.xml')
+     (f'{baseurl}/observations/xml/BC/yesterday/yesterday_bc_20160115_e.xml')
      ), ('hourly-BC-EN',
          {'freq': 'hourly',
           'province': 'BC',
           'language': 'e',
           'time': datetime(2016, 1, 15, 21)},
-         ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/hourly/'
-          'hourly_bc_2016011521_e.xml')
+         (f'{baseurl}/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml')
          ), ('nofreq-BC-EN',
              {'province': 'BC',
               'language': 'e',
               'time': datetime(2016, 1, 15, 21)},
-             ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/yesterday/'
-              'yesterday_bc_20160115_e.xml')
+             (f'{baseurl}/observations/xml/BC/yesterday/'
+              f'yesterday_bc_20160115_e.xml')
              ), ('hourly-noprov-EN',
                  {'freq': 'hourly',
                   'language': 'e',
                   'time': datetime(2016, 1, 15, 21)},
-                 ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
-                  'hourly/hourly_bc_2016011521_e.xml')
+                 (f'{baseurl}/observations/xml/BC/'
+                  f'hourly/hourly_bc_2016011521_e.xml')
                  ), ('hourly-BC-nolang',
                      {'freq': 'hourly',
                       'province': 'BC',
                       'time': datetime(2016, 1, 15, 21)},
-                     ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
-                      'hourly/hourly_bc_2016011521_e.xml')
+                     (f'{baseurl}/observations/xml/BC/'
+                      f'hourly/hourly_bc_2016011521_e.xml')
                      )
 ])
 def test_makeurl(label, args, expected):
@@ -54,8 +55,8 @@ def test_makeurl_no_time_hourly(mocker):
     with mocker.patch('crmprtd.ec.now', return_value=t):
         url = makeurl(freq='hourly')
 
-    assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
-                   'hourly/hourly_bc_{}_e.xml').format(t.strftime(fmt))
+    assert url == (f'{baseurl}/observations/xml/BC/'
+                   f'hourly/hourly_bc_{t.strftime(fmt)}_e.xml')
 
 
 def test_makeurl_no_time_daily(mocker):
@@ -65,8 +66,8 @@ def test_makeurl_no_time_daily(mocker):
     with mocker.patch('crmprtd.ec.now', return_value=t):
         url = makeurl()
 
-    assert url == ('http://dd.weatheroffice.ec.gc.ca/observations/xml/BC/'
-                   'yesterday/yesterday_bc_{}_e.xml').format(t.strftime(fmt))
+    assert url == (f'{baseurl}/observations/xml/BC/'
+                   f'yesterday/yesterday_bc_{t.strftime(fmt)}_e.xml')
 
 
 @pytest.mark.parametrize(('x', 'expected'), [
