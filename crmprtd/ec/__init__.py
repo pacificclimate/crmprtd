@@ -23,21 +23,21 @@ def no_ns_element(name):
     return "*[local-name()='{}']".format(name)
 
 
-def makeurl(freq='daily', province='BC', language='e', time=None):
+def makeurl(freq='daily', province='BC', language='e', time=None,
+            baseurl='https://dd.weather.gc.ca'):
     """Construct a URL for fetching the data file
     freq: daily|hourly
     province: 2 letter province code
     language: 'e' (english) | 'f' (french)
     time: datetime object of the time for which you want to fetch obs
+    baseurl: Scheme and hostname e.g. https://example.com
     """
     if time is None:
         time = now()
     fmt = '%Y%m%d%H' if freq == 'hourly' else '%Y%m%d'
     freq = 'yesterday' if freq == 'daily' else freq
-    fname = '{}_{}_{}_{}.xml'.format(
-        freq, province.lower(), time.strftime(fmt), language)
-    str = 'http://dd.weatheroffice.ec.gc.ca/observations/xml/'
-    return str + '{}/{}/{}'.format(province.upper(), freq, fname)
+    fname = f'{freq}_{province.lower()}_{time.strftime(fmt)}_{language}.xml'
+    return f'{baseurl}/observations/xml/{province.upper()}/{freq}/{fname}'
 
 
 class OmMember(object):
