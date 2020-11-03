@@ -10,6 +10,7 @@ Utility to download near real time weather data and insert it into PCIC's databa
 A `Makefile` handles the project installation:
 ```bash
 make
+source /tmp/crmprtd-venv/bin/activate
 ```
 
 If you do not wish you to use `make`, follow the instructions below.
@@ -95,6 +96,30 @@ Database tests use the `testing.postgresql` database fixture. This requires `pos
 apt-get install postgresql postgis
 pip install -r test_requirements.txt
 py.test -v tests
+```
+
+## Formatting
+
+We use `black` coupled with `pre-commit hooks` to handle our formatting needs. By default `make` will install both of these packages into the virtual environment.
+
+### `black`
+
+To manually install and format with `black`:
+```
+source /tmp/crmprtd-venv/bin/activate
+pip install black
+black .
+```
+
+### `pre-commit`
+
+The `pre-commit hook` will only be triggered if the venv has been activated. If triggered, there will be a warning blocking the commit and the file(s) will automatically be reformatted. From there the files will need to be staged again.
+
+To manually install `pre-commit`:
+```
+source /tmp/crmprtd-venv/bin/activate
+pip install pre-commit
+pre-commit install
 ```
 
 ## Releasing

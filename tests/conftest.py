@@ -25,113 +25,128 @@ def pytest_runtest_setup():
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.yield_fixture(scope="function")
 def postgis_session():
-    '''
+    """
     Yields a blank PostGIS session with no tables or data
-    '''
-    logging.getLogger('sqlalchemy.engine').setLevel(
-        logging.ERROR)  # Let's not log all the db setup stuff...
+    """
+    logging.getLogger("sqlalchemy.engine").setLevel(
+        logging.ERROR
+    )  # Let's not log all the db setup stuff...
 
     with testing.postgresql.Postgresql() as pg:
         engine = sqlalchemy.create_engine(pg.url())
         engine.execute("create extension postgis")
-        engine.execute(CreateSchema('crmp'))
+        engine.execute(CreateSchema("crmp"))
         sesh = sessionmaker(bind=engine)()
 
-        logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
-        sesh.execute('SET search_path TO crmp,public')
+        logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
+        sesh.execute("SET search_path TO crmp,public")
         yield sesh
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.yield_fixture(scope="function")
 def crmp_session(postgis_session):
-    '''
+    """
     Yields a PostGIS enabled session with CRMP schema but no data
-    '''
-    logging.getLogger('sqlalchemy.engine').setLevel(
-        logging.ERROR)  # Let's not log all the db setup stuff...
+    """
+    logging.getLogger("sqlalchemy.engine").setLevel(
+        logging.ERROR
+    )  # Let's not log all the db setup stuff...
 
     engine = postgis_session.get_bind()
     pycds.Base.metadata.create_all(bind=engine)
     pycds.DeferredBase.metadata.create_all(bind=engine)
 
-    logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
     yield postgis_session
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.yield_fixture(scope="function")
 def test_session(crmp_session, caplog):
-    '''
+    """
     Yields a PostGIS enabled session with CRMP schema and test data
-    '''
-    caplog.set_level(logging.ERROR, logger='sqlalchemy.engine')
+    """
+    caplog.set_level(logging.ERROR, logger="sqlalchemy.engine")
 
-    moti = Network(name='MoTIe')
-    ec = Network(name='EC_raw')
-    wmb = Network(name='FLNRO-WMB')
-    wamr = Network(name='ENV-AQN')
+    moti = Network(name="MoTIe")
+    ec = Network(name="EC_raw")
+    wmb = Network(name="FLNRO-WMB")
+    wamr = Network(name="ENV-AQN")
     crmp_session.add_all([moti, ec, wmb, wamr])
 
-    simon = Contact(name='Simon', networks=[moti])
-    eric = Contact(name='Eric', networks=[wmb])
-    pat = Contact(name='Pat', networks=[ec])
+    simon = Contact(name="Simon", networks=[moti])
+    eric = Contact(name="Eric", networks=[wmb])
+    pat = Contact(name="Pat", networks=[ec])
     crmp_session.add_all([simon, eric, pat])
 
-    brandy_hist = History(station_name='Brandywine')
-    five_mile_hist = History(station_name='FIVE MILE')
-    beaver_air_hist = History(id=12345,
-                              station_name='Beaver Creek Airport',
-                              the_geom=('SRID=4326;POINT(-140.866667 '
-                                        '62.416667)'))
-    stewart_air_hist = History(id=10,
-                               station_name='Stewart Airport',
-                               the_geom=('SRID=4326;POINT(-129.985 '
-                                         '55.9361111111111)'))
-    sechelt1 = History(id=20,
-                       station_name='Sechelt',
-                       sdate='2012-09-24',
-                       edate='2012-09-26',
-                       the_geom='SRID=4326;POINT(-123.7 49.45)')
-    sechelt2 = History(id=21,
-                       station_name='Sechelt',
-                       sdate='2012-09-26',
-                       the_geom=('SRID=4326;POINT(-123.7152625 '
-                                 '49.4579966666667)'))
-    warfield = History(station_name='Warfield Elementary',
-                       sdate='2005-01-12')
-    arkham = History(station_name='Arkham Asylum')
+    brandy_hist = History(station_name="Brandywine")
+    five_mile_hist = History(station_name="FIVE MILE")
+    beaver_air_hist = History(
+        id=12345,
+        station_name="Beaver Creek Airport",
+        the_geom=("SRID=4326;POINT(-140.866667 " "62.416667)"),
+    )
+    stewart_air_hist = History(
+        id=10,
+        station_name="Stewart Airport",
+        the_geom=("SRID=4326;POINT(-129.985 " "55.9361111111111)"),
+    )
+    sechelt1 = History(
+        id=20,
+        station_name="Sechelt",
+        sdate="2012-09-24",
+        edate="2012-09-26",
+        the_geom="SRID=4326;POINT(-123.7 49.45)",
+    )
+    sechelt2 = History(
+        id=21,
+        station_name="Sechelt",
+        sdate="2012-09-26",
+        the_geom=("SRID=4326;POINT(-123.7152625 " "49.4579966666667)"),
+    )
+    warfield = History(station_name="Warfield Elementary", sdate="2005-01-12")
+    arkham = History(station_name="Arkham Asylum")
 
     stations = [
-        Station(native_id='11091', network=moti, histories=[brandy_hist]),
-        Station(native_id='1029', network=wmb,
-                histories=[five_mile_hist, arkham]),
-        Station(native_id='2100160', network=ec, histories=[beaver_air_hist]),
-        Station(native_id='1067742', network=ec, histories=[stewart_air_hist]),
-        Station(native_id='1047172', network=ec,
-                histories=[sechelt1, sechelt2]),
-        Station(native_id='0260011', network=wamr, histories=[warfield]),
+        Station(native_id="11091", network=moti, histories=[brandy_hist]),
+        Station(native_id="1029", network=wmb, histories=[five_mile_hist, arkham]),
+        Station(native_id="2100160", network=ec, histories=[beaver_air_hist]),
+        Station(native_id="1067742", network=ec, histories=[stewart_air_hist]),
+        Station(native_id="1047172", network=ec, histories=[sechelt1, sechelt2]),
+        Station(native_id="0260011", network=wamr, histories=[warfield]),
     ]
     crmp_session.add_all(stations)
 
     moti_air_temp = Variable(
-        name='CURRENT_AIR_TEMPERATURE1', unit='celsius', network=moti)
-    ec_precip = Variable(name='precipitation', unit='mm', network=ec)
-    wmb_humitidy = Variable(name='relative_humidity',
-                            unit='percent', network=wmb)
-    wamr_temp = Variable(name='TEMP_MEAN', unit='celsius', network=wamr)
-    bad_var = Variable(name='no_unit', network=wamr)
+        name="CURRENT_AIR_TEMPERATURE1", unit="celsius", network=moti
+    )
+    ec_precip = Variable(name="precipitation", unit="mm", network=ec)
+    wmb_humitidy = Variable(name="relative_humidity", unit="percent", network=wmb)
+    wamr_temp = Variable(name="TEMP_MEAN", unit="celsius", network=wamr)
+    bad_var = Variable(name="no_unit", network=wamr)
 
-    crmp_session.add_all([moti_air_temp, ec_precip, wmb_humitidy,
-                          wamr_temp, bad_var])
+    crmp_session.add_all([moti_air_temp, ec_precip, wmb_humitidy, wamr_temp, bad_var])
 
     obs = [
-        Obs(history=sechelt1, datum=2.5, variable=ec_precip,
-            time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc)),
-        Obs(history=sechelt1, datum=2.7, variable=ec_precip,
-            time=datetime(2012, 9, 26, 6, tzinfo=pytz.utc)),
-        Obs(history=sechelt2, datum=2.5, variable=ec_precip,
-            time=datetime(2012, 9, 26, 18, tzinfo=pytz.utc)),
+        Obs(
+            history=sechelt1,
+            datum=2.5,
+            variable=ec_precip,
+            time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc),
+        ),
+        Obs(
+            history=sechelt1,
+            datum=2.7,
+            variable=ec_precip,
+            time=datetime(2012, 9, 26, 6, tzinfo=pytz.utc),
+        ),
+        Obs(
+            history=sechelt2,
+            datum=2.5,
+            variable=ec_precip,
+            time=datetime(2012, 9, 26, 18, tzinfo=pytz.utc),
+        ),
     ]
     crmp_session.add_all(obs)
     crmp_session.commit()
@@ -139,15 +154,15 @@ def test_session(crmp_session, caplog):
     yield crmp_session
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def test_data():
-    lines = '''station_code,weather_date,precipitation,temperature,relative_humidity,wind_speed,wind_direction,ffmc,isi,fwi,rn_1_pluvio1,snow_depth,snow_depth_quality,precip_pluvio1_status,precip_pluvio1_total,rn_1_pluvio2,precip_pluvio2_status,precip_pluvio2_total,rn_1_RIT,precip_RIT_Status,precip_RIT_total,precip_rgt,solar_radiation_LICOR,solar_radiation_CM3
+    lines = """station_code,weather_date,precipitation,temperature,relative_humidity,wind_speed,wind_direction,ffmc,isi,fwi,rn_1_pluvio1,snow_depth,snow_depth_quality,precip_pluvio1_status,precip_pluvio1_total,rn_1_pluvio2,precip_pluvio2_status,precip_pluvio2_total,rn_1_RIT,precip_RIT_Status,precip_RIT_total,precip_rgt,solar_radiation_LICOR,solar_radiation_CM3
 11,2018052711,.00,14.2,55,10.4,167,81.160995,2.1806495,5.5260615,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
 11,2018052712,.00,16.4,57,9.1,152,81.667679,2.166688,5.4912086,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
 11,2018052713,.00,16.9,54,11.3,185,82.228363,2.5902824,6.5181026,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
 11,2018052714,.00,17.8,53,10.5,185,82.773972,2.6630962,6.9062028,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0,
 11,2018052715,.00,17.4,50,8.2,161,83.291313,2.5341561,6.5958676,.00,.00,,,.00,.00,,.00,.00,.00,.00,,.0
-'''
+"""
     data = []
     f = StringIO(lines)
     reader = csv.DictReader(f)
@@ -157,61 +172,75 @@ def test_data():
     return data
 
 
-@pytest.yield_fixture(scope='function')
+@pytest.yield_fixture(scope="function")
 def ec_session(crmp_session, caplog):
-    '''
+    """
     Yields a PostGIS enabled session with CRMP schema and test data
-    '''
-    caplog.set_level(logging.ERROR, logger='sqlalchemy.engine')
+    """
+    caplog.set_level(logging.ERROR, logger="sqlalchemy.engine")
 
-    ec = Network(name='EC_raw')
+    ec = Network(name="EC_raw")
     crmp_session.add(ec)
 
-    pat = Contact(name='Pat', networks=[ec])
+    pat = Contact(name="Pat", networks=[ec])
     crmp_session.add(pat)
 
-    beaver_air_hist = History(id=10000,
-                              station_name='Beaver Creek Airport',
-                              the_geom=('SRID=4326;POINT(-140.866667 '
-                                        '62.416667)'))
-    stewart_air_hist = History(id=10001,
-                               station_name='Stewart Airport',
-                               the_geom=('SRID=4326;POINT(-129.985 '
-                                         '55.9361111111111)'))
-    sechelt1 = History(id=20000,
-                       station_name='Sechelt',
-                       freq='1-hourly',
-                       sdate='2012-09-24',
-                       edate='2012-09-26',
-                       the_geom='SRID=4326;POINT(-123.7 49.45)')
-    sechelt2 = History(id=20001,
-                       station_name='Sechelt',
-                       freq='1-hourly',
-                       sdate='2012-09-26',
-                       the_geom=('SRID=4326;POINT(-123.7152625 '
-                                 '49.4579966666667)'))
+    beaver_air_hist = History(
+        id=10000,
+        station_name="Beaver Creek Airport",
+        the_geom=("SRID=4326;POINT(-140.866667 " "62.416667)"),
+    )
+    stewart_air_hist = History(
+        id=10001,
+        station_name="Stewart Airport",
+        the_geom=("SRID=4326;POINT(-129.985 " "55.9361111111111)"),
+    )
+    sechelt1 = History(
+        id=20000,
+        station_name="Sechelt",
+        freq="1-hourly",
+        sdate="2012-09-24",
+        edate="2012-09-26",
+        the_geom="SRID=4326;POINT(-123.7 49.45)",
+    )
+    sechelt2 = History(
+        id=20001,
+        station_name="Sechelt",
+        freq="1-hourly",
+        sdate="2012-09-26",
+        the_geom=("SRID=4326;POINT(-123.7152625 " "49.4579966666667)"),
+    )
 
     stations = [
-        Station(native_id='2100160', network=ec, histories=[beaver_air_hist]),
-        Station(native_id='1067742', network=ec, histories=[stewart_air_hist]),
-        Station(native_id='1047172', network=ec,
-                histories=[sechelt1, sechelt2]),
+        Station(native_id="2100160", network=ec, histories=[beaver_air_hist]),
+        Station(native_id="1067742", network=ec, histories=[stewart_air_hist]),
+        Station(native_id="1047172", network=ec, histories=[sechelt1, sechelt2]),
     ]
     crmp_session.add_all(stations)
 
-    ec_precip = Variable(
-        id=100, name='total_precipitation', unit='mm', network=ec)
-    ec_precip = Variable(id=101, name='air_temperature',
-                         unit='Celsius', network=ec)
+    ec_precip = Variable(id=100, name="total_precipitation", unit="mm", network=ec)
+    ec_precip = Variable(id=101, name="air_temperature", unit="Celsius", network=ec)
     crmp_session.add(ec_precip)
 
     obs = [
-        Obs(history=sechelt1, datum=2.5, variable=ec_precip,
-            time=datetime(2012, 9, 24, 6)),
-        Obs(history=sechelt1, datum=2.7, variable=ec_precip,
-            time=datetime(2012, 9, 26, 6)),
-        Obs(history=sechelt2, datum=2.5, variable=ec_precip,
-            time=datetime(2012, 9, 26, 18)),
+        Obs(
+            history=sechelt1,
+            datum=2.5,
+            variable=ec_precip,
+            time=datetime(2012, 9, 24, 6),
+        ),
+        Obs(
+            history=sechelt1,
+            datum=2.7,
+            variable=ec_precip,
+            time=datetime(2012, 9, 26, 6),
+        ),
+        Obs(
+            history=sechelt2,
+            datum=2.5,
+            variable=ec_precip,
+            time=datetime(2012, 9, 26, 18),
+        ),
     ]
     crmp_session.add_all(obs)
     crmp_session.commit()
@@ -219,9 +248,10 @@ def ec_session(crmp_session, caplog):
     yield crmp_session
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def moti_sawr7110_xml():
-    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    return fromstring(
+        b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -260,13 +290,15 @@ def moti_sawr7110_xml():
       </observation>
     </observation-series>
   </data>
-</cmml>''') # noqa
+</cmml>"""
+    )  # noqa
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def moti_sawr7110_xml_2a():
     """No duplicates"""
-    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    return fromstring(
+        b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -294,14 +326,16 @@ def moti_sawr7110_xml_2a():
       </observation>
     </observation-series>
   </data>
-</cmml>''') # noqa
+</cmml>"""
+    )  # noqa
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def moti_sawr7110_xml_2b():
     """Duplicates observations in 2a, plus non-duplicate observations
     before and after the duplicates."""
-    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    return fromstring(
+        b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -339,12 +373,14 @@ def moti_sawr7110_xml_2b():
       </observation>
     </observation-series>
   </data>
-</cmml>''') # noqa
+</cmml>"""
+    )  # noqa
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def moti_sawr7110_new_station():
-    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1" ?>
+    return fromstring(
+        b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <data>
     <observation-series>
@@ -353,12 +389,14 @@ def moti_sawr7110_new_station():
       </origin>
     </observation-series>
   </data>
-</cmml>''') # noqa
+</cmml>"""
+    )  # noqa
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def moti_sawr7100_large():
-    return fromstring(b'''<?xml version="1.0" encoding="ISO-8859-1"?>
+    return fromstring(
+        b"""<?xml version="1.0" encoding="ISO-8859-1"?>
 <cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
@@ -437,12 +475,14 @@ def moti_sawr7100_large():
     </observation-series>
   </data>
 </cmml>
-''') # noqa
+"""
+    )  # noqa
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def ec_xml_single_obs():
-    x = fromstring(b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    x = fromstring(
+        b"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -508,13 +548,14 @@ def ec_xml_single_obs():
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>''') # noqa
-    xsl = resource_filename('crmprtd', 'data/ec_xform.xsl')
+</om:ObservationCollection>"""
+    )  # noqa
+    xsl = resource_filename("crmprtd", "data/ec_xform.xsl")
     transform = XSLT(parse(xsl))
     return transform(x)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope="function")
 def swob_urls(requests_mock):
     def make_404(request):
         resp = requests.Response()
@@ -523,22 +564,22 @@ def swob_urls(requests_mock):
 
     requests_mock.add_matcher(make_404)
     requests_mock.register_uri(
-        'GET',
-        'https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/',
+        "GET",
+        "https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/",
         text=network_listing,
-        status_code=200
+        status_code=200,
     )
     requests_mock.register_uri(
-        'GET',
-        'https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/'
-        '20191015/',
+        "GET",
+        "https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/"
+        "20191015/",
         text=day_listing,
-        status_code=200
+        status_code=200,
     )
     requests_mock.register_uri(
-        'GET',
-        'https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/'
-        '20191015/1d06p/',
+        "GET",
+        "https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/"
+        "20191015/1d06p/",
         text=station_listing,
-        status_code=200
+        status_code=200,
     )

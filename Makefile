@@ -13,7 +13,7 @@ PYTHON=${VENV_PATH}/bin/python3
 PIP=${VENV_PATH}/bin/pip
 
 .PHONY: all
-all: apt install test
+all: apt install test pre-commit-hook
 
 .PHONY: apt
 apt:
@@ -30,7 +30,10 @@ install: venv
 	${PIP} install -r requirements.txt -r test_requirements.txt
 	${PIP} install -e .
 
-# TODO: Add pre-commit hook command
+.PHONY: pre-commit-hook
+pre-commit-hook: venv
+	${PIP} install pre-commit
+	pre-commit install
 
 .PHONY: test
 test: venv

@@ -3,7 +3,7 @@ from io import BytesIO
 
 
 def test_normalize_good_data():
-    lines = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    lines = b"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -69,7 +69,7 @@ def test_normalize_good_data():
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>''' # noqa
+</om:ObservationCollection>"""  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 10
     for row in rows:
@@ -81,7 +81,7 @@ def test_normalize_good_data():
 
 
 def test_normalize_no_station_id():
-    lines = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    lines = b"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -145,13 +145,13 @@ def test_normalize_no_station_id():
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>''' # noqa
+</om:ObservationCollection>"""  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
 
 
 def test_normalize_bad_date():
-    lines = b'''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+    lines = b"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <om:ObservationCollection xmlns="http://dms.ec.gc.ca/schema/point-observation/2.1" xmlns:gml="http://www.opengis.net/gml" xmlns:om="http://www.opengis.net/om/1.0" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <om:member>
     <om:Observation>
@@ -217,6 +217,6 @@ def test_normalize_bad_date():
       </om:result>
     </om:Observation>
   </om:member>
-</om:ObservationCollection>''' # noqa
+</om:ObservationCollection>"""  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0

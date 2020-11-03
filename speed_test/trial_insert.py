@@ -9,8 +9,12 @@ def insert_one_by_one(sesh, o):
     # Check to see if this entry will be unique
     try:
         q = sesh.query(Obs.id).filter(
-            and_(Obs.history_id == o.history_id, Obs.vars_id == o.vars_id,
-                 Obs.time == o.time))
+            and_(
+                Obs.history_id == o.history_id,
+                Obs.vars_id == o.vars_id,
+                Obs.time == o.time,
+            )
+        )
         if q.count() > 0:
             # print("Failure, observation already exists.")
             raise UniquenessError(q.first())
@@ -21,8 +25,9 @@ def insert_one_by_one(sesh, o):
     except Exception as e:
         # print("Failure, an error occured.")
         # print(e)
-        raise InsertionError(obs_time=o.time, datum=o.datum,
-                             vars_id=o.vars_id, hid=o.history_id, e=e)
+        raise InsertionError(
+            obs_time=o.time, datum=o.datum, vars_id=o.vars_id, hid=o.history_id, e=e
+        )
 
     # value does not exist in obs_raw, continue with insertion
     try:
@@ -33,8 +38,9 @@ def insert_one_by_one(sesh, o):
     except Exception as e:
         # print("Failure, an error occured.")
         # print(e)
-        raise InsertionError(obs_time=o.time, datum=o.datum,
-                             vars_id=o.vars_id, hid=o.history_id, e=e)
+        raise InsertionError(
+            obs_time=o.time, datum=o.datum, vars_id=o.vars_id, hid=o.history_id, e=e
+        )
 
 
 def split(tuple_):
@@ -99,7 +105,7 @@ def insert_with_one_by_one(sesh, obs):
 
 def chunks(list, chunk_size):
     for i in range(0, len(list), chunk_size):
-        yield list[i:i+chunk_size]
+        yield list[i : i + chunk_size]
 
 
 def insert_with_chunks(sesh, obs, chunk_size):
