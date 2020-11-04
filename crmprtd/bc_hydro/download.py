@@ -18,7 +18,6 @@ from zipfile import ZipFile
 from argparse import ArgumentParser
 from datetime import date, timedelta
 from functools import partial
-from tempfile import TemporaryDirectory
 
 from crmprtd import logging_args, setup_logging
 
@@ -29,7 +28,7 @@ def download(username, gpg_private_key, ftp_server, ftp_dir, start_date, end_dat
 
     # Connect FTP server and retrieve directory
     try:
-        sftp = pysftp.Connection(
+        connection = pysftp.Connection(
             ftp_server, username=username, private_key=gpg_private_key
         )
 
@@ -38,38 +37,38 @@ def download(username, gpg_private_key, ftp_server, ftp_dir, start_date, end_dat
 
     # Add files to temporary directory then print contents to stdout
     try:
-        with TemporaryDirectory() as tmp_dir:
-
-            """Walktree has 4 required arguements, 3 of which are
-            functions with form: func(filename)"""
-            no_op = lambda x: None
-            callback = partial(matchFile, start_date, end_date, sftp, tmp_dir)
-            sftp.walktree(ftp_dir, callback, no_op, no_op)
-
-            for filename in os.listdir(tmp_dir):
-                file_path = tmp_dir + "/" + filename
-
-                zip_file = ZipFile(file_path, "r")
-                for name in zip_file.namelist():
-                    txt_file = zip_file.open(name)
-                    sys.stdout.buffer.write(txt_file.read())
+        """Walktree has 4 required arguements, 3 of which are
+        functions with form: func(filename)"""
+        no_op = lambda x: None  # noqa: E731
+        callback = partial(matchFile, start_date, end_date, connection)
+        connection.walktree(ftp_dir, callback, no_op, no_op)
 
     except IOError:
         log.exception("Unable to download or open some files")
 
 
 # Add files within date range to tmp dir
-def matchFile(start_date, end_date, sftp, tmp_dir, filename):
-    match = re.search(r"[0-9]{6}", filename)
+def matchFile(start_date, end_date, connection, remote_filename):
+    match = re.search(r"[0-9]{6}", remote_filename)
     if match:
         date = int(match.group(0))
 
         # Get filename, but not directory
-        match = re.search(r"/[^/]*.zip$", filename)
-        if match and date >= int(start_date) and date <= int(end_date):
-            name = match.group(0)
-            file_path = os.path.join(tmp_dir + name)
-            sftp.get(filename, file_path)
+        match = re.search(r"/[^/]*.zip$", remote_filename)
+        if not match:
+            return
+        if date < int(start_date) or date > int(end_date):
+            return
+
+        name = match.group(0)
+        file_path = os.path.join(gettempdir(), name)
+        connection.get(remote_filename, file_path)
+
+        with ZipFile(file_path, "r") as zip_file:
+            for name in zip_file.namelist():
+                txt_file = zip_file.open(name)
+                sys.stdout.buffer.write(txt_file.read())
+        os.remove(file_path)
 
 
 def main():
