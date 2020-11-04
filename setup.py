@@ -65,7 +65,7 @@ setup(
         "requests[security]",
         "pycds >= 2.0.0",
         "pint",
-        "pysftp"
+        "pysftp",
     ],
     tests_require=["pytest", "pysqlite" "requests_mock"],
     extras_require={
