@@ -18,6 +18,7 @@ from zipfile import ZipFile
 from argparse import ArgumentParser
 from datetime import date, timedelta
 from functools import partial
+from tempfile import gettempdir
 
 from crmprtd import logging_args, setup_logging
 
@@ -61,7 +62,7 @@ def matchFile(start_date, end_date, connection, remote_filename):
             return
 
         name = match.group(0)
-        file_path = os.path.join(gettempdir(), name)
+        file_path = gettempdir() + name
         connection.get(remote_filename, file_path)
 
         with ZipFile(file_path, "r") as zip_file:
