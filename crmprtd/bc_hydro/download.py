@@ -105,10 +105,10 @@ def main():
         help=("FTP Directory containing BC hydro's " "data files"),
     )
     parser.add_argument(
-        "-g",
-        "--gpg_private_key",
+        "-S",
+        "--ssh_private_key",
         required=True,
-        help=("Path to file with GPG private key"),
+        help=("Path to file with SSH private key"),
     )
     today = date.today()
     end = today.strftime("%y%m%d")
@@ -141,7 +141,7 @@ def main():
 
     download(
         args.username,
-        args.gpg_private_key,
+        args.ssh_private_key,
         args.ftp_server,
         args.ftp_dir,
         args.start_date,
