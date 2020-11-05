@@ -18,7 +18,8 @@ from zipfile import ZipFile
 from argparse import ArgumentParser
 from datetime import date, timedelta
 from functools import partial
-from tempfile import gettempdir
+from tempfile import mkstemp
+from contextlib import contextmanager
 
 from crmprtd import logging_args, setup_logging
 
@@ -48,6 +49,19 @@ def download(username, gpg_private_key, ftp_server, ftp_dir, start_date, end_dat
         log.exception("Unable to download or open some files")
 
 
+@contextmanager
+def temp_filename(suffix=".zip"):
+    """Return the name of temporary file and ensure that it gets removed
+    at the end of the context block.  This offers a slightly different
+    API than anything in the tempfile module, in that it returns a
+    *name* (not an open file object) and cleans it up at the end.
+    """
+    _, fname = mkstemp(suffix)
+    yield fname
+    if os.path.exists(fname):
+        os.remove(fname)
+
+
 # Add files within date range to tmp dir
 def matchFile(start_date, end_date, connection, remote_filename):
     match = re.search(r"[0-9]{6}", remote_filename)
@@ -62,14 +76,13 @@ def matchFile(start_date, end_date, connection, remote_filename):
             return
 
         name = match.group(0)
-        file_path = gettempdir() + name
-        connection.get(remote_filename, file_path)
+        with temp_filename() as file_path:
+            connection.get(remote_filename, file_path)
 
-        with ZipFile(file_path, "r") as zip_file:
-            for name in zip_file.namelist():
-                txt_file = zip_file.open(name)
-                sys.stdout.buffer.write(txt_file.read())
-        os.remove(file_path)
+            with ZipFile(file_path, "r") as zip_file:
+                for name in zip_file.namelist():
+                    txt_file = zip_file.open(name)
+                    sys.stdout.buffer.write(txt_file.read())
 
 
 def main():
