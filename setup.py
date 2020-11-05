@@ -54,7 +54,7 @@ setup(
         ]
     },
     package_data={
-        "crmprtd": ["data/*.yaml", "data/*.xsl"],
+        "crmprtd": ["data/*.yaml", "data/*.xsl", "tests/data/*"],
     },
     install_requires=[
         "lxml",

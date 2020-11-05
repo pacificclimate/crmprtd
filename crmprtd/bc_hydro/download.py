@@ -40,12 +40,14 @@ def download(username, gpg_private_key, ftp_server, ftp_dir, start_date, end_dat
     except Exception:
         log.exception("Invalid ftp authentication")
 
-    # Add files to temporary directory then print contents to stdout
+    # Downloads files to temporary directory then prints contents to stdout
     try:
         """Walktree has 4 required arguements, 3 of which are
         functions with form: func(filename)"""
         no_op = lambda x: None  # noqa: E731
-        callback = partial(matchFile, start_date, end_date, connection)
+        callback = partial(
+            download_relevant_bch_zipfiles, start_date, end_date, connection
+        )
         connection.walktree(ftp_dir, callback, no_op, no_op)
 
     except IOError:
@@ -66,7 +68,19 @@ def temp_filename(suffix=".zip"):
 
 
 # Add files within date range to tmp dir
-def matchFile(start_date, end_date, connection, remote_filename):
+def download_relevant_bch_zipfiles(start_date, end_date, connection, remote_filename):
+    """sftp callback for walking the FTP tree and downloading data
+
+    This function is a little overloaded in its responsibilities as a
+    consequence of the pysftp API (which only allows you to provide a
+    single callback function with no return value).
+
+    Given a remote_filename and a data range, this function will
+    filter out files that don't match the date patterns that we
+    expect, download those that fall within the range, and print the
+    output to standard output.
+
+    """
     pattern = r"PCIC_BCHhourly_([0-9]{6}).zip"
     match = re.search(pattern, remote_filename)
 
@@ -87,7 +101,7 @@ def matchFile(start_date, end_date, connection, remote_filename):
                 sys.stdout.buffer.write(txt_file.read())
 
 
-def main():
+def main():  # pragma: no cover
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
     parser = logging_args(parser)
