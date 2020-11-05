@@ -16,10 +16,13 @@ import sys
 import re
 from zipfile import ZipFile
 from argparse import ArgumentParser
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from functools import partial
 from tempfile import mkstemp
 from contextlib import contextmanager
+
+from dateutil import relativedelta
+import dateutil.parser
 
 from crmprtd import logging_args, setup_logging
 
@@ -64,25 +67,24 @@ def temp_filename(suffix=".zip"):
 
 # Add files within date range to tmp dir
 def matchFile(start_date, end_date, connection, remote_filename):
-    match = re.search(r"[0-9]{6}", remote_filename)
-    if match:
-        date = int(match.group(0))
+    pattern = r"PCIC_BCHhourly_([0-9]{6}).zip"
+    match = re.search(pattern, remote_filename)
 
-        # Get filename, but not directory
-        match = re.search(r"/[^/]*.zip$", remote_filename)
-        if not match:
-            return
-        if date < int(start_date) or date > int(end_date):
-            return
+    if not match:
+        return
 
-        name = match.group(0)
-        with temp_filename() as file_path:
-            connection.get(remote_filename, file_path)
+    file_time = datetime.strptime(match.group(1), "%y%m%d")
 
-            with ZipFile(file_path, "r") as zip_file:
-                for name in zip_file.namelist():
-                    txt_file = zip_file.open(name)
-                    sys.stdout.buffer.write(txt_file.read())
+    if file_time < start_date or file_time > end_date:
+        return
+
+    with temp_filename() as file_path:
+        connection.get(remote_filename, file_path)
+
+        with ZipFile(file_path, "r") as zip_file:
+            for name in zip_file.namelist():
+                txt_file = zip_file.open(name)
+                sys.stdout.buffer.write(txt_file.read())
 
 
 def main():
@@ -110,24 +112,29 @@ def main():
         required=True,
         help=("Path to file with SSH private key"),
     )
-    today = date.today()
-    end = today.strftime("%y%m%d")
-    lastMonth = date.today() - timedelta(days=28)
-    start = lastMonth.strftime("%y%m%d")
+    end = datetime.now()
+    start = end - relativedelta.relativedelta(months=1)
     parser.add_argument(
         "-s",
         "--start_date",
-        default=(start),
+        default=start,
+        type=dateutil.parser.parse,
         help=(
-            "Download data beginning from this day "
-            "(yymmdd). Defaults to 1 month ago."
+            "Optional start time to use for downloading "
+            "(interpreted with dateutil.parser.parse). "
+            "Defaults to one month prior to now."
         ),
     )
     parser.add_argument(
         "-e",
         "--end_date",
-        default=(end),
-        help=("Download data ending from this day " "(yymmdd). Defaults to today."),
+        default=end,
+        type=dateutil.parser.parse,
+        help=(
+            "Optional end time to use for downloading "
+            "(interpreted with dateutil.parser.parse). "
+            "Defaults to now."
+        ),
     )
     args = parser.parse_args()
 
