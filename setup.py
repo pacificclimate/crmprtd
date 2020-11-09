@@ -44,7 +44,7 @@ setup(
             "download_bc_env_snow=crmprtd.bc_env_snow.download:main",
             "download_bc_env_aq=crmprtd.bc_env_aq.download:main",
             "download_bc_forestry=crmprtd.bc_forestry.download:main",
-            "download_bc_tran=crmprtd.bc_tran.download:main",
+            "download_bc_hydro=crmprtd.bc_hydro.download:main",
             "download_ec=crmprtd.ec.download:main",
             "download_moti=crmprtd.moti.download:main",
             "download_wamr=crmprtd.wamr.download:main",
@@ -54,7 +54,7 @@ setup(
         ]
     },
     package_data={
-        "crmprtd": ["data/*.yaml", "data/*.xsl"],
+        "crmprtd": ["data/*.yaml", "data/*.xsl", "tests/data/*"],
     },
     install_requires=[
         "lxml",
@@ -65,6 +65,7 @@ setup(
         "requests[security]",
         "pycds >= 2.0.0",
         "pint",
+        "pysftp",
     ],
     tests_require=["pytest", "pysqlite" "requests_mock"],
     extras_require={
