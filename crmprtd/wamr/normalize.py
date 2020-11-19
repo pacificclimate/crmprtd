@@ -30,25 +30,40 @@ def normalize(file_stream):
     for row in reader:
         keys_of_interest = (
             "DATE_PST",
+            "EMS_ID",
             "STATION_NAME",
             "UNIT",
             "UNITS",
             "PARAMETER",
             "REPORTED_VALUE",
+            "RAW_VALUE",
             "LONGITUDE",
             "LATITUDE",
         )
-        time, station_id, unit, units, variable_name, val, lon, lat = (
-            row[k] if k in row else None for k in keys_of_interest
-        )
+        (
+            time,
+            ems_id,
+            station_name,
+            unit,
+            units,
+            variable_name,
+            rep_val,
+            raw_val,
+            lon,
+            lat,
+        ) = (row[k] if k in row else None for k in keys_of_interest)
 
-        # skip over empty values
-        if val == "":
-            continue
-
-        # Circa May 2020, BC ENV changed their units column from UNIT
-        # to UNITS. Ensure that we have at least one of these.
+        # Circa 2020, BC ENV is presenting inconsistent names for
+        # several of their columns (UNIT/UNITS, EMS_ID/STATION_NAME,
+        # REPORTED_VALUE/RAW_VALUE/ROUNDED_VALUE. Ensure that we have
+        # at least one of these sets.
         unit = get_one_of((unit, units))
+        station_id = get_one_of((ems_id, station_name))
+        try:
+            val = get_one_of((rep_val, raw_val))
+        except ValueError:
+            # skip over empty values
+            continue
 
         try:
             value = float(val)
