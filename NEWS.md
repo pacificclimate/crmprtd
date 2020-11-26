@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 3.2.1
+
+*26-November-2020*
+
+* Fixes bug were BC Hydro didn't have its module initialized
+
 ## 3.2.0
 
 *26-November-2020*
