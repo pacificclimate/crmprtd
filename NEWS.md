@@ -1,5 +1,14 @@
 # News / Release Notes
 
+## 3.2.0
+
+*26-November-2020*
+
+* Handles a few aliases for data values from WAMR/MoE-ENV (GH Issue #88)
+* Adds download module for BC Hydro data (GH Issue #81)
+* Updates and parameterizes deprecated EC URL (GH Issue #85)
+* Improvements to testing and code formattign (GH Issues #74 #84)
+
 ## 3.1.5
 
 *03-September-2020*
