@@ -33,10 +33,20 @@ def test_normalize_good_data(lines):
 
 def test_normalize_missing_value():
     lines = b"""DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE
-2018-07-30 14:00,0250009,Trail Butler Park Met_60,HUMIDITY,HUMIDITY,HUMIDITY,11.68,% RH,1,n/a,Data Ok,
+2018-07-30 14:00,0250009,Trail Butler Park Met_60,HUMIDITY,HUMIDITY,HUMIDITY,,% RH,1,n/a,Data Ok,
 """  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 0
+
+
+def test_normalize_raw_fallback():
+    """This input line doesn't have a REPORTED_VALUE but falls back to the
+    RAW_VALUE"""
+    lines = b"""DATE_PST,EMS_ID,STATION_NAME,PARAMETER,AIR_PARAMETER,INSTRUMENT,RAW_VALUE,UNIT,STATUS,AIRCODESTATUS,STATUS_DESCRIPTION,REPORTED_VALUE
+2018-07-30 14:00,0250009,Trail Butler Park Met_60,HUMIDITY,HUMIDITY,HUMIDITY,11.68,% RH,1,n/a,Data Ok,
+"""  # noqa
+    rows = [row for row in normalize(BytesIO(lines))]
+    assert len(rows) == 1
 
 
 def test_normalize_bad_value():
