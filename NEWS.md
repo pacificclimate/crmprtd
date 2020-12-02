@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 3.2.2
+
+*02-December-2020*
+
+* Fixes bug where bc_tran download script was omitted from the build
+
 ## 3.2.1
 
 *26-November-2020*
