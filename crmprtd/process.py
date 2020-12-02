@@ -7,7 +7,7 @@ from argparse import ArgumentParser
 
 from crmprtd.align import align
 from crmprtd.insert import insert
-from crmprtd import logging_args, setup_logging
+from crmprtd import logging_args, setup_logging, NETWORKS
 
 
 def process_args(parser):
@@ -32,17 +32,7 @@ def process_args(parser):
     parser.add_argument(
         "-N",
         "--network",
-        choices=[
-            "bc_env_aq",
-            "bc_env_snow",
-            "bc_forestry",
-            "bc_tran",
-            "crd",
-            "ec",
-            "moti",
-            "wamr",
-            "wmb",
-        ],
+        choices=NETWORKS,
         help="The network from which the data is coming from. "
         "The name will be used for a dynamic import of "
         "the module's normalization function.",

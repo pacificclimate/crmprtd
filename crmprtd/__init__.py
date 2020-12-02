@@ -60,6 +60,19 @@ from crmprtd.align import align
 from crmprtd.insert import insert
 
 
+NETWORKS = (
+    "bc_env_aq",
+    "bc_env_snow",
+    "bc_forestry",
+    "bc_tran",
+    "bc_hydro",
+    "crd",
+    "ec",
+    "moti",
+    "wamr",
+    "wmb",
+)
+
 Row = namedtuple(
     "Row",
     "time val variable_name unit network_name \
