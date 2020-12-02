@@ -20,8 +20,8 @@ jobs:
       env:
         PIP_INDEX_URL: https://pypi.pacificclimate.org/simple
       run: |
-        sudo apt-get update
-        sudo apt-get install libxml2-dev libxslt-dev python-dev
+        sudo apt update
+        sudo apt install libxml2-dev libxslt-dev python-dev
         sudo apt purge postgresql-client-13 postgresql-server-dev-13
         sudo apt install postgresql-12-postgis-3
         pip install -U pip pytest
