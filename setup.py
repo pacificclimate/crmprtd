@@ -3,6 +3,8 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
+from crmprtd import NETWORKS
+
 __version__ = (3, 2, 1)
 
 
@@ -40,17 +42,12 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "download_crd=crmprtd.crd.download:main",
-            "download_bc_env_snow=crmprtd.bc_env_snow.download:main",
-            "download_bc_env_aq=crmprtd.bc_env_aq.download:main",
-            "download_bc_forestry=crmprtd.bc_forestry.download:main",
-            "download_bc_hydro=crmprtd.bc_hydro.download:main",
-            "download_ec=crmprtd.ec.download:main",
-            "download_moti=crmprtd.moti.download:main",
-            "download_wamr=crmprtd.wamr.download:main",
-            "download_wmb=crmprtd.wmb.download:main",
             "crmprtd_process=crmprtd.process:main",
             "crmprtd_infill_all=scripts.infill_all:main",
+        ]
+        + [
+            f"download_{network}=crmprtd.{network}.download:main"
+            for network in NETWORKS
         ]
     },
     package_data={
