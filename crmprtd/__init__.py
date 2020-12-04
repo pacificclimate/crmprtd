@@ -180,10 +180,10 @@ def common_auth_arguments(parser):  # pragma: no cover
 
 
 def setup_logging(log_conf, log_filename, error_email, log_level, name):
+    import yaml
+
     if log_conf:
         with open(log_conf, "rb") as f:
-            import yaml
-
             base_config = yaml.safe_load(f)
     else:
         base_config = yaml.safe_load(resource_stream("crmprtd", "/data/logging.yaml"))
