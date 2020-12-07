@@ -50,14 +50,9 @@ speed and reliability. This phase is common to all networks.
 
 import logging
 import logging.config
-import yaml
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 from pkg_resources import resource_stream
 from collections import namedtuple
 from itertools import tee
-from crmprtd.align import align
-from crmprtd.insert import insert
 
 
 NETWORKS = (
@@ -185,6 +180,8 @@ def common_auth_arguments(parser):  # pragma: no cover
 
 
 def setup_logging(log_conf, log_filename, error_email, log_level, name):
+    import yaml
+
     if log_conf:
         with open(log_conf, "rb") as f:
             base_config = yaml.safe_load(f)
@@ -206,40 +203,3 @@ def setup_logging(log_conf, log_filename, error_email, log_level, name):
 
 def subset_dict(a_dict, keys_wanted):
     return {key: a_dict[key] for key in keys_wanted if key in a_dict}
-
-
-def run_data_pipeline(
-    download_func,
-    normalize_func,
-    download_args,
-    cache_file,
-    connection_string,
-    sample_size,
-):
-    """Executes all stages of the data processing pipeline.
-
-    Downloads the data, according to the download arguments
-    provided (generally from the command line), normalizes the data
-    based on the network's format. The the fuction send the
-    normalized rows through the align and insert phases of the
-    pipeline.
-    """
-    download_iter = download_func(**download_args)
-
-    if cache_file:
-        download_iter, cache_iter = tee(download_iter)
-        with open(cache_file, "w") as f:
-            for chunk in cache_iter:
-                f.write(chunk)
-
-    rows = [row for row in normalize_func(download_iter)]
-
-    engine = create_engine(connection_string)
-    Session = sessionmaker(engine)
-    sesh = Session()
-
-    observations = [ob for ob in [align(sesh, row) for row in rows] if ob]
-    results = insert(sesh, observations, sample_size)
-
-    log = logging.getLogger(__name__)
-    log.info("Data insertion results", extra={"results": results})
