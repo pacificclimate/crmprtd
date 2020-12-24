@@ -66,6 +66,7 @@ NETWORKS = (
     "moti",
     "wamr",
     "wmb",
+    "yt_gov",
 )
 
 Row = namedtuple(
