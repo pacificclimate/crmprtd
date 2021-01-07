@@ -6,7 +6,7 @@
 #
 --index-url https://pypi.pacificclimate.org/simple
 
-lxml==4.4
+lxml==4.6.2
 pint==0.9
 psycopg2-binary==2.8
 pycds==2.2
