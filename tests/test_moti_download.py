@@ -31,6 +31,7 @@ defaults = {
     "from": one_hour_ago.strftime(moti_fmt),
     "to": now.strftime(moti_fmt),
 }
+url = "https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110"
 
 
 @pytest.mark.parametrize(
@@ -65,7 +66,7 @@ def test_download(stime, etime, station_id, expected_payload, mocker):
     # mock out datetime.utcnow() to give us a deterministic time to
     # test against.
     mocker.patch("crmprtd.moti.download.utcnow", return_value=now)
-    download("u", "p", None, None, stime, etime, station_id)
+    download("u", "p", None, None, stime, etime, station_id, url)
     crmprtd.download.https_download.assert_called_once()
     call_args, _ = crmprtd.download.https_download.call_args
     _, _, _, _, payload = call_args
@@ -86,7 +87,7 @@ def test_download_bad_args(stime, etime):
     """
     station_id = None
     with pytest.raises(ValueError) as e:
-        download("u", "p", None, None, stime, etime, station_id)
+        download("u", "p", None, None, stime, etime, station_id, url)
         assert "Please either specify" in e.message
 
 
@@ -95,5 +96,5 @@ def test_download_too_long():
     stime = "2019/12/01 00:01:01"
     station_id = "over_the_rainbow"
     with pytest.raises(ValueError) as e:
-        download("u", "p", None, None, stime, etime, station_id)
+        download("u", "p", None, None, stime, etime, station_id, url)
         assert "however requests longer than 7" in e.message

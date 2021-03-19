@@ -49,7 +49,7 @@ def utcnow():
 
 
 def download(
-    username, password, auth_fname, auth_key, start_time, end_time, station_id
+    username, password, auth_fname, auth_key, start_time, end_time, station_id, url
 ):
     log.info("Starting MOTIe rtd")
 
@@ -92,8 +92,6 @@ def download(
         log.info("Starting an automatic run to MOTI's SAWR service")
         payload = {}
 
-    url = "https://prdoas2.apps.th.gov.bc.ca/saw-data/sawr7110"
-
     try:
         crmprtd.download.https_download(url, "https", log, auth, payload)
 
@@ -130,6 +128,12 @@ def main():  # pragma: no cover
     parser.add_argument(
         "-s", "--station_id", default=None, help="Station ID for which to download data"
     )
+    parser.add_argument(
+        "-u",
+        "--base_url",
+        default="https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110",
+        help="Base URL for the MoTI SAW service",
+    )
     args = parser.parse_args()
 
     setup_logging(
@@ -148,6 +152,7 @@ def main():  # pragma: no cover
         args.start_time,
         args.end_time,
         args.station_id,
+        args.base_url,
     )
 
 
