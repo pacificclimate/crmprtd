@@ -1,5 +1,12 @@
 # News / Release Notes
 
+## 3.2.3
+
+*19-April-2020*
+
+* Parametrize's MoTI download URL
+* Corrects problem in installer (GH Issue #91)
+
 ## 3.2.2
 
 *02-December-2020*
