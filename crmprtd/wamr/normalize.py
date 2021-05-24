@@ -84,21 +84,17 @@ def normalize(file_stream):
             log.error("Unable to convert date string to datetime", extra={"time": time})
             continue
 
-        substitutions = [
-            ("% RH", "%"),
-            ("\u00b0C", "celsius"),
-            ("mb", "millibar"),
-        ]
+        substitutions = [("% RH", "%"), ("\u00b0C", "celsius"), ("mb", "millibar")]
         for src, dest in substitutions:
             if unit == src:
                 unit = re.sub(src, dest, unit)
 
-        #There is a set of Metro Vancouver's stations that are being 
-        #delivered to us by WAMR, but it is desired that they are re-
-        #associated with the correct network. Attempting this by altering the 
-        #normalization to the correct station_id and the correct network
-        #name. Issue here is that the metrovan variables need to match the ENV-AQN
-        #variables. Will work on that in the database.
+        # There is a set of Metro Vancouver's stations that are being
+        # delivered to us by WAMR, but it is desired that they are re-
+        # associated with the correct network. Attempting this by altering the
+        # normalization to the correct station_id and the correct network
+        # name. Issue here is that the metrovan variables need to match the ENV-AQN
+        # variables. Will work on that in the database.
 
         mvan_natid_subs = [
             ("E302130", "T43"),
@@ -126,7 +122,7 @@ def normalize(file_stream):
             ("310177", "T4"),
             ("E220891", "T12"),
             ("M110514", "T37"),
-            ("E289309", "T45")
+            ("E289309", "T45"),
         ]
 
         for src, dest in mvan_natid_subs:
