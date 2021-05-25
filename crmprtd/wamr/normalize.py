@@ -3,10 +3,12 @@ import io
 import logging
 import re
 import csv
+from pkg_resources import resource_stream
 
 # Installed libraries
 import pytz
 from dateutil.parser import parse
+import yaml
 
 # Local
 from crmprtd import Row
@@ -58,7 +60,7 @@ def normalize(file_stream):
         # REPORTED_VALUE/RAW_VALUE/ROUNDED_VALUE. Ensure that we have
         # at least one of these sets.
         unit = get_one_of((unit, units))
-        station_id = get_one_of((ems_id, station_name))
+        reported_station_id = get_one_of((ems_id, station_name))
         try:
             val = get_one_of((rep_val, raw_val))
         except ValueError:
@@ -96,41 +98,15 @@ def normalize(file_stream):
         # name. Issue here is that the metrovan variables need to match the ENV-AQN
         # variables. Will work on that in the database.
 
-        mvan_natid_subs = dict(
-            [
-                ("E302130", "T43"),
-                ("E293810", "T44"),
-                ("E207723", "T13"),
-                ("E207417", "T17"),
-                ("E232244", "T20"),
-                ("E244516", "T23"),
-                ("E244515", "T22"),
-                ("E275843", "T35"),
-                ("310162", "T9"),
-                ("E244517", "T24"),
-                ("E209177", "T26"),
-                ("E206270", "T14"),
-                ("E207418", "T18"),
-                ("E232245", "T30"),
-                ("E206271", "T15"),
-                ("E209178", "T27"),
-                ("E242892", "T32"),
-                ("E232246", "T31"),
-                ("E308566", "T46"),
-                ("E238212", "T33"),
-                ("310179", "T6"),
-                ("E223756", "T29"),
-                ("310177", "T4"),
-                ("E220891", "T12"),
-                ("M110514", "T37"),
-                ("E289309", "T45"),
-            ]
+        substitutions = yaml.safe_load(
+            resource_stream("crmprtd", "wamr/station_substitutions.yaml")
         )
 
-        if station_id in mvan_natid_subs:
-            station_id = mvan_natid_subs[station_id]
+        if reported_station_id in substitutions:
+            station_id = substitutions[reported_station_id]
             network_name = "MVan"
         else:
+            station_id = reported_station_id
             network_name = "ENV-AQN"
 
         yield Row(
