@@ -1,8 +1,14 @@
 # News / Release Notes
 
+## 3.2.4
+
+*28-May-2021*
+
+* Reassociates certain mvan stations that come from WAMR
+
 ## 3.2.3
 
-*19-April-2020*
+*19-April-2021*
 
 * Parametrize's MoTI download URL
 * Corrects problem in installer (GH Issue #91)
