@@ -3,10 +3,12 @@ import io
 import logging
 import re
 import csv
+from pkg_resources import resource_stream
 
 # Installed libraries
 import pytz
 from dateutil.parser import parse
+import yaml
 
 # Local
 from crmprtd import Row
@@ -58,7 +60,7 @@ def normalize(file_stream):
         # REPORTED_VALUE/RAW_VALUE/ROUNDED_VALUE. Ensure that we have
         # at least one of these sets.
         unit = get_one_of((unit, units))
-        station_id = get_one_of((ems_id, station_name))
+        reported_station_id = get_one_of((ems_id, station_name))
         try:
             val = get_one_of((rep_val, raw_val))
         except ValueError:
@@ -84,21 +86,35 @@ def normalize(file_stream):
             log.error("Unable to convert date string to datetime", extra={"time": time})
             continue
 
-        substitutions = [
-            ("% RH", "%"),
-            ("\u00b0C", "celsius"),
-            ("mb", "millibar"),
-        ]
+        substitutions = [("% RH", "%"), ("\u00b0C", "celsius"), ("mb", "millibar")]
         for src, dest in substitutions:
             if unit == src:
                 unit = re.sub(src, dest, unit)
+
+        # There is a set of Metro Vancouver's stations that are being
+        # delivered to us by WAMR, but it is desired that they are re-
+        # associated with the correct network. Attempting this by altering the
+        # normalization to the correct station_id and the correct network
+        # name. Issue here is that the metrovan variables need to match the ENV-AQN
+        # variables. Will work on that in the database.
+
+        substitutions = yaml.safe_load(
+            resource_stream("crmprtd", "wamr/station_substitutions.yaml")
+        )
+
+        if reported_station_id in substitutions:
+            station_id = substitutions[reported_station_id]
+            network_name = "MVan"
+        else:
+            station_id = reported_station_id
+            network_name = "ENV-AQN"
 
         yield Row(
             time=dt,
             val=value,
             variable_name=variable_name,
             unit=unit,
-            network_name="ENV-AQN",
+            network_name=network_name,
             station_id=station_id,
             lat=lat,
             lon=lon,

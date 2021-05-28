@@ -51,7 +51,12 @@ setup(
         ]
     },
     package_data={
-        "crmprtd": ["data/*.yaml", "data/*.xsl", "tests/data/*"],
+        "crmprtd": [
+            "data/*.yaml",
+            "data/*.xsl",
+            "tests/data/*",
+            "wamr/station_substitutions.yaml",
+        ],
     },
     install_requires=[
         "lxml",

@@ -1,0 +1,31 @@
+# Defines a mapping between station_id names given to us by WAMR that
+# are actually named stations within the MVan network.
+# Values should be of the form:
+# "WAMR_NAME": "MVan_NAME"
+
+'310162': T9
+'310177': T4
+'310179': T6
+E206270: T14
+E206271: T15
+E207417: T17
+E207418: T18
+E207723: T13
+E209177: T26
+E209178: T27
+E220891: T12
+E223756: T29
+E232244: T20
+E232245: T30
+E232246: T31
+E238212: T33
+E242892: T32
+E244515: T22
+E244516: T23
+E244517: T24
+E275843: T35
+E289309: T45
+E293810: T44
+E302130: T43
+E308566: T46
+M110514: T37
