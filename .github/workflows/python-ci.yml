@@ -18,26 +18,25 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       env:
-        PIP_INDEX_URL: https://pypi.pacificclimate.org/simple
+        PIPENV_PYPI_MIRROR: https://pypi.pacificclimate.org/simple
       run: |
         sudo apt update
         sudo apt install libxml2-dev libxslt-dev python-dev
         sudo apt purge postgresql-client-13 postgresql-server-dev-all
         sudo apt install postgresql-12-postgis-3
-        pip install -U pip pytest
-        pip install -r requirements.txt -r test_requirements.txt
-        pip install .
+        pip install -U pipenv
+        pipenv install --python ${{ matrix.python-version }} --dev
     - name: Test with pytest (full)
       if: github.ref == 'refs/heads/master'
       env:
         TZ: Canada/Pacific
       run: |
-        py.test -m "not online" -v --tb=short --cov
+        pipenv run pytest -m "not online" -v --tb=short --cov
     - name: Test with pytest (fast)
       if: github.ref != 'refs/heads/master'
       env:
         TZ: Canada/Pacific
       run: |
-        py.test -m "not slow and not online" -v --tb=short
+        pipenv run pytest -m "not slow and not online" -v --tb=short
     - name: Code format check
-      run: black . --check
+      run: pipenv run black . --check
