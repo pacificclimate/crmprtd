@@ -17,8 +17,6 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      env:
-        PIPENV_PYPI_MIRROR: https://pypi.pacificclimate.org/simple
       run: |
         sudo apt update
         sudo apt install libxml2-dev libxslt-dev python-dev

@@ -1,5 +1,3 @@
-export PIPENV_PYPI_MIRROR=https://pypi.pacificclimate.org/simple
-
 # Setup venv
 ifeq ($(TMPDIR),)
 VENV_PATH := /tmp/crmprtd-venv
