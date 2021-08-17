@@ -30,7 +30,7 @@ def download_and_process(download_args, network_name, connection_string, log_arg
         network_name,
     ] + log_args
     message = " ".join(process)
-    message = re.sub(r'postgresql:\/\/(.*?)\@', r'postgresql://', message)
+    message = re.sub(r"postgresql:\/\/(.*?)\@", r"postgresql://", message)
     logger.debug(message)
     run(process, input=dl_proc.stdout)
 

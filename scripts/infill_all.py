@@ -20,6 +20,7 @@ import datetime
 from crmprtd import logging_args, setup_logging
 from crmprtd.infill import infill
 
+
 def main():
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
