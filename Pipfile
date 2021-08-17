@@ -30,3 +30,6 @@ pytest-mock = "==1.11.1"
 [packages.requests]
 extras = [ "security",]
 version = "==2.22"
+
+[requires]
+python_version = "3.8"
