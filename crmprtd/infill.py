@@ -3,7 +3,6 @@ import logging
 import datetime
 from warnings import warn
 from subprocess import run, PIPE
-import itertools
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker

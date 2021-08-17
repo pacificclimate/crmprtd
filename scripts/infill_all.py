@@ -16,6 +16,9 @@ to infill.
 
 from argparse import ArgumentParser
 import datetime
+import itertools
+
+from dateutil.tz import tzlocal
 
 from crmprtd import logging_args, setup_logging
 from crmprtd.infill import infill
