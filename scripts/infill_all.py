@@ -14,6 +14,7 @@ can configure the loggging, and select a subset of available networks
 to infill.
 """
 
+import re
 import datetime
 import logging
 from argparse import ArgumentParser
@@ -111,7 +112,9 @@ def download_and_process(download_args, network_name, connection_string, log_arg
         "-N",
         network_name,
     ] + log_args
-    logger.debug(" ".join(process))
+    message = " ".join(process)
+    message = re.sub(r'postgresql:\/\/(.*?)\@', r'postgresql://', message)
+    logger.debug(message)
     run(process, input=dl_proc.stdout)
 
 
