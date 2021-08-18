@@ -10,7 +10,7 @@ Utility to download near real time weather data and insert it into PCIC's databa
 A `Makefile` handles the project installation:
 ```bash
 make
-source /tmp/crmprtd-venv/bin/activate
+pipenv shell
 ```
 
 If you do not wish you to use `make`, follow the instructions below.
@@ -23,14 +23,12 @@ pip install -i https://pypi.pacificclimate.org/simple crmprtd
 pip install -i https://pypi.pacificclimate.org/simple crmprtd[jsonlogger]
 ```
 
-Or for development, clone the repo and install it from your local source tree.
+Or for development, clone the repo and install it (with pipenv) from your local source tree.
 
 ```bash
 git clone git@github.com:pacificclimate/crmprtd
-virtualenv venv
-source venv/bin/activate
-pip install -r requirements.txt -i https://pypi.pacificclimate.org/simple
-pip install .
+pipenv install --dev .
+pipenv shell
 ```
 
 ## Usage
@@ -106,8 +104,7 @@ We use `black` coupled with `pre-commit hooks` to handle our formatting needs. B
 
 To manually install and format with `black`:
 ```
-source /tmp/crmprtd-venv/bin/activate
-pip install black
+pipenv shell
 black .
 ```
 
@@ -117,8 +114,7 @@ The `pre-commit hook` will only be triggered if the venv has been activated. If 
 
 To manually install `pre-commit`:
 ```
-source /tmp/crmprtd-venv/bin/activate
-pip install pre-commit
+pipenv shell
 pre-commit install
 ```
 
