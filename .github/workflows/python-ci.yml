@@ -42,7 +42,7 @@ jobs:
       env:
         TZ: Canada/Pacific
       run: |
-        pipenv run pytest -m "not online" -v --tb=short --cov
+        pipenv run pytest -m "not online" -v --tb=short --cov --cov-report=term-missing
     - name: Test with pytest (fast)
       if: github.ref != 'refs/heads/master'
       env:
