@@ -93,7 +93,7 @@ def download(base_url, date):
 
 def split_multi_xml_stream(stream):
     string = stream.read()
-    matches = re.split(b"(<\?xml.*?\?>)", string)
+    matches = re.split(rb"(<\?xml.*?\?>)", string)
     matches = matches[1:]
     for _ in range(len(matches) // 2):
         rv = BytesIO(matches.pop(0) + matches.pop(0))

@@ -11,7 +11,7 @@ bctz = pytz.timezone("America/Vancouver")
 
 xml = {
     "no_obs": b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <data>
     <observation-series>
       <origin type="station">
@@ -21,7 +21,7 @@ xml = {
   </data>
 </cmml>""",  # noqa
     "no_valid_time": b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <data>
     <observation-series>
       <origin type="station">
@@ -37,7 +37,7 @@ xml = {
   </data>
        </cmml>""",  # noqa
     "bad_value": b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <data>
     <observation-series>
       <origin type="station">
@@ -52,7 +52,7 @@ xml = {
   </data>
        </cmml>""",  # noqa
     "no_value": b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <data>
     <observation-series>
       <origin type="station">
@@ -66,7 +66,7 @@ xml = {
   </data>
        </cmml>""",  # noqa
     "no_units": b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <data>
     <observation-series>
       <origin type="station">

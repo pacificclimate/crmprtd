@@ -252,7 +252,7 @@ def ec_session(crmp_session, caplog):
 def moti_sawr7110_xml():
     return fromstring(
         b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
@@ -299,7 +299,7 @@ def moti_sawr7110_xml_2a():
     """No duplicates"""
     return fromstring(
         b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
@@ -336,7 +336,7 @@ def moti_sawr7110_xml_2b():
     before and after the duplicates."""
     return fromstring(
         b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
@@ -381,7 +381,7 @@ def moti_sawr7110_xml_2b():
 def moti_sawr7110_new_station():
     return fromstring(
         b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <data>
     <observation-series>
       <origin type="station">
@@ -397,7 +397,7 @@ def moti_sawr7110_new_station():
 def moti_sawr7100_large():
     return fromstring(
         b"""<?xml version="1.0" encoding="ISO-8859-1"?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
