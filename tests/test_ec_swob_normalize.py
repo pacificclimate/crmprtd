@@ -1,7 +1,7 @@
 from io import BytesIO
 import re
 import logging
-from collections import Iterable
+from collections.abc import Iterable
 
 import pytest
 
