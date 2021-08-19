@@ -25,7 +25,7 @@ def test_https_download(requests_mock, capsys):
     https_download("https://test.com")
     captured = capsys.readouterr()
     assert captured.out == "data"
-    https_download("https://test.com", auth={"u": "foo", "p": None})
+    https_download("https://test.com", auth={"u": "foo", "p": "ignored"})
     assert captured.out == "data"
 
 

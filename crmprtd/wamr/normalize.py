@@ -98,9 +98,8 @@ def normalize(file_stream):
         # name. Issue here is that the metrovan variables need to match the ENV-AQN
         # variables. Will work on that in the database.
 
-        substitutions = yaml.safe_load(
-            resource_stream("crmprtd", "wamr/station_substitutions.yaml")
-        )
+        with resource_stream("crmprtd", "wamr/station_substitutions.yaml") as f:
+            substitutions = yaml.safe_load(f)
 
         if reported_station_id in substitutions:
             station_id = substitutions[reported_station_id]

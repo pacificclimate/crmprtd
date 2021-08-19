@@ -16,13 +16,14 @@ from crmprtd.ec_swob.download import split_multi_xml_stream
 log = logging.getLogger(__name__)
 
 
-def parse_xml(stream, xsl=None):
-    if xsl is None:
-        xsl = resource_stream("crmprtd", "data/ec_xform.xsl")
+def parse_xml(stream):
+
+    with resource_stream("crmprtd", "data/ec_xform.xsl") as xsl:
+        xsl = parse(xsl)
 
     # Parse and transform the xml
     et = parse(stream)
-    transform = XSLT(parse(xsl))
+    transform = XSLT(xsl)
     return transform(et)
 
 

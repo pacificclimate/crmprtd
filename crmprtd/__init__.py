@@ -186,7 +186,8 @@ def setup_logging(log_conf, log_filename, error_email, log_level, name):
         with open(log_conf, "rb") as f:
             base_config = yaml.safe_load(f)
     else:
-        base_config = yaml.safe_load(resource_stream("crmprtd", "/data/logging.yaml"))
+        with resource_stream("crmprtd", "data/logging.yaml") as f:
+            base_config = yaml.safe_load(f)
 
     if log_filename:
         base_config["handlers"]["file"]["filename"] = log_filename

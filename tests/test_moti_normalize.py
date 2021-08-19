@@ -7,7 +7,7 @@ import pytest
 
 def test_normalize_good_data():
     lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
@@ -56,7 +56,7 @@ def test_normalize_good_data():
 
 def test_normalize_missing_stn_indexerror():
     lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
@@ -92,7 +92,7 @@ def test_normalize_missing_stn_indexerror():
 
 def test_normalize_missing_time():
     lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
@@ -139,7 +139,7 @@ def test_normalize_missing_time():
 
 def test_normalize_bad_time(moti_sawr7110_xml):
     lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
@@ -176,7 +176,7 @@ def test_normalize_bad_time(moti_sawr7110_xml):
 
 def test_normalize_missing_var_name():
     lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
@@ -210,7 +210,7 @@ def test_normalize_missing_var_name():
 
 def test_normalize_missing_value():
     lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
@@ -250,7 +250,7 @@ def test_normalize_missing_value():
 
 def test_normalize_bad_value():
     lines = b"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
@@ -284,10 +284,6 @@ def test_normalize_bad_value():
     assert len(rows) == 0
 
 
-# TODO: Figure out why the results of this test are inconsistent on gitub actions
-# Test does not use online resource but is to be ignored on actions for the
-# reason mentioned above.
-@pytest.mark.online
 @pytest.mark.parametrize(
     ("empty"),
     (
@@ -299,7 +295,7 @@ def test_normalize_bad_value():
 )
 def test_normalize_empty_data(empty, caplog):
     lines = f"""<?xml version="1.0" encoding="ISO-8859-1" ?>
-<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\Schema\CMML.xsd" version="2.01">
+<cmml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\\Schema\\CMML.xsd" version="2.01">
   <head>
     <product operational-mode="official">
       <title>Observation from BC Meteorological Stations</title>
