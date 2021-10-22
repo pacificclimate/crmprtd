@@ -7,6 +7,13 @@ from sly import Lexer, Parser
 from crmprtd import Row
 
 
+def normalize(file_stream):
+    lexer = DataLexer()
+    parser = BCHydroExtendedCSV()
+    tokens = lexer.tokenize(file_stream)
+    yield from parser.parse(tokens)
+
+
 class DataLexer(Lexer):
     tokens = {"DATE", "NUMBER", "EMPTY", "WORD", "NEWLINE"}
 
