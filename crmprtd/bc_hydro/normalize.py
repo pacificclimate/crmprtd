@@ -1,4 +1,3 @@
-import pdb
 import sys
 from itertools import islice, chain
 
@@ -16,7 +15,6 @@ class DataLexer(Lexer):
     NEWLINE = r"\n"
 
     ignore_whitespace = r"(\t|[\t ]{2,})"
-    # ignore_newline = r"\n+"
 
     @_(r"[0-9]{4}[-/][0-9]{2}[-/][0-9]{2}( [0-9]{2}:[0-9]{2})?")
     def DATE(self, t):
@@ -36,16 +34,34 @@ class DataLexer(Lexer):
 class BCHydroExtendedCSV(Parser):
     tokens = DataLexer.tokens
 
-    def __init__(self):
-        self.variables = []
-
     @_("station_name bch_csv", "bch_csv")
     def extended_bch_csv(self, p):
         return p.bch_csv
 
     @_("header_line data_lines")
     def bch_csv(self, p):
-        return chain.from_iterable(p.data_lines)
+        def line_to_rows(header_line, data_line):
+            dt = data_line["datetime"]
+            station_id = data_line["station_id"]
+            return [
+                Row(
+                    time=dt,
+                    val=value,
+                    variable_name=variable_name,
+                    network_name="BCH",
+                    station_id=station_id,
+                    unit=None,
+                    lat=None,
+                    lon=None,
+                )
+                for variable_name, value in zip(header_line[2:], data_line["values"])
+                if value is not None
+            ]
+
+        list_of_lists = [
+            line_to_rows(p.header_line, data_line) for data_line in p.data_lines
+        ]
+        return chain.from_iterable(list_of_lists)
 
     @_("WORD NEWLINE")
     def station_name(self, p):
@@ -57,11 +73,14 @@ class BCHydroExtendedCSV(Parser):
 
     @_("header_names NEWLINE")
     def header_line(self, p):
-        pass
+        return p.header_names
 
     @_("header_name", "header_names header_name")
     def header_names(self, p):
-        self.variables.append(p.header_name)
+        if hasattr(p, "header_names"):
+            return p.header_names + [p.header_name]
+        else:
+            return [p.header_name]
 
     @_("WORD")
     def header_name(self, p):
@@ -83,25 +102,7 @@ class BCHydroExtendedCSV(Parser):
         if not hasattr(p, "WORD"):
             return
 
-        station_id = p.WORD
-        datetime = p.DATE
-        rows = [
-            Row(
-                time=datetime,
-                val=value,
-                variable_name=variable_name,
-                network_name="BCH",
-                station_id=station_id,
-                unit=None,
-                lat=None,
-                lon=None,
-            )
-            for variable_name, value in islice(
-                zip(self.variables, p.data_values), 2, None
-            )
-            if value is not None
-        ]
-        return rows
+        return {"station_id": p.WORD, "datetime": p.DATE, "values": p.data_values}
 
     @_("data_value", "data_values data_value")
     def data_values(self, p):
@@ -119,13 +120,11 @@ class BCHydroExtendedCSV(Parser):
         return p[0]
 
     def error(self, t):
-        import pdb
-
-        pdb.set_trace()
+        raise Exception(t)
         return
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # noqa
     stream = open(sys.argv[1]).read()
     lexer = DataLexer()
     parser = BCHydroExtendedCSV()
@@ -134,10 +133,8 @@ if __name__ == "__main__":
 
     if sys.argv[2] == "parse":
         try:
-            try:
-                rows = parser.parse(tokens)
-            except Exception as e:
-                pdb.set_trace()
+            rows = parser.parse(tokens)
+
             for row in rows:
                 print(row)
         except EOFError:
