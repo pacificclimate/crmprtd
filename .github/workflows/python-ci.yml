@@ -25,7 +25,7 @@ jobs:
       run: |
         sudo apt update
         sudo apt install libxml2-dev libxslt-dev python-dev
-        sudo apt purge postgresql-server-dev-all
+        sudo apt purge postgresql-client-14 postgresql-server-dev-all
         sudo apt install postgresql-12-postgis-3
 
     - id: cache-pipenv
