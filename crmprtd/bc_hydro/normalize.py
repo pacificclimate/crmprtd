@@ -10,14 +10,14 @@ from crmprtd import Row
 def normalize(file_stream):
     lexer = DataLexer()
     parser = BCHydroExtendedCSV()
-    tokens = lexer.tokenize(file_stream)
+    tokens = lexer.tokenize(file_stream.read().decode("UTF-8"))
     yield from parser.parse(tokens)
 
 
 class DataLexer(Lexer):
     tokens = {"DATE", "NUMBER", "EMPTY", "WORD", "NEWLINE"}
 
-    EMPTY = "\+"
+    EMPTY = r"\+"
     WORD = r"[ A-Za-z_/]+[A-Za-z]"
     NEWLINE = r"\n"
 
@@ -127,8 +127,12 @@ class BCHydroExtendedCSV(Parser):
         return p[0]
 
     def error(self, t):
-        raise Exception(t)
-        return
+        if t is None:
+            raise EOFError(
+                "BCHydroExtendedCSV parser reached the end of the token stream. The file parsing has failed."
+            )
+        else:
+            raise RuntimeError("Could not shift/merge token %s" % t)
 
 
 if __name__ == "__main__":  # noqa
