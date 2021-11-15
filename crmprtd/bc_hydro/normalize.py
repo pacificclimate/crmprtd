@@ -15,9 +15,9 @@ def normalize(file_stream):
 
 
 class DataLexer(Lexer):
-    tokens = {"DATE", "NUMBER", "EMPTY", "WORD", "NEWLINE"}
+    tokens = {"DATE", "NUMBER", "NAN", "WORD", "NEWLINE"}
 
-    EMPTY = r"\+"
+    NAN = r"\+"
     WORD = r"[ A-Za-z_/]+[A-Za-z]"
     NEWLINE = r"\n"
 
@@ -41,11 +41,17 @@ class DataLexer(Lexer):
 class BCHydroExtendedCSV(Parser):
     tokens = DataLexer.tokens
 
+    @_("extended_bch_csv", "extended_bch_csv extended_bch_csvs")
+    def extended_bch_csvs(self, p):
+        if hasattr(p, "extended_bch_csvs"):
+            return chain([p.extended_bch_csv], p.extended_bch_csvs)
+        return p.extended_bch_csv
+
     @_("station_name bch_csv", "bch_csv")
     def extended_bch_csv(self, p):
         return p.bch_csv
 
-    @_("header_line data_lines")
+    @_("header_line data_lines NEWLINE")
     def bch_csv(self, p):
         def line_to_rows(header_line, data_line):
             dt = data_line["datetime"]
@@ -104,7 +110,7 @@ class BCHydroExtendedCSV(Parser):
         else:
             return line
 
-    @_("WORD DATE data_values NEWLINE", "NEWLINE")
+    @_("WORD DATE data_values NEWLINE")
     def data_line(self, p):
         if not hasattr(p, "WORD"):
             return
@@ -120,7 +126,7 @@ class BCHydroExtendedCSV(Parser):
                 return p.data_values + [p.data_value]
             return [p.data_values, p.data_value]
 
-    @_("NUMBER", "EMPTY")
+    @_("NUMBER", "NAN")
     def data_value(self, p):
         if p[0] == "+":
             return None
@@ -136,20 +142,21 @@ class BCHydroExtendedCSV(Parser):
 
 
 if __name__ == "__main__":  # noqa
-    stream = open(sys.argv[1]).read()
+    if sys.argv[1] == "both":
+        stream = open("AKI-hdq.txt").read() + open("CPI-hhq.txt").read()
+    else:
+        stream = open(sys.argv[1]).read()
+
     lexer = DataLexer()
     parser = BCHydroExtendedCSV()
 
     tokens = lexer.tokenize(stream)
 
     if sys.argv[2] == "parse":
-        try:
-            rows = parser.parse(tokens)
+        rows = parser.parse(tokens)
 
-            for row in rows:
-                print(row)
-        except EOFError:
-            print("EOFERROR")
+        for row in rows:
+            print(row)
 
     else:
         for token in tokens:
