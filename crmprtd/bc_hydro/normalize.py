@@ -44,7 +44,7 @@ class BCHydroExtendedCSV(Parser):
     @_("extended_bch_csv", "extended_bch_csv extended_bch_csvs")
     def extended_bch_csvs(self, p):
         if hasattr(p, "extended_bch_csvs"):
-            return chain([p.extended_bch_csv], p.extended_bch_csvs)
+            return chain(p.extended_bch_csv, p.extended_bch_csvs)
         return p.extended_bch_csv
 
     @_("station_name bch_csv", "bch_csv")
