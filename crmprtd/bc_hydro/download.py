@@ -29,7 +29,9 @@ from crmprtd import logging_args, setup_logging
 log = logging.getLogger(__name__)
 
 
-def download(username, gpg_private_key, ftp_server, ftp_dir, start_date, end_date):
+def download(
+    username, gpg_private_key, ftp_server, ftp_dir, start_date, end_date
+):  # pragma: no cover
 
     # Connect FTP server and retrieve directory
     try:
@@ -170,5 +172,5 @@ def main():  # pragma: no cover
     )
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
