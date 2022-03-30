@@ -63,9 +63,13 @@ NETWORKS = (
     "bc_hydro",
     "crd",
     "ec",
+    "nt_forestry",
+    "nt_water",
     "moti",
     "wamr",
     "wmb",
+    "yt_gov",
+    "yt_water",
 )
 
 Row = namedtuple(
