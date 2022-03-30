@@ -15,13 +15,21 @@ def normalize(file_stream):
 
 
 class DataLexer(Lexer):
-    tokens = {"DATE", "NUMBER", "NAN", "WORD", "NEWLINE"}
+    tokens = {"DATE", "NUMBER", "NAN", "WORD", "NEWLINE", "NOTES"}
 
     NAN = r"\+"
+    NOTES = (r"("
+             r"Interpolation Performed|"
+             r"eq.|"
+             r"Spatial values? corrected|"
+             r"No valid neighbors for Spatial Precipitation Downscale Corrector|"
+             r"DV error"
+             r")"
+    )
     WORD = r"[ A-Za-z_/]+[A-Za-z]"
     NEWLINE = r"\n"
 
-    ignore_whitespace = r"(\t|[\t ]{2,})"
+    ignore_whitespace = r"(\t|[\t ]{2,}|\r)"
 
     @_(r"[0-9]{4}[-/][0-9]{2}[-/][0-9]{2}( [0-9]{2}:[0-9]{2})?")
     def DATE(self, t):
@@ -34,7 +42,10 @@ class DataLexer(Lexer):
         return t
 
     def error(self, t):
-        print("Illegal character '%s'" % t.value[0])
+        import pdb
+        pdb.set_trace()
+        print(t.value[0])
+        print("Illegal character '%s'" % t.value[0], t.value)
         self.index += 1
 
 
@@ -126,9 +137,10 @@ class BCHydroExtendedCSV(Parser):
                 return p.data_values + [p.data_value]
             return [p.data_values, p.data_value]
 
-    @_("NUMBER", "NAN")
+    @_("NUMBER", "NAN", "NOTES")
     def data_value(self, p):
-        if p[0] == "+":
+        if not hasattr(p, "NUMBER"):
+        #if p[0] == "+" or p[0] == "Interpolation Performed" or p[0] == "eq.":
             return None
         return p[0]
 
@@ -138,6 +150,10 @@ class BCHydroExtendedCSV(Parser):
                 "BCHydroExtendedCSV parser reached the end of the token stream. The file parsing has failed."
             )
         else:
+            print("Error: state stack:", self.statestack)
+            print("Error: symbol stack:", self.symstack)
+            import pdb
+            pdb.set_trace()
             raise RuntimeError("Could not shift/merge token %s" % t)
 
 

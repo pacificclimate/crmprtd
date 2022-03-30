@@ -92,7 +92,15 @@ def download_relevant_bch_zipfiles(start_date, end_date, connection, remote_file
     file_time = datetime.strptime(match.group(1), "%y%m%d")
 
     if file_time < start_date or file_time > end_date:
+        log.debug(
+            "File time %s outside of search range %s <-> %s",
+            file_time,
+            start_date,
+            end_date,
+        )
         return
+
+    log.debug("File time selected... downloading %s", remote_filename)
 
     with temp_filename() as file_path:
         connection.get(remote_filename, file_path)

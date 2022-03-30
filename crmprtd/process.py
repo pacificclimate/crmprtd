@@ -59,10 +59,16 @@ def process(connection_string, sample_size, network, is_diagnostic=False):
         )
         raise Exception("No module name given")
 
-    download_stream = sys.stdin.buffer
+    #download_stream = sys.stdin.buffer
+    #download_stream = open("bch_download.csv").buffer
+    import pdb
+    #pdb.set_trace()
+    
     norm_mod = get_normalization_module(network)
 
-    rows = [row for row in norm_mod.normalize(download_stream)]
+    with open("bch_download.csv") as f:
+        download_stream = f.buffer
+        rows = [row for row in norm_mod.normalize(download_stream)]
 
     engine = create_engine(connection_string)
     Session = sessionmaker(engine)
