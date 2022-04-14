@@ -2,17 +2,20 @@ from io import BytesIO
 import re
 import logging
 from collections.abc import Iterable
+from importlib import import_module
 
 import pytest
 
+from crmprtd import SWOB_PARTNERS
 from .swob_data import multi_xml_download, MSNG_values_xml
-from crmprtd.bc_env_aq.normalize import normalize as norm_aq
-from crmprtd.bc_env_snow.normalize import normalize as norm_snow
-from crmprtd.bc_forestry.normalize import normalize as norm_forest
+
+normalize_mods = (
+    import_module(f"crmprtd.{partner}.normalize") for partner in SWOB_PARTNERS
+)
 from crmprtd.bc_tran.normalize import normalize as norm_tran
 
 
-@pytest.mark.parametrize("function", [norm_aq, norm_snow, norm_forest, norm_tran])
+@pytest.mark.parametrize("function", (x.normalize for x in normalize_mods))
 def test_normalize(function):
     iterator = function(BytesIO(multi_xml_download))
     assert isinstance(iterator, Iterable)

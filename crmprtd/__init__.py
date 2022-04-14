@@ -54,22 +54,24 @@ from pkg_resources import resource_stream
 from collections import namedtuple
 from itertools import tee
 
-
-NETWORKS = (
+SWOB_PARTNERS = (
     "bc_env_aq",
     "bc_env_snow",
     "bc_forestry",
     "bc_tran",
+    "nt_forestry",
+    "nt_water",
+    "yt_gov",
+    "yt_water",
+)
+
+NETWORKS = SWOB_PARTNERS + (
     "bc_hydro",
     "crd",
     "ec",
-    "nt_forestry",
-    "nt_water",
     "moti",
     "wamr",
     "wmb",
-    "yt_gov",
-    "yt_water",
 )
 
 Row = namedtuple(

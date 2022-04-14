@@ -4,10 +4,15 @@
     omit =
         crmprtd/db_excptions
         crmprtd/ec/download.py
+# The EC_SWOB modules barely have any code worth testing
         crmprtd/bc_env_snow/download.py
         crmprtd/bc_env_aq/download.py
         crmprtd/bc_tran/download.py
         crmprtd/bc_forestry/download.py
+        crmprtd/nt_forestry/download.py
+        crmprtd/nt_water/download.py
+        crmprtd/yt_gov/download.py
+        crmprtd/yt_water/download.py
         crmprtd/wamr/download.py
         crmprtd/wmb/download.py
         speed_test/
