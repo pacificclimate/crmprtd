@@ -1,5 +1,13 @@
 # News / Release Notes
 
+## 3.3.0
+
+*14-April-2022*
+
+* Adds support for Northwest Territories and Yukon Territories feeds
+  from ECCC DataMart
+* Converts project setup to use pipenv
+
 ## 3.2.4
 
 *28-May-2021*
