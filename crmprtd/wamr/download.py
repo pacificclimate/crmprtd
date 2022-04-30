@@ -27,7 +27,7 @@ from crmprtd import logging_args, setup_logging
 log = logging.getLogger(__name__)
 
 
-def download(ftp_server, ftp_dir):
+def download(ftp_server, ftp_dir, output_buffer=sys.stdout.buffer):
     """Executes the first stage of the data processing pipeline.
 
     Downloads the data, according to the download arguments
@@ -54,7 +54,7 @@ def download(ftp_server, ftp_dir):
 
             tempfile.seek(0)
             for line in tempfile.readlines():
-                sys.stdout.buffer.write(line.encode("utf-8"))
+                output_buffer.write(line.encode("utf-8"))
 
     except Exception:
         log.exception("Unable to process ftp")

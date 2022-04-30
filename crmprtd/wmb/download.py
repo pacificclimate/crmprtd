@@ -27,7 +27,7 @@ from crmprtd import logging_args, setup_logging, common_auth_arguments
 log = logging.getLogger(__name__)
 
 
-def download(username, password, auth_fname, auth_key, ftp_server, ftp_file):
+def download(username, password, auth_fname, auth_key, ftp_server, ftp_file, output_buffer=sys.stdout.buffer):
     log.info("Starting WMB rtd")
 
     auth_yaml = open(auth_fname, "r").read() if auth_fname else None
@@ -49,7 +49,7 @@ def download(username, password, auth_fname, auth_key, ftp_server, ftp_file):
                 ftpreader.connection.retrlines("RETR {}".format(filename), callback)
             tempfile.seek(0)
             for line in tempfile.readlines():
-                sys.stdout.buffer.write(line.encode("utf-8"))
+                output_buffer.write(line.encode("utf-8"))
 
     except Exception as e:
         log.exception("Unable to process ftp")

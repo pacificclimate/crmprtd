@@ -1,16 +1,23 @@
+import subprocess
 import logging
 from datetime import datetime
 
 import pytest
 
-from crmprtd.infill import download_and_process, round_datetime, datetime_range
+from crmprtd.infill import download_and_process, round_datetime, datetime_range, infill
 
 
-def test_download_and_process(mocker, caplog):
-    mocker.patch("subprocess.run", return_value=True)
+def test_download_and_process(mocker, test_session, caplog):
+    mocker.patch("crmprtd.download.https_download")
+ 
     with caplog.at_level(logging.DEBUG):
         download_and_process(
-            [], "moti", "postgresql://user:password@db3.pcic/somdb", []
+            [
+                "u", "p", None, None, None, None, "station_id", "some_url"
+            ],
+            "moti",
+            test_session,
+            []
         )
     for record in caplog.records:
         assert "password" not in record.message
@@ -61,3 +68,19 @@ def test_datetime_range(start, end, resolution):
     next(result)
     assert True
     # Hey we didn't error... that's good enough for now :P
+
+
+def test_infill(mocker):
+    networks = ("crd", "ec", "moti", "wamr", "wmb", "ec_swob")
+    rv = subprocess.CompletedProcess([], 0)
+    mocker.patch("subprocess.run", return_value=rv)
+    
+    infill(
+        networks,
+        datetime(2021, 1, 20, 11),
+        datetime(2021, 1, 31, 00),
+        "",
+        "postgresql://user:password@db3.pcic/somdb",
+        []
+    )
+    assert True

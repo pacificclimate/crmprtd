@@ -129,7 +129,7 @@ def extract_auth(username, password, auth_yaml, auth_key):
         return {"u": config[auth_key]["username"], "p": config[auth_key]["password"]}
 
 
-def https_download(url, scheme="https", log=None, auth=None, payload={}):
+def https_download(url, scheme="https", log=None, auth=None, payload={}, output_buffer=sys.stdout.buffer):
     """Sends an HTTP(S) request to the provided URL and writes the
     response to sys.stdout
 
@@ -162,4 +162,4 @@ def https_download(url, scheme="https", log=None, auth=None, payload={}):
         )
 
     for line in resp.iter_content(chunk_size=None):
-        sys.stdout.buffer.write(line)
+        output_buffer.write(line)

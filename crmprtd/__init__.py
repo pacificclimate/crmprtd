@@ -54,6 +54,9 @@ from pkg_resources import resource_stream
 from collections import namedtuple
 from itertools import tee
 
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 
 NETWORKS = (
     "bc_env_aq",
@@ -204,3 +207,9 @@ def setup_logging(log_conf, log_filename, error_email, log_level, name):
 
 def subset_dict(a_dict, keys_wanted):
     return {key: a_dict[key] for key in keys_wanted if key in a_dict}
+
+
+def db_session(connection_string):
+    engine = create_engine(connection_string)
+    Session = sessionmaker(engine)
+    return Session()

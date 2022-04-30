@@ -29,7 +29,7 @@ from crmprtd import logging_args, setup_logging
 log = logging.getLogger(__name__)
 
 
-def download(username, gpg_private_key, ftp_server, ftp_dir, start_date, end_date):
+def download(username, gpg_private_key, ftp_server, ftp_dir, start_date, end_date, output_buffer=sys.stdout.buffer):
 
     # Connect FTP server and retrieve directory
     try:
@@ -46,7 +46,7 @@ def download(username, gpg_private_key, ftp_server, ftp_dir, start_date, end_dat
         functions with form: func(filename)"""
         no_op = lambda x: None  # noqa: E731
         callback = partial(
-            download_relevant_bch_zipfiles, start_date, end_date, connection
+            download_relevant_bch_zipfiles, start_date, end_date, connection, output_buffer
         )
         connection.walktree(ftp_dir, callback, no_op, no_op)
 
@@ -68,7 +68,7 @@ def temp_filename(suffix=".zip"):
 
 
 # Add files within date range to tmp dir
-def download_relevant_bch_zipfiles(start_date, end_date, connection, remote_filename):
+def download_relevant_bch_zipfiles(start_date, end_date, connection, remote_filename, output_buffer=sys.stdout.buffer):
     """sftp callback for walking the FTP tree and downloading data
 
     This function is a little overloaded in its responsibilities as a
@@ -98,7 +98,7 @@ def download_relevant_bch_zipfiles(start_date, end_date, connection, remote_file
         with ZipFile(file_path, "r") as zip_file:
             for name in zip_file.namelist():
                 txt_file = zip_file.open(name)
-                sys.stdout.buffer.write(txt_file.read())
+                output_buffer.write(txt_file.read())
 
 
 def main():  # pragma: no cover

@@ -1,8 +1,10 @@
+import io
 import re
 import logging
 import datetime
+import importlib
+from contextlib import redirect_stdout
 from warnings import warn
-from subprocess import run, PIPE
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -10,28 +12,18 @@ from pycds import Station, Network
 from dateutil.tz import tzlocal
 import pytz
 
+from crmprtd.process import process
 
 logger = logging.getLogger(__name__)
 
 
-def download_and_process(download_args, network_name, connection_string, log_args):
-    """Open two subprocesses: download_{network} and crmprtd_process and
-    pipe the output from the first to the second. Returns None.
+def download_and_process(download_args, network_name, sesh, log_args):
+    """FIXME
     """
-    proc = [f"download_{network_name}"] + log_args + download_args
-    logger.debug(" ".join(proc))
-    dl_proc = run(proc, stdout=PIPE)
-    process = [
-        "crmprtd_process",
-        "-c",
-        connection_string,
-        "-N",
-        network_name,
-    ] + log_args
-    message = " ".join(process)
-    message = re.sub(r"postgresql:\/\/(.*?)\@", r"postgresql://", message)
-    logger.debug(message)
-    run(process, input=dl_proc.stdout)
+    download_lib = importlib.import_module(f"crmprtd.{network_name}.download")
+    with redirect_stdout(io.BytesIO()) as io_buffer:
+        download_lib.download(*download_args)
+    process(sesh, 50, network_name, io_buffer)
 
 
 def infill(networks, start_time, end_time, auth_fname, connection_string, log_args):
@@ -47,23 +39,21 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
 
     # CRD
     if "crd" in networks:
+        auth_yaml = open(auth_fname, "r").read() if args.auth_fname else None
+        client_id = crmprtd.download.extract_auth(None, None, auth_yaml, "crd")["u"]
+
         # Divide range into 28 day intervals
         for interval_start, interval_end in zip(
             monthly_ranges[:-1], monthly_ranges[1:]
         ):
-            start = interval_start.strftime(time_fmt)
-            end = interval_end.strftime(time_fmt)
+            start = interval_start
+            end = interval_end
             dl_args = [
-                "-S",
+                client_id,
                 start,
-                "-E",
-                end,
-                "--auth_fname",
-                auth_fname,
-                "--auth_key",
-                "crd",
+                end
             ]
-            download_and_process(dl_args, "crd", connection_string, log_args)
+            download_and_process(dl_args, "crd", sesh, log_args)
 
     # EC
     if "ec" in networks:

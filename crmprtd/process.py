@@ -1,7 +1,5 @@
 import sys
 from importlib import import_module
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 import logging
 from argparse import ArgumentParser
 
@@ -11,6 +9,9 @@ from crmprtd import logging_args, setup_logging, NETWORKS
 
 
 def process_args(parser):
+    import pytest
+
+    # pytest.set_trace()
     parser.add_argument(
         "-c", "--connection_string", help="PostgreSQL connection string", required=True
     )
@@ -44,13 +45,18 @@ def get_normalization_module(network):
     return import_module("crmprtd.{}.normalize".format(network))
 
 
-def process(connection_string, sample_size, network, is_diagnostic=False):
+def process(
+    sesh, sample_size, network, is_diagnostic=False, download_stream=sys.stdin.buffer
+):
     """Executes 3 stages of the data processing pipeline.
 
     Normalizes the data based on the network's format.
     The the fuction send the normalized rows through the align
     and insert phases of the pipeline.
     """
+    import pytest
+
+    # pytest.set_trace()
     log = logging.getLogger("crmprtd")
 
     if network is None:
@@ -59,14 +65,9 @@ def process(connection_string, sample_size, network, is_diagnostic=False):
         )
         raise Exception("No module name given")
 
-    download_stream = sys.stdin.buffer
     norm_mod = get_normalization_module(network)
 
     rows = [row for row in norm_mod.normalize(download_stream)]
-
-    engine = create_engine(connection_string)
-    Session = sessionmaker(engine)
-    sesh = Session()
 
     observations = [
         ob for ob in [align(sesh, row, is_diagnostic) for row in rows] if ob
@@ -132,7 +133,8 @@ def main():
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"
     )
 
-    process(args.connection_string, args.sample_size, args.network, args.diag)
+    sesh = db_session(connection_string)
+    process(sesh, args.sample_size, args.network, args.diag)
 
 
 if __name__ == "__main__":
