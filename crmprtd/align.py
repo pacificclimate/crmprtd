@@ -187,7 +187,9 @@ def get_history(sesh, network_name, native_id, lat, lon, diagnostic=False):
     if histories.count() == 0:
         log.debug("Cound not find native_id %s", native_id)
         if diagnostic:
-            log.debug("In diagnostic mode. Returning from get_history")
+            log.info(
+                f"In diagnostic mode. Skipping insertion of new history entry: {network_name}, {native_id}, {lat}, {lon}"
+            )
             return
         return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
     elif histories.count() == 1:

@@ -29,29 +29,39 @@ import logging
 
 # local
 from pycds import Obs, History, Network, Variable, Station
-from crmprtd.align import get_variable
+from crmprtd.align import get_variable, get_history
+
+
+log = logging.getLogger("crmprtd")
 
 
 def create_variable(sesh, network_name, variable_name, unit):
-    network = sesh.query(Network).filter(Network.name == network_name)
+    network = sesh.query(Network).filter(Network.name == network_name).one()
 
-    return sesh.add(
-        Variable(
-            network=network,
-            name=variable_name,
-            unit=unit
-        )
-    )
+    return Variable(network=network, name=variable_name, unit=unit)
+
 
 def infer(sesh, obs_tuples, diagnostic=False):
 
-    vars_to_create = {}
-    for obs in obs_tuples:
-        variable = get_variable(sesh, obs.network_name, obs.variable_name)
+    # Use a set to filter down to unique tuples
+    vars_to_create = {
+        (obs.network_name, obs.variable_name, obs.unit) for obs in obs_tuples
+    }
+    vars_to_create = [
+        create_variable(sesh, network_name, var_name, unit)
+        for network_name, var_name, unit in vars_to_create
+        if not get_variable(sesh, network_name, var_name)
+    ]
 
-        if not variable:
-            vars_to_create.add((obs.network_name, obs.variable_name, obs.unit))
+    sesh.add_all(vars_to_create)
+    for var in vars_to_create:
+        log.info(
+            f"INSERT INTO meta_vars (network_id, net_var_name, unit) VALUES ({var.network.id}, '{var.name}', '{var.unit}')"
+        )
 
-    vars_to_create = [create_variable(sesh, *attrs) for attrs in vars_to_create]
-
-    print(vars_to_create)
+    # Use a set to filter down to unique tuples
+    hists_to_create = {
+        (obs.network_name, obs.station_id, obs.lat, obs.lon) for obs in obs_tuples
+    }
+    # The poorly named "get_history" function also does inserts as needed
+    hxs = [get_history(sesh, *tup, diagnostic) for tup in hists_to_create]

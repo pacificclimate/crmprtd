@@ -42,9 +42,10 @@ def process_args(parser):
         "-I",
         "--infer",
         default=False,
+        action="store_true",
         help="Run the 'infer' stage of the pipeline, which "
         "determines what metadata insertions could be made based"
-        "on the observed data available"
+        "on the observed data available",
     )
     return parser
 
@@ -53,7 +54,9 @@ def get_normalization_module(network):
     return import_module("crmprtd.{}.normalize".format(network))
 
 
-def process(connection_string, sample_size, network, is_diagnostic=False, infer=False):
+def process(
+    connection_string, sample_size, network, is_diagnostic=False, do_infer=False
+):
     """Executes 3 stages of the data processing pipeline.
 
     Normalizes the data based on the network's format.
@@ -77,9 +80,11 @@ def process(connection_string, sample_size, network, is_diagnostic=False, infer=
     Session = sessionmaker(engine)
     sesh = Session()
 
-    if infer:
-        with sesh.begin_nested():
-            infer(sesh, rows, is_diagnostic)
+    if do_infer:
+        nested = sesh.begin_nested()
+        infer(sesh, rows, is_diagnostic)
+        if is_diagnostic:
+            nested.rollback()
         return
 
     observations = [
@@ -146,7 +151,9 @@ def main():
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"
     )
 
-    process(args.connection_string, args.sample_size, args.network, args.diag, args.infer)
+    process(
+        args.connection_string, args.sample_size, args.network, args.diag, args.infer
+    )
 
 
 if __name__ == "__main__":
