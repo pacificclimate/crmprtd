@@ -53,11 +53,16 @@ def infer(sesh, obs_tuples, diagnostic=False):
         if not get_variable(sesh, network_name, var_name)
     ]
 
+    nested = sesh.begin_nested()
     sesh.add_all(vars_to_create)
     for var in vars_to_create:
         log.info(
             f"INSERT INTO meta_vars (network_id, net_var_name, unit) VALUES ({var.network.id}, '{var.name}', '{var.unit}')"
         )
+    if diagnostic:
+        nested.rollback()
+    else:
+        nested.commit()
 
     # Use a set to filter down to unique tuples
     hists_to_create = {
