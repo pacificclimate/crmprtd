@@ -81,11 +81,7 @@ def process(
     sesh = Session()
 
     if do_infer:
-        nested = sesh.begin_nested()
         infer(sesh, rows, is_diagnostic)
-        if is_diagnostic:
-            nested.rollback()
-        return
 
     observations = [
         ob for ob in [align(sesh, row, is_diagnostic) for row in rows] if ob
