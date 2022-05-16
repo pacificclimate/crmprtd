@@ -26,6 +26,8 @@ from warnings import warn
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
+import dateutil.parser
+
 # Local
 import crmprtd.download
 from crmprtd import common_auth_arguments, logging_args, setup_logging
@@ -35,7 +37,7 @@ log = logging.getLogger(__name__)
 
 def verify_date(datestring, default, label="start_time"):
     try:
-        return datetime.strptime(datestring, "%Y/%m/%d %H:%M:%S")
+        return dateutil.parser.parse(datestring)
     except (ValueError, TypeError):
         warn(
             "Parameter {} '{}' is undefined or unparseable. Using the "
@@ -110,8 +112,7 @@ def main():  # pragma: no cover
         "--start_time",
         help=(
             "Alternate time to use for downloading "
-            "(interpreted with "
-            "strptime(format='Y/m/d H:M:S'). "
+            "(interpreted with dateutil.parser.parse)."
             "Defaults to one hour prior to now"
         ),
     )
@@ -120,8 +121,7 @@ def main():  # pragma: no cover
         "--end_time",
         help=(
             "Alternate time to use for downloading "
-            "(interpreted with "
-            "strptime(format='Y/m/d H:M:S'). "
+            "(interpreted with dateutil.parser.parse)."
             "Defaults to now."
         ),
     )
