@@ -9,7 +9,9 @@ from crmprtd.moti.download import verify_date, download
 def test_verify_date():
     assert verify_date("2020/01/01 00:00:00", None) == datetime.datetime(2020, 1, 1)
     assert verify_date("2020/01/01", None) == datetime.datetime(2020, 1, 1)
-    assert verify_date("January 1 2020 8:21am", None) == datetime.datetime(2020, 1, 1, 8, 21)
+    assert verify_date("January 1 2020 8:21am", None) == datetime.datetime(
+        2020, 1, 1, 8, 21
+    )
 
 
 @pytest.mark.parametrize(("datestring"), (("not-a-datestring"), (None)))
