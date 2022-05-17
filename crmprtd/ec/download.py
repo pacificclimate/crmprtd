@@ -18,6 +18,7 @@ result in data loss.
 import sys
 import logging
 import logging.config
+import dateutil.parser
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
@@ -35,7 +36,7 @@ def download(time, frequency, province, language, baseurl):
     try:
         # Determine time parameter
         if time:
-            time = datetime.strptime(time, "%Y/%m/%d %H:%M:%S")
+            time = dateutil.parser.parse(time)
             log.info("Starting manual run " "using timestamp {0}".format(time))
         else:
             # go back a day
@@ -79,8 +80,7 @@ def main():
         "--time",
         help=(
             "Alternate *UTC* time to use for downloading "
-            "(interpreted using "
-            "format=YYYY/MM/DD HH:MM:SS)."
+            "(interpreted using dateutil.parser.parse)."
             "Defaults to the previous hour/day (depending on"
             " --frequency)."
         ),
