@@ -15,6 +15,7 @@ could result in data loss.
 
 import re
 import datetime
+import dateutil.parser
 import logging
 import urllib.parse
 from io import BytesIO
@@ -122,8 +123,7 @@ def main(partner):
         "--date",
         help=(
             "Alternate date to use for downloading "
-            "(interpreted with "
-            "strptime(format='Y/m/d H:M:S')"
+            "(interpreted with dateutil.parser.parse)."
         ),
     )
     args = parser.parse_args()
@@ -139,7 +139,7 @@ def main(partner):
     if not args.date:
         dl_date = datetime.datetime.now()
     else:
-        dl_date = datetime.datetime.strptime(args.date, "%Y/%m/%d %H:%M:%S")
+        dl_date = dateutil.parser.parse(args.date)
 
     download(
         "https://dd.weather.gc.ca/observations/swob-ml/partners/{}/".format(partner),
