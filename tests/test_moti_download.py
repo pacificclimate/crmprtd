@@ -3,26 +3,7 @@ import datetime
 import pytest
 
 import crmprtd.download
-from crmprtd.moti.download import verify_date, download
-
-
-def test_verify_date():
-    assert verify_date("2020/01/01 00:00:00", None) == datetime.datetime(2020, 1, 1)
-    assert verify_date("2020/01/01", None) == datetime.datetime(2020, 1, 1)
-    assert verify_date("January 1 2020 8:21am", None) == datetime.datetime(
-        2020, 1, 1, 8, 21
-    )
-
-
-@pytest.mark.parametrize(("datestring"), (("not-a-datestring"), (None)))
-def test_verify_date_exception(datestring):
-    default = 1
-    warning = (
-        "Parameter {} '{}' is undefined or unparseable. Using the "
-        "default '{}'".format("", datestring, default)
-    )
-    with pytest.warns(UserWarning, match=warning):
-        assert verify_date(datestring, default, "") == default
+from crmprtd.moti.download import download
 
 
 now = datetime.datetime.now().replace(microsecond=0)
