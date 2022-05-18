@@ -8,6 +8,9 @@ from functools import wraps
 import yaml
 import requests
 
+import dateutil.parser
+from warnings import warn
+
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
     """Retry calling the decorated function using an exponential backoff.
@@ -163,3 +166,14 @@ def https_download(url, scheme="https", log=None, auth=None, payload={}):
 
     for line in resp.iter_content(chunk_size=None):
         sys.stdout.buffer.write(line)
+
+
+def verify_date(datestring, default, label="time"):
+    try:
+        return dateutil.parser.parse(datestring)
+    except (ValueError, TypeError):
+        warn(
+            "Parameter {} '{}' is undefined or unparseable. Using the "
+            "default '{}'".format(label, datestring, default)
+        )
+        return default

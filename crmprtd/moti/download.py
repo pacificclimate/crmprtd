@@ -26,24 +26,12 @@ from warnings import warn
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
-import dateutil.parser
 
 # Local
 import crmprtd.download
 from crmprtd import common_auth_arguments, logging_args, setup_logging
 
 log = logging.getLogger(__name__)
-
-
-def verify_date(datestring, default, label="start_time"):
-    try:
-        return dateutil.parser.parse(datestring)
-    except (ValueError, TypeError):
-        warn(
-            "Parameter {} '{}' is undefined or unparseable. Using the "
-            "default '{}'".format(label, datestring, default)
-        )
-        return default
 
 
 def utcnow():
@@ -67,10 +55,10 @@ def download(
             )
 
         now = utcnow()
-        start_time = verify_date(
+        start_time = crmprtd.download.verify_date(
             start_time, now - timedelta(days=0, seconds=3600), "start_time"
         )
-        end_time = verify_date(end_time, now, "end_time")
+        end_time = crmprtd.download.verify_date(end_time, now, "end_time")
 
         log.info(
             "Starting manual run using timestamps {0} {1}".format(start_time, end_time)
