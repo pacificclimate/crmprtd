@@ -63,6 +63,10 @@ SWOB_PARTNERS = (
     "nt_water",
     "yt_gov",
     "yt_water",
+    "yt_firewx",
+    "yt_avalanche",
+    "dfo_ccg_lighthouse"
+
 )
 
 NETWORKS = SWOB_PARTNERS + (
@@ -72,6 +76,9 @@ NETWORKS = SWOB_PARTNERS + (
     "moti",
     "wamr",
     "wmb",
+    "yt",
+    "dfo"
+
 )
 
 Row = namedtuple(
