@@ -24,7 +24,7 @@ from argparse import ArgumentParser
 from lxml import html
 import requests
 
-from crmprtd.download import https_download
+from crmprtd.download import https_download, verify_date
 from crmprtd import logging_args, setup_logging
 
 
@@ -139,7 +139,9 @@ def main(partner):
     if not args.date:
         dl_date = datetime.datetime.now()
     else:
-        dl_date = dateutil.parser.parse(args.date)
+        dl_date = crmprtd.download.verify_date(
+            args.date, datetime.datetime.now(), "date"
+        )
 
     download(
         "https://dd.weather.gc.ca/observations/swob-ml/partners/{}/".format(partner),
