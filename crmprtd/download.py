@@ -3,13 +3,12 @@ import time
 import ftplib
 import logging
 import csv
+import dateutil.parser
+from warnings import warn
 from functools import wraps
 
 import yaml
 import requests
-
-import dateutil.parser
-from warnings import warn
 
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
@@ -168,7 +167,7 @@ def https_download(url, scheme="https", log=None, auth=None, payload={}):
         sys.stdout.buffer.write(line)
 
 
-def verify_date(datestring, default, label="time"):
+def verify_date(datestring, default, label="date/time"):
     try:
         return dateutil.parser.parse(datestring)
     except (ValueError, TypeError):

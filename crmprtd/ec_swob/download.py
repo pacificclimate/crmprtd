@@ -15,7 +15,6 @@ could result in data loss.
 
 import re
 import datetime
-import dateutil.parser
 import logging
 import urllib.parse
 from io import BytesIO

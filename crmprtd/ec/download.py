@@ -18,14 +18,13 @@ result in data loss.
 import sys
 import logging
 import logging.config
-import dateutil.parser
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
 # Local
 from crmprtd.ec import makeurl
 from crmprtd import setup_logging, logging_args
-from crmprtd.download import https_download
+from crmprtd.download import https_download, verify_date
 
 log = logging.getLogger(__name__)
 
@@ -35,12 +34,15 @@ def download(time, frequency, province, language, baseurl):
 
     try:
         # Determine time parameter
+        deltat = timedelta(1 / 24.0) if frequency == "hourly" else timedelta(1)
+
         if time:
-            time = dateutil.parser.parse(time)
+            time = crmprtd.download.verify_date(
+                time, datetime.utcnow() - deltat, "time"
+            )
             log.info("Starting manual run " "using timestamp {0}".format(time))
         else:
             # go back a day
-            deltat = timedelta(1 / 24.0) if frequency == "hourly" else timedelta(1)
             time = datetime.utcnow() - deltat
             log.info("Starting automatic run " "using timestamp {0}".format(time))
 
