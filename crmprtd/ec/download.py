@@ -40,11 +40,11 @@ def download(time, frequency, province, language, baseurl):
             time = crmprtd.download.verify_date(
                 time, datetime.utcnow() - deltat, "time"
             )
-            log.info("Starting manual run " "using timestamp {0}".format(time))
+            log.info("Starting manual run " f"using timestamp {time}")
         else:
             # go back a day
             time = datetime.utcnow() - deltat
-            log.info("Starting automatic run " "using timestamp {0}".format(time))
+            log.info("Starting automatic run " f"using timestamp {time}")
 
         # Construct and download the xml
         url = makeurl(frequency, province, language, time, baseurl)

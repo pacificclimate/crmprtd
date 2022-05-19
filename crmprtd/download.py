@@ -172,7 +172,7 @@ def verify_date(datestring, default, label="date/time"):
         return dateutil.parser.parse(datestring)
     except (ValueError, TypeError):
         warn(
-            "Parameter {} '{}' is undefined or unparseable. Using the "
-            "default '{}'".format(label, datestring, default)
+            f"Parameter {label} '{datestring}' is undefined or unparseable. Using the "
+            f"default '{default}'"
         )
         return default

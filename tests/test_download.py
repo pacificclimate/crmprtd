@@ -48,8 +48,8 @@ def test_verify_date(datestring, default):
 def test_verify_date_exception(datestring):
     default = 1
     warning = (
-        "Parameter {} '{}' is undefined or unparseable. Using the "
-        "default '{}'".format("", datestring, default)
+        f"Parameter  '{datestring}' is undefined or unparseable. Using the "
+        f"default '{default}'"
     )
     with pytest.warns(UserWarning, match=warning):
         assert verify_date(datestring, default, "") == default
