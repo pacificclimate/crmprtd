@@ -173,6 +173,6 @@ def verify_date(datestring, default, label="date/time"):
     except (ValueError, TypeError):
         warn(
             f"Parameter {label} '{datestring}' is undefined or unparseable. Using the "
-            f"default '{default}'"
+            f"default '{default:%Y-%m-%d %H:%M:%S}'"
         )
         return default

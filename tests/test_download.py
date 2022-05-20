@@ -46,10 +46,10 @@ def test_verify_date(datestring, default):
 
 @pytest.mark.parametrize(("datestring"), (("not-a-datestring"), (None)))
 def test_verify_date_exception(datestring):
-    default = 1
+    default = datetime.datetime.now()
     warning = (
         f"Parameter  '{datestring}' is undefined or unparseable. Using the "
-        f"default '{default}'"
+        f"default '{default:%Y-%m-%d %H:%M:%S}'"
     )
     with pytest.warns(UserWarning, match=warning):
         assert verify_date(datestring, default, "") == default
