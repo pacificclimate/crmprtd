@@ -123,6 +123,7 @@ def main(partner):
         help=(
             "Alternate date to use for downloading "
             "(interpreted with dateutil.parser.parse)."
+            "Defaults to now."
         ),
     )
     args = parser.parse_args()
@@ -138,9 +139,7 @@ def main(partner):
     if not args.date:
         dl_date = datetime.datetime.now()
     else:
-        dl_date = crmprtd.download.verify_date(
-            args.date, datetime.datetime.now(), "date"
-        )
+        dl_date = verify_date(args.date, datetime.datetime.now(), "date")
 
     download(
         "https://dd.weather.gc.ca/observations/swob-ml/partners/{}/".format(partner),

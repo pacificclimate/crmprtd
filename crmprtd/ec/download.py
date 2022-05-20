@@ -37,9 +37,7 @@ def download(time, frequency, province, language, baseurl):
         deltat = timedelta(1 / 24.0) if frequency == "hourly" else timedelta(1)
 
         if time:
-            time = crmprtd.download.verify_date(
-                time, datetime.utcnow() - deltat, "time"
-            )
+            time = verify_date(time, datetime.utcnow() - deltat, "time")
             log.info("Starting manual run " f"using timestamp {time}")
         else:
             # go back a day
