@@ -43,6 +43,7 @@ def get_url_list(
 
     # Match something like this: 2019-10-18-1600-bc-env-asw-1a02p-AUTO-swob.xml
     search_pattern = re.compile(r"{}.*swob\.xml".format(date.strftime("%Y-%m-%d-%H")))
+    search_pattern_dfo = re.compile(r"{}.*SWOB\.xml".format(date.strftime("%Y%m%dT%H30Z")))
 
     while queue:
         # pop the first item off the queue and download
@@ -69,7 +70,7 @@ def get_url_list(
 
         # either return them or add to the queue
         for url in urls:
-            if search_pattern.search(url):
+            if search_pattern_dfo.search(url,re.IGNORECASE):
                 yield url
             elif url not in seen and not url.endswith("xml"):
                 queue.append(url)
@@ -82,7 +83,7 @@ def match_date(url, date):
     """
     has_a_date = re.compile(r"[0-9]{8}")
     has_this_date = re.compile(date.strftime("%Y%m%d"))
-    return bool(has_a_date.search(url)) == bool(has_this_date.search(url))
+    return bool(has_a_date.search(url,re.IGNORECASE)) == bool(has_this_date.search(url))
 
 
 def download(base_url, date):
