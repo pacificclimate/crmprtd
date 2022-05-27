@@ -37,6 +37,20 @@ def process_args(parser):
         "The name will be used for a dynamic import of "
         "the module's normalization function.",
     )
+    parser.add_argument(
+        "-S",
+        "--start_time",
+        help="Optional start time to use for processing "
+        "(interpreted with dateutil.parser.parse)."
+        "Defaults to ",
+    )
+    parser.add_argument(
+        "-E",
+        "--end_time",
+        help="Optional end time to use for processing "
+        "(interpreted with dateutil.parser.parse)."
+        "Defaults to now.",
+    )
     return parser
 
 
@@ -44,7 +58,9 @@ def get_normalization_module(network):
     return import_module("crmprtd.{}.normalize".format(network))
 
 
-def process(connection_string, sample_size, network, is_diagnostic=False):
+def process(
+    connection_string, sample_size, network, start_time, end_time, is_diagnostic=False
+):
     """Executes 3 stages of the data processing pipeline.
 
     Normalizes the data based on the network's format.
@@ -132,7 +148,14 @@ def main():
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"
     )
 
-    process(args.connection_string, args.sample_size, args.network, args.diag)
+    process(
+        args.connection_string,
+        args.sample_size,
+        args.network,
+        args.start_time,
+        args.end_time,
+        args.diag,
+    )
 
 
 if __name__ == "__main__":
