@@ -4,9 +4,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import logging
 from argparse import ArgumentParser
+from datetime import datetime
+from dateutil import relativedelta
 
 from crmprtd.align import align
 from crmprtd.insert import insert
+from crmprtd.download import verify_date
 from crmprtd import logging_args, setup_logging, NETWORKS
 
 
@@ -39,14 +42,14 @@ def process_args(parser):
     )
     parser.add_argument(
         "-S",
-        "--start_time",
+        "--start_date",
         help="Optional start time to use for processing "
         "(interpreted with dateutil.parser.parse)."
-        "Defaults to ",
+        "Defaults to one month prior to now.",
     )
     parser.add_argument(
         "-E",
-        "--end_time",
+        "--end_date",
         help="Optional end time to use for processing "
         "(interpreted with dateutil.parser.parse)."
         "Defaults to now.",
@@ -84,9 +87,19 @@ def process(
     Session = sessionmaker(engine)
     sesh = Session()
 
-    observations = [
-        ob for ob in [align(sesh, row, is_diagnostic) for row in rows] if ob
-    ]
+    # If a start and end date were given then filter observations
+    # Or if just a start date was given. This won't work
+    # Because start and end date have defaults so the wont be empty
+    if (start_date and end_date) or start_date:
+        observations = [
+            ob
+            for ob in [align(sesh, row, is_diagnostic) for row in rows]
+            if ob and (start_date <= ob.time <= end_date)
+        ]
+    else:
+        observations = [
+            ob for ob in [align(sesh, row, is_diagnostic) for row in rows] if ob
+        ]
 
     if is_diagnostic:
         for obs in observations:
@@ -147,6 +160,15 @@ def main():
     setup_logging(
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"
     )
+
+    # Right now start date defaults to one month earlier and
+    # end date defaults to now, but not sure if there
+    # Should even be a default...
+    end = datetime.now()
+    start = end - relativedelta.relativedelta(months=1)
+
+    args.start_date = verify_date(args.start_date, start, "start date")
+    args.end_date = verify_date(args.end_date, end, "end date")
 
     process(
         args.connection_string,
