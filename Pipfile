@@ -15,7 +15,7 @@ pycds = "==2.2"
 python-dateutil = "==2.8"
 pytz = "==2019.3"
 PyYAML = "==5.4"
-SQLAlchemy = "==1.3.10"
+SQLAlchemy = "==1.4.*"
 pysftp = "==0.2.8"
 
 [dev-packages]
