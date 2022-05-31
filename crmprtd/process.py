@@ -44,15 +44,13 @@ def process_args(parser):
         "-S",
         "--start_date",
         help="Optional start time to use for processing "
-        "(interpreted with dateutil.parser.parse)."
-        "Defaults to one month prior to now.",
+        "(interpreted with dateutil.parser.parse).",
     )
     parser.add_argument(
         "-E",
         "--end_date",
         help="Optional end time to use for processing "
-        "(interpreted with dateutil.parser.parse)."
-        "Defaults to now.",
+        "(interpreted with dateutil.parser.parse).",
     )
     return parser
 
@@ -62,7 +60,7 @@ def get_normalization_module(network):
 
 
 def process(
-    connection_string, sample_size, network, start_time, end_time, is_diagnostic=False
+    connection_string, sample_size, network, start_date, end_date, is_diagnostic=False
 ):
     """Executes 3 stages of the data processing pipeline.
 
@@ -87,19 +85,11 @@ def process(
     Session = sessionmaker(engine)
     sesh = Session()
 
-    # If a start and end date were given then filter observations
-    # Or if just a start date was given. This won't work
-    # Because start and end date have defaults so the wont be empty
-    if (start_date and end_date) or start_date:
-        observations = [
-            ob
-            for ob in [align(sesh, row, is_diagnostic) for row in rows]
-            if ob and (start_date <= ob.time <= end_date)
-        ]
-    else:
-        observations = [
-            ob for ob in [align(sesh, row, is_diagnostic) for row in rows] if ob
-        ]
+    observations = [
+        ob
+        for ob in [align(sesh, row, is_diagnostic) for row in rows]
+        if ob and (start_date <= ob.time <= end_date)
+    ]
 
     if is_diagnostic:
         for obs in observations:
@@ -161,21 +151,15 @@ def main():
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"
     )
 
-    # Right now start date defaults to one month earlier and
-    # end date defaults to now, but not sure if there
-    # Should even be a default...
-    end = datetime.now()
-    start = end - relativedelta.relativedelta(months=1)
-
-    args.start_date = verify_date(args.start_date, start, "start date")
-    args.end_date = verify_date(args.end_date, end, "end date")
+    args.start_date = verify_date(args.start_date, datetime.min, "start date")
+    args.end_date = verify_date(args.end_date, datetime.max, "end date")
 
     process(
         args.connection_string,
         args.sample_size,
         args.network,
-        args.start_time,
-        args.end_time,
+        args.start_date,
+        args.end_date,
         args.diag,
     )
 
