@@ -38,7 +38,7 @@ def download(username, password, auth_fname, auth_key, ftp_server, ftp_file):
         ftpreader = ftp_connect(WMBFTPReader, ftp_server, ftp_file, log, auth)
 
         with SpooledTemporaryFile(
-            max_size=int(os.environ.get("CRMPRTD_MAX_CACHE", 2 ** 20)), mode="r+"
+            max_size=int(os.environ.get("CRMPRTD_MAX_CACHE", 2**20)), mode="r+"
         ) as tempfile:
 
             def callback(line):

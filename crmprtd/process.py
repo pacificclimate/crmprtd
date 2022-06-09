@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 
 from crmprtd.align import align
 from crmprtd.insert import insert
+from crmprtd.infer import infer
 from crmprtd import logging_args, setup_logging, NETWORKS
 
 
@@ -37,6 +38,15 @@ def process_args(parser):
         "The name will be used for a dynamic import of "
         "the module's normalization function.",
     )
+    parser.add_argument(
+        "-I",
+        "--infer",
+        default=False,
+        action="store_true",
+        help="Run the 'infer' stage of the pipeline, which "
+        "determines what metadata insertions could be made based"
+        "on the observed data available",
+    )
     return parser
 
 
@@ -44,7 +54,9 @@ def get_normalization_module(network):
     return import_module("crmprtd.{}.normalize".format(network))
 
 
-def process(connection_string, sample_size, network, is_diagnostic=False):
+def process(
+    connection_string, sample_size, network, is_diagnostic=False, do_infer=False
+):
     """Executes 3 stages of the data processing pipeline.
 
     Normalizes the data based on the network's format.
@@ -67,6 +79,9 @@ def process(connection_string, sample_size, network, is_diagnostic=False):
     engine = create_engine(connection_string)
     Session = sessionmaker(engine)
     sesh = Session()
+
+    if do_infer:
+        infer(sesh, rows, is_diagnostic)
 
     observations = [
         ob for ob in [align(sesh, row, is_diagnostic) for row in rows] if ob
@@ -132,7 +147,9 @@ def main():
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"
     )
 
-    process(args.connection_string, args.sample_size, args.network, args.diag)
+    process(
+        args.connection_string, args.sample_size, args.network, args.diag, args.infer
+    )
 
 
 if __name__ == "__main__":
