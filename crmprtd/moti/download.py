@@ -26,22 +26,12 @@ from warnings import warn
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
+
 # Local
 import crmprtd.download
 from crmprtd import common_auth_arguments, logging_args, setup_logging
 
 log = logging.getLogger(__name__)
-
-
-def verify_date(datestring, default, label="start_time"):
-    try:
-        return datetime.strptime(datestring, "%Y/%m/%d %H:%M:%S")
-    except (ValueError, TypeError):
-        warn(
-            "Parameter {} '{}' is undefined or unparseable. Using the "
-            "default '{}'".format(label, datestring, default)
-        )
-        return default
 
 
 def utcnow():
@@ -65,10 +55,10 @@ def download(
             )
 
         now = utcnow()
-        start_time = verify_date(
+        start_time = crmprtd.download.verify_date(
             start_time, now - timedelta(days=0, seconds=3600), "start_time"
         )
-        end_time = verify_date(end_time, now, "end_time")
+        end_time = crmprtd.download.verify_date(end_time, now, "end_time")
 
         log.info(
             "Starting manual run using timestamps {0} {1}".format(start_time, end_time)
@@ -110,8 +100,7 @@ def main():  # pragma: no cover
         "--start_time",
         help=(
             "Alternate time to use for downloading "
-            "(interpreted with "
-            "strptime(format='Y/m/d H:M:S'). "
+            "(interpreted with dateutil.parser.parse)."
             "Defaults to one hour prior to now"
         ),
     )
@@ -120,8 +109,7 @@ def main():  # pragma: no cover
         "--end_time",
         help=(
             "Alternate time to use for downloading "
-            "(interpreted with "
-            "strptime(format='Y/m/d H:M:S'). "
+            "(interpreted with dateutil.parser.parse)."
             "Defaults to now."
         ),
     )

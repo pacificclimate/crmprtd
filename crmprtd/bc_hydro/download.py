@@ -24,6 +24,7 @@ from contextlib import contextmanager
 from dateutil import relativedelta
 import dateutil.parser
 
+from crmprtd.download import verify_date
 from crmprtd import logging_args, setup_logging
 
 log = logging.getLogger(__name__)
@@ -131,8 +132,6 @@ def main():  # pragma: no cover
     parser.add_argument(
         "-s",
         "--start_date",
-        default=start,
-        type=dateutil.parser.parse,
         help=(
             "Optional start time to use for downloading "
             "(interpreted with dateutil.parser.parse). "
@@ -142,8 +141,6 @@ def main():  # pragma: no cover
     parser.add_argument(
         "-e",
         "--end_date",
-        default=end,
-        type=dateutil.parser.parse,
         help=(
             "Optional end time to use for downloading "
             "(interpreted with dateutil.parser.parse). "
@@ -159,6 +156,9 @@ def main():  # pragma: no cover
         args.log_level,
         "crmprtd.bc_hydro",
     )
+
+    args.start_date = verify_date(args.start_date, start, "start date")
+    args.end_date = verify_date(args.end_date, end, "end date")
 
     download(
         args.username,

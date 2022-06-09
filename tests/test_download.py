@@ -1,6 +1,7 @@
 import pytest
+import datetime
 
-from crmprtd.download import extract_auth, https_download
+from crmprtd.download import extract_auth, https_download, verify_date
 
 
 @pytest.mark.parametrize(
@@ -33,3 +34,22 @@ def test_https_download_404(requests_mock):
     requests_mock.register_uri("GET", "https://test.com", status_code=404)
     with pytest.raises(IOError):
         https_download("https://test.com")
+
+
+@pytest.mark.parametrize(
+    ("datestring", "default"),
+    (("2020/01/01 00:00:00", None), ("2020/01/01", None), ("January 1 2020 0am", None)),
+)
+def test_verify_date(datestring, default):
+    assert verify_date(datestring, default, "") == datetime.datetime(2020, 1, 1)
+
+
+@pytest.mark.parametrize(("datestring"), (("not-a-datestring"), (None)))
+def test_verify_date_exception(datestring):
+    default = datetime.datetime.now()
+    warning = (
+        f"Parameter  '{datestring}' is undefined or unparseable. Using the "
+        f"default '{default:%Y-%m-%d %H:%M:%S}'"
+    )
+    with pytest.warns(UserWarning, match=warning):
+        assert verify_date(datestring, default, "") == default

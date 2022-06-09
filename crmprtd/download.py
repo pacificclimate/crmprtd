@@ -3,6 +3,8 @@ import time
 import ftplib
 import logging
 import csv
+import dateutil.parser
+from warnings import warn
 from functools import wraps
 
 import yaml
@@ -163,3 +165,14 @@ def https_download(url, scheme="https", log=None, auth=None, payload={}):
 
     for line in resp.iter_content(chunk_size=None):
         sys.stdout.buffer.write(line)
+
+
+def verify_date(datestring, default, label="date/time"):
+    try:
+        return dateutil.parser.parse(datestring)
+    except (ValueError, TypeError):
+        warn(
+            f"Parameter {label} '{datestring}' is undefined or unparseable. Using the "
+            f"default '{default:%Y-%m-%d %H:%M:%S}'"
+        )
+        return default
