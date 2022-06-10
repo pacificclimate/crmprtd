@@ -8,7 +8,7 @@ def strip_stn_prefix(stn_id):
 def normalize(file_stream):
     yield from normalize_swob(
         file_stream,
-        "YTA",
+        "YAA",
         station_id_attr="msc_id",
         station_id_xform=strip_stn_prefix,
     )
