@@ -10,6 +10,7 @@ from dateutil import relativedelta
 from crmprtd.align import align
 from crmprtd.insert import insert
 from crmprtd.download import verify_date
+from crmprtd.infer import infer
 from crmprtd import logging_args, setup_logging, NETWORKS
 
 
@@ -52,6 +53,15 @@ def process_args(parser):
         help="Optional end time to use for processing "
         "(interpreted with dateutil.parser.parse).",
     )
+    parser.add_argument(
+        "-I",
+        "--infer",
+        default=False,
+        action="store_true",
+        help="Run the 'infer' stage of the pipeline, which "
+        "determines what metadata insertions could be made based"
+        "on the observed data available",
+    )
     return parser
 
 
@@ -60,7 +70,13 @@ def get_normalization_module(network):
 
 
 def process(
-    connection_string, sample_size, network, start_date, end_date, is_diagnostic=False
+    connection_string,
+    sample_size,
+    network,
+    start_date,
+    end_date,
+    is_diagnostic=False,
+    do_infer=False,
 ):
     """Executes 3 stages of the data processing pipeline.
 
@@ -84,6 +100,9 @@ def process(
     engine = create_engine(connection_string)
     Session = sessionmaker(engine)
     sesh = Session()
+
+    if do_infer:
+        infer(sesh, rows, is_diagnostic)
 
     observations = [
         ob
@@ -161,6 +180,7 @@ def main():
         args.start_date,
         args.end_date,
         args.diag,
+        args.infer,
     )
 
 

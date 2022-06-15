@@ -56,7 +56,6 @@ def crmp_session(postgis_session):
 
     engine = postgis_session.get_bind()
     pycds.Base.metadata.create_all(bind=engine)
-    pycds.DeferredBase.metadata.create_all(bind=engine)
 
     logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
     yield postgis_session

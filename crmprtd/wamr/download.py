@@ -41,7 +41,7 @@ def download(ftp_server, ftp_dir):
         ftpreader = ftp_connect(WAMRFTPReader, ftp_server, ftp_dir, log)
 
         with SpooledTemporaryFile(
-            max_size=int(os.environ.get("CRMPRTD_MAX_CACHE", 2 ** 20)), mode="r+"
+            max_size=int(os.environ.get("CRMPRTD_MAX_CACHE", 2**20)), mode="r+"
         ) as tempfile:
 
             for filename in ftpreader.filenames:
