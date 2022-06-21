@@ -1,4 +1,5 @@
 import sys
+import pytz
 from importlib import import_module
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -170,8 +171,12 @@ def main():
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"
     )
 
-    args.start_date = verify_date(args.start_date, datetime.min, "start date")
-    args.end_date = verify_date(args.end_date, datetime.max, "end date")
+    utc = pytz.utc
+
+    args.start_date = utc.localize(
+        verify_date(args.start_date, datetime.min, "start date")
+    )
+    args.end_date = utc.localize(verify_date(args.end_date, datetime.max, "end date"))
 
     process(
         args.connection_string,
