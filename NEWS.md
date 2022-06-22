@@ -1,5 +1,17 @@
 # News / Release Notes
 
+## 3.4.0
+
+*22-June-2022*
+
+* Adds support for several new networks from ECCC DataMart
+  * Yukon Avalanche
+  * Yukon Fire Weather
+  * DFO Lighthouses
+* Adds new optional "infer" phase to the pipeline to detect missing
+  metadata based on a set of observations
+* Standardizes time arguments across all download scripts
+
 ## 3.3.0
 
 *14-April-2022*
