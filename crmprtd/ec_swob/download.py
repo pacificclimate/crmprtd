@@ -45,7 +45,9 @@ def get_url_list(
     # or this from DFO: 20220525T0230Z_DFO-CCG_SWOB_1060901.xml
     datep_standard = date.strftime("%Y-%m-%d-%H")
     datep_dfo = date.strftime("%Y%m%dT%H30Z")
-    search_pattern = re.compile(rf"({datep_standard}|{datep_dfo}).*swob.*\.xml", re.IGNORECASE)
+    search_pattern = re.compile(
+        rf"({datep_standard}|{datep_dfo}).*swob.*\.xml", re.IGNORECASE
+    )
 
     while queue:
         # pop the first item off the queue and download
@@ -85,9 +87,7 @@ def match_date(url, date):
     """
     has_a_date = re.compile(r"[0-9]{8}")
     has_this_date = re.compile(date.strftime("%Y%m%d"))
-    return bool(has_a_date.search(url)) == bool(
-        has_this_date.search(url)
-    )
+    return bool(has_a_date.search(url)) == bool(has_this_date.search(url))
 
 
 def download(base_url, date):

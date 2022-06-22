@@ -65,19 +65,10 @@ SWOB_PARTNERS = (
     "yt_water",
     "yt_firewx",
     "yt_avalanche",
-    "dfo_ccg_lighthouse"
-
+    "dfo_ccg_lighthouse",
 )
 
-NETWORKS = SWOB_PARTNERS + (
-    "bc_hydro",
-    "crd",
-    "ec",
-    "moti",
-    "wamr",
-    "wmb"
-
-)
+NETWORKS = SWOB_PARTNERS + ("bc_hydro", "crd", "ec", "moti", "wamr", "wmb")
 
 Row = namedtuple(
     "Row",
