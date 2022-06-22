@@ -42,9 +42,7 @@ def get_url_list(
     sesh = requests.Session()
 
     # Match something like this: 2019-10-18-1600-bc-env-asw-1a02p-AUTO-swob.xml
-  #  search_pattern = re.compile(r"{}.*swob\.xml".format(date.strftime("%Y-%m-%d-%H")))
-  #  search_pattern_dfo = re.compile(rf"{date.strftime('%Y%m%dT%H30Z')}.*SWOB.*\.xml")
-    
+    # or this from DFO: 20220525T0230Z_DFO-CCG_SWOB_1060901.xml
     datep_standard = date.strftime("%Y-%m-%d-%H")
     datep_dfo = date.strftime("%Y%m%dT%H30Z")
     search_pattern = re.compile(rf"({datep_standard}|{datep_dfo}).*swob.*\.xml", re.IGNORECASE)
