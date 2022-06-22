@@ -41,14 +41,6 @@ def get_url_list(
     queue = [base_url]
     sesh = requests.Session()
 
-    # Match something like this: 2019-10-18-1600-bc-env-asw-1a02p-AUTO-swob.xml
-    # or this from DFO: 20220525T0230Z_DFO-CCG_SWOB_1060901.xml
-    datep_standard = date.strftime("%Y-%m-%d-%H")
-    datep_dfo = date.strftime("%Y%m%dT%H30Z")
-    search_pattern = re.compile(
-        rf"({datep_standard}|{datep_dfo}).*swob.*\.xml", re.IGNORECASE
-    )
-
     while queue:
         # pop the first item off the queue and download
         base_url = queue.pop(0)
@@ -74,11 +66,24 @@ def get_url_list(
 
         # either return them or add to the queue
         for url in urls:
-            if search_pattern.search(url):
+            if match_swob_xml_url(url, date):
                 yield url
             elif url not in seen and not url.endswith("xml"):
                 queue.append(url)
             seen.add(url)
+
+
+def match_swob_xml_url(url, date):
+    """Match something like this: 2019-10-18-1600-bc-env-asw-1a02p-AUTO-swob.xml
+    or this from DFO: 20220525T0230Z_DFO-CCG_SWOB_1060901.xml
+    Returns an re.match object on success, None on failure
+    """
+    datep_standard = date.strftime("%Y-%m-%d-%H")
+    datep_dfo = date.strftime("%Y%m%dT%H30Z")
+    search_pattern = re.compile(
+        rf"({datep_standard}|{datep_dfo}).*swob.*\.xml", re.IGNORECASE
+    )
+    return search_pattern.search(url)
 
 
 def match_date(url, date):
