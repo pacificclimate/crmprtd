@@ -42,8 +42,12 @@ def get_url_list(
     sesh = requests.Session()
 
     # Match something like this: 2019-10-18-1600-bc-env-asw-1a02p-AUTO-swob.xml
-    search_pattern = re.compile(r"{}.*swob\.xml".format(date.strftime("%Y-%m-%d-%H")))
-    search_pattern_dfo = re.compile(rf"{date.strftime('%Y%m%dT%H30Z')}.*SWOB.*\.xml")
+  #  search_pattern = re.compile(r"{}.*swob\.xml".format(date.strftime("%Y-%m-%d-%H")))
+  #  search_pattern_dfo = re.compile(rf"{date.strftime('%Y%m%dT%H30Z')}.*SWOB.*\.xml")
+    
+    datep_standard = date.strftime("%Y-%m-%d-%H")
+    datep_dfo = date.strftime("%Y%m%dT%H30Z")
+    search_pattern = re.compile(rf"({datep_standard}|{datep_dfo}).*swob.*\.xml", re.IGNORECASE)
 
     while queue:
         # pop the first item off the queue and download
@@ -70,7 +74,7 @@ def get_url_list(
 
         # either return them or add to the queue
         for url in urls:
-            if search_pattern_dfo.search(url) or search_pattern.search(url):
+            if search_pattern.search(url):
                 yield url
             elif url not in seen and not url.endswith("xml"):
                 queue.append(url)
@@ -83,7 +87,7 @@ def match_date(url, date):
     """
     has_a_date = re.compile(r"[0-9]{8}")
     has_this_date = re.compile(date.strftime("%Y%m%d"))
-    return bool(has_a_date.search(url, re.IGNORECASE)) == bool(
+    return bool(has_a_date.search(url)) == bool(
         has_this_date.search(url)
     )
 

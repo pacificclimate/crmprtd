@@ -75,9 +75,7 @@ NETWORKS = SWOB_PARTNERS + (
     "ec",
     "moti",
     "wamr",
-    "wmb",
-    "yt",
-    "dfo"
+    "wmb"
 
 )
 
