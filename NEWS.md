@@ -1,5 +1,12 @@
 # News / Release Notes
 
+## 3.5.0
+
+*24-June-2022*
+
+* Implements optional time range selection to process script for a
+  pre-filter before insertion
+
 ## 3.4.0
 
 *22-June-2022*
