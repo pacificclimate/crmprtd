@@ -1,8 +1,8 @@
-import os
 import pytz
 import pytest
 import logging
 from datetime import datetime
+from pkg_resources import resource_filename
 
 from pycds import Network
 from crmprtd.download import verify_date
@@ -29,10 +29,7 @@ def test_process_date(
     start_date = utc.localize(verify_date(start_date, datetime.min, "start date"))
     end_date = utc.localize(verify_date(end_date, datetime.max, "end date"))
 
-    script_dir = os.path.dirname(__file__)
-    forestry_data = open(
-        os.path.join(script_dir, "..", "crmprtd", "data", "forestry_data")
-    )
+    forestry_data = open(resource_filename("crmprtd", "data/forestry_data.xml"))
     monkeypatch.setattr("sys.stdin", forestry_data)
 
     crmp_session.add(Network(name="FLNRO-WMB"))

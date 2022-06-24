@@ -15,7 +15,7 @@ from crmprtd.infer import infer
 from crmprtd import logging_args, setup_logging, NETWORKS
 
 
-def process_args(parser):
+def process_args(parser):  # pragma: no cover
     parser.add_argument(
         "-c", "--connection_string", help="PostgreSQL connection string", required=True
     )
@@ -131,7 +131,7 @@ def run_data_pipeline(
     cache_file,
     connection_string,
     sample_size,
-):
+):  # pragma: no cover
     """Executes all stages of the data processing pipeline.
 
     Downloads the data, according to the download arguments

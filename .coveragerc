@@ -18,7 +18,7 @@
         speed_test/
 
 [report]
-    fail_under = 77.0
+    fail_under = 80.0
 exclude_lines =
     pragma: no cover
     main()
