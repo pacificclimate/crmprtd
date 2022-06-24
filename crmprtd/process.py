@@ -1,17 +1,21 @@
 import sys
+import pytz
 from importlib import import_module
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import logging
 from argparse import ArgumentParser
+from datetime import datetime
+from dateutil import relativedelta
 
 from crmprtd.align import align
 from crmprtd.insert import insert
+from crmprtd.download import verify_date
 from crmprtd.infer import infer
 from crmprtd import logging_args, setup_logging, NETWORKS
 
 
-def process_args(parser):
+def process_args(parser):  # pragma: no cover
     parser.add_argument(
         "-c", "--connection_string", help="PostgreSQL connection string", required=True
     )
@@ -39,6 +43,18 @@ def process_args(parser):
         "the module's normalization function.",
     )
     parser.add_argument(
+        "-S",
+        "--start_date",
+        help="Optional start time to use for processing "
+        "(interpreted with dateutil.parser.parse).",
+    )
+    parser.add_argument(
+        "-E",
+        "--end_date",
+        help="Optional end time to use for processing "
+        "(interpreted with dateutil.parser.parse).",
+    )
+    parser.add_argument(
         "-I",
         "--infer",
         default=False,
@@ -55,7 +71,13 @@ def get_normalization_module(network):
 
 
 def process(
-    connection_string, sample_size, network, is_diagnostic=False, do_infer=False
+    connection_string,
+    sample_size,
+    network,
+    start_date,
+    end_date,
+    is_diagnostic=False,
+    do_infer=False,
 ):
     """Executes 3 stages of the data processing pipeline.
 
@@ -84,7 +106,9 @@ def process(
         infer(sesh, rows, is_diagnostic)
 
     observations = [
-        ob for ob in [align(sesh, row, is_diagnostic) for row in rows] if ob
+        ob
+        for ob in [align(sesh, row, is_diagnostic) for row in rows]
+        if ob and (start_date <= ob.time <= end_date)
     ]
 
     if is_diagnostic:
@@ -107,7 +131,7 @@ def run_data_pipeline(
     cache_file,
     connection_string,
     sample_size,
-):
+):  # pragma: no cover
     """Executes all stages of the data processing pipeline.
 
     Downloads the data, according to the download arguments
@@ -147,8 +171,21 @@ def main():
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"
     )
 
+    utc = pytz.utc
+
+    args.start_date = utc.localize(
+        verify_date(args.start_date, datetime.min, "start date")
+    )
+    args.end_date = utc.localize(verify_date(args.end_date, datetime.max, "end date"))
+
     process(
-        args.connection_string, args.sample_size, args.network, args.diag, args.infer
+        args.connection_string,
+        args.sample_size,
+        args.network,
+        args.start_date,
+        args.end_date,
+        args.diag,
+        args.infer,
     )
 
 
