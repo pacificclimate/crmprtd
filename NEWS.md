@@ -1,5 +1,12 @@
 # News / Release Notes
 
+## 3.5.1
+
+*27-June-2022*
+
+* Fixed bug where improper dependency broke the insertion of stations
+  on demand.
+
 ## 3.5.0
 
 *24-June-2022*

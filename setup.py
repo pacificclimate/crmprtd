@@ -5,7 +5,7 @@ from setuptools.command.test import test as TestCommand
 
 from crmprtd import NETWORKS
 
-__version__ = (3, 5, 0)
+__version__ = (3, 5, 1)
 
 
 class PyTest(TestCommand):
