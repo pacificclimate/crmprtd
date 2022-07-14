@@ -39,9 +39,9 @@ python-json-logger = "==0.1.9"
 requests-mock = "==1.7"
 pytest-mock = "==1.11.1"
 
+[requires]
+python_version = "3.8"
+
 [packages.requests]
 extras = [ "security",]
 version = "==2.22"
-
-[requires]
-python_version = "3.8"
