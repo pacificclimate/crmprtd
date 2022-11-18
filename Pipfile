@@ -4,10 +4,6 @@ verify_ssl = true
 name = "pypi"
 
 [[source]]
-url = "https://pypi.pacificclimate.org/simple/"
-verify_ssl = true
-
-[[source]]
 url = "https://pypi.pacificclimate.org/simple"
 verify_ssl = true
 name = "pypipacificclimate"
