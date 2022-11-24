@@ -5,7 +5,7 @@
 
 Utility to download near real time weather data and insert it into PCIC's database
 
-## Installation
+## Installation for production
 
 For production usage, install the latest tagged release from PCIC's PyPI server.
 
@@ -15,13 +15,22 @@ pip install -i https://pypi.pacificclimate.org/simple crmprtd
 pip install -i https://pypi.pacificclimate.org/simple crmprtd[jsonlogger]
 ```
 
-Or for development, clone the repo and install it (with pipenv) from your local source tree.
+## Installation for development
+
+For development, clone the repo and install it using Pipenv from your 
+local source tree. This is similar to how the Python CI environment is set up.
 
 ```bash
 git clone git@github.com:pacificclimate/crmprtd
 pipenv install --dev .
-pipenv shell
+pipenv run pip install .
 ```
+
+After installation, you can 
+- Issue `pipenv shell` to enter a shell that always implicitly uses the virtual 
+environment just created.
+- Issue `pipenv run ...` commands to run a single command in the virtual
+environment.
 
 ## Usage
 
