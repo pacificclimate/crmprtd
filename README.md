@@ -17,6 +17,10 @@ which is the current default on our workstations.
 - `libpq-dev`: Permits installation of required Python package `psycopg2`.
   Typical installation: `sudo apt-get install libpq-dev`.
 
+Note: The [Python CI](.github/workflows/python-ci.yml) script purges 
+PostgreSQL 14 and installs PostgreSQL 12 instead. It can still be used as 
+a guide for installation in a general way. 
+
 ## Installation for production
 
 For production usage, install the latest tagged release from PCIC's PyPI server.
