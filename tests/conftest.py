@@ -37,6 +37,7 @@ def postgis_session():
     with testing.postgresql.Postgresql() as pg:
         engine = sqlalchemy.create_engine(pg.url())
         engine.execute("create extension postgis")
+        engine.execute("CREATE EXTENSION IF NOT EXISTS citext")
         engine.execute(CreateSchema("crmp"))
         sesh = sessionmaker(bind=engine)()
 
