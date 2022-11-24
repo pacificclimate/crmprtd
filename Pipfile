@@ -11,7 +11,7 @@ name = "pypipacificclimate"
 [packages]
 lxml = "==4.6.3"
 Pint = "==0.9"
-psycopg2-binary = "==2.8"
+psycopg2 = "==2.8"
 pycds = { version = "==3.3.0", index = "pypipacificclimate" }
 python-dateutil = "==2.8"
 pytz = "==2019.3"
