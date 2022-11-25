@@ -34,17 +34,25 @@ for def_ in (
 
 def closest_stns_within_threshold(sesh, network_name, lon, lat, threshold):
     query_txt = """
-        WITH stns_in_thresh AS (
-            SELECT history_id, station_id, lat, lon, Geography(ST_Transform(the_geom,4326)) as p_existing,
-                Geography(ST_SetSRID(ST_MakePoint(:x, :y),4326)) as p_new
+        WITH hxs_in_thresh AS (
+            SELECT 
+                history_id, 
+                station_id, 
+                lat, 
+                lon, 
+                Geography(ST_Transform(the_geom, 4326)) as p_existing,
+                Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)) as p_new
             FROM crmp.meta_history
-            WHERE the_geom && ST_Buffer(Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)),:thresh)
+            WHERE the_geom && ST_Buffer(
+                Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)), :thresh
+            )
         )
-        SELECT history_id, ST_Distance(p_existing,p_new) as dist
-        FROM stns_in_thresh
-        NATURAL JOIN crmp.meta_station
-        NATURAL JOIN crmp.meta_network
-        WHERE network_name = :network_name
+        SELECT 
+            history_id, ST_Distance(p_existing, p_new) as dist
+        FROM hxs_in_thresh hx
+        JOIN crmp.meta_station stn ON (hx.station_id = stn.station_id)
+        JOIN crmp.meta_network nw ON (stn.network_id = nw.network_id)
+        WHERE nw.network_name = :network_name
         ORDER BY dist
 """  # noqa
     q = sesh.execute(
