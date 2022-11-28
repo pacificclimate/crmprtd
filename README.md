@@ -5,15 +5,23 @@
 
 Utility to download near real time weather data and insert it into PCIC's database
 
-## Installation
+## System-level dependencies
 
-A `Makefile` handles the project installation:
-```bash
-make
-pipenv shell
-```
+We assume you have a supported Python 3 installed on your system.
 
-If you do not wish you to use `make`, follow the instructions below.
+Certain system packages must be installed in order to install this Python
+package:
+- PostgreSQL: Typical installation: `sudo apt-get install postgresql-14`, 
+which is the current default on our workstations.
+- PostGIS: Typical installation: `sudo apt-get install postgresql-14-postgis-3`.
+- `libpq-dev`: Permits installation of required Python package `psycopg2`.
+  Typical installation: `sudo apt-get install libpq-dev`.
+
+Note: The [Python CI](.github/workflows/python-ci.yml) script purges 
+PostgreSQL 14 and installs PostgreSQL 12 instead. It can still be used as 
+a guide for installation in a general way. 
+
+## Installation for production
 
 For production usage, install the latest tagged release from PCIC's PyPI server.
 
@@ -23,13 +31,22 @@ pip install -i https://pypi.pacificclimate.org/simple crmprtd
 pip install -i https://pypi.pacificclimate.org/simple crmprtd[jsonlogger]
 ```
 
-Or for development, clone the repo and install it (with pipenv) from your local source tree.
+## Installation for development
+
+For development, clone the repo and install it using Pipenv from your 
+local source tree. This is similar to how the Python CI environment is set up.
 
 ```bash
 git clone git@github.com:pacificclimate/crmprtd
 pipenv install --dev .
-pipenv shell
+pipenv run pip install -e .
 ```
+
+After installation, you can 
+- Issue `pipenv shell` to enter a shell that always implicitly uses the virtual 
+environment just created.
+- Issue `pipenv run ...` commands to run a single command in the virtual
+environment.
 
 ## Usage
 
