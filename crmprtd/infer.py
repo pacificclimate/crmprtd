@@ -35,10 +35,25 @@ from crmprtd.align import get_variable, get_history
 log = logging.getLogger("crmprtd")
 
 
-def create_variable(sesh, network_name, variable_name, unit):
+def create_variable(
+    sesh,
+    network_name,
+    variable_name,
+    unit,
+    standard_name=None,
+    display_name=None,
+    cell_method="undefined",
+):
     network = sesh.query(Network).filter(Network.name == network_name).one()
 
-    return Variable(network=network, name=variable_name, unit=unit)
+    return Variable(
+        network=network,
+        name=variable_name,
+        standard_name=standard_name or variable_name,
+        display_name=display_name or variable_name,
+        cell_method=cell_method,
+        unit=unit,
+    )
 
 
 def infer(sesh, obs_tuples, diagnostic=False):
