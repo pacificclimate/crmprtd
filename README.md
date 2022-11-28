@@ -39,7 +39,7 @@ local source tree. This is similar to how the Python CI environment is set up.
 ```bash
 git clone git@github.com:pacificclimate/crmprtd
 pipenv install --dev .
-pipenv run pip install .
+pipenv run pip install -e .
 ```
 
 After installation, you can 
