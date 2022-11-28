@@ -110,10 +110,14 @@ def test_session(crmp_session, caplog):
 
     stations = [
         Station(native_id="11091", network=moti, histories=[brandy_hist]),
-        Station(native_id="1029", network=wmb, histories=[five_mile_hist, arkham]),
+        Station(
+            native_id="1029", network=wmb, histories=[five_mile_hist, arkham]
+        ),
         Station(native_id="2100160", network=ec, histories=[beaver_air_hist]),
         Station(native_id="1067742", network=ec, histories=[stewart_air_hist]),
-        Station(native_id="1047172", network=ec, histories=[sechelt1, sechelt2]),
+        Station(
+            native_id="1047172", network=ec, histories=[sechelt1, sechelt2]
+        ),
         Station(native_id="0260011", network=wamr, histories=[warfield]),
     ]
     crmp_session.add_all(stations)
@@ -124,7 +128,7 @@ def test_session(crmp_session, caplog):
         display_name="CURRENT_AIR_TEMPERATURE1",
         unit="celsius",
         cell_method="placeholder",
-        network=moti
+        network=moti,
     )
     ec_precip = Variable(
         name="precipitation",
@@ -132,7 +136,7 @@ def test_session(crmp_session, caplog):
         display_name="precipitation",
         unit="mm",
         cell_method="placeholder",
-        network=ec
+        network=ec,
     )
     wmb_humitidy = Variable(
         name="relative_humidity",
@@ -140,7 +144,7 @@ def test_session(crmp_session, caplog):
         display_name="relative_humidity",
         unit="percent",
         cell_method="placeholder",
-        network=wmb
+        network=wmb,
     )
     wamr_temp = Variable(
         name="TEMP_MEAN",
@@ -148,14 +152,14 @@ def test_session(crmp_session, caplog):
         display_name="TEMP_MEAN",
         unit="celsius",
         cell_method="placeholder",
-        network=wamr
+        network=wamr,
     )
     bad_var = Variable(
         name="no_unit",
         standard_name="no_unit",
         display_name="no_unit",
         cell_method="placeholder",
-        network=wamr
+        network=wamr,
     )
 
     crmp_session.add_all(
@@ -248,7 +252,9 @@ def ec_session(crmp_session, caplog):
     stations = [
         Station(native_id="2100160", network=ec, histories=[beaver_air_hist]),
         Station(native_id="1067742", network=ec, histories=[stewart_air_hist]),
-        Station(native_id="1047172", network=ec, histories=[sechelt1, sechelt2]),
+        Station(
+            native_id="1047172", network=ec, histories=[sechelt1, sechelt2]
+        ),
     ]
     crmp_session.add_all(stations)
 
@@ -259,7 +265,7 @@ def ec_session(crmp_session, caplog):
         display_name="Total Precipitation",
         unit="mm",
         cell_method="placeholder",
-        network=ec
+        network=ec,
     )
     ec_precip = Variable(
         id=101,
