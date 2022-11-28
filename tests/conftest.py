@@ -110,14 +110,10 @@ def test_session(crmp_session, caplog):
 
     stations = [
         Station(native_id="11091", network=moti, histories=[brandy_hist]),
-        Station(
-            native_id="1029", network=wmb, histories=[five_mile_hist, arkham]
-        ),
+        Station(native_id="1029", network=wmb, histories=[five_mile_hist, arkham]),
         Station(native_id="2100160", network=ec, histories=[beaver_air_hist]),
         Station(native_id="1067742", network=ec, histories=[stewart_air_hist]),
-        Station(
-            native_id="1047172", network=ec, histories=[sechelt1, sechelt2]
-        ),
+        Station(native_id="1047172", network=ec, histories=[sechelt1, sechelt2]),
         Station(native_id="0260011", network=wamr, histories=[warfield]),
     ]
     crmp_session.add_all(stations)
@@ -162,9 +158,7 @@ def test_session(crmp_session, caplog):
         network=wamr,
     )
 
-    crmp_session.add_all(
-        [moti_air_temp, ec_precip, wmb_humitidy, wamr_temp, bad_var]
-    )
+    crmp_session.add_all([moti_air_temp, ec_precip, wmb_humitidy, wamr_temp, bad_var])
 
     obs = [
         Obs(
@@ -252,9 +246,7 @@ def ec_session(crmp_session, caplog):
     stations = [
         Station(native_id="2100160", network=ec, histories=[beaver_air_hist]),
         Station(native_id="1067742", network=ec, histories=[stewart_air_hist]),
-        Station(
-            native_id="1047172", network=ec, histories=[sechelt1, sechelt2]
-        ),
+        Station(native_id="1047172", network=ec, histories=[sechelt1, sechelt2]),
     ]
     crmp_session.add_all(stations)
 
