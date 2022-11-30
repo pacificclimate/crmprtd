@@ -79,11 +79,13 @@ def process(
     is_diagnostic=False,
     do_infer=False,
 ):
-    """Executes 3 stages of the data processing pipeline.
+    """
+    Executes stages of the data processing pipeline.
 
-    Normalizes the data based on the network's format.
-    The the fuction send the normalized rows through the align
-    and insert phases of the pipeline.
+    1. Get data and normalize it according to which network it is coming from.
+    2. Optionally, infer the variables, stations, and histories required by the data.
+    3. "Align" the input observations, and remove those not in the specified time range.
+    4. Insert the resulting observations.
     """
     log = logging.getLogger("crmprtd")
 
@@ -105,6 +107,14 @@ def process(
     if do_infer:
         infer(sesh, rows, is_diagnostic)
 
+    # TODO: Could filter by time first. Would save a lot of work if much of input is
+    #   outside time range. Would have to filter out None values from result, but that
+    #   is trivial using filter(None, <list>):
+    #
+    #   observations = filter(None, (
+    #       align(sesh, row, is_diagnostic)
+    #       for row in rows if start_date <= row.time <= end_date
+    #   ))
     observations = [
         ob
         for ob in [align(sesh, row, is_diagnostic) for row in rows]

@@ -29,7 +29,7 @@ import logging
 
 # local
 from pycds import Obs, History, Network, Variable, Station
-from crmprtd.align import get_variable, get_history
+from crmprtd.align import get_variable, find_or_create_matching_history_and_station
 
 
 log = logging.getLogger("crmprtd")
@@ -57,12 +57,28 @@ def create_variable(
 
 
 def infer(sesh, obs_tuples, diagnostic=False):
+    """
+    Infer the variables, stations, and histories required by the data.
 
-    # Use a set to filter down to unique tuples
+    This means:
+    1. Construct required variables. Add them to database if and only if not in
+        diagnostic mode.
+    2. Find or create matching history and station records. Always, regardless of
+        diagnostic mode.
+
+    :param sesh: SQLAlchemy db session
+    :param obs_tuples: Data representing observations to be inserted.
+    :param diagnostic: Boolean. In diagnostic mode?
+    :return: None
+    """
+
+    # Reduce observations to unique set of tuples describing required variables
     vars_to_create = {
         (obs.network_name, obs.variable_name, obs.unit) for obs in obs_tuples
     }
 
+    # Construct required variables. Add them to database if and only if not in
+    # diagnostic mode.
     with sesh.begin_nested() as nested:
         vars_to_create = [
             create_variable(sesh, network_name, var_name, unit)
@@ -72,7 +88,8 @@ def infer(sesh, obs_tuples, diagnostic=False):
 
         for var in vars_to_create:
             log.info(
-                f"INSERT INTO meta_vars (network_id, net_var_name, unit) VALUES ({var.network.id}, '{var.name}', '{var.unit}')"
+                f"INSERT INTO meta_vars (network_id, net_var_name, unit) "
+                f"VALUES ({var.network.id}, '{var.name}', '{var.unit}')"
             )
 
         if diagnostic:
@@ -81,9 +98,15 @@ def infer(sesh, obs_tuples, diagnostic=False):
             sesh.add_all(vars_to_create)
             nested.commit()
 
-    # Use a set to filter down to unique tuples
+    # Reduce observations to unique set of tuples describing required histories
+    # and stations.
     hists_to_create = {
         (obs.network_name, obs.station_id, obs.lat, obs.lon) for obs in obs_tuples
     }
-    # The poorly named "get_history" function also does inserts as needed
-    hxs = [get_history(sesh, *tup, diagnostic) for tup in hists_to_create]
+
+    # Find or create matching histories and stations.
+    # TODO: Why is this variable unused? Was it meant to be returned?
+    hxs = [
+        find_or_create_matching_history_and_station(sesh, *tup, diagnostic)
+        for tup in hists_to_create
+    ]
