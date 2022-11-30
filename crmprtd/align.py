@@ -132,6 +132,9 @@ def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
     close_stns = history_ids_within_threshold(sesh, network_name, lon, lat, 800)
 
     if len(close_stns) == 0:
+        # TODO: Subtle bug here? Since there is no diagnostic argument, Station and
+        #  History records are created in diagnostic mode when there are no close
+        #  stations.
         return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
 
     for id in close_stns:
@@ -143,7 +146,7 @@ def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
                 return history
 
 
-def match_station(sesh, network_name, native_id, lat, lon, histories):
+def match_history(sesh, network_name, native_id, lat, lon, histories):
     if lat and lon:
         return find_nearest_history(sesh, network_name, native_id, lat, lon, histories)
     else:
@@ -155,7 +158,9 @@ def create_station_and_history_entry(
 ):
     """
     Create a Station and an associated History object according to the arguments.
-    Note: Arg diagnostic is not used.
+
+    Note: Argument diagnostic is not used, so if this method is invoked, a Station and
+    History are always created, regardless of its value..
 
     :param sesh: SQLAlchemy db session
     :param network_name: Name of network associated to Station.
@@ -225,6 +230,10 @@ def find_or_create_matching_history_and_station(
     Find or create a History and associated Station record matching the arguments,
     if possible.
 
+    Always return a matching History if it already exists in the database.
+
+    In diagnostic mode, do not create any new records (History or Station).
+
     :param sesh: SQLAlchemy db session
     :param network_name: Name of network that History must be in.
     :param native_id: Native id of station that history must be associated with.
@@ -232,21 +241,19 @@ def find_or_create_matching_history_and_station(
         see below
     :param lon: Lon for history record; either for spatial matching or creation -
         see below
-    :param diagnostic: Boolean. In diagnostic mode? See below.
+    :param diagnostic: Boolean. In diagnostic mode?
     :return: History object or None
 
     Search db for existing history records exactly matching network_name and station_id.
 
     If no such history is found, create one (along with the necessary station record)
-    and return it.
+    and return it. In diagnostic mode, do not create new records.
 
     If exactly one such history is found, return it.
 
     If more than one such history is found, do a spatial (lat, lon) match on them.
-        If at least one is found within tolerance distance, return the closest.
-        If none are found within tolerance, this is an error condition, return None.
-
-    In diagnostic mode, do not create new records.
+    - If at least one is found within tolerance distance, return one.
+    - If none are found within tolerance, this is an error condition, return None.
     """
     log.debug("Searching for native_id = %s", native_id)
     histories = (
@@ -262,14 +269,14 @@ def find_or_create_matching_history_and_station(
             log.info(
                 f"In diagnostic mode. Skipping insertion of new history entry: {network_name}, {native_id}, {lat}, {lon}"
             )
-            return
+            return None
         return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
     elif histories.count() == 1:
         log.debug("Found exactly one matching history_id")
         return histories.one_or_none()
     elif histories.count() >= 2:
         log.debug("Found multiple history entries. Searching for match.")
-        return match_station(sesh, network_name, native_id, lat, lon, histories)
+        return match_history(sesh, network_name, native_id, lat, lon, histories)
 
 
 def does_network_exist(sesh, network_name):
@@ -298,6 +305,7 @@ def align(sesh, obs_tuple, diagnostic=False):
     Steps:
     1. Do data sanity checks. On fail, return None.
     2. Find or create matching history and station records. If not possible, return None.
+        In diagnostic mode, do not create new records; return None.
     3. Convert observation value to database units. If not possible, return None.
     4. Create Obs using history, network, value, and return it.
     """

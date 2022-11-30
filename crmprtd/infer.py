@@ -80,13 +80,13 @@ def infer(sesh, obs_tuples, diagnostic=False):
     # Construct required variables. Add them to database if and only if not in
     # diagnostic mode.
     with sesh.begin_nested() as nested:
-        vars_to_create = [
+        variables = [
             create_variable(sesh, network_name, var_name, unit)
             for network_name, var_name, unit in vars_to_create
             if not get_variable(sesh, network_name, var_name)
         ]
 
-        for var in vars_to_create:
+        for var in variables:
             log.info(
                 f"INSERT INTO meta_vars (network_id, net_var_name, unit) "
                 f"VALUES ({var.network.id}, '{var.name}', '{var.unit}')"
