@@ -76,6 +76,22 @@ def infer(sesh, obs_tuples, diagnostic=False):
     :return: None
     """
 
+    # Reduce observations to unique set of tuples describing required histories
+    # and stations.
+    hists_to_create = {
+        (obs.network_name, obs.station_id, obs.lat, obs.lon) for obs in obs_tuples
+    }
+
+    # Find or create matching histories and stations.
+    # This operation should be done before processing variables, because, in
+    # not-diagnostic mode, the latter can raise an exception which would prevent any
+    # further work.
+    # TODO: Why is this variable unused? Was it meant to be logged or returned?
+    hxs = [
+        find_or_create_matching_history_and_station(sesh, *tup, diagnostic)
+        for tup in hists_to_create
+    ]
+
     # Reduce observations to unique set of tuples describing required variables
     vars_to_create = {
         (obs.network_name, obs.variable_name, obs.unit) for obs in obs_tuples
@@ -111,18 +127,3 @@ def infer(sesh, obs_tuples, diagnostic=False):
                 f"{len(variables)} Variables need to be inserted (see log). "
                 f"This is not possible without human intervention."
             )
-
-    # TODO: Should this come before Variable processing so that anything it does (e.g.,
-    #   log information) happens regardless of whether an exception is raised above?
-    # Reduce observations to unique set of tuples describing required histories
-    # and stations.
-    hists_to_create = {
-        (obs.network_name, obs.station_id, obs.lat, obs.lon) for obs in obs_tuples
-    }
-
-    # Find or create matching histories and stations.
-    # TODO: Why is this variable unused? Was it meant to be returned?
-    hxs = [
-        find_or_create_matching_history_and_station(sesh, *tup, diagnostic)
-        for tup in hists_to_create
-    ]
