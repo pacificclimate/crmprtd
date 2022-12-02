@@ -128,14 +128,15 @@ def find_active_history(histories):
         return None
 
 
-def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
+def find_nearest_history(
+    sesh, network_name, native_id, lat, lon, histories, diagnostic=False
+):
     close_stns = history_ids_within_threshold(sesh, network_name, lon, lat, 800)
 
     if len(close_stns) == 0:
-        # TODO: Subtle bug here? Since there is no diagnostic argument, Station and
-        #  History records are created in diagnostic mode when there are no close
-        #  stations.
-        return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
+        return create_station_and_history_entry(
+            sesh, network_name, native_id, lat, lon, diagnostic=diagnostic
+        )
 
     for id in close_stns:
         for history in histories:
@@ -146,9 +147,11 @@ def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
                 return history
 
 
-def match_history(sesh, network_name, native_id, lat, lon, histories):
+def match_history(sesh, network_name, native_id, lat, lon, histories, diagnostic=False):
     if lat and lon:
-        return find_nearest_history(sesh, network_name, native_id, lat, lon, histories)
+        return find_nearest_history(
+            sesh, network_name, native_id, lat, lon, histories, diagnostic=diagnostic
+        )
     else:
         return find_active_history(histories)
 
@@ -158,9 +161,6 @@ def create_station_and_history_entry(
 ):
     """
     Create a Station and an associated History object according to the arguments.
-
-    Note: Argument diagnostic is not used, so if this method is invoked, a Station and
-    History are always created, regardless of its value..
 
     :param sesh: SQLAlchemy db session
     :param network_name: Name of network associated to Station.
@@ -172,37 +172,43 @@ def create_station_and_history_entry(
     """
     network = sesh.query(Network).filter(Network.name == network_name).first()
 
-    stn = Station(native_id=native_id, network=network)
+    action = "Requires" if diagnostic else "Created"
+
+    station = Station(native_id=native_id, network_id=network.id)
     log.info(
-        "Created new station entry",
-        extra={"native_id": stn.native_id, "network_name": network.name},
+        f"{action} new station entry",
+        extra={"native_id": station.native_id, "network_name": network.name},
     )
 
-    hist = History(station=stn, lat=lat, lon=lon)
+    history = History(station_id=station.id, lat=lat, lon=lon)
     log.warning(
-        "Created new history entry",
+        f"{action} new history entry",
         extra={
-            "history": hist.id,
+            "history": history.id,
             "network_name": network_name,
-            "native_id": stn.native_id,
+            "native_id": station.native_id,
             "lat": lat,
             "lon": lon,
         },
     )
 
+    if diagnostic:
+        return None
+
     try:
-        sesh.add(stn)
-        sesh.add(hist)
+        sesh.add(station)
+        sesh.add(history)
     except Exception as e:
         log.warning(
             "Unable to insert new stn/hist entries",
-            extra={"stn": stn, "hist": hist, "exception": e},
+            extra={"stn": station, "hist": history, "exception": e},
         )
         sesh.rollback()
-        raise InsertionError(native_id=stn.id, hid=hist.id, e=e)
+        raise InsertionError(native_id=station.id, hid=history.id, e=e)
     else:
         sesh.commit()
-    return hist
+
+    return history
 
 
 def get_variable(sesh, network_name, variable_name):
@@ -276,7 +282,9 @@ def find_or_create_matching_history_and_station(
         return histories.one_or_none()
     elif histories.count() >= 2:
         log.debug("Found multiple history entries. Searching for match.")
-        return match_history(sesh, network_name, native_id, lat, lon, histories)
+        return match_history(
+            sesh, network_name, native_id, lat, lon, histories, diagnostic=diagnostic
+        )
 
 
 def does_network_exist(sesh, network_name):

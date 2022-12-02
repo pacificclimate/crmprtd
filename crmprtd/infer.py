@@ -88,7 +88,7 @@ def infer(sesh, obs_tuples, diagnostic=False):
     # further work.
     # TODO: Why is this variable unused? Was it meant to be logged or returned?
     hxs = [
-        find_or_create_matching_history_and_station(sesh, *tup, diagnostic)
+        find_or_create_matching_history_and_station(sesh, *tup, diagnostic=diagnostic)
         for tup in hists_to_create
     ]
 
