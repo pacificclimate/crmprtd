@@ -72,8 +72,7 @@ NETWORKS = SWOB_PARTNERS + ("bc_hydro", "crd", "ec", "moti", "wamr", "wmb")
 
 Row = namedtuple(
     "Row",
-    "time val variable_name unit network_name \
-                         station_id lat lon",
+    "time val variable_name unit network_name station_id lat lon",
 )
 
 
