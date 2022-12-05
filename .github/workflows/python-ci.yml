@@ -8,7 +8,9 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
+
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
@@ -26,6 +28,7 @@ jobs:
         sudo apt install postgresql-12-postgis-3
 
     - id: cache-pipenv
+      name: Cache pipenv
       uses: actions/cache@v2
       with:
         path: ~/.local/share/virtualenvs
@@ -44,5 +47,6 @@ jobs:
         TZ: Canada/Pacific
       run: |
         pipenv run pytest -m "not online" -v --tb=short --cov --cov-report=term-missing
+
     - name: Code format check
       run: pipenv run black . --check
