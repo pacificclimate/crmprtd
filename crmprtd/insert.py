@@ -197,14 +197,6 @@ def bisect_insert_strategy(sesh, obs):
 
 
 def insert(sesh, observations, sample_size):
-    """
-    Insert a collection of observations using an appropriate strategy.
-
-    :param sesh: SQLAlchemy db session
-    :param observations: Collection (list, nominally) of observations
-    :param sample_size: Size for random sampling of observations for test of existence.
-    :return:
-    """
     if contains_all_duplicates(sesh, observations, sample_size):
         log.info("Using Single Insert Strategy")
         with Timer() as tmr:

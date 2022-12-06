@@ -107,14 +107,6 @@ def process(
     if do_infer:
         infer(sesh, rows, is_diagnostic)
 
-    # TODO: Could filter by time first. Would save a lot of work if much of input is
-    #   outside time range. Would have to filter out None values from result, but that
-    #   is trivial using filter(None, <list>):
-    #
-    #   observations = filter(None, (
-    #       align(sesh, row, is_diagnostic)
-    #       for row in rows if start_date <= row.time <= end_date
-    #   ))
     observations = [
         ob
         for ob in [align(sesh, row, is_diagnostic) for row in rows]
