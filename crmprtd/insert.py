@@ -169,6 +169,7 @@ def bisect_insert_strategy(sesh, obs):
             return DBMetrics(0, 0, 1)
         else:
             log.debug("Success for single observation")
+            log.info("Successfully inserted observations: 1")
             sesh.commit()
             return DBMetrics(1, 0, 0)
 
@@ -187,7 +188,10 @@ def bisect_insert_strategy(sesh, obs):
             dbm_b = bisect_insert_strategy(sesh, b)
             return dbm_a + dbm_b
         else:
-            log.info("Successfully inserted observations", extra={"num_obs": len(obs)})
+            log.info(
+                f"Successfully inserted observations: {len(obs)}",
+                extra={"num_obs": len(obs)}
+            )
             sesh.commit()
             return DBMetrics(len(obs), 0, 0)
 

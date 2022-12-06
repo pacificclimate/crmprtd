@@ -120,6 +120,7 @@ def process(
         for ob in [align(sesh, row, is_diagnostic) for row in rows]
         if ob and (start_date <= ob.time <= end_date)
     ]
+    log.info(f"Count of observations to insert: {len(observations)}")
 
     if is_diagnostic:
         for obs in observations:
