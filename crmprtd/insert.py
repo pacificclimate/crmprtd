@@ -190,13 +190,22 @@ def bisect_insert_strategy(sesh, obs):
         else:
             log.info(
                 f"Successfully inserted observations: {len(obs)}",
-                extra={"num_obs": len(obs)},
+                extra={"num_obs": len(obs)}
             )
             sesh.commit()
             return DBMetrics(len(obs), 0, 0)
 
 
 def insert(sesh, observations, sample_size):
+    """
+    Insert a collection of observations.
+
+    :param sesh: SQLAlchemy database session
+    :param observations: Obs objects to insert
+    :param sample_size: Size of sample of observations to use to test if all duplicates.
+    :return: dict with information about insertions
+    """
+
     if contains_all_duplicates(sesh, observations, sample_size):
         log.info("Using Single Insert Strategy")
         with Timer() as tmr:
