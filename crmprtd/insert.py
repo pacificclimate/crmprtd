@@ -206,6 +206,10 @@ def insert(sesh, observations, sample_size):
     :return: dict with information about insertions
     """
 
+    # First ensure that all pending objects (on which observations may depend) are
+    # in the database.
+    sesh.commit()
+
     if contains_all_duplicates(sesh, observations, sample_size):
         log.info("Using Single Insert Strategy")
         with Timer() as tmr:
