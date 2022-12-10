@@ -180,7 +180,7 @@ def create_station_and_history_entry(
         extra={"native_id": station.native_id, "network_name": network.name},
     )
 
-    history = History(station_id=station.id, lat=lat, lon=lon)
+    history = History(station=station, lat=lat, lon=lon)
     log.warning(
         f"{action} new history entry",
         extra={
