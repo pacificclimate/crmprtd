@@ -189,7 +189,7 @@ def bisect_insert_strategy(sesh, obs):
         else:
             log.info(
                 f"Successfully inserted observations: {len(obs)}",
-                extra={"num_obs": len(obs)}
+                extra={"num_obs": len(obs)},
             )
             db_metrics = DBMetrics(len(obs), 0, 0)
         sesh.commit()
