@@ -199,6 +199,8 @@ def create_station_and_history_entry(
         )
         return None
 
+    # TODO: I think this should be in a begin_nested context manager.
+    #   See https://docs.sqlalchemy.org/en/14/orm/session_transaction.html#session-begin-nested
     try:
         sesh.add(station)
         sesh.add(history)

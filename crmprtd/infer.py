@@ -99,6 +99,8 @@ def infer(sesh, obs_tuples, diagnostic=False):
 
     # Construct required variables. Add them to database if and only if not in
     # diagnostic mode.
+    # TODO: This is a non-canonical use of the begin_nested context manager. Change it.
+    #   See https://docs.sqlalchemy.org/en/14/orm/session_transaction.html#using-savepoint
     with sesh.begin_nested() as nested:
         variables = [
             create_variable(
