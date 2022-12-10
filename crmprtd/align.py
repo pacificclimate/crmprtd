@@ -193,6 +193,10 @@ def create_station_and_history_entry(
     )
 
     if diagnostic:
+        log.info(
+            f"In diagnostic mode. Skipping insertion of new history entry for: "
+            f"network_name={network_name}, native_id={native_id}, lat={lat}, lon={lon}"
+        )
         return None
 
     try:
@@ -271,12 +275,9 @@ def find_or_create_matching_history_and_station(
 
     if histories.count() == 0:
         log.debug("Cound not find native_id %s", native_id)
-        if diagnostic:
-            log.info(
-                f"In diagnostic mode. Skipping insertion of new history entry: {network_name}, {native_id}, {lat}, {lon}"
-            )
-            return None
-        return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
+        return create_station_and_history_entry(
+            sesh, network_name, native_id, lat, lon, diagnostic=diagnostic
+        )
     elif histories.count() == 1:
         log.debug("Found exactly one matching history_id")
         return histories.one_or_none()
