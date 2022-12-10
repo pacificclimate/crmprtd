@@ -199,20 +199,17 @@ def create_station_and_history_entry(
         )
         return None
 
-    # TODO: I think this should be in a begin_nested context manager.
-    #   See https://docs.sqlalchemy.org/en/14/orm/session_transaction.html#session-begin-nested
     try:
-        sesh.add(station)
-        sesh.add(history)
+        with sesh.begin_nested():
+            sesh.add(station)
+            sesh.add(history)
     except Exception as e:
         log.warning(
             "Unable to insert new stn/hist entries",
             extra={"stn": station, "hist": history, "exception": e},
         )
-        sesh.rollback()
         raise InsertionError(native_id=station.id, hid=history.id, e=e)
-    else:
-        sesh.commit()
+    sesh.commit()
 
     return history
 
