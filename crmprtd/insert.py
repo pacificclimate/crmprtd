@@ -159,19 +159,18 @@ def bisect_insert_strategy(sesh, obs):
                 "Failure, observation already exists",
                 extra={"obs": obs, "exception": e},
             )
-            sesh.rollback()
-            return DBMetrics(0, 1, 0)
+            db_metrics = DBMetrics(0, 1, 0)
         except InsertionError as e:
             log.warning(
                 "Failure occured during insertion", extra={"obs": obs, "exception": e}
             )
-            sesh.rollback()
-            return DBMetrics(0, 0, 1)
+            db_metrics = DBMetrics(0, 0, 1)
         else:
             log.debug("Success for single observation")
             log.info("Successfully inserted observations: 1")
-            sesh.commit()
-            return DBMetrics(1, 0, 0)
+            db_metrics = DBMetrics(1, 0, 0)
+        sesh.commit()
+        return db_metrics
 
     # The happy case: add everything at once
     else:
@@ -192,8 +191,9 @@ def bisect_insert_strategy(sesh, obs):
                 f"Successfully inserted observations: {len(obs)}",
                 extra={"num_obs": len(obs)}
             )
-            sesh.commit()
-            return DBMetrics(len(obs), 0, 0)
+            db_metrics = DBMetrics(len(obs), 0, 0)
+        sesh.commit()
+        return db_metrics
 
 
 def insert(sesh, observations, sample_size):
