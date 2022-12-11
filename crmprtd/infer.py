@@ -97,8 +97,7 @@ def infer(sesh, obs_tuples, diagnostic=False):
         (obs.network_name, obs.variable_name, obs.unit) for obs in obs_tuples
     }
 
-    # Construct required variables. Add them to database if and only if not in
-    # diagnostic mode.
+    # Construct required variables. They are never committed to the database.
     with sesh.begin_nested() as nested:
         variables = [
             create_variable(
