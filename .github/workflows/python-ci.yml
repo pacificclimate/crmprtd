@@ -46,6 +46,10 @@ jobs:
       env:
         TZ: Canada/Pacific
       run: |
+        which pipenv
+        pipenv --venv
+        ls -l "$(pipenv --venv)"
+        ls -l "$(pipenv --venv)/bin"
         pipenv run pytest -m "not online" -v --tb=short --cov --cov-report=term-missing
 
     - name: Code format check
