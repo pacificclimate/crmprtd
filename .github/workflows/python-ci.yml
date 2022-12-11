@@ -27,12 +27,12 @@ jobs:
         sudo apt purge postgresql-client-14 postgresql-server-dev-all
         sudo apt install postgresql-12-postgis-3
 
-    - id: cache-pipenv
-      name: Cache pipenv
-      uses: actions/cache@v2
-      with:
-        path: ~/.local/share/virtualenvs
-        key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+#    - id: cache-pipenv
+#      name: Cache pipenv
+#      uses: actions/cache@v2
+#      with:
+#        path: ~/.local/share/virtualenvs
+#        key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
 
     - name: Install dependencies if changed
 #      if: steps.cache-pipenv.outputs.cache-hit != 'true'
