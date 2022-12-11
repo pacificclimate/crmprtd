@@ -1,12 +1,13 @@
 import sys
 import pytz
 from importlib import import_module
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from itertools import tee
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
-from dateutil import relativedelta
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from crmprtd.align import align
 from crmprtd.insert import insert
