@@ -107,11 +107,17 @@ def process(
     if do_infer:
         infer(sesh, rows, is_diagnostic)
 
-    observations = [
-        ob
-        for ob in [align(sesh, row, is_diagnostic) for row in rows]
-        if ob and (start_date <= ob.time <= end_date)
-    ]
+    observations = list(
+        # Note: filter(None, <collection>) removes falsy values from <collection>.
+        filter(
+            None,
+            (
+                align(sesh, row, is_diagnostic)
+                for row in rows
+                if start_date <= row.time <= end_date
+            ),
+        )
+    )
     log.info(f"Count of observations to insert: {len(observations)}")
 
     if is_diagnostic:
