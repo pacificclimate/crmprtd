@@ -1,12 +1,13 @@
 import sys
 import pytz
 from importlib import import_module
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from itertools import tee
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
-from dateutil import relativedelta
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 from crmprtd.align import align
 from crmprtd.insert import insert
@@ -79,11 +80,13 @@ def process(
     is_diagnostic=False,
     do_infer=False,
 ):
-    """Executes 3 stages of the data processing pipeline.
+    """
+    Executes stages of the data processing pipeline.
 
-    Normalizes the data based on the network's format.
-    The the fuction send the normalized rows through the align
-    and insert phases of the pipeline.
+    1. Get data and normalize it according to which network it is coming from.
+    2. Optionally, infer the variables, stations, and histories required by the data.
+    3. "Align" the input observations, and remove those not in the specified time range.
+    4. Insert the resulting observations.
     """
     log = logging.getLogger("crmprtd")
 
@@ -93,24 +96,36 @@ def process(
         )
         raise Exception("No module name given")
 
+    # Get the normalizer for the specified network.
     download_stream = sys.stdin.buffer
     norm_mod = get_normalization_module(network)
 
-    rows = [row for row in norm_mod.normalize(download_stream)]
+    # The normalizer returns a generator that yields `Row`s. Convert to a list of Rows.
+    rows = list(norm_mod.normalize(download_stream))
 
     engine = create_engine(connection_string)
     Session = sessionmaker(engine)
     sesh = Session()
 
+    # Optionally infer variables and stations/histories.
     if do_infer:
         infer(sesh, rows, is_diagnostic)
 
-    observations = [
-        ob
-        for ob in [align(sesh, row, is_diagnostic) for row in rows]
-        if ob and (start_date <= ob.time <= end_date)
-    ]
+    # Filter the observations by time period, then align them.
+    observations = list(
+        # Note: filter(None, <collection>) removes falsy values from <collection>,
+        # in this case possible None values returned by align.
+        filter(
+            None,
+            (
+                align(sesh, row, is_diagnostic)
+                for row in rows
+                if start_date <= row.time <= end_date
+            ),
+        )
+    )
 
+    log.info(f"Count of observations to process: {len(observations)}")
     if is_diagnostic:
         for obs in observations:
             log.info(obs)
@@ -148,7 +163,7 @@ def run_data_pipeline(
             for chunk in cache_iter:
                 f.write(chunk)
 
-    rows = [row for row in normalize_func(download_iter)]
+    rows = list(normalize_func(download_iter))
 
     engine = create_engine(connection_string)
     Session = sessionmaker(engine)

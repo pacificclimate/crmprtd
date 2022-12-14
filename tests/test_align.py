@@ -3,12 +3,12 @@ from datetime import datetime
 from geoalchemy2.functions import ST_X, ST_Y
 
 from crmprtd.align import (
-    is_network,
-    get_history,
+    does_network_exist,
+    find_or_create_matching_history_and_station,
     get_variable,
-    unit_check,
+    convert_obs_value_to_db_units,
     align,
-    closest_stns_within_threshold,
+    history_ids_within_threshold,
     convert_unit,
 )
 from crmprtd import Row
@@ -19,7 +19,7 @@ from pycds import Station, History
     ("network_name", "expected"), [("FLNRO-WMB", True), ("WMB", False)]
 )
 def test_is_network(test_session, network_name, expected):
-    assert is_network(test_session, network_name) == expected
+    assert does_network_exist(test_session, network_name) == expected
 
 
 def test_get_history_with_no_matches(test_session):
@@ -35,7 +35,7 @@ def test_get_history_with_no_matches(test_session):
         lon=None,
     )
 
-    history = get_history(
+    history = find_or_create_matching_history_and_station(
         test_session,
         obs_tuple.network_name,
         obs_tuple.station_id,
@@ -63,7 +63,7 @@ def test_get_history_with_single_match(test_session):
         lon=None,
     )
 
-    history = get_history(
+    history = find_or_create_matching_history_and_station(
         test_session,
         obs_tuple.network_name,
         obs_tuple.station_id,
@@ -91,7 +91,7 @@ def test_get_history_with_multiple_matches_and_location(test_session):
         lon=-123.7,
     )
 
-    history = get_history(
+    history = find_or_create_matching_history_and_station(
         test_session,
         obs_tuple.network_name,
         obs_tuple.station_id,
@@ -113,7 +113,7 @@ def test_get_history_with_multiple_matches_and_no_location(test_session):
         lon=None,
     )
 
-    history = get_history(
+    history = find_or_create_matching_history_and_station(
         test_session,
         obs_tuple.network_name,
         obs_tuple.station_id,
@@ -142,7 +142,7 @@ def test_get_variable_no_match(test_session):
 )
 def test_unit_check(test_session, network_name, variable_name, unit, val, expected):
     variable = get_variable(test_session, network_name, variable_name)
-    check_val = unit_check(val, unit, variable.unit)
+    check_val = convert_obs_value_to_db_units(val, unit, variable.unit)
     assert check_val == expected
 
 
@@ -335,7 +335,7 @@ def test_align_failures(test_session, obs_tuple):
 
 
 def test_closest_stns_within_threshold(ec_session):
-    x = closest_stns_within_threshold(ec_session, "EC_raw", -123.7, 49.45, 1000)
+    x = history_ids_within_threshold(ec_session, "EC_raw", -123.7, 49.45, 1000)
     assert len(x) > 0
 
 
@@ -356,7 +356,7 @@ def test_closest_stns_within_threshold_bad_data(ec_session):
     ec_session.commit()
 
     # Just search for the good station and ensure there are not errors
-    x = closest_stns_within_threshold(ec_session, "EC_raw", x, y, 1)
+    x = history_ids_within_threshold(ec_session, "EC_raw", x, y, 1)
     assert len(x) > 0
 
 

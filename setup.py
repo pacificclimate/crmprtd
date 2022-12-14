@@ -65,7 +65,7 @@ setup(
         "python-dateutil",
         "pytz",
         "requests[security]",
-        "pycds==3.*",
+        "pycds==4.*",
         "pint",
         "pysftp",
     ],

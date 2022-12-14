@@ -37,6 +37,7 @@ def postgis_session():
     with testing.postgresql.Postgresql() as pg:
         engine = sqlalchemy.create_engine(pg.url())
         engine.execute("create extension postgis")
+        engine.execute("CREATE EXTENSION IF NOT EXISTS citext")
         engine.execute(CreateSchema("crmp"))
         sesh = sessionmaker(bind=engine)()
 
@@ -118,12 +119,44 @@ def test_session(crmp_session, caplog):
     crmp_session.add_all(stations)
 
     moti_air_temp = Variable(
-        name="CURRENT_AIR_TEMPERATURE1", unit="celsius", network=moti
+        name="CURRENT_AIR_TEMPERATURE1",
+        standard_name="CURRENT_AIR_TEMPERATURE1",
+        display_name="CURRENT_AIR_TEMPERATURE1",
+        unit="celsius",
+        cell_method="placeholder",
+        network=moti,
     )
-    ec_precip = Variable(name="precipitation", unit="mm", network=ec)
-    wmb_humitidy = Variable(name="relative_humidity", unit="percent", network=wmb)
-    wamr_temp = Variable(name="TEMP_MEAN", unit="celsius", network=wamr)
-    bad_var = Variable(name="no_unit", network=wamr)
+    ec_precip = Variable(
+        name="precipitation",
+        standard_name="precipitation",
+        display_name="precipitation",
+        unit="mm",
+        cell_method="placeholder",
+        network=ec,
+    )
+    wmb_humitidy = Variable(
+        name="relative_humidity",
+        standard_name="relative_humidity",
+        display_name="relative_humidity",
+        unit="percent",
+        cell_method="placeholder",
+        network=wmb,
+    )
+    wamr_temp = Variable(
+        name="TEMP_MEAN",
+        standard_name="TEMP_MEAN",
+        display_name="TEMP_MEAN",
+        unit="celsius",
+        cell_method="placeholder",
+        network=wamr,
+    )
+    bad_var = Variable(
+        name="no_unit",
+        standard_name="no_unit",
+        display_name="no_unit",
+        cell_method="placeholder",
+        network=wamr,
+    )
 
     crmp_session.add_all([moti_air_temp, ec_precip, wmb_humitidy, wamr_temp, bad_var])
 
@@ -217,8 +250,24 @@ def ec_session(crmp_session, caplog):
     ]
     crmp_session.add_all(stations)
 
-    ec_precip = Variable(id=100, name="total_precipitation", unit="mm", network=ec)
-    ec_precip = Variable(id=101, name="air_temperature", unit="Celsius", network=ec)
+    ec_precip = Variable(
+        id=100,
+        name="total_precipitation",
+        standard_name="total_precipitation",
+        display_name="Total Precipitation",
+        unit="mm",
+        cell_method="placeholder",
+        network=ec,
+    )
+    ec_precip = Variable(
+        id=101,
+        name="air_temperature",
+        standard_name="air_temperature",
+        display_name="Air Temperature",
+        unit="Celsius",
+        cell_method="placeholder",
+        network=ec,
+    )
     crmp_session.add(ec_precip)
 
     obs = [

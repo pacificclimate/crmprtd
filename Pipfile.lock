@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "cbde138e355cb8da2dec8808c206d4b572b4f919ef720a926d4e74b537a25397"
+            "sha256": "b9d0ee146b34969d3151e95d453fcb835d40d48a4d5d6c081b7b3a4bf7af4653"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -289,11 +289,11 @@
         },
         "importlib-metadata": {
             "hashes": [
-                "sha256:da31db32b304314d044d3c12c79bd59e307889b287ad12ff387b3500835fc2ab",
-                "sha256:ddb0e35065e8938f867ed4928d0ae5bf2a53b7773871bfe6bcc7e4fcdc7dea43"
+                "sha256:d5059f9f1e8e41f80e9c56c2ee58811450c31984dfa625329ffd7c0dad88a73b",
+                "sha256:d84d17e21670ec07990e1044a99efe8d615d860fd176fc29ef5c306068fda313"
             ],
             "markers": "python_version < '3.9'",
-            "version": "==5.0.0"
+            "version": "==5.1.0"
         },
         "importlib-resources": {
             "hashes": [
@@ -476,11 +476,11 @@
         },
         "pycds": {
             "hashes": [
-                "sha256:347b218cb81443ca0b87e71fb3cb481688b13133375d6be3bef8697397268ac3",
-                "sha256:66b7e0f4048919516b0a8d2980e8687056af7debb704bf21e210aa95a402f26d"
+                "sha256:1d6eca5c7e3994b36f3e62ac456bdfd3c6ada2bd8c50be2c5cf107dd85261781",
+                "sha256:9d74ddc9b532c131ac85618d401610849cc72ccbbdec5650ad80b132219d4365"
             ],
             "index": "pypipacificclimate",
-            "version": "==3.3.0"
+            "version": "==4.0.0"
         },
         "pycparser": {
             "hashes": [
@@ -635,6 +635,12 @@
             ],
             "index": "pypi",
             "version": "==1.4.44"
+        },
+        "sqlalchemy-citext": {
+            "hashes": [
+                "sha256:a1740e693a9a334e7c8f60ae731083fe75ce6c1605bb9ca6644a6f1f63b15b77"
+            ],
+            "version": "==1.8.0"
         },
         "tomli": {
             "hashes": [

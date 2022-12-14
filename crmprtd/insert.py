@@ -159,18 +159,18 @@ def bisect_insert_strategy(sesh, obs):
                 "Failure, observation already exists",
                 extra={"obs": obs, "exception": e},
             )
-            sesh.rollback()
-            return DBMetrics(0, 1, 0)
+            db_metrics = DBMetrics(0, 1, 0)
         except InsertionError as e:
             log.warning(
                 "Failure occured during insertion", extra={"obs": obs, "exception": e}
             )
-            sesh.rollback()
-            return DBMetrics(0, 0, 1)
+            db_metrics = DBMetrics(0, 0, 1)
         else:
             log.debug("Success for single observation")
-            sesh.commit()
-            return DBMetrics(1, 0, 0)
+            log.info("Successfully inserted observations: 1")
+            db_metrics = DBMetrics(1, 0, 0)
+        sesh.commit()
+        return db_metrics
 
     # The happy case: add everything at once
     else:
@@ -187,12 +187,29 @@ def bisect_insert_strategy(sesh, obs):
             dbm_b = bisect_insert_strategy(sesh, b)
             return dbm_a + dbm_b
         else:
-            log.info("Successfully inserted observations", extra={"num_obs": len(obs)})
-            sesh.commit()
-            return DBMetrics(len(obs), 0, 0)
+            log.info(
+                f"Successfully inserted observations: {len(obs)}",
+                extra={"num_obs": len(obs)},
+            )
+            db_metrics = DBMetrics(len(obs), 0, 0)
+        sesh.commit()
+        return db_metrics
 
 
 def insert(sesh, observations, sample_size):
+    """
+    Insert a collection of observations.
+
+    :param sesh: SQLAlchemy database session
+    :param observations: Obs objects to insert
+    :param sample_size: Size of sample of observations to use to test if all duplicates.
+    :return: dict with information about insertions
+    """
+
+    # First ensure that all pending objects (on which observations may depend) are
+    # in the database.
+    sesh.commit()
+
     if contains_all_duplicates(sesh, observations, sample_size):
         log.info("Using Single Insert Strategy")
         with Timer() as tmr:

@@ -32,21 +32,42 @@ for def_ in (
     ureg.define(def_)
 
 
-def closest_stns_within_threshold(sesh, network_name, lon, lat, threshold):
+def history_ids_within_threshold(sesh, network_name, lon, lat, threshold):
+    """
+    Return a set containing the id's of existing histories associated with the
+    given network and within a threshold distance of the lat and lon.
+
+    :param sesh: SQLAlchemy db session
+    :param network_name: Name of network associated to history.
+    :param lat: Lat for History
+    :param lon: Lon for History
+    :param threshold: Include only histories within this distance from (lat, lon)
+    :return: Set of history ids.
+    """
+
     query_txt = """
-        WITH stns_in_thresh AS (
-            SELECT history_id, station_id, lat, lon, Geography(ST_Transform(the_geom,4326)) as p_existing,
-                Geography(ST_SetSRID(ST_MakePoint(:x, :y),4326)) as p_new
+        WITH hxs_in_thresh AS (
+            SELECT 
+                history_id, 
+                station_id, 
+                lat, 
+                lon, 
+                Geography(ST_Transform(the_geom, 4326)) as p_existing,
+                Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)) as p_new
             FROM crmp.meta_history
-            WHERE the_geom && ST_Buffer(Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)),:thresh)
+            WHERE the_geom && ST_Buffer(
+                Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)), :thresh
+            )
         )
-        SELECT history_id, ST_Distance(p_existing,p_new) as dist
-        FROM stns_in_thresh
-        NATURAL JOIN crmp.meta_station
-        NATURAL JOIN crmp.meta_network
-        WHERE network_name = :network_name
+        SELECT 
+            history_id, ST_Distance(p_existing, p_new) as dist
+        FROM hxs_in_thresh hx
+        JOIN crmp.meta_station stn ON (hx.station_id = stn.station_id)
+        JOIN crmp.meta_network nw ON (stn.network_id = nw.network_id)
+        WHERE nw.network_name = :network_name
         ORDER BY dist
 """  # noqa
+    # TODO: Why is dist computed and rows ordered by it if the result is unordered??
     q = sesh.execute(
         query_txt,
         {"x": lon, "y": lat, "thresh": threshold, "network_name": network_name},
@@ -69,7 +90,15 @@ def convert_unit(val, src_unit, dst_unit):
     return val
 
 
-def unit_check(val, unit_obs, unit_db):
+def convert_obs_value_to_db_units(val, unit_obs, unit_db):
+    """
+    Convert observation data value to database units, if possible.
+
+    :param val: Data value
+    :param unit_obs: Observation unit; assume database unit if absent
+    :param unit_db: Database unit
+    :return: value or None
+    """
     if unit_db is None:
         return None
     elif unit_obs is None:
@@ -99,11 +128,15 @@ def find_active_history(histories):
         return None
 
 
-def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
-    close_stns = closest_stns_within_threshold(sesh, network_name, lon, lat, 800)
+def find_nearest_history(
+    sesh, network_name, native_id, lat, lon, histories, diagnostic=False
+):
+    close_stns = history_ids_within_threshold(sesh, network_name, lon, lat, 800)
 
     if len(close_stns) == 0:
-        return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
+        return create_station_and_history_entry(
+            sesh, network_name, native_id, lat, lon, diagnostic=diagnostic
+        )
 
     for id in close_stns:
         for history in histories:
@@ -114,9 +147,11 @@ def find_nearest_history(sesh, network_name, native_id, lat, lon, histories):
                 return history
 
 
-def match_station(sesh, network_name, native_id, lat, lon, histories):
+def match_history(sesh, network_name, native_id, lat, lon, histories, diagnostic=False):
     if lat and lon:
-        return find_nearest_history(sesh, network_name, native_id, lat, lon, histories)
+        return find_nearest_history(
+            sesh, network_name, native_id, lat, lon, histories, diagnostic=diagnostic
+        )
     else:
         return find_active_history(histories)
 
@@ -124,58 +159,111 @@ def match_station(sesh, network_name, native_id, lat, lon, histories):
 def create_station_and_history_entry(
     sesh, network_name, native_id, lat, lon, diagnostic=False
 ):
-    network = sesh.query(Network).filter(Network.name == network_name)
+    """
+    Create a Station and an associated History object according to the arguments.
 
-    network = network.first()
-    stn = Station(native_id=native_id, network=network)
+    :param sesh: SQLAlchemy db session
+    :param network_name: Name of network associated to Station.
+    :param native_id: Native id of Station.
+    :param lat: Lat for History
+    :param lon: Lon for History
+    :param diagnostic: Boolean. In diagnostic mode? Not used!
+    :return: None
+    """
+    network = sesh.query(Network).filter(Network.name == network_name).first()
 
+    action = "Requires" if diagnostic else "Created"
+
+    station = Station(native_id=native_id, network_id=network.id)
     log.info(
-        "Created new station entry",
-        extra={"native_id": stn.native_id, "network_name": network.name},
+        f"{action} new station entry",
+        extra={"native_id": station.native_id, "network_name": network.name},
     )
 
-    hist = History(station=stn, lat=lat, lon=lon)
-
+    history = History(station=station, lat=lat, lon=lon)
     log.warning(
-        "Created new history entry",
+        f"{action} new history entry",
         extra={
-            "history": hist.id,
+            "history": history.id,
             "network_name": network_name,
-            "native_id": stn.native_id,
+            "native_id": station.native_id,
             "lat": lat,
             "lon": lon,
         },
     )
+
+    if diagnostic:
+        log.info(
+            f"In diagnostic mode. Skipping insertion of new history entry for: "
+            f"network_name={network_name}, native_id={native_id}, lat={lat}, lon={lon}"
+        )
+        return None
+
     try:
-        sesh.add(stn)
-        sesh.add(hist)
+        with sesh.begin_nested():
+            sesh.add(station)
+            sesh.add(history)
     except Exception as e:
         log.warning(
             "Unable to insert new stn/hist entries",
-            extra={"stn": stn, "hist": hist, "exception": e},
+            extra={"stn": station, "hist": history, "exception": e},
         )
-        sesh.rollback()
-        raise InsertionError(native_id=stn.id, hid=hist.id, e=e)
-    else:
-        sesh.commit()
-    return hist
+        raise InsertionError(native_id=station.id, hid=history.id, e=e)
+    sesh.commit()
+
+    return history
 
 
 def get_variable(sesh, network_name, variable_name):
+    """
+    Find (but not create) a Variable matching the arguments, if possible.
+
+    :param sesh: SQLAlchemy db session
+    :param network_name: Name of network that Variable must be in.
+    :param variable_name: Name of Variable
+    :return: Variable or None
+    """
     variable = (
         sesh.query(Variable)
         .join(Network)
         .filter(and_(Network.name == network_name, Variable.name == variable_name))
         .first()
     )
-
-    if not variable:
-        return None
-
     return variable
 
 
-def get_history(sesh, network_name, native_id, lat, lon, diagnostic=False):
+def find_or_create_matching_history_and_station(
+    sesh, network_name, native_id, lat, lon, diagnostic=False
+):
+    """
+    Find or create a History and associated Station record matching the arguments,
+    if possible.
+
+    Always return a matching History if it already exists in the database.
+
+    In diagnostic mode, do not create any new records (History or Station).
+
+    :param sesh: SQLAlchemy db session
+    :param network_name: Name of network that History must be in.
+    :param native_id: Native id of station that history must be associated with.
+    :param lat: Lat for history record; either for spatial matching or creation -
+        see below
+    :param lon: Lon for history record; either for spatial matching or creation -
+        see below
+    :param diagnostic: Boolean. In diagnostic mode?
+    :return: History object or None
+
+    Search db for existing history records exactly matching network_name and station_id.
+
+    If no such history is found, create one (along with the necessary station record)
+    and return it. In diagnostic mode, do not create new records.
+
+    If exactly one such history is found, return it.
+
+    If more than one such history is found, do a spatial (lat, lon) match on them.
+    - If at least one is found within tolerance distance, return one.
+    - If none are found within tolerance, this is an error condition, return None.
+    """
     log.debug("Searching for native_id = %s", native_id)
     histories = (
         sesh.query(History)
@@ -186,101 +274,116 @@ def get_history(sesh, network_name, native_id, lat, lon, diagnostic=False):
 
     if histories.count() == 0:
         log.debug("Cound not find native_id %s", native_id)
-        if diagnostic:
-            log.info(
-                f"In diagnostic mode. Skipping insertion of new history entry: {network_name}, {native_id}, {lat}, {lon}"
-            )
-            return
-        return create_station_and_history_entry(sesh, network_name, native_id, lat, lon)
+        return create_station_and_history_entry(
+            sesh, network_name, native_id, lat, lon, diagnostic=diagnostic
+        )
     elif histories.count() == 1:
         log.debug("Found exactly one matching history_id")
         return histories.one_or_none()
     elif histories.count() >= 2:
         log.debug("Found multiple history entries. Searching for match.")
-        return match_station(sesh, network_name, native_id, lat, lon, histories)
+        return match_history(
+            sesh, network_name, native_id, lat, lon, histories, diagnostic=diagnostic
+        )
 
 
-def is_network(sesh, network_name):
+def does_network_exist(sesh, network_name):
     network = sesh.query(Network).filter(Network.name == network_name)
     return network.count() != 0
 
 
-def has_required_information(obs_tuple):
+def has_required_information(row):
     return (
-        obs_tuple.network_name is not None
-        and obs_tuple.time is not None
-        and obs_tuple.val is not None
-        and obs_tuple.variable_name is not None
+        row.network_name is not None
+        and row.time is not None
+        and row.val is not None
+        and row.variable_name is not None
     )
 
 
-def align(sesh, obs_tuple, diagnostic=False):
-    # Without these items an Obs object cannot be produced
-    if not has_required_information(obs_tuple):
+def align(sesh, row, diagnostic=False):
+    """
+    Create, if possible, an Obs object from the obs_tuple and return it.
+
+    :param sesh: SQLAlchemy db session
+    :param row: Single Row defining an observation.
+    :param diagnostic: Boolean. In diagnostic mode?
+    :return: Obs or None
+
+    Steps:
+    1. Do data sanity checks. On fail, return None.
+    2. Find or create matching history and station records. If not possible,
+        return None. In diagnostic mode, do not create new records; return None.
+    3. Convert observation value to database units. If not possible, return None.
+    4. Create Obs using history, network, value, and return it.
+    """
+
+    # Sanity check: row contains all info required to create an Obs object
+    if not has_required_information(row):
         log.debug(
             "Observation missing critical information",
             extra={
-                "network_name": obs_tuple.network_name,
-                "time": obs_tuple.time,
-                "val": obs_tuple.val,
-                "variable_name": obs_tuple.variable_name,
+                "network_name": row.network_name,
+                "time": row.time,
+                "val": row.val,
+                "variable_name": row.variable_name,
             },
         )
         return None
 
-    if not is_network(sesh, obs_tuple.network_name):
+    # Sanity check: specified network exists
+    if not does_network_exist(sesh, row.network_name):
         log.error(
             "Network does not exist in db",
-            extra={"network_name": obs_tuple.network_name},
+            extra={"network_name": row.network_name},
         )
         return None
 
-    history = get_history(
+    # Find or create a matching History record, if possible.
+    history = find_or_create_matching_history_and_station(
         sesh,
-        obs_tuple.network_name,
-        obs_tuple.station_id,
-        obs_tuple.lat,
-        obs_tuple.lon,
+        row.network_name,
+        row.station_id,
+        row.lat,
+        row.lon,
         diagnostic,
     )
-
     if not history:
         log.warning(
             "Could not find history match",
             extra={
-                "network_name": obs_tuple.network_name,
-                "native_id": obs_tuple.station_id,
+                "network_name": row.network_name,
+                "native_id": row.station_id,
             },
         )
         return None
 
-    variable = get_variable(sesh, obs_tuple.network_name, obs_tuple.variable_name)
-
-    # Necessary attributes for Obs object
+    # Find a matching Variable object, if possible.
+    variable = get_variable(sesh, row.network_name, row.variable_name)
     if not variable:
         log.debug(
             'Variable "%s" from network "%s" is not tracked by crmp',
-            obs_tuple.variable_name,
-            obs_tuple.network_name,
+            row.variable_name,
+            row.network_name,
         )
         return None
 
-    datum = unit_check(obs_tuple.val, obs_tuple.unit, variable.unit)
+    # Convert observation value to database units.
+    datum = convert_obs_value_to_db_units(row.val, row.unit, variable.unit)
     if datum is None:
         log.debug(
             "Unable to confirm data units",
             extra={
-                "unit_obs": obs_tuple.unit,
+                "unit_obs": row.unit,
                 "unit_db": variable.unit,
-                "data": obs_tuple.val,
-                "network_name": obs_tuple.network_name,
+                "data": row.val,
+                "network_name": row.network_name,
             },
         )
         return None
 
+    # Create Obs object.
     # Note: We are very specifically creating the Obs object here using the ids
     # to avoid SQLAlchemy adding this object to the session as part of its
     # cascading backref behaviour https://goo.gl/Lchhv6
-    return Obs(
-        history_id=history.id, time=obs_tuple.time, datum=datum, vars_id=variable.id
-    )
+    return Obs(history_id=history.id, time=row.time, datum=datum, vars_id=variable.id)
