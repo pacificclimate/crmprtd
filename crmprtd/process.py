@@ -96,20 +96,25 @@ def process(
         )
         raise Exception("No module name given")
 
+    # Get the normalizer for the specified network.
     download_stream = sys.stdin.buffer
     norm_mod = get_normalization_module(network)
 
-    rows = [row for row in norm_mod.normalize(download_stream)]
+    # The normalizer returns a generator that yields `Row`s. Convert to a list of Rows.
+    rows = list(norm_mod.normalize(download_stream))
 
     engine = create_engine(connection_string)
     Session = sessionmaker(engine)
     sesh = Session()
 
+    # Optionally infer variables and stations/histories.
     if do_infer:
         infer(sesh, rows, is_diagnostic)
 
+    # Filter the observations by time period, then align them.
     observations = list(
-        # Note: filter(None, <collection>) removes falsy values from <collection>.
+        # Note: filter(None, <collection>) removes falsy values from <collection>,
+        # in this case possible None values returned by align.
         filter(
             None,
             (
@@ -119,8 +124,8 @@ def process(
             ),
         )
     )
-    log.info(f"Count of observations to insert: {len(observations)}")
 
+    log.info(f"Count of observations to process: {len(observations)}")
     if is_diagnostic:
         for obs in observations:
             log.info(obs)
@@ -158,7 +163,7 @@ def run_data_pipeline(
             for chunk in cache_iter:
                 f.write(chunk)
 
-    rows = [row for row in normalize_func(download_iter)]
+    rows = list(normalize_func(download_iter))
 
     engine = create_engine(connection_string)
     Session = sessionmaker(engine)
