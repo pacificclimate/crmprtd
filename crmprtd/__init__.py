@@ -50,6 +50,7 @@ speed and reliability. This phase is common to all networks.
 
 import logging
 import logging.config
+import pkg_resources
 from pkg_resources import resource_stream
 from collections import namedtuple
 from itertools import tee
@@ -74,6 +75,19 @@ Row = namedtuple(
     "Row",
     "time val variable_name unit network_name station_id lat lon",
 )
+
+
+def add_version_arg(parser):
+    parser.add_argument(
+        "--version",
+        action="store_true",
+        help="Output version number and exit",
+    )
+    return parser
+
+
+def get_version():
+    return pkg_resources.require("crmprtd")[0].version
 
 
 def add_logging_args(parser):
