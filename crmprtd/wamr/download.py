@@ -21,8 +21,7 @@ from argparse import ArgumentParser
 # Local
 from crmprtd.download import retry, ftp_connect
 from crmprtd.download import FTPReader
-from crmprtd import add_logging_args, setup_logging
-
+from crmprtd import add_logging_args, setup_logging, get_version, add_version_arg
 
 log = logging.getLogger(__name__)
 
@@ -85,6 +84,7 @@ class WAMRFTPReader(FTPReader):
 def main():
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
+    add_version_arg(parser)
     parser.add_argument(
         "-f",
         "--ftp_server",
@@ -101,6 +101,10 @@ def main():
     )
     parser = add_logging_args(parser)
     args = parser.parse_args()
+
+    if args.version:
+        print(get_version())
+        return
 
     setup_logging(
         args.log_conf,
