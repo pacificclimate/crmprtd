@@ -19,16 +19,15 @@ PyYAML = "==5.4"
 SQLAlchemy = "==1.4.*"
 pysftp = "==0.2.8"
 requests = { version = "==2.22", extras = [ "security",] }
-black = { version = "*", index = "pypipacificclimate" }
 
 [dev-packages]
-black = {version = "*", index = "pypipacificclimate"}
 pytest = "==6.1.2"
 pytest-cov = "==2.10.1"
 python-json-logger = "==0.1.9"
 "testing.postgresql" = "==1.3.0"
 requests-mock = "==1.7"
 pytest-mock = "==1.11.1"
+black = "*"
 
 [requires]
 python_version = "3.8"
