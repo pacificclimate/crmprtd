@@ -22,7 +22,10 @@ from argparse import ArgumentParser
 # Local
 from crmprtd.download import retry, ftp_connect
 from crmprtd.download import FTPReader, extract_auth
-from crmprtd import add_logging_args, setup_logging, common_auth_arguments
+from crmprtd import (
+    add_logging_args, setup_logging, common_auth_arguments, add_version_arg,
+    get_version,
+)
 
 log = logging.getLogger(__name__)
 
@@ -73,8 +76,9 @@ class WMBFTPReader(FTPReader):
 def main():
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
-    parser = add_logging_args(parser)
-    parser = common_auth_arguments(parser)
+    add_version_arg(parser)
+    add_logging_args(parser)
+    common_auth_arguments(parser)
     parser.add_argument(
         "-f",
         "--ftp_server",
@@ -88,6 +92,10 @@ def main():
         help=("Filename to open on the Wildfire Management " "Branch's ftp site"),
     )
     args = parser.parse_args()
+
+    if args.version:
+        print(get_version())
+        return
 
     setup_logging(
         args.log_conf,
