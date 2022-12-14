@@ -23,7 +23,7 @@ from argparse import ArgumentParser
 
 # Local
 from crmprtd.ec import makeurl
-from crmprtd import setup_logging, add_logging_args
+from crmprtd import setup_logging, add_logging_args, add_version_arg, get_version
 from crmprtd.download import https_download, verify_date
 
 log = logging.getLogger(__name__)
@@ -58,6 +58,7 @@ def download(time, frequency, province, language, baseurl):
 def main():
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
+    add_version_arg(parser)
     parser.add_argument(
         "-p", "--province", required=True, help="2 letter province code"
     )
@@ -105,8 +106,12 @@ def main():
             "the meteorological observations service"
         ),
     )
-    parser = add_logging_args(parser)
+    add_logging_args(parser)
     args = parser.parse_args()
+
+    if args.version:
+        print(get_version())
+        return
 
     setup_logging(
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd.ec"
