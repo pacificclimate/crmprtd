@@ -386,6 +386,4 @@ def align(sesh, row, diagnostic=False):
     # Note: We are very specifically creating the Obs object here using the ids
     # to avoid SQLAlchemy adding this object to the session as part of its
     # cascading backref behaviour https://goo.gl/Lchhv6
-    return Obs(
-        history_id=history.id, time=row.time, datum=datum, vars_id=variable.id
-    )
+    return Obs(history_id=history.id, time=row.time, datum=datum, vars_id=variable.id)

@@ -93,9 +93,7 @@ def infer(sesh, rows, diagnostic=False):
     ]
 
     # Reduce observations to unique set of tuples describing required variables
-    vars_to_create = {
-        (row.network_name, row.variable_name, row.unit) for row in rows
-    }
+    vars_to_create = {(row.network_name, row.variable_name, row.unit) for row in rows}
 
     # Construct required variables. They are never committed to the database.
     with sesh.begin_nested() as nested:
