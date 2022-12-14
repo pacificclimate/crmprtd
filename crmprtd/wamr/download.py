@@ -21,7 +21,7 @@ from argparse import ArgumentParser
 # Local
 from crmprtd.download import retry, ftp_connect
 from crmprtd.download import FTPReader
-from crmprtd import logging_args, setup_logging
+from crmprtd import add_logging_args, setup_logging
 
 
 log = logging.getLogger(__name__)
@@ -99,7 +99,7 @@ def main():
         default=("pub/outgoing/AIR/Hourly_Raw_Air_Data/" "Meteorological/"),
         help="FTP Directory containing WAMR's data files",
     )
-    parser = logging_args(parser)
+    parser = add_logging_args(parser)
     args = parser.parse_args()
 
     setup_logging(

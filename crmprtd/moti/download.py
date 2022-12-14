@@ -29,7 +29,7 @@ from argparse import ArgumentParser
 
 # Local
 import crmprtd.download
-from crmprtd import common_auth_arguments, logging_args, setup_logging
+from crmprtd import common_auth_arguments, add_logging_args, setup_logging
 
 log = logging.getLogger(__name__)
 
@@ -93,7 +93,7 @@ def download(
 def main():  # pragma: no cover
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
-    parser = logging_args(parser)
+    parser = add_logging_args(parser)
     parser = common_auth_arguments(parser)
     parser.add_argument(
         "-S",

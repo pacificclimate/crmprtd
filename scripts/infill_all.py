@@ -20,7 +20,7 @@ import itertools
 
 from dateutil.tz import tzlocal
 
-from crmprtd import logging_args, setup_logging
+from crmprtd import add_logging_args, setup_logging
 from crmprtd.infill import infill
 
 
@@ -66,7 +66,7 @@ def main():
         help="Set of networks for which to infill",
     )
 
-    parser = logging_args(parser)
+    parser = add_logging_args(parser)
     args = parser.parse_args()
 
     log_args = [

@@ -23,7 +23,7 @@ from argparse import ArgumentParser
 
 # Local
 from crmprtd.ec import makeurl
-from crmprtd import setup_logging, logging_args
+from crmprtd import setup_logging, add_logging_args
 from crmprtd.download import https_download, verify_date
 
 log = logging.getLogger(__name__)
@@ -105,7 +105,7 @@ def main():
             "the meteorological observations service"
         ),
     )
-    parser = logging_args(parser)
+    parser = add_logging_args(parser)
     args = parser.parse_args()
 
     setup_logging(

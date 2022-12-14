@@ -13,10 +13,10 @@ from crmprtd.align import align
 from crmprtd.insert import insert
 from crmprtd.download import verify_date
 from crmprtd.infer import infer
-from crmprtd import logging_args, setup_logging, NETWORKS
+from crmprtd import add_logging_args, setup_logging, NETWORKS
 
 
-def process_args(parser):  # pragma: no cover
+def add_process_args(parser):  # pragma: no cover
     parser.add_argument(
         "-c", "--connection_string", help="PostgreSQL connection string", required=True
     )
@@ -178,8 +178,8 @@ def run_data_pipeline(
 
 def main():
     parser = ArgumentParser()
-    parser = process_args(parser)
-    parser = logging_args(parser)
+    add_process_args(parser)
+    add_logging_args(parser)
     args = parser.parse_args()
 
     setup_logging(

@@ -76,7 +76,7 @@ Row = namedtuple(
 )
 
 
-def logging_args(parser):
+def add_logging_args(parser):
     parser.add_argument(
         "-L",
         "--log_conf",

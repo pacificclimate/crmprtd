@@ -24,7 +24,7 @@ from datetime import timedelta
 import dateutil.parser
 
 import crmprtd.download
-from crmprtd import logging_args, setup_logging, common_auth_arguments
+from crmprtd import add_logging_args, setup_logging, common_auth_arguments
 
 log = logging.getLogger(__name__)
 
@@ -68,7 +68,7 @@ def download(client_id, start_date, end_date):  # pragma: no cover
 def main():  # pragma: no cover
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
-    parser = logging_args(parser)
+    parser = add_logging_args(parser)
     parser = common_auth_arguments(parser)
     parser.add_argument(
         "-S",
