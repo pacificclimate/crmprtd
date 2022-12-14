@@ -292,92 +292,92 @@ def does_network_exist(sesh, network_name):
     return network.count() != 0
 
 
-def has_required_information(obs_tuple):
+def has_required_information(row):
     return (
-        obs_tuple.network_name is not None
-        and obs_tuple.time is not None
-        and obs_tuple.val is not None
-        and obs_tuple.variable_name is not None
+        row.network_name is not None
+        and row.time is not None
+        and row.val is not None
+        and row.variable_name is not None
     )
 
 
-def align(sesh, obs_tuple, diagnostic=False):
+def align(sesh, row, diagnostic=False):
     """
     Create, if possible, an Obs object from the obs_tuple and return it.
 
     :param sesh: SQLAlchemy db session
-    :param obs_tuple: Single record from input data defining an observation.
+    :param row: Single Row defining an observation.
     :param diagnostic: Boolean. In diagnostic mode?
     :return: Obs or None
 
     Steps:
     1. Do data sanity checks. On fail, return None.
-    2. Find or create matching history and station records. If not possible, return None.
-        In diagnostic mode, do not create new records; return None.
+    2. Find or create matching history and station records. If not possible,
+        return None. In diagnostic mode, do not create new records; return None.
     3. Convert observation value to database units. If not possible, return None.
     4. Create Obs using history, network, value, and return it.
     """
 
-    # Sanity check: obs tuple contains all info required to create an Obs object
-    if not has_required_information(obs_tuple):
+    # Sanity check: row contains all info required to create an Obs object
+    if not has_required_information(row):
         log.debug(
             "Observation missing critical information",
             extra={
-                "network_name": obs_tuple.network_name,
-                "time": obs_tuple.time,
-                "val": obs_tuple.val,
-                "variable_name": obs_tuple.variable_name,
+                "network_name": row.network_name,
+                "time": row.time,
+                "val": row.val,
+                "variable_name": row.variable_name,
             },
         )
         return None
 
     # Sanity check: specified network exists
-    if not does_network_exist(sesh, obs_tuple.network_name):
+    if not does_network_exist(sesh, row.network_name):
         log.error(
             "Network does not exist in db",
-            extra={"network_name": obs_tuple.network_name},
+            extra={"network_name": row.network_name},
         )
         return None
 
     # Find or create a matching History record, if possible.
     history = find_or_create_matching_history_and_station(
         sesh,
-        obs_tuple.network_name,
-        obs_tuple.station_id,
-        obs_tuple.lat,
-        obs_tuple.lon,
+        row.network_name,
+        row.station_id,
+        row.lat,
+        row.lon,
         diagnostic,
     )
     if not history:
         log.warning(
             "Could not find history match",
             extra={
-                "network_name": obs_tuple.network_name,
-                "native_id": obs_tuple.station_id,
+                "network_name": row.network_name,
+                "native_id": row.station_id,
             },
         )
         return None
 
     # Find a matching Variable object, if possible.
-    variable = get_variable(sesh, obs_tuple.network_name, obs_tuple.variable_name)
+    variable = get_variable(sesh, row.network_name, row.variable_name)
     if not variable:
         log.debug(
             'Variable "%s" from network "%s" is not tracked by crmp',
-            obs_tuple.variable_name,
-            obs_tuple.network_name,
+            row.variable_name,
+            row.network_name,
         )
         return None
 
     # Convert observation value to database units.
-    datum = convert_obs_value_to_db_units(obs_tuple.val, obs_tuple.unit, variable.unit)
+    datum = convert_obs_value_to_db_units(row.val, row.unit, variable.unit)
     if datum is None:
         log.debug(
             "Unable to confirm data units",
             extra={
-                "unit_obs": obs_tuple.unit,
+                "unit_obs": row.unit,
                 "unit_db": variable.unit,
-                "data": obs_tuple.val,
-                "network_name": obs_tuple.network_name,
+                "data": row.val,
+                "network_name": row.network_name,
             },
         )
         return None
@@ -387,5 +387,5 @@ def align(sesh, obs_tuple, diagnostic=False):
     # to avoid SQLAlchemy adding this object to the session as part of its
     # cascading backref behaviour https://goo.gl/Lchhv6
     return Obs(
-        history_id=history.id, time=obs_tuple.time, datum=datum, vars_id=variable.id
+        history_id=history.id, time=row.time, datum=datum, vars_id=variable.id
     )

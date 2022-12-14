@@ -60,7 +60,7 @@ def create_variable(
     )
 
 
-def infer(sesh, obs_tuples, diagnostic=False):
+def infer(sesh, rows, diagnostic=False):
     """
     Infer the variables, stations, and histories required by the data.
 
@@ -71,7 +71,7 @@ def infer(sesh, obs_tuples, diagnostic=False):
         diagnostic mode.
 
     :param sesh: SQLAlchemy db session
-    :param obs_tuples: Data representing observations to be inserted.
+    :param rows: Collection of Rows representing observations to be inserted.
     :param diagnostic: Boolean. In diagnostic mode?
     :return: None
     """
@@ -79,7 +79,7 @@ def infer(sesh, obs_tuples, diagnostic=False):
     # Reduce observations to unique set of tuples describing required histories
     # and stations.
     hists_to_create = {
-        (obs.network_name, obs.station_id, obs.lat, obs.lon) for obs in obs_tuples
+        (row.network_name, row.station_id, row.lat, row.lon) for row in rows
     }
 
     # Find or create matching histories and stations.
@@ -94,7 +94,7 @@ def infer(sesh, obs_tuples, diagnostic=False):
 
     # Reduce observations to unique set of tuples describing required variables
     vars_to_create = {
-        (obs.network_name, obs.variable_name, obs.unit) for obs in obs_tuples
+        (row.network_name, row.variable_name, row.unit) for row in rows
     }
 
     # Construct required variables. They are never committed to the database.
