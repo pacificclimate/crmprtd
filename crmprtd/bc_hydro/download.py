@@ -25,7 +25,7 @@ from dateutil import relativedelta
 import dateutil.parser
 
 from crmprtd.download import verify_date
-from crmprtd import add_logging_args, setup_logging
+from crmprtd import add_logging_args, setup_logging, get_version, add_version_arg
 
 log = logging.getLogger(__name__)
 
@@ -115,7 +115,8 @@ def download_relevant_bch_zipfiles(start_date, end_date, connection, remote_file
 def main():  # pragma: no cover
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
-    parser = add_logging_args(parser)
+    add_version_arg(parser)
+    add_logging_args(parser)
     parser.add_argument(
         "-u", "--username", default="pcic", help=("Username for the ftp server ")
     )
@@ -158,6 +159,10 @@ def main():  # pragma: no cover
         ),
     )
     args = parser.parse_args()
+
+    if args.version:
+        print(get_version())
+        return
 
     setup_logging(
         args.log_conf,
