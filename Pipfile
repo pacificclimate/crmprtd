@@ -18,6 +18,7 @@ pytz = "==2019.3"
 PyYAML = "==5.4"
 SQLAlchemy = "==1.4.*"
 pysftp = "==0.2.8"
+requests = { version = "==2.22", extras = [ "security",] }
 black = { version = "*", index = "pypipacificclimate" }
 
 [dev-packages]
@@ -31,7 +32,3 @@ pytest-mock = "==1.11.1"
 
 [requires]
 python_version = "3.8"
-
-[packages.requests]
-extras = [ "security",]
-version = "==2.22"
