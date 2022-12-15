@@ -13,12 +13,18 @@ from crmprtd.align import align
 from crmprtd.insert import insert
 from crmprtd.download import verify_date
 from crmprtd.infer import infer
-from crmprtd import logging_args, setup_logging, NETWORKS
+from crmprtd import (
+    add_version_arg,
+    add_logging_args,
+    setup_logging,
+    NETWORKS,
+    get_version,
+)
 
 
-def process_args(parser):  # pragma: no cover
+def add_process_args(parser):  # pragma: no cover
     parser.add_argument(
-        "-c", "--connection_string", help="PostgreSQL connection string", required=True
+        "-c", "--connection_string", help="PostgreSQL connection string"
     )
     parser.add_argument(
         "-D",
@@ -176,15 +182,20 @@ def run_data_pipeline(
     log.info("Data insertion results", extra={"results": results})
 
 
-def main():
+def main(args=None):
     parser = ArgumentParser()
-    parser = process_args(parser)
-    parser = logging_args(parser)
-    args = parser.parse_args()
+    add_version_arg(parser)
+    add_process_args(parser)
+    add_logging_args(parser)
+    args = parser.parse_args(args)
 
     setup_logging(
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"
     )
+
+    if args.version:
+        print(get_version())
+        return
 
     utc = pytz.utc
 
@@ -194,13 +205,13 @@ def main():
     args.end_date = utc.localize(verify_date(args.end_date, datetime.max, "end date"))
 
     process(
-        args.connection_string,
-        args.sample_size,
-        args.network,
-        args.start_date,
-        args.end_date,
-        args.diag,
-        args.infer,
+        connection_string=args.connection_string,
+        sample_size=args.sample_size,
+        network=args.network,
+        start_date=args.start_date,
+        end_date=args.end_date,
+        is_diagnostic=args.diag,
+        do_infer=args.infer,
     )
 
 

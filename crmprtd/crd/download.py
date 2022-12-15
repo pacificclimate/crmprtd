@@ -24,7 +24,13 @@ from datetime import timedelta
 import dateutil.parser
 
 import crmprtd.download
-from crmprtd import logging_args, setup_logging, common_auth_arguments
+from crmprtd import (
+    add_logging_args,
+    setup_logging,
+    common_auth_arguments,
+    add_version_arg,
+    get_version,
+)
 
 log = logging.getLogger(__name__)
 
@@ -65,11 +71,12 @@ def download(client_id, start_date, end_date):  # pragma: no cover
         sys.exit(1)
 
 
-def main():  # pragma: no cover
+def main(args=None):  # pragma: no cover
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
-    parser = logging_args(parser)
-    parser = common_auth_arguments(parser)
+    add_version_arg(parser)
+    add_logging_args(parser)
+    common_auth_arguments(parser)
     parser.add_argument(
         "-S",
         "--start_time",
@@ -90,7 +97,11 @@ def main():  # pragma: no cover
             "Defaults to now."
         ),
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
+
+    if args.version:
+        print(get_version())
+        return
 
     setup_logging(
         args.log_conf,

@@ -20,13 +20,14 @@ import itertools
 
 from dateutil.tz import tzlocal
 
-from crmprtd import logging_args, setup_logging
+from crmprtd import add_logging_args, setup_logging, add_version_arg, get_version
 from crmprtd.infill import infill
 
 
-def main():
+def main(args=None):
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
+    add_version_arg(parser)
     parser.add_argument(
         "-S",
         "--start_time",
@@ -56,7 +57,7 @@ def main():
         "those networks.",
     )
     parser.add_argument(
-        "-c", "--connection_string", help="PostgreSQL connection string", required=True
+        "-c", "--connection_string", help="PostgreSQL connection string"
     )
     parser.add_argument(
         "-N",
@@ -66,8 +67,12 @@ def main():
         help="Set of networks for which to infill",
     )
 
-    parser = logging_args(parser)
-    args = parser.parse_args()
+    parser = add_logging_args(parser)
+    args = parser.parse_args(args)
+
+    if args.version:
+        print(get_version())
+        return
 
     log_args = [
         args.log_conf,

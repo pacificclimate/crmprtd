@@ -16,16 +16,15 @@ import sys
 import re
 from zipfile import ZipFile
 from argparse import ArgumentParser
-from datetime import date, timedelta, datetime
+from datetime import datetime
 from functools import partial
 from tempfile import mkstemp
 from contextlib import contextmanager
 
 from dateutil import relativedelta
-import dateutil.parser
 
 from crmprtd.download import verify_date
-from crmprtd import logging_args, setup_logging
+from crmprtd import add_logging_args, setup_logging, get_version, add_version_arg
 
 log = logging.getLogger(__name__)
 
@@ -112,30 +111,30 @@ def download_relevant_bch_zipfiles(start_date, end_date, connection, remote_file
                 sys.stdout.buffer.write(txt_file.read())
 
 
-def main():  # pragma: no cover
+def main(args=None):  # pragma: no cover
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
-    parser = logging_args(parser)
+    add_version_arg(parser)
+    add_logging_args(parser)
     parser.add_argument(
-        "-u", "--username", default="pcic", help=("Username for the ftp server ")
+        "-u", "--username", default="pcic", help="Username for the ftp server "
     )
     parser.add_argument(
         "-f",
         "--ftp_server",
         default="sftp2.bchydro.com",
-        help=("Full uri to BC Hydro's ftp " "server"),
+        help="Full uri to BC Hydro's ftp server",
     )
     parser.add_argument(
         "-F",
         "--ftp_dir",
         default=("pcic"),
-        help=("FTP Directory containing BC hydro's " "data files"),
+        help="FTP Directory containing BC hydro's data files",
     )
     parser.add_argument(
         "-S",
         "--ssh_private_key",
-        required=True,
-        help=("Path to file with SSH private key"),
+        help="Path to file with SSH private key",
     )
     end = datetime.now()
     start = end - relativedelta.relativedelta(months=1)
@@ -157,7 +156,11 @@ def main():  # pragma: no cover
             "Defaults to now."
         ),
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
+
+    if args.version:
+        print(get_version())
+        return
 
     setup_logging(
         args.log_conf,

@@ -1,8 +1,8 @@
 from crmprtd.ec_swob.download import main as swob_main
 
 
-def main():
-    swob_main("nt-water")
+def main(args=None):
+    swob_main("nt-water", args)
 
 
 if __name__ == "__main__":

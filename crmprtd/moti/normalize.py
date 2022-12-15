@@ -48,7 +48,7 @@ def normalize(file_stream):
             time = member.get("valid-time")
             if not time:
                 log.warning(
-                    "Could not find a valid-time attribute for this " "observation"
+                    "Could not find a valid-time attribute for this observation"
                 )
                 continue
 

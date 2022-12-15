@@ -21,8 +21,7 @@ from argparse import ArgumentParser
 # Local
 from crmprtd.download import retry, ftp_connect
 from crmprtd.download import FTPReader
-from crmprtd import logging_args, setup_logging
-
+from crmprtd import add_logging_args, setup_logging, get_version, add_version_arg
 
 log = logging.getLogger(__name__)
 
@@ -82,25 +81,28 @@ class WAMRFTPReader(FTPReader):
         self.connection.retrlines("NLST " + data_path, callback)
 
 
-def main():
+def main(args=None):
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
+    add_version_arg(parser)
     parser.add_argument(
         "-f",
         "--ftp_server",
         default="ftp.env.gov.bc.ca",
-        help=(
-            "Full hostname of Water and Air Monitoring and " "Reporting's ftp server"
-        ),
+        help=("Full hostname of Water and Air Monitoring and Reporting's ftp server"),
     )
     parser.add_argument(
         "-F",
         "--ftp_dir",
-        default=("pub/outgoing/AIR/Hourly_Raw_Air_Data/" "Meteorological/"),
+        default="pub/outgoing/AIR/Hourly_Raw_Air_Data/Meteorological/",
         help="FTP Directory containing WAMR's data files",
     )
-    parser = logging_args(parser)
-    args = parser.parse_args()
+    parser = add_logging_args(parser)
+    args = parser.parse_args(args)
+
+    if args.version:
+        print(get_version())
+        return
 
     setup_logging(
         args.log_conf,

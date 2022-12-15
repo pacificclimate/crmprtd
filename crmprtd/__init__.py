@@ -50,9 +50,9 @@ speed and reliability. This phase is common to all networks.
 
 import logging
 import logging.config
+import pkg_resources
 from pkg_resources import resource_stream
 from collections import namedtuple
-from itertools import tee
 
 SWOB_PARTNERS = (
     "bc_env_aq",
@@ -76,12 +76,25 @@ Row = namedtuple(
 )
 
 
-def logging_args(parser):
+def add_version_arg(parser):
+    parser.add_argument(
+        "--version",
+        action="store_true",
+        help="Output version number and exit",
+    )
+    return parser
+
+
+def get_version():
+    return pkg_resources.require("crmprtd")[0].version
+
+
+def add_logging_args(parser):
     parser.add_argument(
         "-L",
         "--log_conf",
         default=None,
-        help=("YAML file to use to override the default " "logging configuration"),
+        help="YAML file to use to override the default logging configuration",
     )
     parser.add_argument(
         "-l", "--log_filename", default=None, help="Override the default log filename"
@@ -123,7 +136,7 @@ def common_script_arguments(parser):  # pragma: no cover
         "-L",
         "--log_conf",
         default=None,
-        help=("YAML file to use to override the default " "logging configuration"),
+        help="YAML file to use to override the default logging configuration",
     )
     parser.add_argument(
         "-l", "--log_filename", default=None, help="Override the default log filename"
@@ -150,7 +163,7 @@ def common_script_arguments(parser):  # pragma: no cover
     parser.add_argument(
         "-C",
         "--cache_file",
-        help="Full path of file in which to put downloaded " "observations",
+        help="Full path of file in which to put downloaded observations",
     )
     parser.add_argument("-i", "--input_file", help="Input file to process")
     parser.add_argument(
@@ -169,13 +182,13 @@ def common_auth_arguments(parser):  # pragma: no cover
         "--auth_fname", help="Yaml file with plaintext usernames/passwords"
     )
     parser.add_argument(
-        "--auth_key", help=("Top level key which user/pass are stored in " "yaml file.")
+        "--auth_key", help="Top level key which user/pass are stored in yaml file."
     )
     parser.add_argument(
-        "--username", help=("The username for data requests. Overrides auth " "file.")
+        "--username", help="The username for data requests. Overrides auth file."
     )
     parser.add_argument(
-        "--password", help=("The password for data requests. Overrides auth " "file.")
+        "--password", help="The password for data requests. Overrides auth file."
     )
     return parser
 

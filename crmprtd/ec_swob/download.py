@@ -24,14 +24,13 @@ from lxml import html
 import requests
 
 from crmprtd.download import https_download, verify_date
-from crmprtd import logging_args, setup_logging
-
+from crmprtd import add_logging_args, setup_logging, add_version_arg, get_version
 
 log = logging.getLogger(__name__)
 
 
 def get_url_list(
-    base_url="https://dd.weather.gc.ca/observations/swob-ml/partners/" "bc-env-snow/",
+    base_url="https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/",
     date=datetime.datetime.now(),
 ):
     """Recursively search an HTML directory tree and yield a set of
@@ -110,7 +109,7 @@ def split_multi_xml_stream(stream):
         yield rv
 
 
-def main(partner):
+def main(partner, args=None):
     """Main download function to use for download scripts for the EC_SWOB
     provincial partners (e.g. bc-env-snow, bc-env-aq, bc-forestry and
     bc-tran).
@@ -118,6 +117,7 @@ def main(partner):
     Args:
         partner (str): The partner abbreviation found in the SWOB URL
         (e.g. bc-tran)
+        args (list): Argument list (for testing; default is to parse from sys.argv).
 
     Returns:
         No return value. Produces side-effect of sending downloaded
@@ -126,7 +126,8 @@ def main(partner):
     """
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
-    parser = logging_args(parser)
+    add_version_arg(parser)
+    add_logging_args(parser)
     parser.add_argument(
         "-d",
         "--date",
@@ -136,7 +137,11 @@ def main(partner):
             "Defaults to now."
         ),
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
+
+    if args.version:
+        print(get_version())
+        return
 
     setup_logging(
         args.log_conf,

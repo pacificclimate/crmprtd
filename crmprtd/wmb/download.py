@@ -12,7 +12,6 @@ greater than 24 hours, you will miss data.
 
 # Standard module
 import os
-import logging
 import logging.config
 import ftplib
 import sys
@@ -22,7 +21,13 @@ from argparse import ArgumentParser
 # Local
 from crmprtd.download import retry, ftp_connect
 from crmprtd.download import FTPReader, extract_auth
-from crmprtd import logging_args, setup_logging, common_auth_arguments
+from crmprtd import (
+    add_logging_args,
+    setup_logging,
+    common_auth_arguments,
+    add_version_arg,
+    get_version,
+)
 
 log = logging.getLogger(__name__)
 
@@ -70,24 +75,29 @@ class WMBFTPReader(FTPReader):
         self.connection = ftp_connect_with_retry(host, user, password)
 
 
-def main():
+def main(args=None):
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
-    parser = logging_args(parser)
-    parser = common_auth_arguments(parser)
+    add_version_arg(parser)
+    add_logging_args(parser)
+    common_auth_arguments(parser)
     parser.add_argument(
         "-f",
         "--ftp_server",
         default="BCFireweatherFTPp1.nrs.gov.bc.ca",
-        help=("Full uri to Wildfire Management Branch's ftp " "server"),
+        help="Full uri to Wildfire Management Branch's ftp server",
     )
     parser.add_argument(
         "-F",
         "--ftp_file",
         default="HourlyWeatherAllFields_WA.txt",
-        help=("Filename to open on the Wildfire Management " "Branch's ftp site"),
+        help="Filename to open on the Wildfire Management Branch's ftp site",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
+
+    if args.version:
+        print(get_version())
+        return
 
     setup_logging(
         args.log_conf,

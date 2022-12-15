@@ -20,16 +20,20 @@ little risk of missing data.
 
 # Standard module
 import sys
-import logging
 import logging.config
-from warnings import warn
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
 
 # Local
 import crmprtd.download
-from crmprtd import common_auth_arguments, logging_args, setup_logging
+from crmprtd import (
+    common_auth_arguments,
+    add_logging_args,
+    setup_logging,
+    get_version,
+    add_version_arg,
+)
 
 log = logging.getLogger(__name__)
 
@@ -90,11 +94,12 @@ def download(
         sys.exit(1)
 
 
-def main():  # pragma: no cover
+def main(args=None):  # pragma: no cover
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
-    parser = logging_args(parser)
-    parser = common_auth_arguments(parser)
+    add_version_arg(parser)
+    add_logging_args(parser)
+    common_auth_arguments(parser)
     parser.add_argument(
         "-S",
         "--start_time",
@@ -122,7 +127,11 @@ def main():  # pragma: no cover
         default="https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110",
         help="Base URL for the MoTI SAW service",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
+
+    if args.version:
+        print(get_version())
+        return
 
     setup_logging(
         args.log_conf,
