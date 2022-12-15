@@ -73,7 +73,7 @@ class WMBFTPReader(FTPReader):
         self.connection = ftp_connect_with_retry(host, user, password)
 
 
-def main():
+def main(args=None):
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
     add_version_arg(parser)
@@ -91,7 +91,7 @@ def main():
         default="HourlyWeatherAllFields_WA.txt",
         help=("Filename to open on the Wildfire Management " "Branch's ftp site"),
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     if args.version:
         print(get_version())

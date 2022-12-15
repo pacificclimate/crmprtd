@@ -1,8 +1,8 @@
 from crmprtd.ec_swob.download import main as swob_main
 
 
-def main():
-    swob_main("bc-env-snow")
+def main(args=None):
+    swob_main("bc-env-snow", args)
 
 
 if __name__ == "__main__":

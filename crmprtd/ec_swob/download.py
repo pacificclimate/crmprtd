@@ -109,7 +109,7 @@ def split_multi_xml_stream(stream):
         yield rv
 
 
-def main(partner):
+def main(partner, args=None):
     """Main download function to use for download scripts for the EC_SWOB
     provincial partners (e.g. bc-env-snow, bc-env-aq, bc-forestry and
     bc-tran).
@@ -117,6 +117,7 @@ def main(partner):
     Args:
         partner (str): The partner abbreviation found in the SWOB URL
         (e.g. bc-tran)
+        args (list): Argument list (for testing; default is to parse from sys.argv).
 
     Returns:
         No return value. Produces side-effect of sending downloaded
@@ -136,7 +137,7 @@ def main(partner):
             "Defaults to now."
         ),
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     if args.version:
         print(get_version())

@@ -29,7 +29,10 @@ from argparse import ArgumentParser
 
 # Local
 import crmprtd.download
-from crmprtd import common_auth_arguments, add_logging_args, setup_logging, get_version
+from crmprtd import (
+    common_auth_arguments, add_logging_args, setup_logging, get_version,
+    add_version_arg,
+)
 
 log = logging.getLogger(__name__)
 
@@ -90,9 +93,10 @@ def download(
         sys.exit(1)
 
 
-def main():  # pragma: no cover
+def main(args=None):  # pragma: no cover
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
+    add_version_arg(parser)
     add_logging_args(parser)
     common_auth_arguments(parser)
     parser.add_argument(
@@ -122,7 +126,7 @@ def main():  # pragma: no cover
         default="https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110",
         help="Base URL for the MoTI SAW service",
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     if args.version:
         print(get_version())

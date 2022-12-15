@@ -81,7 +81,7 @@ class WAMRFTPReader(FTPReader):
         self.connection.retrlines("NLST " + data_path, callback)
 
 
-def main():
+def main(args=None):
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
     add_version_arg(parser)
@@ -100,7 +100,7 @@ def main():
         help="FTP Directory containing WAMR's data files",
     )
     parser = add_logging_args(parser)
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     if args.version:
         print(get_version())

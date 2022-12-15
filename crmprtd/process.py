@@ -182,12 +182,12 @@ def run_data_pipeline(
     log.info("Data insertion results", extra={"results": results})
 
 
-def main():
+def main(args=None):
     parser = ArgumentParser()
     add_version_arg(parser)
     add_process_args(parser)
     add_logging_args(parser)
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     setup_logging(
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"

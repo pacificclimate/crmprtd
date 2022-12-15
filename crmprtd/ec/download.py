@@ -55,12 +55,12 @@ def download(time, frequency, province, language, baseurl):
         sys.exit(1)
 
 
-def main():
+def main(args=None):
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
     add_version_arg(parser)
     parser.add_argument(
-        "-p", "--province", required=True, help="2 letter province code"
+        "-p", "--province", help="2 letter province code"
     )
     parser.add_argument(
         "-g",
@@ -72,7 +72,6 @@ def main():
     parser.add_argument(
         "-F",
         "--frequency",
-        required=True,
         choices=["daily", "hourly"],
         help="daily|hourly",
     )
@@ -107,7 +106,7 @@ def main():
         ),
     )
     add_logging_args(parser)
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     if args.version:
         print(get_version())

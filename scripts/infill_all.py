@@ -24,7 +24,7 @@ from crmprtd import add_logging_args, setup_logging, add_version_arg, get_versio
 from crmprtd.infill import infill
 
 
-def main():
+def main(args=None):
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
     add_version_arg(parser)
@@ -68,7 +68,7 @@ def main():
     )
 
     parser = add_logging_args(parser)
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     if args.version:
         print(get_version())

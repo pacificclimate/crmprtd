@@ -112,7 +112,7 @@ def download_relevant_bch_zipfiles(start_date, end_date, connection, remote_file
                 sys.stdout.buffer.write(txt_file.read())
 
 
-def main():  # pragma: no cover
+def main(args=None):  # pragma: no cover
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
     add_version_arg(parser)
@@ -135,7 +135,6 @@ def main():  # pragma: no cover
     parser.add_argument(
         "-S",
         "--ssh_private_key",
-        required=True,
         help=("Path to file with SSH private key"),
     )
     end = datetime.now()
@@ -158,7 +157,7 @@ def main():  # pragma: no cover
             "Defaults to now."
         ),
     )
-    args = parser.parse_args()
+    args = parser.parse_args(args)
 
     if args.version:
         print(get_version())
