@@ -180,7 +180,7 @@ def round_datetime(d, resolution="hour", direction="down"):
         pass
     else:
         raise ValueError(
-            f"resolution parameter can only be 'hour' or 'day' " "not '{resolution}'"
+            f"resolution parameter can only be 'hour' or 'day' not '{resolution}'"
         )
     if d_prime == d:
         return d

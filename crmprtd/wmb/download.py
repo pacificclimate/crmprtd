@@ -85,13 +85,13 @@ def main(args=None):
         "-f",
         "--ftp_server",
         default="BCFireweatherFTPp1.nrs.gov.bc.ca",
-        help=("Full uri to Wildfire Management Branch's ftp " "server"),
+        help="Full uri to Wildfire Management Branch's ftp server",
     )
     parser.add_argument(
         "-F",
         "--ftp_file",
         default="HourlyWeatherAllFields_WA.txt",
-        help=("Filename to open on the Wildfire Management " "Branch's ftp site"),
+        help="Filename to open on the Wildfire Management Branch's ftp site",
     )
     args = parser.parse_args(args)
 

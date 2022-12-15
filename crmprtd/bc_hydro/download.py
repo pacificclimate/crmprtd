@@ -16,13 +16,12 @@ import sys
 import re
 from zipfile import ZipFile
 from argparse import ArgumentParser
-from datetime import date, timedelta, datetime
+from datetime import datetime
 from functools import partial
 from tempfile import mkstemp
 from contextlib import contextmanager
 
 from dateutil import relativedelta
-import dateutil.parser
 
 from crmprtd.download import verify_date
 from crmprtd import add_logging_args, setup_logging, get_version, add_version_arg
@@ -118,24 +117,24 @@ def main(args=None):  # pragma: no cover
     add_version_arg(parser)
     add_logging_args(parser)
     parser.add_argument(
-        "-u", "--username", default="pcic", help=("Username for the ftp server ")
+        "-u", "--username", default="pcic", help="Username for the ftp server "
     )
     parser.add_argument(
         "-f",
         "--ftp_server",
         default="sftp2.bchydro.com",
-        help=("Full uri to BC Hydro's ftp " "server"),
+        help="Full uri to BC Hydro's ftp server",
     )
     parser.add_argument(
         "-F",
         "--ftp_dir",
         default=("pcic"),
-        help=("FTP Directory containing BC hydro's " "data files"),
+        help="FTP Directory containing BC hydro's data files",
     )
     parser.add_argument(
         "-S",
         "--ssh_private_key",
-        help=("Path to file with SSH private key"),
+        help="Path to file with SSH private key",
     )
     end = datetime.now()
     start = end - relativedelta.relativedelta(months=1)

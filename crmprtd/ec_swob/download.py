@@ -30,7 +30,7 @@ log = logging.getLogger(__name__)
 
 
 def get_url_list(
-    base_url="https://dd.weather.gc.ca/observations/swob-ml/partners/" "bc-env-snow/",
+    base_url="https://dd.weather.gc.ca/observations/swob-ml/partners/bc-env-snow/",
     date=datetime.datetime.now(),
 ):
     """Recursively search an HTML directory tree and yield a set of

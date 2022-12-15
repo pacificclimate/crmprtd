@@ -27,7 +27,7 @@ for def_ in (
     "degreeC = degC; offset: 273.15 = °C = celsius = Celsius",
     "degreeF = 5 / 9 * kelvin; offset: 255.372222",
     "degreeK = degK; offset: 0",
-    "degree = π / 180 * radian = deg = Deg = arcdeg = arcdegree = " "angular_degree",
+    "degree = π / 180 * radian = deg = Deg = arcdeg = arcdegree = angular_degree",
 ):
     ureg.define(def_)
 

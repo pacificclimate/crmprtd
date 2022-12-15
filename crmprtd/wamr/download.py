@@ -90,13 +90,13 @@ def main(args=None):
         "--ftp_server",
         default="ftp.env.gov.bc.ca",
         help=(
-            "Full hostname of Water and Air Monitoring and " "Reporting's ftp server"
+            "Full hostname of Water and Air Monitoring and Reporting's ftp server"
         ),
     )
     parser.add_argument(
         "-F",
         "--ftp_dir",
-        default=("pub/outgoing/AIR/Hourly_Raw_Air_Data/" "Meteorological/"),
+        default="pub/outgoing/AIR/Hourly_Raw_Air_Data/Meteorological/",
         help="FTP Directory containing WAMR's data files",
     )
     parser = add_logging_args(parser)
