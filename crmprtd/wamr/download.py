@@ -89,9 +89,7 @@ def main(args=None):
         "-f",
         "--ftp_server",
         default="ftp.env.gov.bc.ca",
-        help=(
-            "Full hostname of Water and Air Monitoring and Reporting's ftp server"
-        ),
+        help=("Full hostname of Water and Air Monitoring and Reporting's ftp server"),
     )
     parser.add_argument(
         "-F",
