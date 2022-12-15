@@ -12,7 +12,6 @@ greater than 24 hours, you will miss data.
 
 # Standard module
 import os
-import logging
 import logging.config
 import ftplib
 import sys
@@ -23,7 +22,10 @@ from argparse import ArgumentParser
 from crmprtd.download import retry, ftp_connect
 from crmprtd.download import FTPReader, extract_auth
 from crmprtd import (
-    add_logging_args, setup_logging, common_auth_arguments, add_version_arg,
+    add_logging_args,
+    setup_logging,
+    common_auth_arguments,
+    add_version_arg,
     get_version,
 )
 

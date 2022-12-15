@@ -25,7 +25,10 @@ import dateutil.parser
 
 import crmprtd.download
 from crmprtd import (
-    add_logging_args, setup_logging, common_auth_arguments, add_version_arg,
+    add_logging_args,
+    setup_logging,
+    common_auth_arguments,
+    add_version_arg,
     get_version,
 )
 

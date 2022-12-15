@@ -16,7 +16,6 @@ result in data loss.
 
 # Standard module
 import sys
-import logging
 import logging.config
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
@@ -59,9 +58,7 @@ def main(args=None):
     desc = globals()["__doc__"]
     parser = ArgumentParser(description=desc)
     add_version_arg(parser)
-    parser.add_argument(
-        "-p", "--province", help="2 letter province code"
-    )
+    parser.add_argument("-p", "--province", help="2 letter province code")
     parser.add_argument(
         "-g",
         "--language",

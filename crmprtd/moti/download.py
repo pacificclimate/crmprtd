@@ -20,9 +20,7 @@ little risk of missing data.
 
 # Standard module
 import sys
-import logging
 import logging.config
-from warnings import warn
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
@@ -30,7 +28,10 @@ from argparse import ArgumentParser
 # Local
 import crmprtd.download
 from crmprtd import (
-    common_auth_arguments, add_logging_args, setup_logging, get_version,
+    common_auth_arguments,
+    add_logging_args,
+    setup_logging,
+    get_version,
     add_version_arg,
 )
 
