@@ -9,10 +9,10 @@ pycds.Obs objects. This phase is common to all networks.
 """
 
 import logging
-from sqlalchemy import and_
+
+from sqlalchemy import and_, func
 from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
 
-# local
 from pycds import Obs, History, Network, Variable, Station
 from crmprtd.db_exceptions import InsertionError
 
@@ -45,35 +45,45 @@ def history_ids_within_threshold(sesh, network_name, lon, lat, threshold):
     :return: Set of history ids.
     """
 
-    query_txt = """
-        WITH hxs_in_thresh AS (
-            SELECT 
-                history_id, 
-                station_id, 
-                lat, 
-                lon, 
-                Geography(ST_Transform(the_geom, 4326)) as p_existing,
-                Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)) as p_new
-            FROM crmp.meta_history
-            WHERE the_geom && ST_Buffer(
-                Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)), :thresh
-            )
+    all_hxs_within_threshold = (
+        sesh.query(
+            History.id.label("history_id"),
+            History.station_id.label("station_id"),
+            func.Geography(func.ST_Transform(History.the_geom, 4326)).label(
+                "p_existing"
+            ),
+            func.Geography(func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326)).label(
+                "p_new"
+            ),
         )
-        SELECT 
-            history_id, ST_Distance(p_existing, p_new) as dist
-        FROM hxs_in_thresh hx
-        JOIN crmp.meta_station stn ON (hx.station_id = stn.station_id)
-        JOIN crmp.meta_network nw ON (stn.network_id = nw.network_id)
-        WHERE nw.network_name = :network_name
-        ORDER BY dist
-"""  # noqa
-    # TODO: Why is dist computed and rows ordered by it if the result is unordered??
-    q = sesh.execute(
-        query_txt,
-        {"x": lon, "y": lat, "thresh": threshold, "network_name": network_name},
+        .filter(
+            History.the_geom.intersects(
+                func.ST_Buffer(
+                    func.Geography(func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326)),
+                    threshold,
+                )
+            ),
+        )
+        .cte(name="hxs_in_thresh")
     )
-    valid_hid = set([x[0] for x in q.fetchall()])
-    return valid_hid
+
+    network_hxs_within_threshold = list(
+        sesh.query(
+            History.id.label("history_id"),
+            func.ST_Distance(
+                all_hxs_within_threshold.c.p_existing, all_hxs_within_threshold.c.p_new
+            ).label("dist"),
+        )
+        .select_from(all_hxs_within_threshold)
+        .join(History, all_hxs_within_threshold.c.history_id == History.id)
+        .join(Station, History.station_id == Station.id)
+        .join(Network, Station.network_id == Network.id)
+        .filter(Network.name == network_name)
+        .order_by("dist")
+        .all()
+    )
+
+    return {hx.history_id for hx in network_hxs_within_threshold}
 
 
 def convert_unit(val, src_unit, dst_unit):
