@@ -32,17 +32,17 @@ for def_ in (
     ureg.define(def_)
 
 
-def history_ids_within_threshold(sesh, network_name, lon, lat, threshold):
+def histories_within_threshold(sesh, network_name, lon, lat, threshold):
     """
-    Return a set containing the id's of existing histories associated with the
-    given network and within a threshold distance of the lat and lon.
+    Return existing histories associated with the given network and within a threshold
+    distance of the point specified by (lon, lat).
 
     :param sesh: SQLAlchemy db session
     :param network_name: Name of network associated to history.
     :param lat: Lat for History
     :param lon: Lon for History
-    :param threshold: Include only histories within this distance from (lat, lon)
-    :return: Set of history ids.
+    :param threshold: Include only histories within this distance (m) from (lat, lon)
+    :return: List of records containing history_id, distance
     """
 
     all_hxs_within_threshold = (
@@ -72,18 +72,18 @@ def history_ids_within_threshold(sesh, network_name, lon, lat, threshold):
             History.id.label("history_id"),
             func.ST_Distance(
                 all_hxs_within_threshold.c.p_existing, all_hxs_within_threshold.c.p_new
-            ).label("dist"),
+            ).label("distance"),
         )
         .select_from(all_hxs_within_threshold)
         .join(History, all_hxs_within_threshold.c.history_id == History.id)
         .join(Station, History.station_id == Station.id)
         .join(Network, Station.network_id == Network.id)
         .filter(Network.name == network_name)
-        .order_by("dist")
+        .order_by("distance")
         .all()
     )
 
-    return [hx.history_id for hx in network_hxs_within_threshold]
+    return network_hxs_within_threshold
 
 
 def convert_unit(val, src_unit, dst_unit):
@@ -141,16 +141,16 @@ def find_active_history(histories):
 def find_nearest_history(
     sesh, network_name, native_id, lat, lon, histories, diagnostic=False
 ):
-    close_stns = history_ids_within_threshold(sesh, network_name, lon, lat, 800)
+    close_histories = histories_within_threshold(sesh, network_name, lon, lat, 800)
 
-    if len(close_stns) == 0:
+    if len(close_histories) == 0:
         return create_station_and_history_entry(
             sesh, network_name, native_id, lat, lon, diagnostic=diagnostic
         )
 
-    for id in close_stns:
+    for close_history in close_histories:
         for history in histories:
-            if id == history.id:
+            if close_history.history_id == history.id:
                 log.debug(
                     "Matched history", extra={"station_name": history.station_name}
                 )
