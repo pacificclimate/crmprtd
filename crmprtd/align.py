@@ -53,33 +53,31 @@ def histories_within_threshold(sesh, network_name, lon, lat, threshold):
     :return: List of records containing history_id, distance
     """
 
+    # Histories in network AND within threshold distance of (lon, lat).
+    p_ref = cast(ST_SetSRID(ST_MakePoint(lon, lat), 4326), Geography)
     hxs_within_threshold = (
         sesh.query(
             History.id.label("history_id"),
             History.station_id.label("station_id"),
-            cast(ST_Transform(History.the_geom, 4326), Geography).label("p_existing"),
-            cast(ST_SetSRID(ST_MakePoint(lon, lat), 4326), Geography).label("p_new"),
+            cast(ST_Transform(History.the_geom, 4326), Geography).label("p_this"),
+            p_ref.label("p_ref"),
         )
         .select_from(History)
         .join(Station, History.station_id == Station.id)
         .join(Network, Station.network_id == Network.id)
         .filter(Network.name == network_name)
         .filter(
-            History.the_geom.intersects(
-                ST_Buffer(
-                    cast(ST_SetSRID(ST_MakePoint(lon, lat), 4326), Geography),
-                    threshold,
-                )
-            ),
+            History.the_geom.intersects(ST_Buffer(p_ref, threshold)),
         )
         .cte(name="hxs_in_thresh")
     )
 
+    # Result set of those histories (id's), with distance from (lon, lat).
     hxs_by_distance = list(
         sesh.query(
             hxs_within_threshold.c.history_id.label("history_id"),
             ST_Distance(
-                hxs_within_threshold.c.p_existing, hxs_within_threshold.c.p_new
+                hxs_within_threshold.c.p_this, hxs_within_threshold.c.p_ref
             ).label("distance"),
         )
         .select_from(hxs_within_threshold)
