@@ -10,7 +10,15 @@ pycds.Obs objects. This phase is common to all networks.
 
 import logging
 
-from sqlalchemy import and_, func
+from sqlalchemy import and_, cast
+from geoalchemy2.functions import (
+    ST_Buffer,
+    ST_Distance,
+    ST_Transform,
+    ST_SetSRID,
+    ST_MakePoint,
+)
+from geoalchemy2.types import Geography
 from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
 
 from pycds import Obs, History, Network, Variable, Station
@@ -49,17 +57,13 @@ def histories_within_threshold(sesh, network_name, lon, lat, threshold):
         sesh.query(
             History.id.label("history_id"),
             History.station_id.label("station_id"),
-            func.Geography(func.ST_Transform(History.the_geom, 4326)).label(
-                "p_existing"
-            ),
-            func.Geography(func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326)).label(
-                "p_new"
-            ),
+            cast(ST_Transform(History.the_geom, 4326), Geography).label("p_existing"),
+            cast(ST_SetSRID(ST_MakePoint(lon, lat), 4326), Geography).label("p_new"),
         )
         .filter(
             History.the_geom.intersects(
-                func.ST_Buffer(
-                    func.Geography(func.ST_SetSRID(func.ST_MakePoint(lon, lat), 4326)),
+                ST_Buffer(
+                    cast(ST_SetSRID(ST_MakePoint(lon, lat), 4326), Geography),
                     threshold,
                 )
             ),
@@ -70,7 +74,7 @@ def histories_within_threshold(sesh, network_name, lon, lat, threshold):
     network_hxs_within_threshold = list(
         sesh.query(
             History.id.label("history_id"),
-            func.ST_Distance(
+            ST_Distance(
                 all_hxs_within_threshold.c.p_existing, all_hxs_within_threshold.c.p_new
             ).label("distance"),
         )
