@@ -8,7 +8,7 @@ from crmprtd.align import (
     get_variable,
     convert_obs_value_to_db_units,
     align,
-    history_ids_within_threshold,
+    histories_within_threshold,
     convert_unit,
 )
 from crmprtd import Row
@@ -335,7 +335,7 @@ def test_align_failures(test_session, obs_tuple):
 
 
 def test_closest_stns_within_threshold(ec_session):
-    x = history_ids_within_threshold(ec_session, "EC_raw", -123.7, 49.45, 1000)
+    x = histories_within_threshold(ec_session, "EC_raw", -123.7, 49.45, 1000)
     assert len(x) > 0
 
 
@@ -356,7 +356,7 @@ def test_closest_stns_within_threshold_bad_data(ec_session):
     ec_session.commit()
 
     # Just search for the good station and ensure there are not errors
-    x = history_ids_within_threshold(ec_session, "EC_raw", x, y, 1)
+    x = histories_within_threshold(ec_session, "EC_raw", x, y, 1)
     assert len(x) > 0
 
 

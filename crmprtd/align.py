@@ -9,10 +9,18 @@ pycds.Obs objects. This phase is common to all networks.
 """
 
 import logging
-from sqlalchemy import and_
+
+from sqlalchemy import and_, cast
+from geoalchemy2.functions import (
+    ST_Buffer,
+    ST_Distance,
+    ST_Transform,
+    ST_SetSRID,
+    ST_MakePoint,
+)
+from geoalchemy2.types import Geography
 from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
 
-# local
 from pycds import Obs, History, Network, Variable, Station
 from crmprtd.db_exceptions import InsertionError
 
@@ -32,48 +40,56 @@ for def_ in (
     ureg.define(def_)
 
 
-def history_ids_within_threshold(sesh, network_name, lon, lat, threshold):
+def histories_within_threshold(sesh, network_name, lon, lat, threshold):
     """
-    Return a set containing the id's of existing histories associated with the
-    given network and within a threshold distance of the lat and lon.
+    Find existing histories associated with the given network and within a threshold
+    distance of the point specified by (lon, lat). Return the history id and distance
+    for each such history, as a list in ascending order of distance.
 
     :param sesh: SQLAlchemy db session
     :param network_name: Name of network associated to history.
     :param lat: Lat for History
     :param lon: Lon for History
-    :param threshold: Include only histories within this distance from (lat, lon)
-    :return: Set of history ids.
+    :param threshold: Include only histories within this distance (m) from (lat, lon)
+    :return: List of records with attributes history_id, distance, in ascending order
+        of distance.
     """
 
-    query_txt = """
-        WITH hxs_in_thresh AS (
-            SELECT 
-                history_id, 
-                station_id, 
-                lat, 
-                lon, 
-                Geography(ST_Transform(the_geom, 4326)) as p_existing,
-                Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)) as p_new
-            FROM crmp.meta_history
-            WHERE the_geom && ST_Buffer(
-                Geography(ST_SetSRID(ST_MakePoint(:x, :y), 4326)), :thresh
-            )
+    # Construct reference point at (lon, lat) for distance computations.
+    p_ref = cast(ST_SetSRID(ST_MakePoint(lon, lat), 4326), Geography)
+
+    # Histories in network AND within threshold distance of (lon, lat).
+    hxs_within_threshold = (
+        sesh.query(
+            History.id.label("history_id"),
+            History.station_id.label("station_id"),
+            cast(ST_Transform(History.the_geom, 4326), Geography).label("p_this"),
+            p_ref.label("p_ref"),
         )
-        SELECT 
-            history_id, ST_Distance(p_existing, p_new) as dist
-        FROM hxs_in_thresh hx
-        JOIN crmp.meta_station stn ON (hx.station_id = stn.station_id)
-        JOIN crmp.meta_network nw ON (stn.network_id = nw.network_id)
-        WHERE nw.network_name = :network_name
-        ORDER BY dist
-"""  # noqa
-    # TODO: Why is dist computed and rows ordered by it if the result is unordered??
-    q = sesh.execute(
-        query_txt,
-        {"x": lon, "y": lat, "thresh": threshold, "network_name": network_name},
+        .select_from(History)
+        .join(Station, History.station_id == Station.id)
+        .join(Network, Station.network_id == Network.id)
+        .filter(Network.name == network_name)
+        .filter(
+            History.the_geom.intersects(ST_Buffer(p_ref, threshold)),
+        )
+        .cte(name="hxs_in_thresh")
     )
-    valid_hid = set([x[0] for x in q.fetchall()])
-    return valid_hid
+
+    # Result set of those histories (id's), with distance from (lon, lat).
+    hxs_by_distance = list(
+        sesh.query(
+            hxs_within_threshold.c.history_id.label("history_id"),
+            ST_Distance(
+                hxs_within_threshold.c.p_this, hxs_within_threshold.c.p_ref
+            ).label("distance"),
+        )
+        .select_from(hxs_within_threshold)
+        .order_by("distance")
+        .all()
+    )
+
+    return hxs_by_distance
 
 
 def convert_unit(val, src_unit, dst_unit):
@@ -131,16 +147,16 @@ def find_active_history(histories):
 def find_nearest_history(
     sesh, network_name, native_id, lat, lon, histories, diagnostic=False
 ):
-    close_stns = history_ids_within_threshold(sesh, network_name, lon, lat, 800)
+    close_histories = histories_within_threshold(sesh, network_name, lon, lat, 800)
 
-    if len(close_stns) == 0:
+    if len(close_histories) == 0:
         return create_station_and_history_entry(
             sesh, network_name, native_id, lat, lon, diagnostic=diagnostic
         )
 
-    for id in close_stns:
+    for close_history in close_histories:
         for history in histories:
-            if id == history.id:
+            if close_history.history_id == history.id:
                 log.debug(
                     "Matched history", extra={"station_name": history.station_name}
                 )
