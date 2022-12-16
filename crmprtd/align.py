@@ -42,19 +42,23 @@ for def_ in (
 
 def histories_within_threshold(sesh, network_name, lon, lat, threshold):
     """
-    Return existing histories associated with the given network and within a threshold
-    distance of the point specified by (lon, lat).
+    Find existing histories associated with the given network and within a threshold
+    distance of the point specified by (lon, lat). Return the history id and distance
+    for each such history, as a list in ascending order of distance.
 
     :param sesh: SQLAlchemy db session
     :param network_name: Name of network associated to history.
     :param lat: Lat for History
     :param lon: Lon for History
     :param threshold: Include only histories within this distance (m) from (lat, lon)
-    :return: List of records containing history_id, distance
+    :return: List of records with attributes history_id, distance, in ascending order
+        of distance.
     """
 
-    # Histories in network AND within threshold distance of (lon, lat).
+    # Construct reference point at (lon, lat) for distance computations.
     p_ref = cast(ST_SetSRID(ST_MakePoint(lon, lat), 4326), Geography)
+
+    # Histories in network AND within threshold distance of (lon, lat).
     hxs_within_threshold = (
         sesh.query(
             History.id.label("history_id"),
