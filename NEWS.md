@@ -1,5 +1,21 @@
 # News / Release Notes
 
+## 4.0.0
+
+*16-Dec-2022*
+
+Major change is to upgrade PyCDS to ver 4.0.0, which makes this release 
+compatible with revision 879f0efa125f of the database.
+
+Changes:
+- [Use distance ordering in spatially matched histories](https://github.com/pacificclimate/crmprtd/pull/122)
+- [Add --version arg to console scripts](https://github.com/pacificclimate/crmprtd/pull/121)
+- [More pipenv improvements](https://github.com/pacificclimate/crmprtd/pull/119)
+- [Upgrade PyCDS to ver 4.0.0](https://github.com/pacificclimate/crmprtd/pull/116)
+- [Don't use psycopg2-binary](https://github.com/pacificclimate/crmprtd/pull/113)
+- [Improve installation instructions](https://github.com/pacificclimate/crmprtd/pull/112)
+- [Remove errors from Pipfile](https://github.com/pacificclimate/crmprtd/pull/109)
+
 ## 3.5.1
 
 *27-June-2022*
