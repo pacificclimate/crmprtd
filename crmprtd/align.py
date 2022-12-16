@@ -83,7 +83,7 @@ def history_ids_within_threshold(sesh, network_name, lon, lat, threshold):
         .all()
     )
 
-    return {hx.history_id for hx in network_hxs_within_threshold}
+    return [hx.history_id for hx in network_hxs_within_threshold]
 
 
 def convert_unit(val, src_unit, dst_unit):
