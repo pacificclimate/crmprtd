@@ -53,13 +53,17 @@ def histories_within_threshold(sesh, network_name, lon, lat, threshold):
     :return: List of records containing history_id, distance
     """
 
-    all_hxs_within_threshold = (
+    hxs_within_threshold = (
         sesh.query(
             History.id.label("history_id"),
             History.station_id.label("station_id"),
             cast(ST_Transform(History.the_geom, 4326), Geography).label("p_existing"),
             cast(ST_SetSRID(ST_MakePoint(lon, lat), 4326), Geography).label("p_new"),
         )
+        .select_from(History)
+        .join(Station, History.station_id == Station.id)
+        .join(Network, Station.network_id == Network.id)
+        .filter(Network.name == network_name)
         .filter(
             History.the_geom.intersects(
                 ST_Buffer(
@@ -71,23 +75,19 @@ def histories_within_threshold(sesh, network_name, lon, lat, threshold):
         .cte(name="hxs_in_thresh")
     )
 
-    network_hxs_within_threshold = list(
+    hxs_by_distance = list(
         sesh.query(
-            History.id.label("history_id"),
+            hxs_within_threshold.c.history_id.label("history_id"),
             ST_Distance(
-                all_hxs_within_threshold.c.p_existing, all_hxs_within_threshold.c.p_new
+                hxs_within_threshold.c.p_existing, hxs_within_threshold.c.p_new
             ).label("distance"),
         )
-        .select_from(all_hxs_within_threshold)
-        .join(History, all_hxs_within_threshold.c.history_id == History.id)
-        .join(Station, History.station_id == Station.id)
-        .join(Network, Station.network_id == Network.id)
-        .filter(Network.name == network_name)
+        .select_from(hxs_within_threshold)
         .order_by("distance")
         .all()
     )
 
-    return network_hxs_within_threshold
+    return hxs_by_distance
 
 
 def convert_unit(val, src_unit, dst_unit):
