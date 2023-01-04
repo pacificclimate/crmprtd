@@ -21,7 +21,18 @@ Note: The [Python CI](.github/workflows/python-ci.yml) script purges
 PostgreSQL 14 and installs PostgreSQL 12 instead. It can still be used as 
 a guide for installation in a general way. 
 
-## Installation for production
+## Installation
+
+Note: The scripts installed by this project include both Python programs and
+a set of shell scripts used to download and process data from the various
+networks. We call these "execution scripts" for lack of a better term, and
+their source is in the directory `crmprtd/execution`. They are a recent addition 
+to this repo; formerly they were maintained outside source control.
+
+The execution scripts are installed in the installation environment `bin/` 
+directory (e.g., `venv/bin/`), like all other project scripts.
+
+### Installation for production
 
 For production usage, install the latest tagged release from PCIC's PyPI server.
 
@@ -31,7 +42,7 @@ pip install -i https://pypi.pacificclimate.org/simple crmprtd
 pip install -i https://pypi.pacificclimate.org/simple crmprtd[jsonlogger]
 ```
 
-## Installation for development
+### Installation for development
 
 For development, clone the repo and install it using Pipenv from your 
 local source tree. This is similar to how the Python CI environment is set up.
@@ -52,7 +63,9 @@ environment.
 
 The most common usage pattern for the `crmprtd` is to configure a number of scripts to run on an hourly or daily basis.
 
-Some of the data sources require authentication. For most scripts, credentials can be provided as command line arguments, or more preferrably, entries in a yaml config file. A sample version of this file can be see [here](https://github.com/pacificclimate/crmprtd/blob/master/auth.yaml). This is then sources by passing the file location with the `--auth` argument and the key with the `--auth_key` argument.
+Some data sources require authentication. For most scripts, credentials can be provided as command line arguments, or, preferably, entries in a yaml config file. A sample version of this file can be seen [here](https://github.com/pacificclimate/crmprtd/blob/master/auth.yaml). The location of the config is passed with the `--auth` argument and the key with the `--auth_key` argument.
+
+### Downloading data
 
 Each network has a `download_[network_name]` script which will download data.  The standard output stream of this script can be redirected into a file or piped into `crmprtd_process`.  `crmprtd_process` will take the data and run it through a series of formatting changes and checks before inserting the data into the database.
 
@@ -98,6 +111,13 @@ download_[network_name] | crmprtd_process -N [network_name]
 # Or
 download_[network_name] | tee cache_filename | crmprtd_process -N [network_name]
 ```
+
+### Execution scripts
+
+Typical usage is to set up a cron job that invokes the download and process
+scripts for each network. Shell scripts for this purpose are installed 
+as part of the project, and are found in the installation environment's 
+`bin/` directory.
 
 ### Logging
 
