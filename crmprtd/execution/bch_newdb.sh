@@ -3,6 +3,10 @@
 # Distinguishes cache and log file names.
 tag="$1"
 
+# Target database DSN, e.g., postgresql://crmprtd@db.pcic.uvic.ca:5433/crmp
+# (Not currently used.)
+db="$2"
+
 export net=bc_hydro
 export NOW=$(date +'%Y-%m-%dT%H:%M:%S')
 
