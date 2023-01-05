@@ -19,12 +19,14 @@ def normalize(file_stream):
     # All of the BC Hydro data seem to be either comma delimited or a
     # mixture of a tab and other whitespace to make it fixed
     # width. This pattern encapsulates either
-    sep_pattern = re.compile(b"\\s*[\t,]+\\s*")
+    sep_pattern = re.compile("\\s*[\t,]+\\s*")
 
     # Detect if numbers are convertible
-    num_pattern = re.compile(rb"-?\d+(\.\d+)?$")
+    num_pattern = re.compile(r"-?\d+(\.\d+)?$")
 
     for line in file_stream:
+        line = line.decode("utf-8")
+
         # Heuristically guess whether each line is one of three types:
         # a) a free form station name
         # b) a heading line containing variable names, or
@@ -39,9 +41,9 @@ def normalize(file_stream):
             continue
 
         # Detect header lines
-        elif re.search(b"date", line, re.IGNORECASE):
+        elif re.search("date", line, re.IGNORECASE):
             # some variable names contain spaces (*eyeroll*)
-            headers = [x.replace(b" ", b"_") for x in sep_pattern.split(line)]
+            headers = [x.replace(" ", "_") for x in sep_pattern.split(line)]
 
         # Default to data lines
         else:
@@ -53,7 +55,7 @@ def normalize(file_stream):
             obs_time = date_parse.parse(values[1])
 
             for value, varname in islice(zip(values, headers), 2, None):
-                if value == b"+":  # this is NaN
+                if value == "+":  # this is NaN
                     log.debug(f"{varname}: NaN")
                     continue
 
