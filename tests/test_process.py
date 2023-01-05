@@ -5,11 +5,28 @@ import logging
 from datetime import datetime
 from pkg_resources import resource_filename
 
-from pycds import Network, Variable, Obs
+from pycds import Network, History, Variable, Obs
 from crmprtd.download_utils import verify_date
 
 # Must import the module, not objects from it, so we can mock the objects.
 import crmprtd.process
+
+
+def test_dups(ec_session):
+    sechelt1 = ec_session.query(History).filter(History.id == 20000).one()
+    ec_precip = ec_session.query(Variable).filter(Variable.id == 100).one()
+    obs = Obs(
+        history=sechelt1,
+        datum=2.5,
+        variable=ec_precip,
+        time=datetime(2012, 9, 24, 6),
+    )
+    ec_session.add(obs)
+    ec_session.add(obs)
+    ec_session.add(obs)
+    ec_session.commit()
+    q = ec_session.query(Obs).filter(History.id == 20000).filter(Variable.id == 100)
+    assert q.count() == 1
 
 
 def get_num_obs_to_insert(records):
