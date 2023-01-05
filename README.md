@@ -146,11 +146,11 @@ SHELL=/bin/bash
 CRMP_BIN=env_3.5.1/bin
 CRMP_DB=postgresql://crmprtd@db.pcic.uvic.ca:5433/crmp
 
-METNORTH_BIN_A=env_3.5.1/bin
-METNORTH_DB_A=postgresql://crmprtd@dbnorth/metnorth
+METNORTH_BIN=env_3.5.1/bin
+METNORTH_DB=postgresql://crmprtd@dbnorth/metnorth
 
-METNORTH_BIN_B=env_4.0.0/bin
-METNORTH_DB_B=postgresql://crmprtd@dbnorth/metnorth2
+METNORTH2_BIN=env_4.0.0/bin
+METNORTH2_DB=postgresql://crmprtd@dbnorth/metnorth2
 
 @hourly                         $CRMP_BIN/hourly_swobml2.sh crmp $CRMP_DB
 @weekly                         $CRMP_BIN/wamr.sh crmp $CRMP_DB
@@ -160,8 +160,8 @@ METNORTH_DB_B=postgresql://crmprtd@dbnorth/metnorth2
 30 * * * *                      $CRMP_BIN/moti.sh crmp $CRMP_DB
 @daily                          $CRMP_BIN/crd.sh crmp $CRMP_DB
 @daily                          $CRMP_BIN/bch.sh crmp $CRMP_DB
-@hourly                         $METNORTH_BIN_A/metnorth.sh metnorthA $METNORTH_DB_A
-@hourly                         $METNORTH_BIN_B/metnorth.sh metnorthB $METNORTH_DB_B
+@hourly                         $METNORTH_BIN/metnorth.sh metnorth $METNORTH_DB
+@hourly                         $METNORTH2_BIN/metnorth.sh metnorth2 $METNORTH2_DB
 ```
 
 Notes:
