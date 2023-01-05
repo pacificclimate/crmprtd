@@ -114,7 +114,8 @@ def process(
 
     # The normalizer returns a generator that yields `Row`s. Convert to a list of Rows.
     log.info("Normalize: start")
-    rows = list(norm_mod.normalize(download_stream))
+    rows = {row for row in norm_mod.normalize(download_stream)}
+    print(f"Found {len(rows)} rows.")
     log.info("Normalize: done")
 
     engine = create_engine(connection_string)
