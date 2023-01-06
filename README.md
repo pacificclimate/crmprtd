@@ -160,8 +160,8 @@ METNORTH2_DB=postgresql://crmprtd@dbnorth/metnorth2
 30 * * * *                      $CRMP_BIN/moti.sh crmp $CRMP_DB
 @daily                          $CRMP_BIN/crd.sh crmp $CRMP_DB
 @daily                          $CRMP_BIN/bch.sh crmp $CRMP_DB
-@hourly                         $METNORTH_BIN/metnorth.sh metnorth $METNORTH_DB
-@hourly                         $METNORTH2_BIN/metnorth.sh metnorth2 $METNORTH2_DB
+@hourly                         $METNORTH_BIN/ytnt.sh metnorth $METNORTH_DB
+@hourly                         $METNORTH2_BIN/ytnt.sh metnorth2 $METNORTH2_DB
 ```
 
 Notes:
