@@ -15,18 +15,37 @@ import crmprtd.process
 def test_dups(ec_session):
     sechelt1 = ec_session.query(History).filter(History.id == 20000).one()
     ec_precip = ec_session.query(Variable).filter(Variable.id == 100).one()
-    obs = Obs(
-        history=sechelt1,
-        datum=2.5,
-        variable=ec_precip,
-        time=datetime(2012, 9, 24, 6),
-    )
-    ec_session.add(obs)
-    ec_session.add(obs)
-    ec_session.add(obs)
+    # q = ec_session.query(Obs).filter(History.id == 20000).filter(Variable.id == 100)
+    q = ec_session.query(Obs).filter(Obs.history_id == 20000).filter(Obs.vars_id == 100)
+    init_count = q.count()
+
+    def r(obs):
+        return (
+            f"Obs<id={obs.id}, time={obs.time}, datum={obs.datum}, "
+            f"history_id={obs.history_id}, vars_id={obs.vars_id},>")
+
+    print()
+    print("initial observations")
+    for obs in q.all():
+        print("\t", r(obs))
+
+    for i in range(3):
+        obs = Obs(
+            history=sechelt1,
+            datum=2.5,
+            variable=ec_precip,
+            time=datetime(2012, 9, 24, 6),
+        )
+        ec_session.add(obs)
     ec_session.commit()
-    q = ec_session.query(Obs).filter(History.id == 20000).filter(Variable.id == 100)
-    assert q.count() == 1
+    final_count = q.count()
+
+    print("final observations")
+    for obs in q.all():
+        print("\t", r(obs))
+
+    # assert q.count() == 1
+    assert final_count - init_count == 1
 
 
 def get_num_obs_to_insert(records):
