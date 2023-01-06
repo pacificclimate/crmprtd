@@ -19,8 +19,8 @@ from tempfile import SpooledTemporaryFile
 from argparse import ArgumentParser
 
 # Local
-from crmprtd.download import retry, ftp_connect
-from crmprtd.download import FTPReader, extract_auth
+from crmprtd.download_utils import retry, ftp_connect
+from crmprtd.download_utils import FTPReader, extract_auth
 from crmprtd import (
     add_logging_args,
     setup_logging,

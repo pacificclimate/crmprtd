@@ -26,7 +26,7 @@ from argparse import ArgumentParser
 
 
 # Local
-import crmprtd.download
+import crmprtd.download_utils
 from crmprtd import (
     common_auth_arguments,
     add_logging_args,
@@ -48,7 +48,7 @@ def download(
     log.info("Starting MOTIe rtd")
 
     auth_yaml = open(auth_fname, "r").read() if auth_fname else None
-    auth = crmprtd.download.extract_auth(username, password, auth_yaml, auth_key)
+    auth = crmprtd.download_utils.extract_auth(username, password, auth_yaml, auth_key)
 
     if start_time or end_time:
         if not station_id:
@@ -59,10 +59,10 @@ def download(
             )
 
         now = utcnow()
-        start_time = crmprtd.download.verify_date(
+        start_time = crmprtd.download_utils.verify_date(
             start_time, now - timedelta(days=0, seconds=3600), "start_time"
         )
-        end_time = crmprtd.download.verify_date(end_time, now, "end_time")
+        end_time = crmprtd.download_utils.verify_date(end_time, now, "end_time")
 
         log.info(
             "Starting manual run using timestamps {0} {1}".format(start_time, end_time)
@@ -87,7 +87,7 @@ def download(
         payload = {}
 
     try:
-        crmprtd.download.https_download(url, "https", log, auth, payload)
+        crmprtd.download_utils.https_download(url, "https", log, auth, payload)
 
     except IOError:
         log.exception("Unable to download or open xml data")

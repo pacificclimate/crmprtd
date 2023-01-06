@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 
 from crmprtd.align import align
 from crmprtd.insert import insert
-from crmprtd.download import verify_date
+from crmprtd.download_utils import verify_date
 from crmprtd.infer import infer
 from crmprtd import (
     add_version_arg,

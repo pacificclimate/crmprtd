@@ -19,8 +19,8 @@ from tempfile import SpooledTemporaryFile
 from argparse import ArgumentParser
 
 # Local
-from crmprtd.download import retry, ftp_connect
-from crmprtd.download import FTPReader
+from crmprtd.download_utils import retry, ftp_connect
+from crmprtd.download_utils import FTPReader
 from crmprtd import add_logging_args, setup_logging, get_version, add_version_arg
 
 log = logging.getLogger(__name__)

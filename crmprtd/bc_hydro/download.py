@@ -23,7 +23,7 @@ from contextlib import contextmanager
 
 from dateutil import relativedelta
 
-from crmprtd.download import verify_date
+from crmprtd.download_utils import verify_date
 from crmprtd import add_logging_args, setup_logging, get_version, add_version_arg
 
 log = logging.getLogger(__name__)

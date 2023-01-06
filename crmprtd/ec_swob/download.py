@@ -23,7 +23,7 @@ from argparse import ArgumentParser
 from lxml import html
 import requests
 
-from crmprtd.download import https_download, verify_date
+from crmprtd.download_utils import https_download, verify_date
 from crmprtd import add_logging_args, setup_logging, add_version_arg, get_version
 
 log = logging.getLogger(__name__)

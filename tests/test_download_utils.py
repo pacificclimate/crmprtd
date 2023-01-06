@@ -1,7 +1,7 @@
 import pytest
 import datetime
 
-from crmprtd.download import extract_auth, https_download, verify_date
+from crmprtd.download_utils import extract_auth, https_download, verify_date
 
 
 @pytest.mark.parametrize(

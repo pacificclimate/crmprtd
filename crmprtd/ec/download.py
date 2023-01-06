@@ -23,7 +23,7 @@ from argparse import ArgumentParser
 # Local
 from crmprtd.ec import makeurl
 from crmprtd import setup_logging, add_logging_args, add_version_arg, get_version
-from crmprtd.download import https_download, verify_date
+from crmprtd.download_utils import https_download, verify_date
 
 log = logging.getLogger(__name__)
 

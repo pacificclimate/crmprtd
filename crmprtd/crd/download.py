@@ -23,7 +23,7 @@ from datetime import timedelta
 
 import dateutil.parser
 
-import crmprtd.download
+import crmprtd.download_utils
 from crmprtd import (
     add_logging_args,
     setup_logging,
@@ -64,7 +64,7 @@ def make_url(client_id, sdate=None, edate=None):
 def download(client_id, start_date, end_date):  # pragma: no cover
     url = make_url(client_id, start_date, end_date)
     try:
-        crmprtd.download.https_download(url, "https", log)
+        crmprtd.download_utils.https_download(url, "https", log)
 
     except IOError:
         log.exception("Unable to download or open JSON data")
@@ -114,7 +114,7 @@ def main(args=None):  # pragma: no cover
     verify_dates(args.start_time, args.end_time)
 
     auth_yaml = open(args.auth_fname, "r").read() if args.auth_fname else None
-    auth = crmprtd.download.extract_auth(args.username, None, auth_yaml, args.auth_key)
+    auth = crmprtd.download_utils.extract_auth(args.username, None, auth_yaml, args.auth_key)
 
     download(auth["u"], args.start_time, args.end_time)
 
