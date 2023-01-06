@@ -114,10 +114,61 @@ download_[network_name] | tee cache_filename | crmprtd_process -N [network_name]
 
 ### Execution scripts
 
-Typical usage is to set up a cron job that invokes the download and process
-scripts for each network. Shell scripts for this purpose are installed 
-as part of the project, and are found in the installation environment's 
-`bin/` directory.
+Most execution scripts receive 2 or more arguments, as follows:
+
+| Script              | Arguments                      |
+|---------------------|--------------------------------|
+| `bch.sh`            | `<tag> <database>`             |
+| `crd.sh`            | `<tag> <database>`             |
+| `ec.sh`             | `<frequency> <tag> <database>` |
+| `hourly_swobml2.sh` | `<tag> <database>`             |
+| `metnorth.sh`       | `<tag> <database>`             |
+| `moti.sh`           | `<tag> <database>`             |
+| `wamr.sh`           | `<tag> <database>`             |
+| `wmb.sh`            | `<tag> <database>`             |
+
+Arguments:
+
+- `<tag>`: A short tag that becomes part of the filepaths for cache and log files.
+  Usually indicates the target database (but is not the database DSN, which
+  is not suitable for forming a filepath). Examples: `crmp`, `metnorth`, `metnorth2`.
+- `<database>`: DSN for target database. Example: `postgresql://crmprtd@db.pcic.uvic.ca:5433/crmp`
+- `<frequency>`: Frequency of observations; used only in EC downloads.
+
+### Cron usage
+
+Typical usage is to set up a cron job that invokes an execution script at the
+appropriate times. An example partial crontab using the above scripts is:
+
+```text
+SHELL=/bin/bash
+
+CRMP_BIN=env_3.5.1/bin
+CRMP_DB=postgresql://crmprtd@db.pcic.uvic.ca:5433/crmp
+
+METNORTH_BIN=env_3.5.1/bin
+METNORTH_DB=postgresql://crmprtd@dbnorth/metnorth
+
+METNORTH2_BIN=env_4.0.0/bin
+METNORTH2_DB=postgresql://crmprtd@dbnorth/metnorth2
+
+@hourly                         $CRMP_BIN/hourly_swobml2.sh crmp $CRMP_DB
+@weekly                         $CRMP_BIN/wamr.sh crmp $CRMP_DB
+40 4 * * *                      $CRMP_BIN/wmb.sh crmp $CRMP_DB
+@hourly                         $CRMP_BIN/ec.sh hourly crmp $CRMP_DB
+@daily                          $CRMP_BIN/ec.sh daily crmp $CRMP_DB
+30 * * * *                      $CRMP_BIN/moti.sh crmp $CRMP_DB
+@daily                          $CRMP_BIN/crd.sh crmp $CRMP_DB
+@daily                          $CRMP_BIN/bch.sh crmp $CRMP_DB
+@hourly                         $METNORTH_BIN/ytnt.sh metnorth $METNORTH_DB
+@hourly                         $METNORTH2_BIN/ytnt.sh metnorth2 $METNORTH2_DB
+```
+
+Notes:
+- Variables defined inside the crontab are used to shorten the script invocations
+  and to simpify maintenance.
+- The Metnorth processing targets different databases with different tags to
+  distinguish the cache and log files produced by each job.
 
 ### Logging
 
