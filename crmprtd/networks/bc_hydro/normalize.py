@@ -6,6 +6,7 @@ from time import perf_counter
 from contextlib import contextmanager
 
 from dateutil import parser as date_parse
+import pytz
 
 from crmprtd import Row
 from crmprtd import setup_logging
@@ -53,6 +54,9 @@ def normalize(file_stream):
             values = sep_pattern.split(line)
             stn_id = values[0]
             obs_time = date_parse.parse(values[1])
+            if obs_time.tzinfo is None or obs_time.utcoffset(None) is None:
+                tz = pytz.timezone("Canada/Pacific")
+                obs_time = tz.localize(obs_time).astimezone(pytz.utc)
 
             for value, varname in islice(zip(values, headers), 2, None):
                 if value == "+":  # this is NaN
