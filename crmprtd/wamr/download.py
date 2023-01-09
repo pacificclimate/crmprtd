@@ -21,7 +21,7 @@ from argparse import ArgumentParser
 # Local
 from crmprtd.download_utils import retry, ftp_connect
 from crmprtd.download_utils import FTPReader
-from crmprtd import add_logging_args, setup_logging, get_version, add_version_arg
+from crmprtd import setup_logging, get_version
 
 log = logging.getLogger(__name__)
 
@@ -81,24 +81,32 @@ class WAMRFTPReader(FTPReader):
         self.connection.retrlines("NLST " + data_path, callback)
 
 
-def main(args=None):
+def main(args: dict = None, parent_parser: object = None) -> None:  # pragma: no cover
+    """Download CLI function for BC Hydro
+
+    Side effect: Sends downloaded XML files to STDOUT.
+
+    :param args: Argument list (for testing; default is to parse from sys.argv).
+        Arg parser is not created or invoked if this arg is present.
+    :param parent_parser: Argument parser common to all network downloads.
+    """
     desc = globals()["__doc__"]
-    parser = ArgumentParser(description=desc)
-    add_version_arg(parser)
-    parser.add_argument(
-        "-f",
-        "--ftp_server",
-        default="ftp.env.gov.bc.ca",
-        help=("Full hostname of Water and Air Monitoring and Reporting's ftp server"),
-    )
-    parser.add_argument(
-        "-F",
-        "--ftp_dir",
-        default="pub/outgoing/AIR/Hourly_Raw_Air_Data/Meteorological/",
-        help="FTP Directory containing WAMR's data files",
-    )
-    parser = add_logging_args(parser)
-    args = parser.parse_args(args)
+
+    if args is None:
+        parser = ArgumentParser(parents=[parent_parser], description=desc)
+        parser.add_argument(
+            "-f",
+            "--ftp_server",
+            default="ftp.env.gov.bc.ca",
+            help=("Full hostname of Water and Air Monitoring and Reporting's ftp server"),
+        )
+        parser.add_argument(
+            "-F",
+            "--ftp_dir",
+            default="pub/outgoing/AIR/Hourly_Raw_Air_Data/Meteorological/",
+            help="FTP Directory containing WAMR's data files",
+        )
+        args = parser.parse_args(args)
 
     if args.version:
         print(get_version())

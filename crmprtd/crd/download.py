@@ -25,10 +25,8 @@ import dateutil.parser
 
 import crmprtd.download_utils
 from crmprtd import (
-    add_logging_args,
     setup_logging,
-    common_auth_arguments,
-    add_version_arg,
+    add_common_auth_arguments,
     get_version,
 )
 
@@ -71,33 +69,41 @@ def download(client_id, start_date, end_date):  # pragma: no cover
         sys.exit(1)
 
 
-def main(args=None):  # pragma: no cover
+def main(args: dict = None, parent_parser: object = None) -> None:  # pragma: no cover
+    """Download CLI function for CRD
+
+    Side effect: Sends downloaded XML files to STDOUT.
+
+    :param args: Argument list (for testing; default is to parse from sys.argv).
+        Arg parser is not created or invoked if this arg is present.
+    :param parent_parser: Argument parser common to all network downloads.
+    """
     desc = globals()["__doc__"]
-    parser = ArgumentParser(description=desc)
-    add_version_arg(parser)
-    add_logging_args(parser)
-    common_auth_arguments(parser)
-    parser.add_argument(
-        "-S",
-        "--start_time",
-        type=dateutil.parser.parse,
-        help=(
-            "Optional start time to use for downloading "
-            "(interpreted with dateutil.parser.parse)."
-            "Defaults to one day prior to now"
-        ),
-    )
-    parser.add_argument(
-        "-E",
-        "--end_time",
-        type=dateutil.parser.parse,
-        help=(
-            "Optional end time to use for downloading "
-            "(interpreted with dateutil.parser.parse)."
-            "Defaults to now."
-        ),
-    )
-    args = parser.parse_args(args)
+
+    if args is None:
+        parser = ArgumentParser(parents=[parent_parser], description=desc)
+        add_common_auth_arguments(parser)
+        parser.add_argument(
+            "-S",
+            "--start_time",
+            type=dateutil.parser.parse,
+            help=(
+                "Optional start time to use for downloading "
+                "(interpreted with dateutil.parser.parse)."
+                "Defaults to one day prior to now"
+            ),
+        )
+        parser.add_argument(
+            "-E",
+            "--end_time",
+            type=dateutil.parser.parse,
+            help=(
+                "Optional end time to use for downloading "
+                "(interpreted with dateutil.parser.parse)."
+                "Defaults to now."
+            ),
+        )
+        args = parser.parse_args(args)
 
     if args.version:
         print(get_version())
