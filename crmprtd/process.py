@@ -56,12 +56,14 @@ def add_process_args(parser):  # pragma: no cover
         "--start_date",
         help="Optional start time to use for processing "
         "(interpreted with dateutil.parser.parse).",
+        default=str(datetime.min),
     )
     parser.add_argument(
         "-E",
         "--end_date",
         help="Optional end time to use for processing "
         "(interpreted with dateutil.parser.parse).",
+        default=str(datetime.max),
     )
     parser.add_argument(
         "-I",
