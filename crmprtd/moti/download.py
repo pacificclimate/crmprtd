@@ -92,7 +92,9 @@ def download(
         sys.exit(1)
 
 
-def main(args: dict = None, parent_parser: object = None) -> None:  # pragma: no cover
+def main(
+    args: dict = None, parent_parser: ArgumentParser = None
+) -> None:  # pragma: no cover
     """Download CLI function for MoTI
 
     Side effect: Sends downloaded XML files to STDOUT.

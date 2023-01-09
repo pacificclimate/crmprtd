@@ -108,7 +108,7 @@ def split_multi_xml_stream(stream):
         yield rv
 
 
-def main(partner: str, args: dict = None, parent_parser: object = None) -> None:
+def main(partner: str, args: dict = None, parent_parser: ArgumentParser = None) -> None:
     """Common download CLI function for the EC_SWOB provincial partners (e.g.
     bc-env-snow, bc-env-aq, bc-forestry and bc-tran).
 

@@ -73,7 +73,9 @@ class WMBFTPReader(FTPReader):
         self.connection = ftp_connect_with_retry(host, user, password)
 
 
-def main(args: dict = None, parent_parser: object = None) -> None:  # pragma: no cover
+def main(
+    args: dict = None, parent_parser: ArgumentParser = None
+) -> None:  # pragma: no cover
     """Download CLI function for BC Hydro
 
     Side effect: Sends downloaded XML files to STDOUT.

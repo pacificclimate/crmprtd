@@ -54,7 +54,7 @@ def download(time, frequency, province, language, baseurl):
         sys.exit(1)
 
 
-def main(args: dict = None, parent_parser: object = None) -> None:
+def main(args: dict = None, parent_parser: ArgumentParser = None) -> None:
     """Download CLI function for Environment Canada
 
     Side effect: Sends downloaded XML files to STDOUT.

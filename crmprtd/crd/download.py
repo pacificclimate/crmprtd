@@ -69,7 +69,9 @@ def download(client_id, start_date, end_date):  # pragma: no cover
         sys.exit(1)
 
 
-def main(args: dict = None, parent_parser: object = None) -> None:  # pragma: no cover
+def main(
+    args: dict = None, parent_parser: ArgumentParser = None
+) -> None:  # pragma: no cover
     """Download CLI function for CRD
 
     Side effect: Sends downloaded XML files to STDOUT.
