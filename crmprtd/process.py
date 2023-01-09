@@ -114,8 +114,9 @@ def process(
     download_stream = sys.stdin.buffer
     norm_mod = get_normalization_module(network)
 
-    # The normalizer returns a generator that yields `Row`s. Convert to a list of Rows.
+    # The normalizer returns a generator that yields `Row`s. Convert to a set of Rows.
     log.info("Normalize: start")
+
     rows = {row for row in norm_mod.normalize(download_stream)}
     print(f"Found {len(rows)} rows.")
     log.info("Normalize: done")
