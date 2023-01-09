@@ -120,7 +120,9 @@ def main(args: dict = None, parent_parser: object = None) -> None:  # pragma: no
     verify_dates(args.start_time, args.end_time)
 
     auth_yaml = open(args.auth_fname, "r").read() if args.auth_fname else None
-    auth = crmprtd.download_utils.extract_auth(args.username, None, auth_yaml, args.auth_key)
+    auth = crmprtd.download_utils.extract_auth(
+        args.username, None, auth_yaml, args.auth_key
+    )
 
     download(auth["u"], args.start_time, args.end_time)
 

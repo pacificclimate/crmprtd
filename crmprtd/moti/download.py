@@ -125,7 +125,10 @@ def main(args: dict = None, parent_parser: object = None) -> None:  # pragma: no
             ),
         )
         parser.add_argument(
-            "-s", "--station_id", default=None, help="Station ID for which to download data"
+            "-s",
+            "--station_id",
+            default=None,
+            help="Station ID for which to download data",
         )
         parser.add_argument(
             "-u",

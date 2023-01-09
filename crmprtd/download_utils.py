@@ -76,7 +76,7 @@ class FTPReader(object):
     """
 
     def __init__(self):
-        """WAMR and WMB need to implement slight variats of this for their
+        """WAMR and WMB need to implement slight variants of this for their
         connections.
         """
         raise NotImplementedError
