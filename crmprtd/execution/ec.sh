@@ -24,6 +24,6 @@ for prov in ${provinces}; do
     export lower_prov=$(echo ${prov} | tr '[:upper:]' '[:lower:]')
     export log_file=~/${net}/logs/${tag}_{lower_prov}_${frequency}_json.log
     export cache_file=~/${net}/download/${tag}_{frequency}_${lower_prov}_${NOW}.xml
-    echo "download_${net} -p ${lower_prov} -F ${frequency} -L ~/logging.yaml --log_filename ${log_file} -t \"${TIME}\" | tee ${cache_file} |\
+    echo "crmptd_download -N ${net} -p ${lower_prov} -F ${frequency} -L ~/logging.yaml --log_filename ${log_file} -t \"${TIME}\" | tee ${cache_file} |\
        crmprtd_process -c ${db} -N ${net} -L ~/logging.yaml --log_filename ${log_file}" | batch
 done

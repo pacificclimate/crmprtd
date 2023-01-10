@@ -13,4 +13,4 @@ export NOW=$(date +'%Y-%m-%dT%H:%M:%S')
 export log_file=~/${net}/logs/${tag}_{net}_json.log
 export cache_file=~/${net}/cache/${tag}_{net}_${NOW}.txt
 
-echo "download_${net} -f sftp2.bchydro.com -F pcic -S ~/.ssh/id_rsa -L ~/logging.yaml --log_filename ${log_file} | tee ${cache_file}" | batch
+echo "crmptd_download -N ${net} -f sftp2.bchydro.com -F pcic -S ~/.ssh/id_rsa -L ~/logging.yaml --log_filename ${log_file} | tee ${cache_file}" | batch
