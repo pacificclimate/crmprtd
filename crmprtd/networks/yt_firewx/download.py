@@ -1,4 +1,4 @@
-from crmprtd.ec_swob.download import main as swob_main
+from crmprtd.networks.ec_swob.download import main as swob_main
 
 
 def main(*args, **kwargs):

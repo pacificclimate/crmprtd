@@ -22,7 +22,7 @@ from datetime import datetime, timedelta
 from argparse import ArgumentParser
 
 # Local
-from crmprtd.ec import makeurl
+from crmprtd.networks.ec import makeurl
 from crmprtd import setup_logging, get_version
 from crmprtd.download_utils import https_download, verify_date
 
