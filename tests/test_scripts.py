@@ -16,7 +16,8 @@ def test_version_download(capsys, network):
         (name, ep.load())
         for name, ep in crmprtd.pkg_resources.get_entry_map("crmprtd")[
             "console_scripts"
-        ].items() if name != "crmprtd_download"
+        ].items()
+        if name != "crmprtd_download"
     ],
 )
 def test_version_non_download(capsys, name, entry_point):
