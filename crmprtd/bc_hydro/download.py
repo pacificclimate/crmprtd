@@ -8,7 +8,7 @@ updated available data, supplemented with monitoring and alerting
 for errors. If the script is run less than once every 3 months
 you will miss data.
 """
-
+from typing import List
 import pysftp
 import logging
 import os
@@ -112,14 +112,13 @@ def download_relevant_bch_zipfiles(start_date, end_date, connection, remote_file
 
 
 def main(
-    args: dict = None, parent_parser: ArgumentParser = None
+    arglist: List[str] = None, parent_parser: ArgumentParser = None
 ) -> None:  # pragma: no cover
     """Download CLI function for BC Hydro
 
     Side effect: Sends downloaded XML files to STDOUT.
 
-    :param args: Argument list (for testing; default is to parse from sys.argv).
-        Arg parser is not created or invoked if this arg is present.
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
     :param parent_parser: Argument parser common to all network downloads.
     """
     desc = globals()["__doc__"]
@@ -127,47 +126,46 @@ def main(
     end = datetime.now()
     start = end - relativedelta.relativedelta(months=1)
 
-    if args is None:
-        parser = ArgumentParser(parents=[parent_parser], description=desc)
-        parser.add_argument(
-            "-u", "--username", default="pcic", help="Username for the ftp server "
-        )
-        parser.add_argument(
-            "-f",
-            "--ftp_server",
-            default="sftp2.bchydro.com",
-            help="Full uri to BC Hydro's ftp server",
-        )
-        parser.add_argument(
-            "-F",
-            "--ftp_dir",
-            default=("pcic"),
-            help="FTP Directory containing BC hydro's data files",
-        )
-        parser.add_argument(
-            "-S",
-            "--ssh_private_key",
-            help="Path to file with SSH private key",
-        )
-        parser.add_argument(
-            "-s",
-            "--start_date",
-            help=(
-                "Optional start time to use for downloading "
-                "(interpreted with dateutil.parser.parse). "
-                "Defaults to one month prior to now."
-            ),
-        )
-        parser.add_argument(
-            "-e",
-            "--end_date",
-            help=(
-                "Optional end time to use for downloading "
-                "(interpreted with dateutil.parser.parse). "
-                "Defaults to now."
-            ),
-        )
-        args = parser.parse_args(args)
+    parser = ArgumentParser(parents=[parent_parser], description=desc)
+    parser.add_argument(
+        "-u", "--username", default="pcic", help="Username for the ftp server "
+    )
+    parser.add_argument(
+        "-f",
+        "--ftp_server",
+        default="sftp2.bchydro.com",
+        help="Full uri to BC Hydro's ftp server",
+    )
+    parser.add_argument(
+        "-F",
+        "--ftp_dir",
+        default=("pcic"),
+        help="FTP Directory containing BC hydro's data files",
+    )
+    parser.add_argument(
+        "-S",
+        "--ssh_private_key",
+        help="Path to file with SSH private key",
+    )
+    parser.add_argument(
+        "-s",
+        "--start_date",
+        help=(
+            "Optional start time to use for downloading "
+            "(interpreted with dateutil.parser.parse). "
+            "Defaults to one month prior to now."
+        ),
+    )
+    parser.add_argument(
+        "-e",
+        "--end_date",
+        help=(
+            "Optional end time to use for downloading "
+            "(interpreted with dateutil.parser.parse). "
+            "Defaults to now."
+        ),
+    )
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())

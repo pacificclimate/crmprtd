@@ -17,8 +17,8 @@ that came in late. Gaps can be filled in at any time, so there is
 little risk of missing data.
 """
 
-
 # Standard module
+from typing import List
 import sys
 import logging.config
 from datetime import datetime, timedelta
@@ -93,52 +93,50 @@ def download(
 
 
 def main(
-    args: dict = None, parent_parser: ArgumentParser = None
+    arglist: List[str] = None, parent_parser: ArgumentParser = None
 ) -> None:  # pragma: no cover
     """Download CLI function for MoTI
 
     Side effect: Sends downloaded XML files to STDOUT.
 
-    :param args: Argument list (for testing; default is to parse from sys.argv).
-        Arg parser is not created or invoked if this arg is present.
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
     :param parent_parser: Argument parser common to all network downloads.
     """
     desc = globals()["__doc__"]
 
-    if args is None:
-        parser = ArgumentParser(parents=[parent_parser], description=desc)
-        add_common_auth_arguments(parser)
-        parser.add_argument(
-            "-S",
-            "--start_time",
-            help=(
-                "Alternate time to use for downloading "
-                "(interpreted with dateutil.parser.parse)."
-                "Defaults to one hour prior to now"
-            ),
-        )
-        parser.add_argument(
-            "-E",
-            "--end_time",
-            help=(
-                "Alternate time to use for downloading "
-                "(interpreted with dateutil.parser.parse)."
-                "Defaults to now."
-            ),
-        )
-        parser.add_argument(
-            "-s",
-            "--station_id",
-            default=None,
-            help="Station ID for which to download data",
-        )
-        parser.add_argument(
-            "-u",
-            "--base_url",
-            default="https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110",
-            help="Base URL for the MoTI SAW service",
-        )
-        args = parser.parse_args(args)
+    parser = ArgumentParser(parents=[parent_parser], description=desc)
+    add_common_auth_arguments(parser)
+    parser.add_argument(
+        "-S",
+        "--start_time",
+        help=(
+            "Alternate time to use for downloading "
+            "(interpreted with dateutil.parser.parse)."
+            "Defaults to one hour prior to now"
+        ),
+    )
+    parser.add_argument(
+        "-E",
+        "--end_time",
+        help=(
+            "Alternate time to use for downloading "
+            "(interpreted with dateutil.parser.parse)."
+            "Defaults to now."
+        ),
+    )
+    parser.add_argument(
+        "-s",
+        "--station_id",
+        default=None,
+        help="Station ID for which to download data",
+    )
+    parser.add_argument(
+        "-u",
+        "--base_url",
+        default="https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110",
+        help="Base URL for the MoTI SAW service",
+    )
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())

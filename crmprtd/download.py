@@ -19,7 +19,7 @@ function, or a main-like wrapper for it. Pros and cons:
 - Cons: Significant changes to existing code. Greater complexity. Significant changes
 to scripts that use it.
 """
-
+from typing import List
 from importlib import import_module
 from argparse import ArgumentParser
 
@@ -40,7 +40,7 @@ def get_download_module(network):
 #     download_module.download(**kwargs)
 
 
-def main(args=None):
+def main(arglist: List[str] = None):
     parser = ArgumentParser(add_help=False)
 
     # Basic args
@@ -56,11 +56,11 @@ def main(args=None):
         help="Network from which to download observations",
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(arglist)
 
     # Download module will define network-specific args.
     download_module = get_download_module(args.network)
-    download_module.main(parent_parser=parser)
+    download_module.main(arglist=arglist, parent_parser=parser)
 
     # TODO: Abandoned approach. Remove.
     # # Date args (almost all networks)

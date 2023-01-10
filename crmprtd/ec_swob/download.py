@@ -12,6 +12,8 @@ constant monitoring for outages and errors as even a short outage
 could result in data loss.
 
 """
+
+from typing import List
 import re
 import datetime
 import logging
@@ -108,31 +110,31 @@ def split_multi_xml_stream(stream):
         yield rv
 
 
-def main(partner: str, args: dict = None, parent_parser: ArgumentParser = None) -> None:
+def main(
+    partner: str, arglist: List[str] = None, parent_parser: ArgumentParser = None
+) -> None:
     """Common download CLI function for the EC_SWOB provincial partners (e.g.
     bc-env-snow, bc-env-aq, bc-forestry and bc-tran).
 
     Side effect: Sends downloaded XML files to STDOUT.
 
     :param partner: The partner abbreviation found in the SWOB URL (e.g. bc-tran).
-    :param args: Argument list (for testing; default is to parse from sys.argv).
-        Arg parser is not created or invoked if this arg is present.
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
     :param parent_parser: Argument parser common to all network downloads.
     """
     desc = globals()["__doc__"]
 
-    if args is None:
-        parser = ArgumentParser(parents=[parent_parser], description=desc)
-        parser.add_argument(
-            "-d",
-            "--date",
-            help=(
-                "Alternate date to use for downloading "
-                "(interpreted with dateutil.parser.parse)."
-                "Defaults to now."
-            ),
-        )
-        args = parser.parse_args(args)
+    parser = ArgumentParser(parents=[parent_parser], description=desc)
+    parser.add_argument(
+        "-d",
+        "--date",
+        help=(
+            "Alternate date to use for downloading "
+            "(interpreted with dateutil.parser.parse)."
+            "Defaults to now."
+        ),
+    )
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())

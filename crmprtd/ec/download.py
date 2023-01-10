@@ -15,6 +15,7 @@ result in data loss.
 """
 
 # Standard module
+from typing import List
 import sys
 import logging.config
 from datetime import datetime, timedelta
@@ -54,64 +55,62 @@ def download(time, frequency, province, language, baseurl):
         sys.exit(1)
 
 
-def main(args: dict = None, parent_parser: ArgumentParser = None) -> None:
+def main(arglist: List[str] = None, parent_parser: ArgumentParser = None) -> None:
     """Download CLI function for Environment Canada
 
     Side effect: Sends downloaded XML files to STDOUT.
 
-    :param args: Argument list (for testing; default is to parse from sys.argv).
-        Arg parser is not created or invoked if this arg is present.
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
     :param parent_parser: Argument parser common to all network downloads.
     """
     desc = globals()["__doc__"]
 
-    if args is None:
-        parser = ArgumentParser(parents=[parent_parser], description=desc)
-        parser.add_argument("-p", "--province", help="2 letter province code")
-        parser.add_argument(
-            "-g",
-            "--language",
-            default="e",
-            choices=["e", "f"],
-            help="'e' (english) | 'f' (french)",
-        )
-        parser.add_argument(
-            "-F",
-            "--frequency",
-            choices=["daily", "hourly"],
-            help="daily|hourly",
-        )
-        parser.add_argument(
-            "-t",
-            "--time",
-            help=(
-                "Alternate *UTC* time to use for downloading "
-                "(interpreted using dateutil.parser.parse)."
-                "Defaults to the previous hour/day (depending on"
-                " --frequency)."
-            ),
-        )
-        parser.add_argument(
-            "-T",
-            "--threshold",
-            default=1000,
-            help=(
-                "Distance threshold (in meters) to use when "
-                "matching stations. Stations are considered a "
-                "match if they have the same id, name, and are "
-                "within this threshold"
-            ),
-        )
-        parser.add_argument(
-            "-b",
-            "--baseurl",
-            default="https://dd.weather.gc.ca",
-            help=(
-                "Base URL (scheme and hostname components) for"
-                "the meteorological observations service"
-            ),
-        )
-        args = parser.parse_args(args)
+    parser = ArgumentParser(parents=[parent_parser], description=desc)
+    parser.add_argument("-p", "--province", help="2 letter province code")
+    parser.add_argument(
+        "-g",
+        "--language",
+        default="e",
+        choices=["e", "f"],
+        help="'e' (english) | 'f' (french)",
+    )
+    parser.add_argument(
+        "-F",
+        "--frequency",
+        choices=["daily", "hourly"],
+        help="daily|hourly",
+    )
+    parser.add_argument(
+        "-t",
+        "--time",
+        help=(
+            "Alternate *UTC* time to use for downloading "
+            "(interpreted using dateutil.parser.parse)."
+            "Defaults to the previous hour/day (depending on"
+            " --frequency)."
+        ),
+    )
+    parser.add_argument(
+        "-T",
+        "--threshold",
+        default=1000,
+        help=(
+            "Distance threshold (in meters) to use when "
+            "matching stations. Stations are considered a "
+            "match if they have the same id, name, and are "
+            "within this threshold"
+        ),
+    )
+    parser.add_argument(
+        "-b",
+        "--baseurl",
+        default="https://dd.weather.gc.ca",
+        help=(
+            "Base URL (scheme and hostname components) for"
+            "the meteorological observations service"
+        ),
+    )
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())

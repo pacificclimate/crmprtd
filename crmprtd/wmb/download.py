@@ -11,6 +11,7 @@ greater than 24 hours, you will miss data.
 """
 
 # Standard module
+from typing import List
 import os
 import logging.config
 import ftplib
@@ -74,34 +75,32 @@ class WMBFTPReader(FTPReader):
 
 
 def main(
-    args: dict = None, parent_parser: ArgumentParser = None
+    arglist: List[str] = None, parent_parser: ArgumentParser = None
 ) -> None:  # pragma: no cover
     """Download CLI function for BC Hydro
 
     Side effect: Sends downloaded XML files to STDOUT.
 
-    :param args: Argument list (for testing; default is to parse from sys.argv).
-        Arg parser is not created or invoked if this arg is present.
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
     :param parent_parser: Argument parser common to all network downloads.
     """
     desc = globals()["__doc__"]
 
-    if args is None:
-        parser = ArgumentParser(parents=[parent_parser], description=desc)
-        add_common_auth_arguments(parser)
-        parser.add_argument(
-            "-f",
-            "--ftp_server",
-            default="BCFireweatherFTPp1.nrs.gov.bc.ca",
-            help="Full uri to Wildfire Management Branch's ftp server",
-        )
-        parser.add_argument(
-            "-F",
-            "--ftp_file",
-            default="HourlyWeatherAllFields_WA.txt",
-            help="Filename to open on the Wildfire Management Branch's ftp site",
-        )
-        args = parser.parse_args(args)
+    parser = ArgumentParser(parents=[parent_parser], description=desc)
+    add_common_auth_arguments(parser)
+    parser.add_argument(
+        "-f",
+        "--ftp_server",
+        default="BCFireweatherFTPp1.nrs.gov.bc.ca",
+        help="Full uri to Wildfire Management Branch's ftp server",
+    )
+    parser.add_argument(
+        "-F",
+        "--ftp_file",
+        default="HourlyWeatherAllFields_WA.txt",
+        help="Filename to open on the Wildfire Management Branch's ftp site",
+    )
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())
