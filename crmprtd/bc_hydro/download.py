@@ -8,7 +8,7 @@ updated available data, supplemented with monitoring and alerting
 for errors. If the script is run less than once every 3 months
 you will miss data.
 """
-
+from typing import List
 import pysftp
 import logging
 import os
@@ -23,8 +23,8 @@ from contextlib import contextmanager
 
 from dateutil import relativedelta
 
-from crmprtd.download import verify_date
-from crmprtd import add_logging_args, setup_logging, get_version, add_version_arg
+from crmprtd.download_utils import verify_date
+from crmprtd import setup_logging, get_version
 
 log = logging.getLogger(__name__)
 
@@ -111,11 +111,22 @@ def download_relevant_bch_zipfiles(start_date, end_date, connection, remote_file
                 sys.stdout.buffer.write(txt_file.read())
 
 
-def main(args=None):  # pragma: no cover
+def main(
+    arglist: List[str] = None, parent_parser: ArgumentParser = None
+) -> None:  # pragma: no cover
+    """Download CLI function for BC Hydro
+
+    Side effect: Sends downloaded XML files to STDOUT.
+
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
+    :param parent_parser: Argument parser common to all network downloads.
+    """
     desc = globals()["__doc__"]
-    parser = ArgumentParser(description=desc)
-    add_version_arg(parser)
-    add_logging_args(parser)
+
+    end = datetime.now()
+    start = end - relativedelta.relativedelta(months=1)
+
+    parser = ArgumentParser(parents=[parent_parser], description=desc)
     parser.add_argument(
         "-u", "--username", default="pcic", help="Username for the ftp server "
     )
@@ -136,8 +147,6 @@ def main(args=None):  # pragma: no cover
         "--ssh_private_key",
         help="Path to file with SSH private key",
     )
-    end = datetime.now()
-    start = end - relativedelta.relativedelta(months=1)
     parser.add_argument(
         "-s",
         "--start_date",
@@ -156,7 +165,7 @@ def main(args=None):  # pragma: no cover
             "Defaults to now."
         ),
     )
-    args = parser.parse_args(args)
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())

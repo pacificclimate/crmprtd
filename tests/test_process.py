@@ -6,7 +6,7 @@ from datetime import datetime
 from pkg_resources import resource_filename
 
 from pycds import Network, Variable, Obs
-from crmprtd.download import verify_date
+from crmprtd.download_utils import verify_date
 from crmprtd.process import process
 
 

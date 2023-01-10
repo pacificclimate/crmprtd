@@ -15,7 +15,7 @@ CRD's data has a unique and pseudo-secret client ID. This client id
 can be supplied as the username in the authentication file or via the
 --username paramenter. No password is necessary.
 """
-
+from typing import List
 import sys
 from argparse import ArgumentParser
 import logging
@@ -23,12 +23,10 @@ from datetime import timedelta
 
 import dateutil.parser
 
-import crmprtd.download
+import crmprtd.download_utils
 from crmprtd import (
-    add_logging_args,
     setup_logging,
-    common_auth_arguments,
-    add_version_arg,
+    add_common_auth_arguments,
     get_version,
 )
 
@@ -64,19 +62,25 @@ def make_url(client_id, sdate=None, edate=None):
 def download(client_id, start_date, end_date):  # pragma: no cover
     url = make_url(client_id, start_date, end_date)
     try:
-        crmprtd.download.https_download(url, "https", log)
+        crmprtd.download_utils.https_download(url, "https", log)
 
     except IOError:
         log.exception("Unable to download or open JSON data")
         sys.exit(1)
 
 
-def main(args=None):  # pragma: no cover
-    desc = globals()["__doc__"]
-    parser = ArgumentParser(description=desc)
-    add_version_arg(parser)
-    add_logging_args(parser)
-    common_auth_arguments(parser)
+def main(
+    arglist: List[str] = None, parent_parser: ArgumentParser = None
+) -> None:  # pragma: no cover
+    """Download CLI function for CRD
+
+    Side effect: Sends downloaded XML files to STDOUT.
+
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
+    :param parent_parser: Argument parser common to all network downloads.
+    """
+    parser = ArgumentParser(parents=[parent_parser], description=globals()["__doc__"])
+    add_common_auth_arguments(parser)
     parser.add_argument(
         "-S",
         "--start_time",
@@ -97,7 +101,7 @@ def main(args=None):  # pragma: no cover
             "Defaults to now."
         ),
     )
-    args = parser.parse_args(args)
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())
@@ -114,7 +118,9 @@ def main(args=None):  # pragma: no cover
     verify_dates(args.start_time, args.end_time)
 
     auth_yaml = open(args.auth_fname, "r").read() if args.auth_fname else None
-    auth = crmprtd.download.extract_auth(args.username, None, auth_yaml, args.auth_key)
+    auth = crmprtd.download_utils.extract_auth(
+        args.username, None, auth_yaml, args.auth_key
+    )
 
     download(auth["u"], args.start_time, args.end_time)
 

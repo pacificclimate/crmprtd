@@ -11,6 +11,7 @@ greater than 24 hours, you will miss data.
 """
 
 # Standard module
+from typing import List
 import os
 import logging.config
 import ftplib
@@ -19,13 +20,11 @@ from tempfile import SpooledTemporaryFile
 from argparse import ArgumentParser
 
 # Local
-from crmprtd.download import retry, ftp_connect
-from crmprtd.download import FTPReader, extract_auth
+from crmprtd.download_utils import retry, ftp_connect
+from crmprtd.download_utils import FTPReader, extract_auth
 from crmprtd import (
-    add_logging_args,
     setup_logging,
-    common_auth_arguments,
-    add_version_arg,
+    add_common_auth_arguments,
     get_version,
 )
 
@@ -75,12 +74,20 @@ class WMBFTPReader(FTPReader):
         self.connection = ftp_connect_with_retry(host, user, password)
 
 
-def main(args=None):
+def main(
+    arglist: List[str] = None, parent_parser: ArgumentParser = None
+) -> None:  # pragma: no cover
+    """Download CLI function for BC Hydro
+
+    Side effect: Sends downloaded XML files to STDOUT.
+
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
+    :param parent_parser: Argument parser common to all network downloads.
+    """
     desc = globals()["__doc__"]
-    parser = ArgumentParser(description=desc)
-    add_version_arg(parser)
-    add_logging_args(parser)
-    common_auth_arguments(parser)
+
+    parser = ArgumentParser(parents=[parent_parser], description=desc)
+    add_common_auth_arguments(parser)
     parser.add_argument(
         "-f",
         "--ftp_server",
@@ -93,7 +100,7 @@ def main(args=None):
         default="HourlyWeatherAllFields_WA.txt",
         help="Filename to open on the Wildfire Management Branch's ftp site",
     )
-    args = parser.parse_args(args)
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())

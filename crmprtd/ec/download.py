@@ -15,6 +15,7 @@ result in data loss.
 """
 
 # Standard module
+from typing import List
 import sys
 import logging.config
 from datetime import datetime, timedelta
@@ -22,8 +23,8 @@ from argparse import ArgumentParser
 
 # Local
 from crmprtd.ec import makeurl
-from crmprtd import setup_logging, add_logging_args, add_version_arg, get_version
-from crmprtd.download import https_download, verify_date
+from crmprtd import setup_logging, get_version
+from crmprtd.download_utils import https_download, verify_date
 
 log = logging.getLogger(__name__)
 
@@ -54,10 +55,17 @@ def download(time, frequency, province, language, baseurl):
         sys.exit(1)
 
 
-def main(args=None):
+def main(arglist: List[str] = None, parent_parser: ArgumentParser = None) -> None:
+    """Download CLI function for Environment Canada
+
+    Side effect: Sends downloaded XML files to STDOUT.
+
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
+    :param parent_parser: Argument parser common to all network downloads.
+    """
     desc = globals()["__doc__"]
-    parser = ArgumentParser(description=desc)
-    add_version_arg(parser)
+
+    parser = ArgumentParser(parents=[parent_parser], description=desc)
     parser.add_argument("-p", "--province", help="2 letter province code")
     parser.add_argument(
         "-g",
@@ -102,8 +110,7 @@ def main(args=None):
             "the meteorological observations service"
         ),
     )
-    add_logging_args(parser)
-    args = parser.parse_args(args)
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())

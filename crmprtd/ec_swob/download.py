@@ -8,11 +8,12 @@ https://dd.weather.gc.ca/observations/doc/README_SWOB.txt). ECCC
 appears to maintain the partner data for only 4 to 6 days.
 
 It is recommended to run this script once per hour and maintain
-constant monitoring for outtages and errors as even a short outtage
+constant monitoring for outages and errors as even a short outage
 could result in data loss.
 
 """
 
+from typing import List
 import re
 import datetime
 import logging
@@ -23,8 +24,8 @@ from argparse import ArgumentParser
 from lxml import html
 import requests
 
-from crmprtd.download import https_download, verify_date
-from crmprtd import add_logging_args, setup_logging, add_version_arg, get_version
+from crmprtd.download_utils import https_download, verify_date
+from crmprtd import setup_logging, get_version
 
 log = logging.getLogger(__name__)
 
@@ -109,25 +110,21 @@ def split_multi_xml_stream(stream):
         yield rv
 
 
-def main(partner, args=None):
-    """Main download function to use for download scripts for the EC_SWOB
-    provincial partners (e.g. bc-env-snow, bc-env-aq, bc-forestry and
-    bc-tran).
+def main(
+    partner: str, arglist: List[str] = None, parent_parser: ArgumentParser = None
+) -> None:
+    """Common download CLI function for the EC_SWOB provincial partners (e.g.
+    bc-env-snow, bc-env-aq, bc-forestry and bc-tran).
 
-    Args:
-        partner (str): The partner abbreviation found in the SWOB URL
-        (e.g. bc-tran)
-        args (list): Argument list (for testing; default is to parse from sys.argv).
+    Side effect: Sends downloaded XML files to STDOUT.
 
-    Returns:
-        No return value. Produces side-effect of sending downloaded
-        XML files to STDOUT
-
+    :param partner: The partner abbreviation found in the SWOB URL (e.g. bc-tran).
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
+    :param parent_parser: Argument parser common to all network downloads.
     """
     desc = globals()["__doc__"]
-    parser = ArgumentParser(description=desc)
-    add_version_arg(parser)
-    add_logging_args(parser)
+
+    parser = ArgumentParser(parents=[parent_parser], description=desc)
     parser.add_argument(
         "-d",
         "--date",
@@ -137,7 +134,7 @@ def main(partner, args=None):
             "Defaults to now."
         ),
     )
-    args = parser.parse_args(args)
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())
@@ -162,5 +159,6 @@ def main(partner, args=None):
     )
 
 
+# TODO: I think this is a hangover from code from which ec_swob was abstracted. Remove.
 if __name__ == "__main__":
     main("bc-env-snow")

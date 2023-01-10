@@ -9,7 +9,7 @@ collect all available data (plus, presumably some duplicate data from
 the last run). If the script is run less than once per month, you will
 miss data.
 """
-
+from typing import List
 import ftplib
 import logging
 import os
@@ -19,9 +19,9 @@ from tempfile import SpooledTemporaryFile
 from argparse import ArgumentParser
 
 # Local
-from crmprtd.download import retry, ftp_connect
-from crmprtd.download import FTPReader
-from crmprtd import add_logging_args, setup_logging, get_version, add_version_arg
+from crmprtd.download_utils import retry, ftp_connect
+from crmprtd.download_utils import FTPReader
+from crmprtd import setup_logging, get_version
 
 log = logging.getLogger(__name__)
 
@@ -81,10 +81,19 @@ class WAMRFTPReader(FTPReader):
         self.connection.retrlines("NLST " + data_path, callback)
 
 
-def main(args=None):
+def main(
+    arglist: List[str] = None, parent_parser: ArgumentParser = None
+) -> None:  # pragma: no cover
+    """Download CLI function for BC Hydro
+
+    Side effect: Sends downloaded XML files to STDOUT.
+
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
+    :param parent_parser: Argument parser common to all network downloads.
+    """
     desc = globals()["__doc__"]
-    parser = ArgumentParser(description=desc)
-    add_version_arg(parser)
+
+    parser = ArgumentParser(parents=[parent_parser], description=desc)
     parser.add_argument(
         "-f",
         "--ftp_server",
@@ -97,8 +106,7 @@ def main(args=None):
         default="pub/outgoing/AIR/Hourly_Raw_Air_Data/Meteorological/",
         help="FTP Directory containing WAMR's data files",
     )
-    parser = add_logging_args(parser)
-    args = parser.parse_args(args)
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())

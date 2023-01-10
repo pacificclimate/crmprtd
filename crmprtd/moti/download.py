@@ -17,8 +17,8 @@ that came in late. Gaps can be filled in at any time, so there is
 little risk of missing data.
 """
 
-
 # Standard module
+from typing import List
 import sys
 import logging.config
 from datetime import datetime, timedelta
@@ -26,13 +26,11 @@ from argparse import ArgumentParser
 
 
 # Local
-import crmprtd.download
+import crmprtd.download_utils
 from crmprtd import (
-    common_auth_arguments,
-    add_logging_args,
+    add_common_auth_arguments,
     setup_logging,
     get_version,
-    add_version_arg,
 )
 
 log = logging.getLogger(__name__)
@@ -48,7 +46,7 @@ def download(
     log.info("Starting MOTIe rtd")
 
     auth_yaml = open(auth_fname, "r").read() if auth_fname else None
-    auth = crmprtd.download.extract_auth(username, password, auth_yaml, auth_key)
+    auth = crmprtd.download_utils.extract_auth(username, password, auth_yaml, auth_key)
 
     if start_time or end_time:
         if not station_id:
@@ -59,10 +57,10 @@ def download(
             )
 
         now = utcnow()
-        start_time = crmprtd.download.verify_date(
+        start_time = crmprtd.download_utils.verify_date(
             start_time, now - timedelta(days=0, seconds=3600), "start_time"
         )
-        end_time = crmprtd.download.verify_date(end_time, now, "end_time")
+        end_time = crmprtd.download_utils.verify_date(end_time, now, "end_time")
 
         log.info(
             "Starting manual run using timestamps {0} {1}".format(start_time, end_time)
@@ -87,19 +85,27 @@ def download(
         payload = {}
 
     try:
-        crmprtd.download.https_download(url, "https", log, auth, payload)
+        crmprtd.download_utils.https_download(url, "https", log, auth, payload)
 
     except IOError:
         log.exception("Unable to download or open xml data")
         sys.exit(1)
 
 
-def main(args=None):  # pragma: no cover
+def main(
+    arglist: List[str] = None, parent_parser: ArgumentParser = None
+) -> None:  # pragma: no cover
+    """Download CLI function for MoTI
+
+    Side effect: Sends downloaded XML files to STDOUT.
+
+    :param arglist: Argument list (for testing; default is to parse from sys.argv).
+    :param parent_parser: Argument parser common to all network downloads.
+    """
     desc = globals()["__doc__"]
-    parser = ArgumentParser(description=desc)
-    add_version_arg(parser)
-    add_logging_args(parser)
-    common_auth_arguments(parser)
+
+    parser = ArgumentParser(parents=[parent_parser], description=desc)
+    add_common_auth_arguments(parser)
     parser.add_argument(
         "-S",
         "--start_time",
@@ -119,7 +125,10 @@ def main(args=None):  # pragma: no cover
         ),
     )
     parser.add_argument(
-        "-s", "--station_id", default=None, help="Station ID for which to download data"
+        "-s",
+        "--station_id",
+        default=None,
+        help="Station ID for which to download data",
     )
     parser.add_argument(
         "-u",
@@ -127,7 +136,7 @@ def main(args=None):  # pragma: no cover
         default="https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110",
         help="Base URL for the MoTI SAW service",
     )
-    args = parser.parse_args(args)
+    args = parser.parse_args(arglist)
 
     if args.version:
         print(get_version())
