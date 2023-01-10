@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 import crmprtd.download_utils
-from crmprtd.moti.download import download
+from crmprtd.networks.moti.download import download
 
 
 now = datetime.datetime.now().replace(microsecond=0)
@@ -50,7 +50,7 @@ def test_download(stime, etime, station_id, expected_payload, mocker):
     # download() is run. Since this is not predictable, we need to
     # mock out datetime.utcnow() to give us a deterministic time to
     # test against.
-    mocker.patch("crmprtd.moti.download.utcnow", return_value=now)
+    mocker.patch("crmprtd.networks.moti.download.utcnow", return_value=now)
     download("u", "p", None, None, stime, etime, station_id, url)
     crmprtd.download_utils.https_download.assert_called_once()
     call_args, _ = crmprtd.download_utils.https_download.call_args

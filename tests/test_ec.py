@@ -5,7 +5,7 @@ from lxml.etree import LxmlError
 from lxml.etree import fromstring, parse, XSLT
 import pytest
 
-from crmprtd.ec import makeurl, ns, OmMember
+from crmprtd.networks.ec import makeurl, ns, OmMember
 
 
 baseurl = "https://dd.weather.gc.ca"
@@ -65,7 +65,7 @@ def test_makeurl_no_time_hourly(mocker):
     t = datetime(2016, 1, 15, 21)
     fmt = "%Y%m%d%H"
 
-    with mocker.patch("crmprtd.ec.now", return_value=t):
+    with mocker.patch("crmprtd.networks.ec.now", return_value=t):
         url = makeurl(freq="hourly")
 
     assert url == (
@@ -77,7 +77,7 @@ def test_makeurl_no_time_daily(mocker):
     t = datetime(2016, 1, 15, 21)
     fmt = "%Y%m%d"
 
-    with mocker.patch("crmprtd.ec.now", return_value=t):
+    with mocker.patch("crmprtd.networks.ec.now", return_value=t):
         url = makeurl()
 
     assert url == (

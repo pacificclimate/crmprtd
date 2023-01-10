@@ -31,7 +31,7 @@ from crmprtd import (
 
 
 def get_download_module(network):
-    return import_module(f"crmprtd.{network}.download")
+    return import_module(f"crmprtd.networks.{network}.download")
 
 
 def main(arglist: List[str] = None):

@@ -6,7 +6,10 @@ from operator import gt, eq
 
 import pytest
 
-from crmprtd.bc_hydro.download import temp_filename, download_relevant_bch_zipfiles
+from crmprtd.networks.bc_hydro.download import (
+    temp_filename,
+    download_relevant_bch_zipfiles,
+)
 
 
 class FakeFTPConnection(object):

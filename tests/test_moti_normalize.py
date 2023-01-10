@@ -1,4 +1,4 @@
-from crmprtd.moti.normalize import normalize
+from crmprtd.networks.moti.normalize import normalize
 from io import BytesIO
 import logging
 
@@ -134,6 +134,7 @@ def test_normalize_missing_time():
     rows = [row for row in normalize(BytesIO(lines))]
     assert len(rows) == 2
     for row in rows:
+        # TODO: Assert this?
         row.time is not None
 
 

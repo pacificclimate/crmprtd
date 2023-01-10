@@ -2,7 +2,7 @@ import pytest
 
 from dateutil.parser import parse
 
-from crmprtd.crd.download import verify_dates, make_url
+from crmprtd.networks.crd.download import verify_dates, make_url
 
 
 @pytest.mark.parametrize(

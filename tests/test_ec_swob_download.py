@@ -4,8 +4,8 @@ from datetime import datetime
 import pytest
 
 from .swob_data import multi_xml_bytes
-from crmprtd.ec_swob.download import match_date, get_url_list
-from crmprtd.ec_swob.download import split_multi_xml_stream, match_swob_xml_url
+from crmprtd.networks.ec_swob.download import match_date, get_url_list
+from crmprtd.networks.ec_swob.download import split_multi_xml_stream, match_swob_xml_url
 
 
 @pytest.mark.parametrize(

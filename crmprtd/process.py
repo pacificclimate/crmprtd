@@ -74,7 +74,7 @@ def add_process_args(parser):  # pragma: no cover
 
 
 def get_normalization_module(network):
-    return import_module("crmprtd.{}.normalize".format(network))
+    return import_module(f"crmprtd.networks.{network}.normalize")
 
 
 def process(
