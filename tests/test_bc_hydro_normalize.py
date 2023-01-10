@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from crmprtd.bc_hydro.normalize import normalize
+from crmprtd.networks.bc_hydro.normalize import normalize
 
 import pytest
 

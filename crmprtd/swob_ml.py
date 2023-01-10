@@ -9,8 +9,8 @@ from dateutil.parser import parse as dateparse
 # Local
 from pkg_resources import resource_stream
 from crmprtd import Row
-from crmprtd.ec import ns, OmMember, no_ns_element
-from crmprtd.ec_swob.download import split_multi_xml_stream
+from crmprtd.networks.ec import ns, OmMember, no_ns_element
+from crmprtd.networks.ec_swob.download import split_multi_xml_stream
 
 
 log = logging.getLogger(__name__)

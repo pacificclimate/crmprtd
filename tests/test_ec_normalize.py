@@ -1,4 +1,4 @@
-from crmprtd.ec.normalize import normalize
+from crmprtd.networks.ec.normalize import normalize
 from io import BytesIO
 
 

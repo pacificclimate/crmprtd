@@ -147,7 +147,7 @@ def main(
         args.log_filename,
         args.error_email,
         args.log_level,
-        "crmprtd.moti",
+        "crmprtd.networks.moti",
     )
 
     download(

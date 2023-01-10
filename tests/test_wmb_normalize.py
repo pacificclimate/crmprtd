@@ -2,7 +2,7 @@ from io import BytesIO
 from datetime import datetime
 import pytz
 
-from crmprtd.wmb.normalize import normalize
+from crmprtd.networks.wmb.normalize import normalize
 
 
 def test_normalize_good_data():

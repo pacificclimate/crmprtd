@@ -111,7 +111,7 @@ def main(
         args.log_filename,
         args.error_email,
         args.log_level,
-        "crmprtd.wmb",
+        "crmprtd.networks.wmb",
     )
 
     download(

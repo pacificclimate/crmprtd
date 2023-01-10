@@ -14,7 +14,7 @@ from sqlalchemy.orm import sessionmaker
 
 from pycds import Station, History, Network, Variable
 from pycds.util import create_test_database
-from crmprtd.moti import process
+from crmprtd.networks.moti import process
 
 
 def main(opts, args):

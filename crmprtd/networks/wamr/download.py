@@ -117,7 +117,7 @@ def main(
         args.log_filename,
         args.error_email,
         args.log_level,
-        "crmprtd.wamr",
+        "crmprtd.networks.wamr",
     )
 
     download(args.ftp_server, args.ftp_dir)

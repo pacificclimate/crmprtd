@@ -15,7 +15,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from pycds import CrmpNetworkGeoserver as CNG
-from crmprtd.moti import url_generator
+from crmprtd.networks.moti import url_generator
 
 
 def download(url, auth, out, log):
@@ -49,7 +49,7 @@ def main(args):
     if args.error_email:
         log_conf["handlers"]["mail"]["toaddrs"] = args.error_email
     logging.config.dictConfig(log_conf)
-    log = logging.getLogger("crmprtd.moti")
+    log = logging.getLogger("crmprtd.networks.moti")
     if args.log_level:
         log.setLevel(args.log_level)
 

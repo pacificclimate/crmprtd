@@ -10,9 +10,9 @@ from crmprtd import SWOB_PARTNERS
 from .swob_data import multi_xml_download, MSNG_values_xml
 
 normalize_mods = (
-    import_module(f"crmprtd.{partner}.normalize") for partner in SWOB_PARTNERS
+    import_module(f"crmprtd.networks.{partner}.normalize") for partner in SWOB_PARTNERS
 )
-from crmprtd.bc_tran.normalize import normalize as norm_tran
+from crmprtd.networks.bc_tran.normalize import normalize as norm_tran
 
 
 @pytest.mark.parametrize("function", (x.normalize for x in normalize_mods))

@@ -4,7 +4,7 @@ from datetime import datetime
 from lxml.etree import parse, XSLT
 import pytz
 
-from crmprtd.moti import url_generator
+from crmprtd.networks.moti import url_generator
 
 bctz = pytz.timezone("America/Vancouver")
 

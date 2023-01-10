@@ -3,7 +3,7 @@ import datetime
 
 import pytz
 
-from crmprtd.crd.normalize import normalize
+from crmprtd.networks.crd.normalize import normalize
 
 
 def test_normalize_good_data():

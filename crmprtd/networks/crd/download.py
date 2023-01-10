@@ -112,7 +112,7 @@ def main(
         args.log_filename,
         args.error_email,
         args.log_level,
-        "crmprtd.crd",
+        "crmprtd.networks.crd",
     )
 
     verify_dates(args.start_time, args.end_time)

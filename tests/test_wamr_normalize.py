@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from crmprtd.wamr.normalize import normalize
+from crmprtd.networks.wamr.normalize import normalize
 
 import pytest
 

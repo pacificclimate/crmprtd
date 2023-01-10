@@ -176,7 +176,7 @@ def main(
         args.log_filename,
         args.error_email,
         args.log_level,
-        "crmprtd.bc_hydro",
+        "crmprtd.networks.bc_hydro",
     )
 
     args.start_date = verify_date(args.start_date, start, "start date")

@@ -145,7 +145,7 @@ def main(
         args.log_filename,
         args.error_email,
         args.log_level,
-        "crmprtd.{}".format(partner),
+        f"crmprtd.networks.{partner}",
     )
 
     if not args.date:
