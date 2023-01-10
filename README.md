@@ -61,13 +61,17 @@ environment.
 
 ## Usage
 
-The most common usage pattern for the `crmprtd` is to configure a number of scripts to run on an hourly or daily basis.
+The most common usage pattern for package `crmprtd` is to configure a number of scripts to run on an hourly or daily basis.
 
 Some data sources require authentication. For most scripts, credentials can be provided as command line arguments, or, preferably, entries in a yaml config file. A sample version of this file can be seen [here](https://github.com/pacificclimate/crmprtd/blob/master/auth.yaml). The location of the config is passed with the `--auth` argument and the key with the `--auth_key` argument.
 
 ### Downloading data
 
-Each network has a `download_[network_name]` script which will download data.  The standard output stream of this script can be redirected into a file or piped into `crmprtd_process`.  `crmprtd_process` will take the data and run it through a series of formatting changes and checks before inserting the data into the database.
+Script `crmprtd_download -N [network_name]` downloads data for the named network.  
+The standard output stream of this script can be redirected into a file or piped 
+into `crmprtd_process`.  Script `crmprtd_process` read data from the standard input
+stream runs it through a series of formatting changes and checks before inserting 
+the data into the database.
 
 A list of all available network modules can be found in the online help for `crmprtd_process`:
 
@@ -93,23 +97,23 @@ optional arguments:
 Connecting the I/O of the download scripts to cache files and the processing scripts is as easy as using unix pipes and I/O redirects. For example, fetching the SWOB-ML for the BC Forestry data and processing it, looks like this:
 
 ```bash
-download_bc_forestry > cache_filename
+crmprtd_download -N bc_forestry > cache_filename
 crmprtd_process -N bc_forestry < cache_filename
 # Or
-download_bc_forestry | crmprtd_process -N bc_forestry
+crmprtd_download -N bc_forestry | crmprtd_process -N bc_forestry
 # Or
-download_bc_forestry | tee cache_filename | crmprtd_process -N bc_forestry
+crmprtd_download -N bc_forestry | tee cache_filename | crmprtd_process -N bc_forestry
 ```
 
 More generally:
 
 ```bash
-download_[network_name] > cache_filename
+crmprtd_download -N [network_name] > cache_filename
 crmprtd_process -N [network_name] < cache_filename
 # Or
-download_[network_name] | crmprtd_process -N [network_name]
+crmprtd_download -N [network_name] | crmprtd_process -N [network_name]
 # Or
-download_[network_name] | tee cache_filename | crmprtd_process -N [network_name]
+crmprtd_download -N [network_name] | tee cache_filename | crmprtd_process -N [network_name]
 ```
 
 ### Execution scripts
