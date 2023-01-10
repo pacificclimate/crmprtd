@@ -117,7 +117,11 @@ def main(arglist: List[str] = None, parent_parser: ArgumentParser = None) -> Non
         return
 
     setup_logging(
-        args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd.networks.ec"
+        args.log_conf,
+        args.log_filename,
+        args.error_email,
+        args.log_level,
+        "crmprtd.networks.ec",
     )
 
     download(args.time, args.frequency, args.province, args.language, args.baseurl)
