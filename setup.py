@@ -7,6 +7,7 @@ import pkg_resources
 __version__ = (4, 0, 0)
 
 
+# TODO: I believe that adding commands in setup.py is now discouraged. Remove.
 class PyTest(TestCommand):
     def finalize_options(self):
         TestCommand.finalize_options(self)
@@ -45,7 +46,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "crmprtd_download=crmprtd.download.main",
+            "crmprtd_download=crmprtd.download:main",
             "crmprtd_process=crmprtd.process:main",
             "crmprtd_infill_all=scripts.infill_all:main",
         ]
