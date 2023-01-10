@@ -15,10 +15,10 @@ logger = logging.getLogger(__name__)
 
 
 def download_and_process(download_args, network_name, connection_string, log_args):
-    """Open two subprocesses: download_{network} and crmprtd_process and
+    """Open two subprocesses: crmprtd_download and crmprtd_process and
     pipe the output from the first to the second. Returns None.
     """
-    proc = [f"download_{network_name}"] + log_args + download_args
+    proc = [f"crmprtd_download", "-N", network_name] + log_args + download_args
     logger.debug(" ".join(proc))
     dl_proc = run(proc, stdout=PIPE)
     process = [
