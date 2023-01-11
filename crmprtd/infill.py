@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def download_and_process(download_args, network_name, connection_string, log_args):
-    """Open two subprocesses: crmprtd_download and crmprtd_process and
+    """Start two subprocesses, `crmprtd_download` and `crmprtd_process`, and
     pipe the output from the first to the second. Returns None.
     """
     proc = [f"crmprtd_download", "-N", network_name] + log_args + download_args
@@ -35,14 +35,20 @@ def download_and_process(download_args, network_name, connection_string, log_arg
 
 
 def infill(networks, start_time, end_time, auth_fname, connection_string, log_args):
-    """Setup and delegate all of the infilling processes"""
+    """Set up and delegate all infilling processes to scripts
+    crmprtd_download and crmprtd_process, invoked in a subprocess.
+    """
+
+    # Compute lists of "discretized" time periods between start and end time, for each
+    # important resolution: month, week, day, hour. Notes:
+    # - A "month" is 28 days.
+    # - A "week" is 6 days. (7-day intervals were too much data for some services.)
+    # - "Day" and "hour" have their usual meanings.
     monthly_ranges = list(datetime_range(start_time, end_time, resolution="month"))
     weekly_ranges = list(datetime_range(start_time, end_time, resolution="week"))
     daily_ranges = list(datetime_range(start_time, end_time, resolution="day"))
     hourly_ranges = list(datetime_range(start_time, end_time, resolution="hour"))
 
-    # Unfortunately most of the download functions only accepts a time
-    # *string* :(
     time_fmt = "%Y/%m/%d %H:%M:%S"
 
     # CRD
@@ -86,7 +92,7 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
     # MOTI
     if "moti" in networks:
 
-        # Query all of the stations
+        # Query all existing stations
         stations = get_moti_stations(connection_string)
 
         # MoTI has an insane config where each user has a specific set
@@ -209,17 +215,18 @@ def datetime_range(start, end, resolution="hour"):
     The 'week' resolution behaves slightly different since its usage
     is currently constrained to the MoTI time parameters and their
     particularities. (MoTI allows you to specify a full time range
-    rather than discrete days/hours). Using the week resoultion rounds
+    rather than discrete days/hours). Using the week resolution rounds
     the beginning time step down to the nearest day and then just uses
-    the end time as is. During initial testing, we found that using
-    the full 7 day time range resulted in many HTTP 500 errors, so
-    we're using a conservative "week" of 6 days.
+    the end time as is.
 
-    The loosely defined 'month' resolution returns 28 day intervals
-    (for CRD).
+    During initial testing, we found that using the full 7 day time range
+    resulted in many HTTP 500 errors, so we're using a conservative "week" of 6 days.
+
+    The loosely defined 'month' resolution returns 28-day intervals
+    (for use by CRD).
 
     Args:
-        start (datetime.datetime): The beginnng of the range
+        start (datetime.datetime): The beginning of the range
         end (datetime.datetime): The end of the range
         resolution (string): 'hour', 'day', 'week' or 'month'
 
