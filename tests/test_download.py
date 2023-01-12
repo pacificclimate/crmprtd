@@ -21,4 +21,4 @@ def test_network_dispatch(network, mocker):
     # Check that targeted downloader was called with the expected args
     downloader = import_module(dl_module_name).main
     downloader.assert_called_once()
-    assert downloader.call_args.kwargs['arglist'] == arglist
+    assert downloader.call_args.kwargs["arglist"] == arglist
