@@ -50,9 +50,10 @@ def main(arglist: List[str] = None):
         help="Network from which to download observations",
     )
 
-    args = parser.parse_args(arglist)
+    # parse_known_args allows unrecognized args to be present.
+    args, _ = parser.parse_known_args(arglist)
 
-    # Download module will define network-specific args.
+    # Each download module adds its own network-specific args.
     download_module = get_download_module(args.network)
     download_module.main(arglist=arglist, parent_parser=parser)
 
