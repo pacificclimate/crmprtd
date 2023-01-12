@@ -14,10 +14,13 @@ import pytz
 logger = logging.getLogger(__name__)
 
 
-def download_and_process(network_name, log_args, download_args, connection_string):
+def download_and_process(
+    network_name, log_args, download_args, cache_filename=None, connection_string=None
+):
     """Start two subprocesses, `crmprtd_download` and `crmprtd_process`, and
     pipe the output from the first to the second. Returns None.
     """
+    # TODO: Add cache handling (cache_filename).
     proc = [f"crmprtd_download", "-N", network_name] + log_args + download_args
     logger.debug(" ".join(proc))
     dl_proc = run(proc, stdout=PIPE)
@@ -69,7 +72,9 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                 "--auth_key",
                 "crd",
             ]
-            download_and_process("crd", log_args, dl_args, connection_string)
+            download_and_process(
+                "crd", log_args, dl_args, connection_string=connection_string
+            )
 
     # EC
     if "ec" in networks:
@@ -87,7 +92,9 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                         "-t",
                         time.strftime(time_fmt),
                     ]
-                    download_and_process("ec", log_args, dl_args, connection_string)
+                    download_and_process(
+                        "ec", log_args, dl_args, connection_string=connection_string
+                    )
 
     # MOTI
     if "moti" in networks:
@@ -121,7 +128,9 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                         "-s",
                         station,
                     ]
-                    download_and_process("moti", log_args, dl_args, connection_string)
+                    download_and_process(
+                        "moti", log_args, dl_args, connection_string=connection_string
+                    )
 
     warning_msg = {
         "disjoint": "{} cannot be infilled since the period of infilling is "
@@ -143,7 +152,9 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
             if not interval_contains((start_time, end_time), last_month):
                 warn(warning_msg["not_contained"].format("WAMR", "one_month"))
             dl_args = []
-            download_and_process("wamr", log_args, dl_args, connection_string)
+            download_and_process(
+                "wamr", log_args, dl_args, connection_string=connection_string
+            )
 
     # WMB
     if "wmb" in networks:
@@ -157,7 +168,9 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                 warn(warning_msg["not_contained"].format("WMB", "day"))
             # Run it
             dl_args = ["--auth_fname", auth_fname, "--auth_key", "wmb"]
-            download_and_process("wmb", log_args, dl_args, connection_string)
+            download_and_process(
+                "wmb", log_args, dl_args, connection_string=connection_string
+            )
 
     # EC_SWOB
     if "ec_swob" in networks:
@@ -165,7 +178,9 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
             for hour in hourly_ranges:
                 hour = hour.astimezone(pytz.utc)  # EC files are named in UTC
                 dl_args = ["-d", hour.strftime(time_fmt)]
-                download_and_process(partner, log_args, dl_args, connection_string)
+                download_and_process(
+                    partner, log_args, dl_args, connection_string=connection_string
+                )
 
 
 def round_datetime(d, resolution="hour", direction="down"):
