@@ -1,16 +1,95 @@
+import crmprtd.infill
 import logging
 from datetime import datetime
+from subprocess import PIPE
 
 import pytest
+from unittest.mock import call, MagicMock
 
-from crmprtd.infill import download_and_process, round_datetime, datetime_range
+from crmprtd.infill import (
+    download_and_process,
+    round_datetime,
+    datetime_range,
+    chain_subprocesses,
+)
 
 
-def test_download_and_process(mocker, caplog):
+# !! IMPORTANT !!
+#
+# Because crmprtd.infill imports run (and not just subprocesses), we must mock
+# "crmprtd.infill.run" and NOT "subprocesses.run". This is counterintuitive!
+# If you don't then the commands actually get run. Potentially nasty.
+
+
+@pytest.mark.parametrize(
+    # NB: Only use harmless operations to test this in case mocking of `run` is wrong!
+    "commands, final_destination",
+    [
+        ([["ls", "-la"]], None),
+        ([["ls", "-la"], ["sort"]], None),
+        ([["ls", "-la"], ["sort"], ["wc", "-l"]], None),
+    ],
+)
+def test_chain_subprocesses(commands, final_destination, mocker):
+    return_value = MagicMock()
+    return_value.stdout = "foo"
+    mocker.patch("crmprtd.infill.run", return_value=return_value)
+
+    chain_subprocesses(commands, final_destination)
+    expected_calls = [
+        call(
+            cmd,
+            stdout=PIPE if i != len(commands) - 1 else final_destination,
+            input=None if i == 0 else return_value.stdout,
+        )
+        for i, cmd in enumerate(commands)
+    ]
+    assert crmprtd.infill.run.call_args_list == expected_calls
+    crmprtd.infill.run.reset_mock()
+
+
+@pytest.mark.parametrize(
+    "network_name, cache_filename, connection_string, expected_commands",
+    [
+        # Do nothing
+        ("netwerk", None, None, []),
+        # Download and cache only
+        ("netwerk", "filename", None, ["crmprtd_download"]),
+        # Download and process only
+        ("netwerk", None, "dsn", ["crmprtd_download", "crmprtd_process"]),
+        # Download, cache and process
+        ("netwerk", "filename", "dsn", ["crmprtd_download", "tee", "crmprtd_process"]),
+    ],
+)
+def test_download_and_process_choreography(
+    network_name, cache_filename, connection_string, expected_commands, mocker
+):
+    mocker.patch("crmprtd.infill.chain_subprocesses", return_value=True)
+    download_and_process(
+        network_name=network_name,
+        log_args=["--log_args"],
+        download_args=["--download_args"],
+        cache_filename=cache_filename,
+        connection_string=connection_string,
+    )
+
+    call_args = crmprtd.infill.chain_subprocesses.call_args
+    commands = [arg[0] for arg in call_args.args[0]]
+    assert commands == expected_commands
+
+    final_destination = call_args.kwargs["final_destination"]
+    if not cache_filename or connection_string:
+        assert final_destination is None
+    else:
+        assert final_destination is not None
+
+
+def test_download_and_process_security(mocker, caplog):
     mocker.patch("subprocess.run", return_value=True)
     with caplog.at_level(logging.DEBUG):
-        download_and_process("moti", [], [],
-                             connection_string="postgresql://user:password@db.pcic/somdb")
+        download_and_process(
+            "moti", [], [], connection_string="postgresql://user:password@db.pcic/somdb"
+        )
     for record in caplog.records:
         assert "password" not in record.message
 
