@@ -59,6 +59,7 @@ def log_filename(
 
 def cache_filename(
     timestamp: datetime.datetime = datetime.datetime.now(),
+    timestamp_format : str = "%Y-%m-%dT%H:%M:%S",
     network_name: str = None,
     tag: str = None,
     frequency: str = None,
@@ -70,6 +71,7 @@ def cache_filename(
     filename.
 
     :param timestamp: Timestamp to include in filename.
+    :param timestamp_format: Format for converting timestamp to string.
     :param network_name: Network name to include in filename.
     :param tag: Tag to include in filename.
     :param frequency: Download frequency to include in filename (network ec only).
@@ -80,10 +82,25 @@ def cache_filename(
     if network_name not in NETWORKS:
         raise ValueError(f"Network name '{network_name}' is not recognized.")
 
-    # TODO: Convert timestamp to appropriate format!!!
+    ts = timestamp.strftime(timestamp_format)
     if network_name in ("ec",):
-        return f"~/{network_name}/cache/{tag}_{frequency}_{province.lower()}_{timestamp}.txt"
-    return f"~/{network_name}/cache/{tag}_{network_name}_{timestamp}.txt"
+        return f"~/{network_name}/download/{tag}_{frequency}_{province.lower()}_{ts}.xml"
+    if network_name in (
+        "bc_env_snow",
+        "bc_forestry",
+        "bc_tran",
+        "dfo_ccg_lighthouse",
+        "nt_forestry",
+        "nt_water",
+        "yt_gov",
+        "yt_water",
+        "yt_avalanche",
+        "yt_firewx",
+    ):
+        return f"~/{network_name}/cache/{tag}_{network_name}_{ts}.xml"
+    if network_name in ("wmb",):
+        return f"~/{network_name}/download/{tag}_{network_name}_{ts}.txt"
+    return f"~/{network_name}/cache/{tag}_{network_name}_{ts}.txt"
 
 
 def log_args(**kwargs):
