@@ -50,10 +50,10 @@ def log_filename(
     if network_name not in NETWORKS:
         raise ValueError(f"Network name '{network_name}' is not recognized.")
     if network_name in ("ec",):
-        return f"~/${network_name}/logs/${tag}_{province.lower()}_${frequency}_json.log"
+        return f"~/{network_name}/logs/{tag}_{province.lower()}_{frequency}_json.log"
     if network_name in ("wmb",):
         # Oh, yes, this one has to be a special snowflake.
-        return f"~/${network_name}/logs/{network_name}_mof_json.log"
+        return f"~/{network_name}/logs/{tag}_mof_json.log"
     return f"~/{network_name}/logs/{tag}_{network_name}_json.log"
 
 
@@ -79,9 +79,11 @@ def cache_filename(
     """
     if network_name not in NETWORKS:
         raise ValueError(f"Network name '{network_name}' is not recognized.")
+
+    # TODO: Convert timestamp to appropriate format!!!
     if network_name in ("ec",):
-        return f"~/${network_name}/cache/${tag}_${frequency}_{province.lower()}_${timestamp}.txt"
-    return f"~/{network_name}/cache/{tag}_{network_name}_${timestamp}.txt"
+        return f"~/{network_name}/cache/{tag}_{frequency}_{province.lower()}_{timestamp}.txt"
+    return f"~/{network_name}/cache/{tag}_{network_name}_{timestamp}.txt"
 
 
 def log_args(**kwargs):

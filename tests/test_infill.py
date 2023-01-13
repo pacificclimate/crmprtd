@@ -85,6 +85,7 @@ def test_download_and_process_choreography(
 
 
 def test_download_and_process_security(mocker, caplog):
+    # TODO: This probably doesn't stop subprocess.run from being invoked. See above.
     mocker.patch("subprocess.run", return_value=True)
     with caplog.at_level(logging.DEBUG):
         download_and_process(
