@@ -47,29 +47,14 @@ def log_filename(
     :param _: Ignored additional kw args.
     :return: Filename.
     """
-    if network_name in (
-        "bc_hydro",
-        "crd",
-        "bc_env_snow",
-        "bc_forestry",
-        "bc_tran",
-        "dfo_ccg_lighthouse",
-        "moti",
-        "wamr",
-        "nt_forestry",
-        "nt_water",
-        "yt_gov",
-        "yt_water",
-        "yt_avalanche",
-        "yt_firewx",
-    ):
-        return f"~/{network_name}/logs/{tag}_{network_name}_json.log"
+    if network_name not in NETWORKS:
+        raise ValueError(f"Network name '{network_name}' is not recognized.")
     if network_name in ("ec",):
         return f"~/${network_name}/logs/${tag}_{province.lower()}_${frequency}_json.log"
     if network_name in ("wmb",):
-        # Oh, yes, this one has to be special.
+        # Oh, yes, this one has to be a special snowflake.
         return f"~/${network_name}/logs/{network_name}_mof_json.log"
-    raise ValueError(f"Network name '{network_name}' is not recognized.")
+    return f"~/{network_name}/logs/{tag}_{network_name}_json.log"
 
 
 def cache_filename(
@@ -92,28 +77,11 @@ def cache_filename(
     :param _: Ignored additional kw args.
     :return: Filename.
     """
-
-    if network_name in (
-        "bc_hydro",
-        "crd",
-        "bc_env_snow",
-        "bc_forestry",
-        "bc_tran",
-        "dfo_ccg_lighthouse",
-        "moti",
-        "wamr",
-        "wmb",
-        "nt_forestry",
-        "nt_water",
-        "yt_gov",
-        "yt_water",
-        "yt_avalanche",
-        "yt_firewx",
-    ):
-        return f"~/{network_name}/cache/{tag}_{network_name}_${timestamp}.txt"
+    if network_name not in NETWORKS:
+        raise ValueError(f"Network name '{network_name}' is not recognized.")
     if network_name in ("ec",):
         return f"~/${network_name}/cache/${tag}_${frequency}_{province.lower()}_${timestamp}.txt"
-    raise ValueError(f"Network name '{network_name}' is not recognized.")
+    return f"~/{network_name}/cache/{tag}_{network_name}_${timestamp}.txt"
 
 
 def log_args(**kwargs):
@@ -135,7 +103,7 @@ def alias_to_networks(network_alias: str):
     return network_aliases[network_alias]
 
 
-def dispatch_network(connection_string: str=None, **kwargs) -> None:
+def dispatch_network(connection_string: str = None, **kwargs) -> None:
     """
     Dispatch a single network to the download-and-process pipeline.
 
@@ -152,17 +120,17 @@ def dispatch_network(connection_string: str=None, **kwargs) -> None:
     )
     return
 
-    # TODO: Some network-dependent stuff here; see ec.
+    # TODO: Some network-dependent stuff here; see ec, moti.
     download_and_process(
         network_name=network_name,
         log_args=log_args(**kwargs),
         download_args=download_args(**kwargs),
-        connection_string=connection_string,
         cache_filename=cache_filename(**kwargs),
+        connection_string=connection_string,
     )
 
 
-def dispatch_alias(network_alias: str=None, **kwargs) -> None:
+def dispatch_alias(network_alias: str = None, **kwargs) -> None:
     """
     Dispatch each network defined by an alias.
 
@@ -175,7 +143,7 @@ def dispatch_alias(network_alias: str=None, **kwargs) -> None:
         dispatch_network(network_name=network_name, **kwargs)
 
 
-def dispatch(network: str=None, **kwargs) -> None:
+def dispatch(network: str = None, **kwargs) -> None:
     """
     Dispatch a network or a network alias.
 
