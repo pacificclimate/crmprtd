@@ -1,6 +1,7 @@
 import re
 import logging
 import datetime
+from typing import List
 from warnings import warn
 from subprocess import run, PIPE
 
@@ -14,27 +15,90 @@ import pytz
 logger = logging.getLogger(__name__)
 
 
-def download_and_process(
-    network_name, log_args, download_args, cache_filename=None, connection_string=None
-):
-    """Start two subprocesses, `crmprtd_download` and `crmprtd_process`, and
-    pipe the output from the first to the second. Returns None.
+def chain_subprocesses(commands, final_destination=None):
     """
-    # TODO: Add cache handling (cache_filename).
-    proc = [f"crmprtd_download", "-N", network_name] + log_args + download_args
-    logger.debug(" ".join(proc))
-    dl_proc = run(proc, stdout=PIPE)
-    process = [
-        "crmprtd_process",
-        "-c",
-        connection_string,
-        "-N",
-        network_name,
-    ] + log_args
-    message = " ".join(process)
-    message = re.sub(r"postgresql:\/\/(.*?)\@", r"postgresql://", message)
-    logger.debug(message)
-    run(process, input=dl_proc.stdout)
+    Chain a series of commands by starting a subprocess for each and piping the output
+    of each successive one to the next. If the output (stdout) of the final command is
+    to be redirected (written) to a file, set final_destination to a file handle.
+    """
+    proc = None
+    for i, command in enumerate(commands):
+        proc = run(
+            command,
+            input=(proc and proc.stdout),
+            stdout=PIPE if i < len(commands) - 1 else final_destination,
+        )
+
+
+def download_and_process(
+    network_name: str,
+    log_args: List[str],
+    download_args: List[str],
+    cache_filename: str = None,
+    connection_string: str = None,
+):
+    """
+    Start subprocesses as necessary to perform download-and-process pipeline.
+    The download step is always performed (using script `crmprtd_download`).
+    The result of downloading can optionally be directed to a cache file (as well as
+        processed if the process step is requested).
+    The process step is optionally performed (using script `crmprtd_process`).
+
+    :param network_name: Name of network to download.
+    :param log_args: Configuration for application logging.
+    :param download_args: Args to be passed to crmprtd_download.
+    :param cache_filename: Name of file in which to cache downloaded data. If this
+        arg is None, data is not cached even if it is processed.
+    :param connection_string: Database connection string for process step. If this
+        arg is none, the process step is skipped.
+    :return:
+    """
+
+    do_cache = cache_filename is not None
+    do_process = connection_string is not None
+
+    if not (do_cache or do_process):
+        warn(
+            f"Network {network_name}: Data is to be neither cached nor processed. "
+            f"Nothing to do."
+        )
+
+    # Build up commands to be chained in this list
+    commands = []
+
+    def add_command(command):
+        message = " ".join(command)
+        message = re.sub(r"postgresql://(.*?)@", r"postgresql://", message)
+        logger.debug(message)
+        commands.append(command)
+
+    # Set up download step
+    if do_cache or do_process:
+        add_command(
+            [f"crmprtd_download", "-N", network_name] + log_args + download_args
+        )
+
+    # Set up process step.
+    if do_process:
+        if do_cache:
+            add_command(["tee", cache_filename])
+        add_command(
+            [
+                "crmprtd_process",
+                "-c",
+                connection_string,
+                "-N",
+                network_name,
+            ]
+            + log_args,
+        )
+
+    chain_subprocesses(
+        commands,
+        final_destination=(
+            open(cache_filename, "w") if do_cache and not do_process else None
+        ),
+    )
 
 
 def infill(networks, start_time, end_time, auth_fname, connection_string, log_args):
