@@ -2,6 +2,8 @@ import datetime
 from argparse import ArgumentParser
 from typing import List
 
+import pytz
+
 from crmprtd import add_version_arg, get_version, NETWORKS
 from crmprtd.infill import download_and_process
 
@@ -29,6 +31,11 @@ network_aliases = {
 network_alias_names = tuple(network_aliases.keys())
 
 
+def check_network_name(network_name):
+    if network_name not in NETWORKS:
+        raise ValueError(f"Network name '{network_name}' is not recognized.")
+
+
 def log_filename(
     network_name: str = None,
     tag: str = None,
@@ -47,8 +54,7 @@ def log_filename(
     :param _: Ignored additional kw args.
     :return: Filename.
     """
-    if network_name not in NETWORKS:
-        raise ValueError(f"Network name '{network_name}' is not recognized.")
+    check_network_name(network_name)
     if network_name in ("ec",):
         return f"~/{network_name}/logs/{tag}_{province.lower()}_{frequency}_json.log"
     if network_name in ("wmb",):
@@ -59,7 +65,7 @@ def log_filename(
 
 def cache_filename(
     timestamp: datetime.datetime = datetime.datetime.now(),
-    timestamp_format : str = "%Y-%m-%dT%H:%M:%S",
+    timestamp_format: str = "%Y-%m-%dT%H:%M:%S",
     network_name: str = None,
     tag: str = None,
     frequency: str = None,
@@ -79,12 +85,12 @@ def cache_filename(
     :param _: Ignored additional kw args.
     :return: Filename.
     """
-    if network_name not in NETWORKS:
-        raise ValueError(f"Network name '{network_name}' is not recognized.")
-
+    check_network_name(network_name)
     ts = timestamp.strftime(timestamp_format)
     if network_name in ("ec",):
-        return f"~/{network_name}/download/{tag}_{frequency}_{province.lower()}_{ts}.xml"
+        return (
+            f"~/{network_name}/download/{tag}_{frequency}_{province.lower()}_{ts}.xml"
+        )
     if network_name in (
         "bc_env_snow",
         "bc_forestry",
@@ -113,9 +119,67 @@ def log_args(**kwargs):
     ]
 
 
-def download_args(network_name=None, **_):
-    """Return args for download phase. They depend on the network and other arguments."""
-    return []
+def to_utc(d: datetime.datetime, tz_string : str = "Canada/Pacific"):
+    if d.tzinfo is not None and d.tzinfo.utcoffset(d) is not None:
+        # d is not localized. Make it so.
+        tz = pytz.timezone(tz_string)
+        d = tz.localize(d)
+    return d.astimezone(pytz.utc)
+
+
+def download_args(
+    network_name: str = None,
+    frequency: str = None,
+    province: str = None,
+    time: datetime.datetime = None,  # TODO: use now()?
+    start_time: datetime.datetime = None,
+
+    **_,
+):
+    """Return command-line args for download phase. They depend on the network and
+    other arguments.
+
+    :param time:
+    :param start_time:
+    :param network_name: Network name.
+    :param _: Remainder args. Passed through.
+    :return:
+    """
+    check_network_name(network_name)
+
+    common_args = f"-N {network_name} ".split()
+    net_args = None
+
+    # Set net_args per network.
+    if network_name == "bc_hydro":
+        net_args = "-f sftp2.bchydro.com -F pcic -S ~/.ssh/id_rsa".split()
+    if network_name == "crd":
+        net_args = f"--auth_fname ~/.rtd_auth.yaml --auth_key={network_name}".split()
+    if network_name == "ec":
+        net_args = f"-p {province.lower()} -F {frequency}".split()
+    if network_name in (
+        "bc_env_snow",
+        "bc_forestry",
+        "bc_tran",
+        "dfo_ccg_lighthouse",
+        "nt_forestry",
+        "nt_water",
+        "yt_gov",
+        "yt_water",
+        "yt_avalanche",
+        "yt_firewx",
+    ):
+        ts = to_utc(time).strftime("%Y/%m/%d %H:00:00")
+        net_args = ['-d', f'"{ts}"']
+    if network_name == "moti":
+        net_args = f"-u https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110 --auth_fname ~/.rtd_auth.yaml --auth_key={network_name}".split()
+    if network_name == "wamr":
+        net_args = []
+    if network_name == "wmb":
+        net_args = f"--auth_fname ~/.rtd_auth.yaml --auth_key={network_name}".split()
+
+    assert net_args is not None
+    return common_args + net_args
 
 
 def alias_to_networks(network_alias: str):
@@ -133,10 +197,6 @@ def dispatch_network(connection_string: str = None, **kwargs) -> None:
     """
     network_name = kwargs["network_name"]
     assert network_name in NETWORKS
-    print(
-        f"dispatching network {network_name} with connection_string={connection_string}",
-        kwargs,
-    )
     return
 
     # TODO: Some network-dependent stuff here; see ec, moti.
@@ -178,7 +238,7 @@ def dispatch(network: str = None, **kwargs) -> None:
         dispatch_network(network_name=network, **kwargs)
     else:
         raise ValueError(
-            f"Network argument '{network}' is neither a valid network name nor an alias"
+            f"Network argument '{network}' is not a valid network name or alias"
         )
 
 
