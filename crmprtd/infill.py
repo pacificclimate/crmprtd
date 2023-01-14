@@ -1,7 +1,7 @@
 import re
 import logging
 import datetime
-from typing import List
+from typing import List, TextIO, Optional
 from warnings import warn
 from subprocess import run, PIPE
 
@@ -15,11 +15,13 @@ import pytz
 logger = logging.getLogger(__name__)
 
 
-def chain_subprocesses(commands, final_destination=None):
+def chain_subprocesses(
+    commands: List[List[str]], final_destination: Optional[TextIO] = None
+):
     """
     Chain a series of commands by starting a subprocess for each and piping the output
-    of each successive one to the next. If the output (stdout) of the final command is
-    to be redirected (written) to a file, set final_destination to a file handle.
+    of each one successively to the next. If the output (stdout) of the final command is
+    to be redirected (written) to a file, set `final_destination` to a file object.
     """
     proc = None
     for i, command in enumerate(commands):
@@ -138,7 +140,10 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                 "crd",
             ]
             download_and_process(
-                "crd", log_args, dl_args, connection_string=connection_string
+                network_name="crd",
+                log_args=log_args,
+                download_args=dl_args,
+                connection_string=connection_string,
             )
 
     # EC
@@ -158,7 +163,10 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                         time.strftime(time_fmt),
                     ]
                     download_and_process(
-                        "ec", log_args, dl_args, connection_string=connection_string
+                        network_name="ec",
+                        log_args=log_args,
+                        download_args=dl_args,
+                        connection_string=connection_string,
                     )
 
     # MOTI
@@ -194,7 +202,10 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                         station,
                     ]
                     download_and_process(
-                        "moti", log_args, dl_args, connection_string=connection_string
+                        network_name="moti",
+                        log_args=log_args,
+                        download_args=dl_args,
+                        connection_string=connection_string,
                     )
 
     warning_msg = {
@@ -218,7 +229,10 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                 warn(warning_msg["not_contained"].format("WAMR", "one_month"))
             dl_args = []
             download_and_process(
-                "wamr", log_args, dl_args, connection_string=connection_string
+                network_name="wamr",
+                log_args=log_args,
+                download_args=dl_args,
+                connection_string=connection_string,
             )
 
     # WMB
@@ -234,7 +248,10 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
             # Run it
             dl_args = ["--auth_fname", auth_fname, "--auth_key", "wmb"]
             download_and_process(
-                "wmb", log_args, dl_args, connection_string=connection_string
+                network_name="wmb",
+                log_args=log_args,
+                download_args=dl_args,
+                connection_string=connection_string,
             )
 
     # EC_SWOB
@@ -244,7 +261,10 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                 hour = hour.astimezone(pytz.utc)  # EC files are named in UTC
                 dl_args = ["-d", hour.strftime(time_fmt)]
                 download_and_process(
-                    partner, log_args, dl_args, connection_string=connection_string
+                    network_name=partner,
+                    log_args=log_args,
+                    download_args=dl_args,
+                    connection_string=connection_string,
                 )
 
 

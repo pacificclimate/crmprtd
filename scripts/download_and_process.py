@@ -119,7 +119,7 @@ def log_args(**kwargs):
     ]
 
 
-def to_utc(d: datetime.datetime, tz_string : str = "Canada/Pacific"):
+def to_utc(d: datetime.datetime, tz_string: str = "Canada/Pacific"):
     if d.tzinfo is not None and d.tzinfo.utcoffset(d) is not None:
         # d is not localized. Make it so.
         tz = pytz.timezone(tz_string)
@@ -133,7 +133,6 @@ def download_args(
     province: str = None,
     time: datetime.datetime = None,  # TODO: use now()?
     start_time: datetime.datetime = None,
-
     **_,
 ):
     """Return command-line args for download phase. They depend on the network and
@@ -170,7 +169,7 @@ def download_args(
         "yt_firewx",
     ):
         ts = to_utc(time).strftime("%Y/%m/%d %H:00:00")
-        net_args = ['-d', f'"{ts}"']
+        net_args = ["-d", f'"{ts}"']
     if network_name == "moti":
         net_args = f"-u https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110 --auth_fname ~/.rtd_auth.yaml --auth_key={network_name}".split()
     if network_name == "wamr":
