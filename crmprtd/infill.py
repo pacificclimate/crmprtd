@@ -56,8 +56,9 @@ def download_and_process(
 
     do_cache = cache_filename is not None
     do_process = connection_string is not None
+    do_download = do_cache or do_process
 
-    if not (do_cache or do_process):
+    if not do_download:
         warn(
             f"Network {network_name}: Data is to be neither cached nor processed. "
             f"Nothing to do."
@@ -73,7 +74,7 @@ def download_and_process(
         commands.append(command)
 
     # Set up download step
-    if do_cache or do_process:
+    if do_download:
         add_command(
             [f"crmprtd_download", "-N", network_name] + log_args + download_args
         )
