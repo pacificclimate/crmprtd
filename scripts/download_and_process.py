@@ -196,20 +196,49 @@ def dispatch_network(connection_string: str = None, **kwargs) -> None:
     :return: None. Side effect: Download and process network specified in args.
     """
     network_name = kwargs["network_name"]
-    assert network_name in NETWORKS
-    return
+    check_network_name(network_name)
 
-    # TODO: Some network-dependent stuff here; see ec, moti.
-    download_and_process(
-        network_name=network_name,
-        log_args=log_args(**kwargs),
-        download_args=download_args(**kwargs),
-        cache_filename=cache_filename(**kwargs),
-        connection_string=connection_string,
-    )
+    if network_name == "ec":
+        for province in ("BC", "YT"):
+            download_and_process(
+                network_name=network_name,
+                log_args=log_args(**kwargs),
+                download_args=download_args(**kwargs, province=province),
+                cache_filename=cache_filename(**kwargs, province=province),
+                connection_string=connection_string,
+            )
+    elif network_name in (
+        "bc_env_snow",
+        "bc_forestry",
+        "bc_tran",
+        "dfo_ccg_lighthouse",
+        "nt_forestry",
+        "nt_water",
+        "yt_gov",
+        "yt_water",
+        "yt_avalanche",
+        "yt_firewx",
+    ):
+        an_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=1)
+        download_and_process(
+            network_name=network_name,
+            log_args=log_args(**kwargs),
+            download_args=download_args(**kwargs, time=an_hour_ago),
+            cache_filename=cache_filename(**kwargs, timestamp=an_hour_ago),
+            connection_string=connection_string,
+        )
+    else:
+        now = datetime.datetime.now()
+        download_and_process(
+            network_name=network_name,
+            log_args=log_args(**kwargs),
+            download_args=download_args(**kwargs, time=now),
+            cache_filename=cache_filename(**kwargs, timestamp=now),
+            connection_string=connection_string,
+        )
 
 
-def dispatch_alias(network_alias: str = None, **kwargs) -> None:
+def dispatch_network_alias(network_alias: str = None, **kwargs) -> None:
     """
     Dispatch each network defined by an alias.
 
@@ -233,7 +262,7 @@ def dispatch(network: str = None, **kwargs) -> None:
     assert network is not None
     del kwargs["version"]
     if network in network_alias_names:
-        dispatch_alias(network_alias=network, **kwargs)
+        dispatch_network_alias(network_alias=network, **kwargs)
     elif network in NETWORKS:
         dispatch_network(network_name=network, **kwargs)
     else:
@@ -301,6 +330,9 @@ def main(arglist: List[str] = None) -> None:
             help="Frequency of download (network ec only)",
         )
         args = parser.parse_args(arglist)
+
+    # TODO: Add network-dependent time arg here? Currently it is hardwired in code to
+    #  "now".
 
     dispatch(**vars(args))
 
