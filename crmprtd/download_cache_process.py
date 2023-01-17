@@ -11,7 +11,8 @@ from typing import List
 
 import pytz
 
-from crmprtd import add_version_arg, NETWORKS
+from crmprtd import NETWORKS, get_version
+from crmprtd.argparse_helpers import OneAndDoneAction
 from crmprtd.infill import download_and_process
 
 # Maps a network alias to a *list* of networks (names). This allows for both groups
@@ -266,7 +267,6 @@ def dispatch(network: str = None, **kwargs) -> None:
     :return: None.
     """
     assert network is not None
-    del kwargs["version"]
     if network in network_alias_names:
         dispatch_network_alias(network_alias=network, **kwargs)
     elif network in NETWORKS:
@@ -275,6 +275,17 @@ def dispatch(network: str = None, **kwargs) -> None:
         raise ValueError(
             f"Network argument '{network}' is not a valid network name or alias"
         )
+
+
+def describe_network(network):
+    """Return a string describing `network`, which may be a network name or alias."""
+    if network in NETWORKS:
+        return f"'{network}' is the name of a single network"
+    if network in network_alias_names:
+        return (
+            f"'{network}' is the name of a network alias, which translates to the "
+            f"following network names: {', '.join(network_aliases[network])}")
+    return f"'{network}' is not a known network name or alias"
 
 
 def main(arglist: List[str] = None) -> None:
@@ -298,11 +309,27 @@ def main(arglist: List[str] = None) -> None:
         """
     )
 
-    add_version_arg(parser)
+    # add_version_arg(parser)
+    # This method for --version avoids an error in testing that is provoked by using the
+    # action='version' method as used in add_version_arg. Reason for error unknown.
+    # TODO: Update add_version_arg and use it here.
+    parser.add_argument(
+        "--version",
+        nargs=0,
+        action=OneAndDoneAction,
+        function=get_version,
+        help="Show version number and exit",
+    )
 
-    # TODO: Add a -D/--describe operator that describes any valid network name.
-    #   Use the `action` argument of add_argument to do this as a one-and-done.
-    #   See https://docs.python.org/3/library/argparse.html#action
+    parser.add_argument(
+        "-D",
+        "--describe",
+        nargs=1,
+        choices=NETWORKS + network_alias_names,
+        action=OneAndDoneAction,
+        function=describe_network,
+        help="Describe a network name or alias",
+    )
 
     parser.add_argument(
         "-N",
