@@ -2,7 +2,6 @@ import sys
 
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
-import pkg_resources
 
 __version__ = (4, 0, 0)
 
@@ -42,7 +41,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "crmprtd_download_cache_process=scripts.download_cache_process:main",
+            "crmprtd_download_cache_process=crmprtd.download_cache_process:main",
             "crmprtd_download=crmprtd.download:main",
             "crmprtd_process=crmprtd.process:main",
             "crmprtd_infill_all=scripts.infill_all:main",

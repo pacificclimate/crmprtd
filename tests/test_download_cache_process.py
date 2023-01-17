@@ -2,7 +2,7 @@ import datetime
 
 import pytest
 
-from scripts.download_cache_process import (
+from crmprtd.download_cache_process import (
     log_filename,
     cache_filename,
     download_args,

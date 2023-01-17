@@ -1,6 +1,8 @@
 """
 This script choreographs the download and process steps (with optional data caching)
 in the pipeline.
+
+TODO: More doc.
 """
 
 import datetime
