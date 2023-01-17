@@ -11,7 +11,7 @@ from typing import List
 
 import pytz
 
-from crmprtd import NETWORKS, get_version
+from crmprtd import NETWORKS, add_version_arg
 from crmprtd.argparse_helpers import OneAndDoneAction
 from crmprtd.infill import download_and_process
 
@@ -309,17 +309,7 @@ def main(arglist: List[str] = None) -> None:
         """
     )
 
-    # add_version_arg(parser)
-    # This method for --version avoids an error in testing that is provoked by using the
-    # action='version' method as used in add_version_arg. Reason for error unknown.
-    # TODO: Update add_version_arg and use it here.
-    parser.add_argument(
-        "--version",
-        nargs=0,
-        action=OneAndDoneAction,
-        function=get_version,
-        help="Show version number and exit",
-    )
+    add_version_arg(parser)
 
     parser.add_argument(
         "-D",

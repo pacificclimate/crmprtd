@@ -78,6 +78,8 @@ Row = namedtuple(
 )
 
 
+# This method for --version avoids an error in testing that is provoked by using the
+# action='version' method as used in add_version_arg. Reason for error unknown.
 def add_version_arg(parser):
     parser.add_argument(
         "--version",
