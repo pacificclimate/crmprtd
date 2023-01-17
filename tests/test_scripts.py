@@ -3,18 +3,12 @@ import crmprtd
 from crmprtd import get_version, download, NETWORKS
 
 
-@pytest.mark.parametrize("network", NETWORKS)
-def test_version_download(capsys, network):
-    download.main(["-N", network, "--version"])
-    captured = capsys.readouterr()
-    assert captured.out == f"{get_version()}\n"
-
-
-@pytest.mark.parametrize("name", ["crmprtd_process", "crmprtd_infill_all"])
-def test_version_non_download(capsys, name):
+@pytest.mark.parametrize("name", ["crmprtd_download", "crmprtd_process", "crmprtd_download_cache_process", "crmprtd_infill_all"])
+def test_version_option(capsys, name):
     entry_point = crmprtd.pkg_resources.get_entry_map("crmprtd")["console_scripts"][
         name
     ].load()
-    entry_point(["--version"])
+    with pytest.raises(SystemExit):
+        entry_point(["--version"])
     captured = capsys.readouterr()
     assert captured.out == f"{get_version()}\n"
