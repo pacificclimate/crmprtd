@@ -54,6 +54,8 @@ import pkg_resources
 from pkg_resources import resource_stream
 from collections import namedtuple
 
+from crmprtd.argparse_helpers import OneAndDoneAction
+
 SWOB_PARTNERS = (
     "bc_env_aq",
     "bc_env_snow",
@@ -79,9 +81,10 @@ Row = namedtuple(
 def add_version_arg(parser):
     parser.add_argument(
         "--version",
-        action="version",
-        version=get_version(),
-        help="Output version number and exit",
+        action=OneAndDoneAction,
+        nargs=0,
+        function=get_version,
+        help="Show version number and exit",
     )
     return parser
 
