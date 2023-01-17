@@ -9,7 +9,7 @@ from typing import List
 
 import pytz
 
-from crmprtd import add_version_arg, get_version, NETWORKS
+from crmprtd import add_version_arg, NETWORKS
 from crmprtd.infill import download_and_process
 
 # Maps a network alias to a *list* of networks (names). This allows for both groups
@@ -298,14 +298,19 @@ def main(arglist: List[str] = None) -> None:
 
     add_version_arg(parser)
 
+    # TODO: Add a -D/--describe operator that describes any valid network name.
+    #   Use the `action` argument of add_argument to do this as a one-and-done.
+    #   See https://docs.python.org/3/library/argparse.html#action
+
     parser.add_argument(
         "-N",
         "--network",
         choices=NETWORKS + network_alias_names,
         required=True,
         help=(
-            "Network identifier (may designate more than one group) from "
-            "which to download observations."
+            "Network identifier (a network name or network alias) from which to "
+            "download observations. A network alias can stand for one or more "
+            "individual networks (e.g., 'ytnt' stands for many networks)."
         ),
     )
     parser.add_argument(

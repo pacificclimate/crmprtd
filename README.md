@@ -23,15 +23,6 @@ a guide for installation in a general way.
 
 ## Installation
 
-Note: The scripts installed by this project include both Python programs and
-a set of shell scripts used to download and process data from the various
-networks. We call these "execution scripts" for lack of a better term, and
-their source is in the directory `crmprtd/execution`. They are a recent addition 
-to this repo; formerly they were maintained outside source control.
-
-The execution scripts are installed in the installation environment `bin/` 
-directory (e.g., `venv/bin/`), like all other project scripts.
-
 ### Installation for production
 
 For production usage, install the latest tagged release from PCIC's PyPI server.
@@ -61,9 +52,43 @@ environment.
 
 ## Usage
 
-The most common usage pattern for package `crmprtd` is to configure a number of scripts to run on an hourly or daily basis.
+The most common usage pattern for package `crmprtd` is to configure cron to run a number of scripts on an hourly or daily basis.
 
 Some data sources require authentication. For most scripts, credentials can be provided as command line arguments, or, preferably, entries in a yaml config file. A sample version of this file can be seen [here](https://github.com/pacificclimate/crmprtd/blob/master/auth.yaml). The location of the config is passed with the `--auth` argument and the key with the `--auth_key` argument.
+
+### Performing the download-cache-process sequence
+
+Although the three steps of downloading data, caching it, and processing it can
+be invoked as separate operations, the most common and convenient way to perform
+this sequence is the console script `crmprtd_download_cache_process`.
+
+The script takes a network argument and a handful of other arguments, formulates
+appropriate command lines for each step, and causes them to be executed.
+
+Here is the help from `crmprtd_download_cache_process`:
+
+```text
+(crmprtd) rglover@pcic-3002:~/code/crmprtd$ crmprtd_download_cache_process -h
+usage: crmprtd_download_cache_process [-h] [--version] -N {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,bch,hourly_swobml2,ytnt} -T TAG
+                                      [-c CONNECTION_STRING]
+
+The download-cache-process dispatcher. Starts two subprocesses running crmprtd_download and crmprtd_process with appropriate arguments, pipes the first into the second, and caches the downloaded data.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             Output version number and exit
+  -N {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,bch,hourly_swobml2,ytnt}, --network {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,bch,hourly_swobml2,ytnt}
+                        Network identifier (a network name or network alias) from which to download observations. A network alias can stand for one or more individual networks (e.g., 'ytnt' stands for many networks).
+  -T TAG, --tag TAG     Tag for naming log and cache files
+  -c CONNECTION_STRING, --connection_string CONNECTION_STRING
+                        Connection string for target database. If absent, processing step is not performed.
+```
+
+A typical use of this script is:
+
+```text
+$ crmprtd_download_cache_process -N ytnt -T metnorth -c postgresql://user:password@db.uvic.ca/metnorth
+```
 
 ### Downloading data
 
@@ -116,29 +141,6 @@ crmprtd_download -N [network_name] | crmprtd_process -N [network_name]
 crmprtd_download -N [network_name] | tee cache_filename | crmprtd_process -N [network_name]
 ```
 
-### Execution scripts
-
-Most execution scripts receive 2 or more arguments, as follows:
-
-| Script              | Arguments                      |
-|---------------------|--------------------------------|
-| `bch.sh`            | `<tag> <database>`             |
-| `crd.sh`            | `<tag> <database>`             |
-| `ec.sh`             | `<frequency> <tag> <database>` |
-| `hourly_swobml2.sh` | `<tag> <database>`             |
-| `metnorth.sh`       | `<tag> <database>`             |
-| `moti.sh`           | `<tag> <database>`             |
-| `wamr.sh`           | `<tag> <database>`             |
-| `wmb.sh`            | `<tag> <database>`             |
-
-Arguments:
-
-- `<tag>`: A short tag that becomes part of the filepaths for cache and log files.
-  Usually indicates the target database (but is not the database DSN, which
-  is not suitable for forming a filepath). Examples: `crmp`, `metnorth`, `metnorth2`.
-- `<database>`: DSN for target database. Example: `postgresql://crmprtd@db.pcic.uvic.ca:5433/crmp`
-- `<frequency>`: Frequency of observations; used only in EC downloads.
-
 ### Cron usage
 
 Typical usage is to set up a cron job that invokes an execution script at the
@@ -156,16 +158,16 @@ METNORTH_DB=postgresql://crmprtd@dbnorth/metnorth
 METNORTH2_BIN=env_4.0.0/bin
 METNORTH2_DB=postgresql://crmprtd@dbnorth/metnorth2
 
-@hourly                         $CRMP_BIN/hourly_swobml2.sh crmp $CRMP_DB
-@weekly                         $CRMP_BIN/wamr.sh crmp $CRMP_DB
-40 4 * * *                      $CRMP_BIN/wmb.sh crmp $CRMP_DB
-@hourly                         $CRMP_BIN/ec.sh hourly crmp $CRMP_DB
-@daily                          $CRMP_BIN/ec.sh daily crmp $CRMP_DB
-30 * * * *                      $CRMP_BIN/moti.sh crmp $CRMP_DB
-@daily                          $CRMP_BIN/crd.sh crmp $CRMP_DB
-@daily                          $CRMP_BIN/bch.sh crmp $CRMP_DB
-@hourly                         $METNORTH_BIN/ytnt.sh metnorth $METNORTH_DB
-@hourly                         $METNORTH2_BIN/ytnt.sh metnorth2 $METNORTH2_DB
+@hourly                         $CRMP_BIN/crmprtd_dp -G hourly_swobml2 -T crmp -c $CRMP_DB
+@weekly                         $CRMP_BIN/crmprtd_dp -G wamr -T crmp -c $CRMP_DB
+40 4 * * *                      $CRMP_BIN/crmprtd_dp -G wmb -T crmp -c $CRMP_DB
+@hourly                         $CRMP_BIN/crmprtd_dp -G ec -F hourly -T crmp -c $CRMP_DB
+@daily                          $CRMP_BIN/crmprtd_dp -G ec -F daily -T crmp -c $CRMP_DB
+30 * * * *                      $CRMP_BIN/crmprtd_dp -G moti -T crmp -c $CRMP_DB
+@daily                          $CRMP_BIN/crmprtd_dp -G crd -T crmp -c $CRMP_DB
+@daily                          $CRMP_BIN/crmprtd_dp -G bch -T crmp -c $CRMP_DB
+@hourly                         $METNORTH_BIN/crmprtd_dp -G ytnt -T metnorth -c $METNORTH_DB
+@hourly                         $METNORTH2_BIN/crmprtd_dp -G ytnt -T metnorth2 -c $METNORTH2_DB
 ```
 
 Notes:
