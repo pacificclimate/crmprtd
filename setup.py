@@ -39,13 +39,10 @@ setup(
         "scripts/moti_infill_download.py",
         "scripts/moti_insert_files.py",
         "scripts/moti_infill_insert.py",
-    ]
-    + [
-        f"crmprtd/execution/{name}"
-        for name in pkg_resources.resource_listdir("crmprtd", "execution")
     ],
     entry_points={
         "console_scripts": [
+            "crmprtd_download_cache_process=scripts.download_cache_process:main",
             "crmprtd_download=crmprtd.download:main",
             "crmprtd_process=crmprtd.process:main",
             "crmprtd_infill_all=scripts.infill_all:main",
