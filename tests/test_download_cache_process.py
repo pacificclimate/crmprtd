@@ -2,14 +2,13 @@ import datetime
 
 import pytest
 
-from scripts.download_and_process import (
+from scripts.download_cache_process import (
     log_filename,
     cache_filename,
     download_args,
     main,
     network_aliases,
 )
-import crmprtd.infill
 
 
 @pytest.mark.parametrize(
