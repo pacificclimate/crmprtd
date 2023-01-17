@@ -290,20 +290,13 @@ def main(arglist: List[str] = None) -> None:
 
     parser = ArgumentParser(
         description="""
-            Dispatcher for download-and-process pipeline. Starts two subprocesses
+            The download-cache-process dispatcher. Starts two subprocesses
             running crmprtd_download and crmprtd_process with appropriate arguments,
             pipes the first into the second, and caches the downloaded data.
         """
     )
 
-    # Don't force user to provide normally required arguments for --version.
     add_version_arg(parser)
-    args, _ = parser.parse_known_args(arglist)
-    if args.version:
-        print(get_version())
-        return
-
-    # Add non-version arguments.
 
     parser.add_argument(
         "-N",

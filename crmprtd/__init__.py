@@ -79,7 +79,8 @@ Row = namedtuple(
 def add_version_arg(parser):
     parser.add_argument(
         "--version",
-        action="store_true",
+        action="version",
+        version=get_version(),
         help="Output version number and exit",
     )
     return parser
