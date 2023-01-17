@@ -17,11 +17,19 @@ logger = logging.getLogger(__name__)
 
 def chain_subprocesses(
     commands: List[List[str]], final_destination: Optional[TextIO] = None
-):
+) -> None:
     """
     Chain a series of commands by starting a subprocess for each and piping the output
     of each one successively to the next. If the output (stdout) of the final command is
     to be redirected (written) to a file, set `final_destination` to a file object.
+
+    :param commands: List of commands to be run in a subprocess and changed. A command
+        itself is a list of strings, and is the main argument for subprocess.run.
+    :param final_destination: Optional text file object to which the output of the
+        last process can be directed.
+    :return: None.
+
+    Side effects: Run the commands.
     """
     proc = None
     for i, command in enumerate(commands):
@@ -77,9 +85,7 @@ def download_and_process(
 
     # Set up download step
     if do_download:
-        add_command(
-            [f"crmprtd_download", "-N", network_name] + log_args + download_args
-        )
+        add_command(["crmprtd_download"] + download_args + log_args)
 
     # Set up process step.
     if do_process:
@@ -88,10 +94,10 @@ def download_and_process(
         add_command(
             [
                 "crmprtd_process",
-                "-c",
-                connection_string,
                 "-N",
                 network_name,
+                "-c",
+                connection_string,
             ]
             + log_args,
         )

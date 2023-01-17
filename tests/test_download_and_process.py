@@ -2,7 +2,14 @@ import datetime
 
 import pytest
 
-from scripts.download_and_process import log_filename, cache_filename, download_args
+from scripts.download_and_process import (
+    log_filename,
+    cache_filename,
+    download_args,
+    main,
+    network_aliases,
+)
+import crmprtd.infill
 
 
 @pytest.mark.parametrize(
@@ -151,3 +158,114 @@ def test_download_args(network_name, frequency, province, time, expected):
         )
         == expected
     )
+
+
+@pytest.mark.parametrize(
+    "network, tag, connection_string, frequency, seq_of_expected_cmds_prefixes",
+    # This covers all current networks and aliases.
+    [
+        (
+            "bc_hydro",
+            "tag",
+            None,
+            None,
+            [
+                [
+                    "crmprtd_download -N bc_hydro".split(),
+                ],
+            ],
+        ),
+        *(
+            (
+                network,
+                "tag",
+                "DSN",
+                None,
+                [
+                    [
+                        f"crmprtd_download -N {network}".split(),
+                        "tee".split(),
+                        f"crmprtd_process -N {network} -c DSN".split(),
+                    ],
+                ],
+            )
+            for network in "crd moti wamr wmb".split()
+        ),
+        (
+            "ec",
+            "tag",
+            "DSN",
+            "daily",
+            [
+                [
+                    f"crmprtd_download -N ec -p {prov} -F daily".split(),
+                    "tee".split(),
+                    "crmprtd_process -N ec -c DSN".split(),
+                ]
+                for prov in "bc yt".split()
+            ],
+        ),
+        *(
+            (
+                alias,
+                "tag",
+                "DSN",
+                None,
+                [
+                    [
+                        f"crmprtd_download -N {network}".split(),
+                        "tee".split(),
+                        f"crmprtd_process -N {network} -c DSN".split(),
+                    ]
+                    for network in network_aliases[alias]
+                ],
+            )
+            for alias in "hourly_swobml2 ytnt".split()
+        ),
+    ],
+)
+def test_main(
+    network, tag, connection_string, frequency, seq_of_expected_cmds_prefixes, mocker
+):
+    arglist = f"-N {network} -T {tag}"
+    if connection_string is not None:
+        arglist += f" -c {connection_string}"
+    if frequency is not None:
+        arglist += f" -F {frequency}"
+
+    # In certain cases, the unit under test will try to open a file, in a place that
+    # does not exist. Catch this to prevent an inconsquential error.
+    mocker.patch("builtins.open", return_value=None)
+
+    # Mock chain_subprocesses, so that we can see what it is being called with. That's
+    # the evidence we use to certify that the script is working as expected.
+    # chain_subprocesses itself is tested separately.
+    cp = mocker.patch("crmprtd.infill.chain_subprocesses", return_value=True)
+    main(arglist.split())
+    call_args_list = cp.call_args_list
+
+    # call_args_list is a list of the arguments of calls to chain_subprocessses
+    # from each element of that arguments list we extract the first argument
+    #   (which is a list of the commands to be chained)
+    # seq_of_expected_cmds_prefixes is a list of expected prefixes (initial elements)
+    #   of commands
+    # we compare actual commands to the prefixes.
+
+    # print("###")
+    # print("call_args_list", call_args_list)
+
+    # Check that the expected number of calls was made.
+    assert len(call_args_list) == len(seq_of_expected_cmds_prefixes)
+
+    # Check that each call contained the expected commands (or prefixes thereof).
+    for call_arg, expected_cmds_prefixes in zip(
+        call_args_list, seq_of_expected_cmds_prefixes
+    ):
+        commands, *_ = call_arg.args
+        # Check that the number of commands in the call is as expected.
+        assert len(commands) == len(expected_cmds_prefixes)
+        # Check that the prefix of each command is as expected.
+        for cmd, expected_cmd in zip(commands, expected_cmds_prefixes):
+            assert cmd[: len(expected_cmd)] == expected_cmd
+
+    cp.reset_mock()

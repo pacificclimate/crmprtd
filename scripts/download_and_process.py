@@ -1,3 +1,8 @@
+"""
+This script choreographs the download and process steps (with optional data caching)
+in the pipeline.
+"""
+
 import datetime
 from argparse import ArgumentParser
 from typing import List
@@ -201,7 +206,7 @@ def dispatch_network(connection_string: str = None, **kwargs) -> None:
         for province in ("BC", "YT"):
             download_and_process(
                 network_name=network_name,
-                log_args=log_args(**kwargs),
+                log_args=log_args(**kwargs, province=province),
                 download_args=download_args(**kwargs, province=province),
                 cache_filename=cache_filename(**kwargs, province=province),
                 connection_string=connection_string,
@@ -272,7 +277,11 @@ def dispatch(network: str = None, **kwargs) -> None:
 
 def main(arglist: List[str] = None) -> None:
     """
-    Mainline for dispatcher.
+    Mainline for script.
+
+    Note: This script allows for only two options:
+    1. Download data and cache only (omit database connection string).
+    2. Download data, cache it, and process it.
 
     :param arglist: Argument list to be processed by argparse. This eases testing;
         if None then sys.argv is used.
@@ -287,12 +296,14 @@ def main(arglist: List[str] = None) -> None:
         """
     )
 
-    # Don't force user to provide normally required arguments for this case.
+    # Don't force user to provide normally required arguments for --version.
     add_version_arg(parser)
     args, _ = parser.parse_known_args(arglist)
     if args.version:
         print(get_version())
         return
+
+    # Add non-version arguments.
 
     parser.add_argument(
         "-N",
@@ -301,7 +312,7 @@ def main(arglist: List[str] = None) -> None:
         required=True,
         help=(
             "Network identifier (may designate more than one group) from "
-            "which to download observations"
+            "which to download observations."
         ),
     )
     parser.add_argument(
@@ -313,8 +324,10 @@ def main(arglist: List[str] = None) -> None:
     parser.add_argument(
         "-c",
         "--connection_string",
-        help="Connection string for target database",
-        required=True,
+        help=(
+            "Connection string for target database. "
+            "If absent, processing step is not performed."
+        ),
     )
 
     args, _ = parser.parse_known_args(arglist)
