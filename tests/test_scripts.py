@@ -1,9 +1,17 @@
 import pytest
 import crmprtd
-from crmprtd import get_version, download, NETWORKS
+from crmprtd import get_version
 
 
-@pytest.mark.parametrize("name", ["crmprtd_download", "crmprtd_process", "crmprtd_download_cache_process", "crmprtd_infill_all"])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "crmprtd_download",
+        "crmprtd_process",
+        "crmprtd_download_cache_process",
+        "crmprtd_infill_all",
+    ],
+)
 def test_version_option(capsys, name):
     entry_point = crmprtd.pkg_resources.get_entry_map("crmprtd")["console_scripts"][
         name

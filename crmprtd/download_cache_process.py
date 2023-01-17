@@ -284,7 +284,8 @@ def describe_network(network):
     if network in network_alias_names:
         return (
             f"'{network}' is the name of a network alias, which translates to the "
-            f"following network names: {', '.join(network_aliases[network])}")
+            f"following network names: {', '.join(network_aliases[network])}"
+        )
     return f"'{network}' is not a known network name or alias"
 
 
