@@ -16,9 +16,16 @@ from crmprtd.infill import (
 
 # !! IMPORTANT !!
 #
-# Because crmprtd.infill imports run (and not just subprocesses), we must mock
-# "crmprtd.infill.run" and NOT "subprocesses.run". This is counterintuitive!
-# If you don't then the commands actually get run. Potentially nasty.
+# Because `crmprtd.infill` imports `subprocesses.run` with `from subprocesses import run`
+# (and not `import subprocesses`), we must mock `crmprtd.infill.run` and NOT
+# `subprocesses.run`. If you mock the wrong `run` then you don't catch the calls and the
+# commands actually get run. Potentially nasty. And counterintuitive.
+
+def mock_run(mocker):
+    return_value = MagicMock()
+    return_value.stdout = "foo"
+    mocker.patch("crmprtd.infill.run", return_value=return_value)
+    return return_value
 
 
 @pytest.mark.parametrize(
@@ -31,10 +38,7 @@ from crmprtd.infill import (
     ],
 )
 def test_chain_subprocesses(commands, final_destination, mocker):
-    return_value = MagicMock()
-    return_value.stdout = "foo"
-    mocker.patch("crmprtd.infill.run", return_value=return_value)
-
+    return_value = mock_run(mocker)
     chain_subprocesses(commands, final_destination)
     expected_calls = [
         call(
@@ -85,8 +89,7 @@ def test_download_and_process_choreography(
 
 
 def test_download_and_process_security(mocker, caplog):
-    # TODO: This probably doesn't stop subprocess.run from being invoked. See above.
-    mocker.patch("subprocess.run", return_value=True)
+    mock_run(mocker)
     with caplog.at_level(logging.DEBUG):
         download_and_process(
             "moti", [], [], connection_string="postgresql://user:password@db.pcic/somdb"
