@@ -6,9 +6,9 @@ from crmprtd import get_version
 @pytest.mark.parametrize(
     "name",
     [
+        "crmprtd_dcp",
         "crmprtd_download",
         "crmprtd_process",
-        "crmprtd_download_cache_process",
         "crmprtd_infill_all",
     ],
 )
