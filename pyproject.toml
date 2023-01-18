@@ -1,0 +1,45 @@
+[build-system]
+requires = [
+    "setuptools >= 40.9.0",
+]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "crmprtd"
+version = "4.0.0"
+description = "Utility to download Environment Canada MPO-XML and insert it into PCIC's database"
+keywords = "sql database data science climate oceanography meteorology"
+requires-python = ">=3.8"
+authors=[
+    {name = "James Hiebert", email = "hiebert@uvic.ca"},
+    {name = "Rod Glover", email = "rglover@uvic.ca"},
+    {name = "Nic Rados"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+]
+dependencies=[
+    "lxml",
+    "psycopg2",
+    "pyyaml",
+    "python-dateutil",
+    "pytz",
+    "requests[security]",
+    "pycds == 4.*",
+    "pint",
+    "pysftp",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+    "pysqlite",
+    "requests_mock"
+]
+jsonlogger = ["python-json-logger"]
+
+[project.urls]
+homepage = "http://www.pacificclimate.org/"
+
