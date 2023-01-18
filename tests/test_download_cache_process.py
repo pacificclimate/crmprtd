@@ -14,14 +14,15 @@ from crmprtd.download_cache_process import (
 @pytest.mark.parametrize(
     "network_name, frequency, province, expected",
     [
-        # A representative sample, covering all present execution scripts.
+        # A representative sample, copied from all present execution scripts.
+        # Some changes due to simplification of filename pattern.
         ("bc_hydro", None, None, "~/bc_hydro/logs/tag_bc_hydro_json.log"),
         ("crd", None, None, "~/crd/logs/tag_crd_json.log"),
         ("ec", "freq", "PR", "~/ec/logs/tag_pr_freq_json.log"),
         ("bc_env_snow", None, None, "~/bc_env_snow/logs/tag_bc_env_snow_json.log"),
         ("moti", None, None, "~/moti/logs/tag_moti_json.log"),
         ("wamr", None, None, "~/wamr/logs/tag_wamr_json.log"),
-        ("wmb", None, None, "~/wmb/logs/tag_mof_json.log"),
+        ("wmb", None, None, "~/wmb/logs/tag_wmb_json.log"),
         ("nt_forestry", None, None, "~/nt_forestry/logs/tag_nt_forestry_json.log"),
     ],
 )
@@ -40,7 +41,8 @@ def test_log_filename(network_name, frequency, province, expected):
 @pytest.mark.parametrize(
     "network_name, frequency, province, expected",
     [
-        # A representative sample, covering all present execution scripts.
+        # A representative sample, copied from all present execution scripts.
+        # Some changes due to simplification of filename pattern.
         (
             "bc_hydro",
             None,
@@ -48,7 +50,7 @@ def test_log_filename(network_name, frequency, province, expected):
             "~/bc_hydro/cache/tag_bc_hydro_2020-01-02T03:04:05.txt",
         ),
         ("crd", None, None, "~/crd/cache/tag_crd_2020-01-02T03:04:05.txt"),
-        ("ec", "freq", "PR", "~/ec/download/tag_freq_pr_2020-01-02T03:04:05.xml"),
+        ("ec", "freq", "PR", "~/ec/cache/tag_freq_pr_2020-01-02T03:04:05.xml"),
         (
             "bc_env_snow",
             None,
@@ -57,7 +59,7 @@ def test_log_filename(network_name, frequency, province, expected):
         ),
         ("moti", None, None, "~/moti/cache/tag_moti_2020-01-02T03:04:05.txt"),
         ("wamr", None, None, "~/wamr/cache/tag_wamr_2020-01-02T03:04:05.txt"),
-        ("wmb", None, None, "~/wmb/download/tag_wmb_2020-01-02T03:04:05.txt"),
+        ("wmb", None, None, "~/wmb/cache/tag_wmb_2020-01-02T03:04:05.txt"),
         (
             "nt_forestry",
             None,
