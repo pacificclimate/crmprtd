@@ -95,9 +95,7 @@ def default_cache_filename(
     ts = timestamp.strftime(timestamp_format)
     filepath = f"~/{network_name}/cache"
     if network_name in ("ec",):
-        return (
-            f"{filepath}/{tag}_{frequency}_{province.lower()}_{ts}.xml"
-        )
+        return f"{filepath}/{tag}_{frequency}_{province.lower()}_{ts}.xml"
     if network_name in (
         "bc_env_snow",
         "bc_forestry",
@@ -114,13 +112,13 @@ def default_cache_filename(
     return f"{filepath}/{tag}_{network_name}_{ts}.txt"
 
 
-def log_args(**kwargs):
+def log_args(log_filename: str = None, **kwargs) -> List[str]:
     """Return logging args. Only the log filename depends on the arguments."""
     return [
         "-L",
         "~/logging.yaml",
         "--log_filename",
-        default_log_filename(**kwargs),
+        log_filename or default_log_filename(**kwargs),
     ]
 
 
@@ -139,7 +137,7 @@ def download_args(
     time: datetime.datetime = None,  # TODO: use now()?
     start_time: datetime.datetime = None,
     **_,
-):
+) -> List[str]:
     """Return command-line args for download phase. They depend on the network and
     other arguments.
 
@@ -147,7 +145,7 @@ def download_args(
     :param start_time:
     :param network_name: Network name.
     :param _: Remainder args. Passed through.
-    :return:
+    :return: List of download args.
     """
     check_network_name(network_name)
 
@@ -190,10 +188,13 @@ def alias_to_networks(network_alias: str):
     return network_aliases[network_alias]
 
 
-def dispatch_network(connection_string: str = None, **kwargs) -> None:
+def dispatch_network(
+    cache_filename: str = None, connection_string: str = None, **kwargs
+) -> None:
     """
     Dispatch a single network to the download-and-process pipeline.
 
+    :param cache_filename: Custom cache filename.
     :param connection_string: Database connection string for "process" step.
     :param kwargs: Remaining args, passed through to various subfunctions. Note that
         network name is one of these args.
@@ -208,7 +209,10 @@ def dispatch_network(connection_string: str = None, **kwargs) -> None:
                 network_name=network_name,
                 log_args=log_args(**kwargs, province=province),
                 download_args=download_args(**kwargs, province=province),
-                cache_filename=default_cache_filename(**kwargs, province=province),
+                cache_filename=(
+                    cache_filename
+                    or default_cache_filename(**kwargs, province=province)
+                ),
                 connection_string=connection_string,
             )
     elif network_name in (
@@ -228,7 +232,10 @@ def dispatch_network(connection_string: str = None, **kwargs) -> None:
             network_name=network_name,
             log_args=log_args(**kwargs),
             download_args=download_args(**kwargs, time=an_hour_ago),
-            cache_filename=default_cache_filename(**kwargs, timestamp=an_hour_ago),
+            cache_filename=(
+                cache_filename
+                or default_cache_filename(**kwargs, timestamp=an_hour_ago)
+            ),
             connection_string=connection_string,
         )
     else:
@@ -237,7 +244,9 @@ def dispatch_network(connection_string: str = None, **kwargs) -> None:
             network_name=network_name,
             log_args=log_args(**kwargs),
             download_args=download_args(**kwargs, time=now),
-            cache_filename=default_cache_filename(**kwargs, timestamp=now),
+            cache_filename=(
+                cache_filename or default_cache_filename(**kwargs, timestamp=now)
+            ),
             connection_string=connection_string,
         )
 
@@ -330,12 +339,31 @@ def main(arglist: List[str] = None) -> None:
             "individual networks (e.g., 'ytnt' stands for many networks)."
         ),
     )
+
+    # Log and cache filenames
+
     parser.add_argument(
         "-T",
         "--tag",
-        required=True,
-        help="Tag for naming log and cache files",
+        help="Tag for forming default names for log and cache files",
     )
+    parser.add_argument(
+        "--log_filename",
+        help=(
+            "Filename for log file. (If omitted, use default filename generated "
+            "from network name, tag, and other parameters.)"
+        ),
+    )
+    parser.add_argument(
+        "--cache_filename",
+        help=(
+            "Filename for cache file. (If omitted, use default filename generated "
+            "from network name, tag, and other parameters.)"
+        ),
+    )
+
+    # Processing step
+
     parser.add_argument(
         "-c",
         "--connection_string",

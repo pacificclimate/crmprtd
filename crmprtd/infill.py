@@ -185,8 +185,7 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
         # of stations associated with it. PCIC wants *all* the
         # stations which is too many for one request, so we have two
         # users with half of the stations. This way of requesting the
-        # data will get many "skips", but at least we'll get all of
-        # the data.
+        # data will get many "skips", but at least we'll get all the data.
         for auth_key in ("moti", "moti2"):
             # Divide range into 6 day intervals
             for interval_start, interval_end in zip(
