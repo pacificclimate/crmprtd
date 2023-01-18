@@ -63,12 +63,10 @@ def log_filename(
     :return: Filename.
     """
     check_network_name(network_name)
+    filepath = f"~/{network_name}/logs"
     if network_name in ("ec",):
-        return f"~/{network_name}/logs/{tag}_{province.lower()}_{frequency}_json.log"
-    if network_name in ("wmb",):
-        # Oh, yes, this one has to be a special snowflake.
-        return f"~/{network_name}/logs/{tag}_mof_json.log"
-    return f"~/{network_name}/logs/{tag}_{network_name}_json.log"
+        return f"{filepath}/{tag}_{province.lower()}_{frequency}_json.log"
+    return f"{filepath}/{tag}_{network_name}_json.log"
 
 
 def cache_filename(
