@@ -60,16 +60,16 @@ Some data sources require authentication. For most scripts, credentials can be p
 
 Although the three steps of downloading data, caching it, and processing it can
 be invoked as separate operations, the most common and convenient way to perform
-this sequence is the console script `crmprtd_download_cache_process`.
+this sequence is the console script `crmprtd_dcp`.
 
 The script takes a network argument and a handful of other arguments, formulates
 appropriate command lines for each step, and causes them to be executed.
 
-Here is the help from `crmprtd_download_cache_process`:
+Here is the help from `crmprtd_dcp`:
 
 ```text
-(crmprtd) rglover@pcic-3002:~/code/crmprtd$ crmprtd_download_cache_process -h
-usage: crmprtd_download_cache_process [-h] [--version] -N {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,bch,hourly_swobml2,ytnt} -T TAG
+(crmprtd) rglover@pcic-3002:~/code/crmprtd$ crmprtd_dcp -h
+usage: crmprtd_dcp [-h] [--version] -N {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,bch,hourly_swobml2,ytnt} -T TAG
                                       [-c CONNECTION_STRING]
 
 The download-cache-process dispatcher. Starts two subprocesses running crmprtd_download and crmprtd_process with appropriate arguments, pipes the first into the second, and caches the downloaded data.
@@ -87,7 +87,7 @@ optional arguments:
 A typical use of this script is:
 
 ```text
-$ crmprtd_download_cache_process -N ytnt -T metnorth -c postgresql://user:password@db.uvic.ca/metnorth
+$ crmprtd_dcp -N ytnt -T metnorth -c postgresql://user:password@db.uvic.ca/metnorth
 ```
 
 ### Downloading data
@@ -158,16 +158,16 @@ METNORTH_DB=postgresql://crmprtd@dbnorth/metnorth
 METNORTH2_BIN=env_4.0.0/bin
 METNORTH2_DB=postgresql://crmprtd@dbnorth/metnorth2
 
-@hourly                         $CRMP_BIN/crmprtd_dp -G hourly_swobml2 -T crmp -c $CRMP_DB
-@weekly                         $CRMP_BIN/crmprtd_dp -G wamr -T crmp -c $CRMP_DB
-40 4 * * *                      $CRMP_BIN/crmprtd_dp -G wmb -T crmp -c $CRMP_DB
-@hourly                         $CRMP_BIN/crmprtd_dp -G ec -F hourly -T crmp -c $CRMP_DB
-@daily                          $CRMP_BIN/crmprtd_dp -G ec -F daily -T crmp -c $CRMP_DB
-30 * * * *                      $CRMP_BIN/crmprtd_dp -G moti -T crmp -c $CRMP_DB
-@daily                          $CRMP_BIN/crmprtd_dp -G crd -T crmp -c $CRMP_DB
-@daily                          $CRMP_BIN/crmprtd_dp -G bch -T crmp -c $CRMP_DB
-@hourly                         $METNORTH_BIN/crmprtd_dp -G ytnt -T metnorth -c $METNORTH_DB
-@hourly                         $METNORTH2_BIN/crmprtd_dp -G ytnt -T metnorth2 -c $METNORTH2_DB
+@hourly                         $CRMP_BIN/crmprtd_dcp -G hourly_swobml2 -T crmp -c $CRMP_DB
+@weekly                         $CRMP_BIN/crmprtd_dcp -G wamr -T crmp -c $CRMP_DB
+40 4 * * *                      $CRMP_BIN/crmprtd_dcp -G wmb -T crmp -c $CRMP_DB
+@hourly                         $CRMP_BIN/crmprtd_dcp -G ec -F hourly -T crmp -c $CRMP_DB
+@daily                          $CRMP_BIN/crmprtd_dcp -G ec -F daily -T crmp -c $CRMP_DB
+30 * * * *                      $CRMP_BIN/crmprtd_dcp -G moti -T crmp -c $CRMP_DB
+@daily                          $CRMP_BIN/crmprtd_dcp -G crd -T crmp -c $CRMP_DB
+@daily                          $CRMP_BIN/crmprtd_dcp -G bch -T crmp -c $CRMP_DB
+@hourly                         $METNORTH_BIN/crmprtd_dcp -G ytnt -T metnorth -c $METNORTH_DB
+@hourly                         $METNORTH2_BIN/crmprtd_dcp -G ytnt -T metnorth2 -c $METNORTH2_DB
 ```
 
 Notes:
