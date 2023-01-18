@@ -93,9 +93,10 @@ def cache_filename(
     """
     check_network_name(network_name)
     ts = timestamp.strftime(timestamp_format)
+    filepath = f"~/{network_name}/cache"
     if network_name in ("ec",):
         return (
-            f"~/{network_name}/download/{tag}_{frequency}_{province.lower()}_{ts}.xml"
+            f"{filepath}/{tag}_{frequency}_{province.lower()}_{ts}.xml"
         )
     if network_name in (
         "bc_env_snow",
@@ -109,10 +110,8 @@ def cache_filename(
         "yt_avalanche",
         "yt_firewx",
     ):
-        return f"~/{network_name}/cache/{tag}_{network_name}_{ts}.xml"
-    if network_name in ("wmb",):
-        return f"~/{network_name}/download/{tag}_{network_name}_{ts}.txt"
-    return f"~/{network_name}/cache/{tag}_{network_name}_{ts}.txt"
+        return f"{filepath}/{tag}_{network_name}_{ts}.xml"
+    return f"{filepath}/{tag}_{network_name}_{ts}.txt"
 
 
 def log_args(**kwargs):
