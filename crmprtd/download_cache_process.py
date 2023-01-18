@@ -44,7 +44,7 @@ def check_network_name(network_name):
         raise ValueError(f"Network name '{network_name}' is not recognized.")
 
 
-def log_filename(
+def default_log_filename(
     network_name: str = None,
     tag: str = None,
     frequency: str = None,
@@ -120,7 +120,7 @@ def log_args(**kwargs):
         "-L",
         "~/logging.yaml",
         "--log_filename",
-        log_filename(**kwargs),
+        default_log_filename(**kwargs),
     ]
 
 

@@ -3,7 +3,7 @@ import datetime
 import pytest
 
 from crmprtd.download_cache_process import (
-    log_filename,
+    default_log_filename,
     cache_filename,
     download_args,
     main,
@@ -28,7 +28,7 @@ from crmprtd.download_cache_process import (
 )
 def test_log_filename(network_name, frequency, province, expected):
     assert (
-        log_filename(
+        default_log_filename(
             network_name=network_name,
             tag="tag",
             frequency=frequency,
