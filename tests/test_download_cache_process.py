@@ -4,7 +4,7 @@ import pytest
 
 from crmprtd.download_cache_process import (
     default_log_filename,
-    cache_filename,
+    default_cache_filename,
     download_args,
     main,
     network_aliases,
@@ -26,7 +26,7 @@ from crmprtd.download_cache_process import (
         ("nt_forestry", None, None, "~/nt_forestry/logs/tag_nt_forestry_json.log"),
     ],
 )
-def test_log_filename(network_name, frequency, province, expected):
+def test_default_log_filename(network_name, frequency, province, expected):
     assert (
         default_log_filename(
             network_name=network_name,
@@ -68,9 +68,9 @@ def test_log_filename(network_name, frequency, province, expected):
         ),
     ],
 )
-def test_cache_filename(network_name, frequency, province, expected):
+def test_default_cache_filename(network_name, frequency, province, expected):
     assert (
-        cache_filename(
+        default_cache_filename(
             timestamp=datetime.datetime(2020, 1, 2, 3, 4, 5),
             network_name=network_name,
             tag="tag",

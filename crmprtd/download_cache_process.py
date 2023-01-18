@@ -69,7 +69,7 @@ def default_log_filename(
     return f"{filepath}/{tag}_{network_name}_json.log"
 
 
-def cache_filename(
+def default_cache_filename(
     timestamp: datetime.datetime = datetime.datetime.now(),
     timestamp_format: str = "%Y-%m-%dT%H:%M:%S",
     network_name: str = None,
@@ -208,7 +208,7 @@ def dispatch_network(connection_string: str = None, **kwargs) -> None:
                 network_name=network_name,
                 log_args=log_args(**kwargs, province=province),
                 download_args=download_args(**kwargs, province=province),
-                cache_filename=cache_filename(**kwargs, province=province),
+                cache_filename=default_cache_filename(**kwargs, province=province),
                 connection_string=connection_string,
             )
     elif network_name in (
@@ -228,7 +228,7 @@ def dispatch_network(connection_string: str = None, **kwargs) -> None:
             network_name=network_name,
             log_args=log_args(**kwargs),
             download_args=download_args(**kwargs, time=an_hour_ago),
-            cache_filename=cache_filename(**kwargs, timestamp=an_hour_ago),
+            cache_filename=default_cache_filename(**kwargs, timestamp=an_hour_ago),
             connection_string=connection_string,
         )
     else:
@@ -237,7 +237,7 @@ def dispatch_network(connection_string: str = None, **kwargs) -> None:
             network_name=network_name,
             log_args=log_args(**kwargs),
             download_args=download_args(**kwargs, time=now),
-            cache_filename=cache_filename(**kwargs, timestamp=now),
+            cache_filename=default_cache_filename(**kwargs, timestamp=now),
             connection_string=connection_string,
         )
 
