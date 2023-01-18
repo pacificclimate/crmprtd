@@ -21,6 +21,7 @@ from crmprtd.infill import (
 # `subprocesses.run`. If you mock the wrong `run` then you don't catch the calls and the
 # commands actually get run. Potentially nasty. And counterintuitive.
 
+
 def mock_run(mocker):
     return_value = MagicMock()
     return_value.stdout = "foo"
