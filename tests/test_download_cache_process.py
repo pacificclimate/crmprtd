@@ -1,4 +1,6 @@
 import datetime
+import re
+from typing import List
 
 import pytest
 
@@ -161,8 +163,16 @@ def test_download_args(network_name, frequency, province, time, expected):
     )
 
 
+def match_args(arglist: List[str], pattern: str):
+    return re.match(pattern, " ".join(arglist))
+
+
+def assert_match_args(*args):
+    assert match_args(*args) is not None
+
+
 @pytest.mark.parametrize(
-    "network, tag, connection_string, frequency, seq_of_expected_cmds_prefixes",
+    "network, tag, connection_string, frequency, seq_of_expected_cmds_patterns",
     # This covers all current networks and aliases.
     [
         (
@@ -172,7 +182,7 @@ def test_download_args(network_name, frequency, province, time, expected):
             None,
             [
                 [
-                    "crmprtd_download -N bc_hydro".split(),
+                    r"crmprtd_download -N bc_hydro",
                 ],
             ],
         ),
@@ -184,9 +194,9 @@ def test_download_args(network_name, frequency, province, time, expected):
                 None,
                 [
                     [
-                        f"crmprtd_download -N {network}".split(),
-                        "tee".split(),
-                        f"crmprtd_process -N {network} -c DSN".split(),
+                        rf"crmprtd_download -N {network}",
+                        r"tee",
+                        rf"crmprtd_process -N {network} -c DSN",
                     ],
                 ],
             )
@@ -199,9 +209,9 @@ def test_download_args(network_name, frequency, province, time, expected):
             "daily",
             [
                 [
-                    f"crmprtd_download -N ec -p {prov} -F daily".split(),
-                    "tee".split(),
-                    "crmprtd_process -N ec -c DSN".split(),
+                    rf"crmprtd_download -N ec -p {prov} -F daily",
+                    r"tee",
+                    r"crmprtd_process -N ec -c DSN",
                 ]
                 for prov in "bc yt".split()
             ],
@@ -214,9 +224,9 @@ def test_download_args(network_name, frequency, province, time, expected):
                 None,
                 [
                     [
-                        f"crmprtd_download -N {network}".split(),
-                        "tee".split(),
-                        f"crmprtd_process -N {network} -c DSN".split(),
+                        rf"crmprtd_download -N {network}",
+                        r"tee",
+                        rf"crmprtd_process -N {network} -c DSN",
                     ]
                     for network in network_aliases[alias]
                 ],
@@ -226,16 +236,18 @@ def test_download_args(network_name, frequency, province, time, expected):
     ],
 )
 def test_main(
-    network, tag, connection_string, frequency, seq_of_expected_cmds_prefixes, mocker
+    network, tag, connection_string, frequency, seq_of_expected_cmds_patterns, mocker
 ):
-    arglist = f"-N {network} -T {tag}"
+    arglist = f"-N {network}"
+    if tag is not None:
+        arglist += f" -T {tag}"
     if connection_string is not None:
         arglist += f" -c {connection_string}"
     if frequency is not None:
         arglist += f" -F {frequency}"
 
     # In certain cases, the unit under test will try to open a file, in a place that
-    # does not exist. Catch this to prevent an inconsquential error.
+    # does not exist. Catch this to prevent an irrelevant error.
     mocker.patch("builtins.open", return_value=None)
 
     # Mock chain_subprocesses, so that we can see what it is being called with. That's
@@ -256,17 +268,17 @@ def test_main(
     # print("call_args_list", call_args_list)
 
     # Check that the expected number of calls was made.
-    assert len(call_args_list) == len(seq_of_expected_cmds_prefixes)
+    assert len(call_args_list) == len(seq_of_expected_cmds_patterns)
 
     # Check that each call contained the expected commands (or prefixes thereof).
-    for call_arg, expected_cmds_prefixes in zip(
-        call_args_list, seq_of_expected_cmds_prefixes
+    for call_arg, expected_cmd_patterns in zip(
+        call_args_list, seq_of_expected_cmds_patterns
     ):
         commands, *_ = call_arg.args
         # Check that the number of commands in the call is as expected.
-        assert len(commands) == len(expected_cmds_prefixes)
-        # Check that the prefix of each command is as expected.
-        for cmd, expected_cmd in zip(commands, expected_cmds_prefixes):
-            assert cmd[: len(expected_cmd)] == expected_cmd
+        assert len(commands) == len(expected_cmd_patterns)
+        # Check that each command matches the expected pattern.
+        for cmd, expected_cmd_pattern in zip(commands, expected_cmd_patterns):
+            assert_match_args(cmd, expected_cmd_pattern)
 
     cp.reset_mock()
