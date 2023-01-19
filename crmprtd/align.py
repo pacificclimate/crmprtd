@@ -230,6 +230,19 @@ def create_station_and_history_entry(
     return history
 
 
+def cached_get_var(f):
+    cache = {}
+
+    def memoize(sesh, network_name, variable_name):
+        nonlocal cache
+        if (network_name, variable_name) not in cache:
+            cache[(network_name, variable_name)] = f(sesh, network_name, variable_name)
+        return cache[(network_name, variable_name)]
+
+    return memoize
+
+
+@cached_get_var
 def get_variable(sesh, network_name, variable_name):
     """
     Find (but not create) a Variable matching the arguments, if possible.
@@ -248,6 +261,21 @@ def get_variable(sesh, network_name, variable_name):
     return variable
 
 
+def cached_get_hist(f):
+    cache = {}
+
+    def memoize(sesh, network_name, native_id, lat, lon, diagnostic=False):
+        nonlocal cache
+        if (network_name, native_id, lat, lon, diagnostic) not in cache:
+            cache[(network_name, native_id, lat, lon, diagnostic)] = f(
+                sesh, network_name, native_id, lat, lon, diagnostic
+            )
+        return cache[(network_name, native_id, lat, lon, diagnostic)]
+
+    return memoize
+
+
+@cached_get_hist
 def find_or_create_matching_history_and_station(
     sesh, network_name, native_id, lat, lon, diagnostic=False
 ):
@@ -303,9 +331,21 @@ def find_or_create_matching_history_and_station(
         )
 
 
+def cached_query(f):
+    cache = []
+
+    def memoize(sesh, network_name):
+        nonlocal cache
+        if not cache:
+            cache = f(sesh, network_name)
+        return network_name in cache
+
+    return memoize
+
+
+@cached_query
 def does_network_exist(sesh, network_name):
-    network = sesh.query(Network).filter(Network.name == network_name)
-    return network.count() != 0
+    return [x[0] for x in sesh.query(Network.name).all()]
 
 
 def has_required_information(row):
