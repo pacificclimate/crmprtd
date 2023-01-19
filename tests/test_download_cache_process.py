@@ -172,7 +172,8 @@ def assert_match_args(*args):
 
 
 @pytest.mark.parametrize(
-    "network, tag, connection_string, frequency, seq_of_expected_cmds_patterns",
+    "network, tag, connection_string, frequency, "
+    "seq_of_expected_cmds_patterns, expected_final_destination",
     # This covers all current networks and aliases.
     [
         (
@@ -185,6 +186,7 @@ def assert_match_args(*args):
                     r"crmprtd_download -N bc_hydro",
                 ],
             ],
+            None,
         ),
         *(
             (
@@ -195,10 +197,11 @@ def assert_match_args(*args):
                 [
                     [
                         rf"crmprtd_download -N {network}",
-                        r"tee",
+                        rf"tee\s+~/{network}/cache/tag_{network}_.*.txt",
                         rf"crmprtd_process -N {network} -c DSN",
                     ],
                 ],
+                None,
             )
             for network in "crd moti wamr wmb".split()
         ),
@@ -210,11 +213,12 @@ def assert_match_args(*args):
             [
                 [
                     rf"crmprtd_download -N ec -p {prov} -F daily",
-                    r"tee",
+                    rf"tee\s+~/ec/cache/tag_daily_{prov}_.*.xml",
                     r"crmprtd_process -N ec -c DSN",
                 ]
                 for prov in "bc yt".split()
             ],
+            None,
         ),
         *(
             (
@@ -225,18 +229,25 @@ def assert_match_args(*args):
                 [
                     [
                         rf"crmprtd_download -N {network}",
-                        r"tee",
+                        rf"tee\s+~/{network}/cache/tag_{network}_.*.xml",
                         rf"crmprtd_process -N {network} -c DSN",
                     ]
                     for network in network_aliases[alias]
                 ],
+                None,
             )
             for alias in "hourly_swobml2 ytnt".split()
         ),
     ],
 )
 def test_main(
-    network, tag, connection_string, frequency, seq_of_expected_cmds_patterns, mocker
+    network,
+    tag,
+    connection_string,
+    frequency,
+    seq_of_expected_cmds_patterns,
+    expected_final_destination,
+    mocker,
 ):
     arglist = f"-N {network}"
     if tag is not None:
@@ -271,14 +282,17 @@ def test_main(
     assert len(call_args_list) == len(seq_of_expected_cmds_patterns)
 
     # Check that each call contained the expected commands (or prefixes thereof).
-    for call_arg, expected_cmd_patterns in zip(
+    for call_arg, expected_cmds_patterns in zip(
         call_args_list, seq_of_expected_cmds_patterns
     ):
         commands, *_ = call_arg.args
+        final_destination = call_arg.kwargs["final_destination"]
         # Check that the number of commands in the call is as expected.
-        assert len(commands) == len(expected_cmd_patterns)
+        assert len(commands) == len(expected_cmds_patterns)
         # Check that each command matches the expected pattern.
-        for cmd, expected_cmd_pattern in zip(commands, expected_cmd_patterns):
+        for cmd, expected_cmd_pattern in zip(commands, expected_cmds_patterns):
             assert_match_args(cmd, expected_cmd_pattern)
+        # TODO: Check that final destination is as expected.
+        # assert final_destination == expected_final_destination
 
     cp.reset_mock()
