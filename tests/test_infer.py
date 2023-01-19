@@ -1,8 +1,10 @@
 from datetime import datetime
+import importlib
 
 import pytest
 
-from crmprtd.infer import infer
+import crmprtd.infer
+import crmprtd.align
 from crmprtd import Row
 from pycds import Variable, Network, Station, History
 
@@ -65,6 +67,15 @@ def commit_raises(diagnostic=False, stn_count=1, var_count=1):
 @pytest.mark.parametrize("stn_count", (1, 2))
 @pytest.mark.parametrize("var_count", (1, 2))
 def test_infer(crmp_session, diagnostic, stn_count, var_count):
+    # align has several functions that reach out to the database and
+    # subsequently cache results While this speeds up align
+    # *significantly* reducing round trips to the database, an
+    # unwanted side-effect is that each of these test runs are not
+    # independent. If we reload the infer and align module, the
+    # function local cache gets cleared
+    importlib.reload(crmprtd.infer)
+    importlib.reload(crmprtd.align)
+
     network_name = "MoTIe"
     stn_id_prefix = "test_stn_id"
     var_name_prefix = "test_var"
@@ -97,9 +108,9 @@ def test_infer(crmp_session, diagnostic, stn_count, var_count):
 
     if raises:
         with pytest.raises(ValueError) as exc_info:
-            infer(crmp_session, rows, diagnostic)
+            crmprtd.infer.infer(crmp_session, rows, diagnostic)
     else:
-        infer(crmp_session, rows, diagnostic)
+        crmprtd.infer.infer(crmp_session, rows, diagnostic)
 
     post_stn_count = stn_query.count()
     post_var_count = var_query.count()
