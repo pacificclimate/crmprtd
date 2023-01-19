@@ -69,6 +69,10 @@ def default_log_filename(
     return f"{filepath}/{tag}_{network_name}_json.log"
 
 
+def the_log_filename(log_filename: str = None, **kwargs):
+    return log_filename or default_log_filename(**kwargs)
+
+
 def default_cache_filename(
     timestamp: datetime.datetime = datetime.datetime.now(),
     timestamp_format: str = "%Y-%m-%dT%H:%M:%S",
@@ -112,13 +116,20 @@ def default_cache_filename(
     return f"{filepath}/{tag}_{network_name}_{ts}.txt"
 
 
-def log_args(log_filename: str = None, **kwargs) -> List[str]:
+def the_cache_filename(cache_filename: str = None, **kwargs) -> str:
+    return (
+        cache_filename
+        or default_cache_filename(**kwargs)
+    )
+
+
+def log_args(**kwargs) -> List[str]:
     """Return logging args. Only the log filename depends on the arguments."""
     return [
         "-L",
         "~/logging.yaml",
         "--log_filename",
-        log_filename or default_log_filename(**kwargs),
+        the_log_filename(**kwargs),
     ]
 
 
@@ -209,10 +220,7 @@ def dispatch_network(
                 network_name=network_name,
                 log_args=log_args(**kwargs, province=province),
                 download_args=download_args(**kwargs, province=province),
-                cache_filename=(
-                    cache_filename
-                    or default_cache_filename(**kwargs, province=province)
-                ),
+                cache_filename=the_cache_filename(**kwargs, province=province),
                 connection_string=connection_string,
             )
     elif network_name in (
@@ -232,10 +240,7 @@ def dispatch_network(
             network_name=network_name,
             log_args=log_args(**kwargs),
             download_args=download_args(**kwargs, time=an_hour_ago),
-            cache_filename=(
-                cache_filename
-                or default_cache_filename(**kwargs, timestamp=an_hour_ago)
-            ),
+            cache_filename=the_cache_filename(**kwargs, timestamp=an_hour_ago),
             connection_string=connection_string,
         )
     else:
@@ -244,9 +249,7 @@ def dispatch_network(
             network_name=network_name,
             log_args=log_args(**kwargs),
             download_args=download_args(**kwargs, time=now),
-            cache_filename=(
-                cache_filename or default_cache_filename(**kwargs, timestamp=now)
-            ),
+            cache_filename=the_cache_filename(**kwargs, timestamp=now),
             connection_string=connection_string,
         )
 
