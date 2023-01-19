@@ -117,10 +117,7 @@ def default_cache_filename(
 
 
 def the_cache_filename(cache_filename: str = None, **kwargs) -> str:
-    return (
-        cache_filename
-        or default_cache_filename(**kwargs)
-    )
+    return cache_filename or default_cache_filename(**kwargs)
 
 
 def log_args(**kwargs) -> List[str]:
@@ -220,7 +217,9 @@ def dispatch_network(
                 network_name=network_name,
                 log_args=log_args(**kwargs, province=province),
                 download_args=download_args(**kwargs, province=province),
-                cache_filename=the_cache_filename(**kwargs, province=province),
+                cache_filename=the_cache_filename(
+                    cache_filename=cache_filename, province=province, **kwargs
+                ),
                 connection_string=connection_string,
             )
     elif network_name in (
@@ -240,7 +239,9 @@ def dispatch_network(
             network_name=network_name,
             log_args=log_args(**kwargs),
             download_args=download_args(**kwargs, time=an_hour_ago),
-            cache_filename=the_cache_filename(**kwargs, timestamp=an_hour_ago),
+            cache_filename=the_cache_filename(
+                cache_filename=cache_filename, timestamp=an_hour_ago, **kwargs
+            ),
             connection_string=connection_string,
         )
     else:
@@ -249,7 +250,9 @@ def dispatch_network(
             network_name=network_name,
             log_args=log_args(**kwargs),
             download_args=download_args(**kwargs, time=now),
-            cache_filename=the_cache_filename(**kwargs, timestamp=now),
+            cache_filename=the_cache_filename(
+                cache_filename=cache_filename, timestamp=now, **kwargs
+            ),
             connection_string=connection_string,
         )
 
@@ -389,7 +392,7 @@ def main(arglist: List[str] = None) -> None:
         )
         args = parser.parse_args(arglist)
 
-    # TODO: Add network-dependent time arg here? Currently it is hardwired in code to
+    # TODO: Add network-dependent time arg here? Currently, it is hardwired in code to
     #  "now".
 
     dispatch(**vars(args))

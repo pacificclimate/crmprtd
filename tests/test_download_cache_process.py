@@ -1,5 +1,6 @@
 import datetime
 import re
+from itertools import product
 from typing import List
 
 import pytest
@@ -172,13 +173,16 @@ def assert_match_args(*args):
 
 
 @pytest.mark.parametrize(
-    "network, tag, connection_string, frequency, "
-    "seq_of_expected_cmds_patterns, expected_final_destination",
+    "network, tag, frequency, log_filename, cache_filename, connection_string, "
+    "seq_of_expected_cmds_patterns, expected_final_destination_pattern",
     # This covers all current networks and aliases.
     [
+        # Tests of all networks, with default log/cache filenames
         (
             "bc_hydro",
             "tag",
+            None,
+            None,
             None,
             None,
             [
@@ -186,14 +190,16 @@ def assert_match_args(*args):
                     r"crmprtd_download -N bc_hydro",
                 ],
             ],
-            None,
+            r"~/bc_hydro/cache/tag_bc_hydro_.*\.txt",
         ),
         *(
             (
                 network,
                 "tag",
-                "DSN",
                 None,
+                None,
+                None,
+                "DSN",
                 [
                     [
                         rf"crmprtd_download -N {network}",
@@ -208,8 +214,10 @@ def assert_match_args(*args):
         (
             "ec",
             "tag",
-            "DSN",
             "daily",
+            None,
+            None,
+            "DSN",
             [
                 [
                     rf"crmprtd_download -N ec -p {prov} -F daily",
@@ -224,8 +232,10 @@ def assert_match_args(*args):
             (
                 alias,
                 "tag",
-                "DSN",
                 None,
+                None,
+                None,
+                "DSN",
                 [
                     [
                         rf"crmprtd_download -N {network}",
@@ -238,28 +248,64 @@ def assert_match_args(*args):
             )
             for alias in "hourly_swobml2 ytnt".split()
         ),
+        # Tests of output filename handling
+        *(
+            (
+                network,
+                "tag",
+                None,
+                log_filename,
+                cache_filename,
+                "DSN",
+                [
+                    [
+                        (
+                            rf"crmprtd_download -N {network}"
+                            rf" .*--log_filename {log_filename or f'~/{network}/logs/tag_{network}_json.log'}"
+                        ),
+                        rf"tee\s+{cache_filename or rf'~/{network}/cache/tag_{network}_.*.txt'}",
+                        rf"crmprtd_process -N {network} -c DSN",
+                    ],
+                ],
+                None,
+            )
+            for network, log_filename, cache_filename in product(
+                "crd".split(),  # Probably only need to check on one network
+                (None, "custom_log_filename"),
+                (None, "custom_cache_filename"),
+            )
+        ),
     ],
 )
 def test_main(
     network,
     tag,
-    connection_string,
     frequency,
+    log_filename,
+    cache_filename,
+    connection_string,
     seq_of_expected_cmds_patterns,
-    expected_final_destination,
+    expected_final_destination_pattern,
     mocker,
 ):
     arglist = f"-N {network}"
     if tag is not None:
         arglist += f" -T {tag}"
-    if connection_string is not None:
-        arglist += f" -c {connection_string}"
     if frequency is not None:
         arglist += f" -F {frequency}"
+    if log_filename is not None:
+        arglist += f" --log_filename {log_filename}"
+    if cache_filename is not None:
+        arglist += f" --cache_filename {cache_filename}"
+    if connection_string is not None:
+        arglist += f" -c {connection_string}"
 
-    # In certain cases, the unit under test will try to open a file, in a place that
-    # does not exist. Catch this to prevent an irrelevant error.
-    mocker.patch("builtins.open", return_value=None)
+    # In certain cases, the unit under test will try to open a file.
+    # Instead, don't open a file but return the filepath for checking.
+    def new_open(filepath, *args, **kwargs):
+        return filepath
+
+    mocker.patch("builtins.open", new=new_open)
 
     # Mock chain_subprocesses, so that we can see what it is being called with. That's
     # the evidence we use to certify that the script is working as expected.
@@ -292,7 +338,9 @@ def test_main(
         # Check that each command matches the expected pattern.
         for cmd, expected_cmd_pattern in zip(commands, expected_cmds_patterns):
             assert_match_args(cmd, expected_cmd_pattern)
-        # TODO: Check that final destination is as expected.
-        # assert final_destination == expected_final_destination
+        # Check that final destination is as expected.
+        assert final_destination is None or re.match(
+            expected_final_destination_pattern, final_destination
+        )
 
     cp.reset_mock()
