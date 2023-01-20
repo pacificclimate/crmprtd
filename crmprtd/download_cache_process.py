@@ -323,10 +323,26 @@ def main(arglist: List[str] = None) -> None:
 
     parser = ArgumentParser(
         description="""
-            The download-cache-process dispatcher. Starts two subprocesses
-            running crmprtd_download and crmprtd_process with appropriate arguments,
-            pipes the first into the second, and caches the downloaded data.
-        """
+            The download-cache-process pipeline. Starts a pipeline of subprocesses
+            running, in sequence, (1) script crmprtd_download, (2) an optional cache step 
+            (tee), and (3) the script crmprtd_process. The third subprocess
+            is optional, depending on arguments provided to this command. Arguments to 
+            each script in the pipeline are provided as appropriate, depending on the 
+            network(s) and other arguments to this command.
+        """,
+        epilog="""
+            Hints:
+            (1) Use the -D/--describe <name> option to see the network(s) designated by
+            <name>, which can be either a single network name or an alias, which 
+            designates one or more networks (e.g., ytnt).
+            (2) Arguments generated for each step of the pipeline depend in a complicated
+            way on the network and other arguments provided to this command. Use the
+            --dry_run option to print to stdout the command pipeline(s) that would be
+            run using the arguments you provide to this command. It is informative, 
+            and each line can if you wish be be pasted into a Linux command line and 
+            will have the same effect as running this script, except that database 
+            passwords are sanitized from the output.
+        """,
     )
 
     # Utility options.
