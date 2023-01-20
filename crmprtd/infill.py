@@ -46,6 +46,7 @@ def download_and_process(
     download_args: List[str],
     cache_filename: str = None,
     connection_string: str = None,
+    dry_run: bool = None,
 ):
     """
     Start subprocesses as necessary to perform download-and-process pipeline.
@@ -61,8 +62,11 @@ def download_and_process(
         arg is None, data is not cached even if it is processed.
     :param connection_string: Database connection string for process step. If this
         arg is none, the process step is skipped.
+    :param dry_run: If true, print commands but don't run them.
     :return:
     """
+    # Ensure this method was not invoked sloppily.
+    assert dry_run is not None
 
     do_cache = cache_filename is not None
     do_process = connection_string is not None
@@ -101,6 +105,13 @@ def download_and_process(
             ]
             + log_args,
         )
+
+    if dry_run:
+        print(
+            " | ".join([" ".join(command) for command in commands])
+            + (f" > {cache_filename}" if do_cache and not do_process else "")
+        )
+        return
 
     chain_subprocesses(
         commands,

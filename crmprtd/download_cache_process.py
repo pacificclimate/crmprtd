@@ -197,7 +197,10 @@ def alias_to_networks(network_alias: str):
 
 
 def dispatch_network(
-    cache_filename: str = None, connection_string: str = None, **kwargs
+    cache_filename: str = None,
+    connection_string: str = None,
+    dry_run: bool = None,
+    **kwargs,
 ) -> None:
     """
     Dispatch a single network to the download-and-process pipeline.
@@ -206,6 +209,7 @@ def dispatch_network(
     :param connection_string: Database connection string for "process" step.
     :param kwargs: Remaining args, passed through to various subfunctions. Note that
         network name is one of these args.
+    :param dry_run: If true, print commands but don't run them.
     :return: None. Side effect: Download and process network specified in args.
     """
     network_name = kwargs["network_name"]
@@ -221,6 +225,7 @@ def dispatch_network(
                     cache_filename=cache_filename, province=province, **kwargs
                 ),
                 connection_string=connection_string,
+                dry_run=dry_run,
             )
     elif network_name in (
         "bc_env_snow",
@@ -243,6 +248,7 @@ def dispatch_network(
                 cache_filename=cache_filename, timestamp=an_hour_ago, **kwargs
             ),
             connection_string=connection_string,
+            dry_run=dry_run,
         )
     else:
         now = datetime.datetime.now()
@@ -254,6 +260,7 @@ def dispatch_network(
                 cache_filename=cache_filename, timestamp=now, **kwargs
             ),
             connection_string=connection_string,
+            dry_run=dry_run,
         )
 
 
@@ -322,6 +329,8 @@ def main(arglist: List[str] = None) -> None:
         """
     )
 
+    # Utility options.
+
     add_version_arg(parser)
 
     parser.add_argument(
@@ -332,6 +341,15 @@ def main(arglist: List[str] = None) -> None:
         action=OneAndDoneAction,
         function=describe_network,
         help="Describe a network name or alias",
+    )
+
+    parser.add_argument(
+        "--dry_run",
+        action="store_true",
+        help=(
+            "Do a dry run. This prints to stdout all commands and their arguments "
+            "(sanitized) that would be run. The commands are not actually run."
+        ),
     )
 
     parser.add_argument(
