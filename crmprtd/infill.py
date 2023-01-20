@@ -122,7 +122,15 @@ def download_and_process(
     )
 
 
-def infill(networks, start_time, end_time, auth_fname, connection_string, log_args):
+def infill(
+    networks,
+    start_time,
+    end_time,
+    auth_fname,
+    connection_string,
+    log_args,
+    dry_run=False,
+):
     """Set up and delegate all infilling processes to scripts
     crmprtd_download and crmprtd_process, invoked in a subprocess.
     """
@@ -162,6 +170,7 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                 log_args=log_args,
                 download_args=dl_args,
                 connection_string=connection_string,
+                dry_run=dry_run,
             )
 
     # EC
@@ -185,6 +194,7 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                         log_args=log_args,
                         download_args=dl_args,
                         connection_string=connection_string,
+                        dry_run=dry_run,
                     )
 
     # MOTI
@@ -223,6 +233,7 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                         log_args=log_args,
                         download_args=dl_args,
                         connection_string=connection_string,
+                        dry_run=dry_run,
                     )
 
     warning_msg = {
@@ -250,6 +261,7 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                 log_args=log_args,
                 download_args=dl_args,
                 connection_string=connection_string,
+                dry_run=dry_run,
             )
 
     # WMB
@@ -269,6 +281,7 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                 log_args=log_args,
                 download_args=dl_args,
                 connection_string=connection_string,
+                dry_run=dry_run,
             )
 
     # EC_SWOB
@@ -282,6 +295,7 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                     log_args=log_args,
                     download_args=dl_args,
                     connection_string=connection_string,
+                    dry_run=dry_run,
                 )
 
 
