@@ -54,6 +54,8 @@ import pkg_resources
 from pkg_resources import resource_stream
 from collections import namedtuple
 
+from crmprtd.argparse_helpers import OneAndDoneAction
+
 SWOB_PARTNERS = (
     "bc_env_aq",
     "bc_env_snow",
@@ -76,11 +78,15 @@ Row = namedtuple(
 )
 
 
+# This method for --version avoids an error in testing that is provoked by using the
+# action='version' method as used in add_version_arg. Reason for error unknown.
 def add_version_arg(parser):
     parser.add_argument(
         "--version",
-        action="store_true",
-        help="Output version number and exit",
+        action=OneAndDoneAction,
+        nargs=0,
+        function=get_version,
+        help="Show version number and exit",
     )
     return parser
 

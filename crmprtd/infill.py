@@ -1,6 +1,7 @@
 import re
 import logging
 import datetime
+from typing import List, TextIO, Optional
 from warnings import warn
 from subprocess import run, PIPE
 
@@ -14,35 +15,136 @@ import pytz
 logger = logging.getLogger(__name__)
 
 
-def download_and_process(download_args, network_name, connection_string, log_args):
-    """Open two subprocesses: crmprtd_download and crmprtd_process and
-    pipe the output from the first to the second. Returns None.
+def chain_subprocesses(
+    commands: List[List[str]], final_destination: Optional[TextIO] = None
+) -> None:
     """
-    proc = [f"crmprtd_download", "-N", network_name] + log_args + download_args
-    logger.debug(" ".join(proc))
-    dl_proc = run(proc, stdout=PIPE)
-    process = [
-        "crmprtd_process",
-        "-c",
-        connection_string,
-        "-N",
-        network_name,
-    ] + log_args
-    message = " ".join(process)
-    message = re.sub(r"postgresql:\/\/(.*?)\@", r"postgresql://", message)
-    logger.debug(message)
-    run(process, input=dl_proc.stdout)
+    Chain a series of commands by starting a subprocess for each and piping the output
+    of each one successively to the next. If the output (stdout) of the final command is
+    to be redirected (written) to a file, set `final_destination` to a file object.
+
+    :param commands: List of commands to be run in a subprocess and changed. A command
+        itself is a list of strings, and is the main argument for subprocess.run.
+    :param final_destination: Optional text file object to which the output of the
+        last process can be directed.
+    :return: None.
+
+    Side effects: Run the commands.
+    """
+    proc = None
+    for i, command in enumerate(commands):
+        proc = run(
+            command,
+            input=(proc and proc.stdout),
+            stdout=PIPE if i < len(commands) - 1 else final_destination,
+        )
 
 
-def infill(networks, start_time, end_time, auth_fname, connection_string, log_args):
-    """Setup and delegate all of the infilling processes"""
+def download_and_process(
+    network_name: str,
+    log_args: List[str],
+    download_args: List[str],
+    cache_filename: str = None,
+    connection_string: str = None,
+    dry_run: bool = None,
+):
+    """
+    Start subprocesses as necessary to perform download-and-process pipeline.
+    The download step is always performed (using script `crmprtd_download`).
+    The result of downloading can optionally be directed to a cache file (as well as
+        processed if the process step is requested).
+    The process step is optionally performed (using script `crmprtd_process`).
+
+    :param network_name: Name of network to download.
+    :param log_args: Configuration for application logging.
+    :param download_args: Args to be passed to crmprtd_download.
+    :param cache_filename: Name of file in which to cache downloaded data. If this
+        arg is None, data is not cached even if it is processed.
+    :param connection_string: Database connection string for process step. If this
+        arg is none, the process step is skipped.
+    :param dry_run: If true, print commands but don't run them.
+    :return:
+    """
+    # Ensure this method was not invoked sloppily.
+    assert dry_run is not None
+
+    do_cache = cache_filename is not None
+    do_process = connection_string is not None
+    do_download = do_cache or do_process
+
+    if not do_download:
+        warn(
+            f"Network {network_name}: Data is to be neither cached nor processed. "
+            f"Nothing to do."
+        )
+
+    # Build up commands to be chained in this list
+    commands = []
+
+    def add_command(command):
+        message = " ".join(command)
+        message = re.sub(r"postgresql://(.*?)@", r"postgresql://", message)
+        logger.debug(message)
+        commands.append(command)
+
+    # Set up download step
+    if do_download:
+        add_command(["crmprtd_download"] + download_args + log_args)
+
+    # Set up process step.
+    if do_process:
+        if do_cache:
+            add_command(["tee", cache_filename])
+        add_command(
+            [
+                "crmprtd_process",
+                "-N",
+                network_name,
+                "-c",
+                connection_string,
+            ]
+            + log_args,
+        )
+
+    if dry_run:
+        message = " | ".join([" ".join(command) for command in commands]) + (
+            f" > {cache_filename}" if do_cache and not do_process else ""
+        )
+        message = re.sub(r"postgresql://(.*?)@", r"postgresql://", message)
+        print(message)
+        return
+
+    chain_subprocesses(
+        commands,
+        final_destination=(
+            open(cache_filename, "w") if do_cache and not do_process else None
+        ),
+    )
+
+
+def infill(
+    networks,
+    start_time,
+    end_time,
+    auth_fname,
+    connection_string,
+    log_args,
+    dry_run=False,
+):
+    """Set up and delegate all infilling processes to scripts
+    crmprtd_download and crmprtd_process, invoked in a subprocess.
+    """
+
+    # Compute lists of "discretized" time periods between start and end time, for each
+    # important resolution: month, week, day, hour. Notes:
+    # - A "month" is 28 days.
+    # - A "week" is 6 days. (7-day intervals were too much data for some services.)
+    # - "Day" and "hour" have their usual meanings.
     monthly_ranges = list(datetime_range(start_time, end_time, resolution="month"))
     weekly_ranges = list(datetime_range(start_time, end_time, resolution="week"))
     daily_ranges = list(datetime_range(start_time, end_time, resolution="day"))
     hourly_ranges = list(datetime_range(start_time, end_time, resolution="hour"))
 
-    # Unfortunately most of the download functions only accepts a time
-    # *string* :(
     time_fmt = "%Y/%m/%d %H:%M:%S"
 
     # CRD
@@ -63,7 +165,13 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                 "--auth_key",
                 "crd",
             ]
-            download_and_process(dl_args, "crd", connection_string, log_args)
+            download_and_process(
+                network_name="crd",
+                log_args=log_args,
+                download_args=dl_args,
+                connection_string=connection_string,
+                dry_run=dry_run,
+            )
 
     # EC
     if "ec" in networks:
@@ -81,20 +189,25 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                         "-t",
                         time.strftime(time_fmt),
                     ]
-                    download_and_process(dl_args, "ec", connection_string, log_args)
+                    download_and_process(
+                        network_name="ec",
+                        log_args=log_args,
+                        download_args=dl_args,
+                        connection_string=connection_string,
+                        dry_run=dry_run,
+                    )
 
     # MOTI
     if "moti" in networks:
 
-        # Query all of the stations
+        # Query all existing stations
         stations = get_moti_stations(connection_string)
 
         # MoTI has an insane config where each user has a specific set
         # of stations associated with it. PCIC wants *all* the
         # stations which is too many for one request, so we have two
         # users with half of the stations. This way of requesting the
-        # data will get many "skips", but at least we'll get all of
-        # the data.
+        # data will get many "skips", but at least we'll get all the data.
         for auth_key in ("moti", "moti2"):
             # Divide range into 6 day intervals
             for interval_start, interval_end in zip(
@@ -115,7 +228,13 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                         "-s",
                         station,
                     ]
-                    download_and_process(dl_args, "moti", connection_string, log_args)
+                    download_and_process(
+                        network_name="moti",
+                        log_args=log_args,
+                        download_args=dl_args,
+                        connection_string=connection_string,
+                        dry_run=dry_run,
+                    )
 
     warning_msg = {
         "disjoint": "{} cannot be infilled since the period of infilling is "
@@ -137,7 +256,13 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
             if not interval_contains((start_time, end_time), last_month):
                 warn(warning_msg["not_contained"].format("WAMR", "one_month"))
             dl_args = []
-            download_and_process(dl_args, "wamr", connection_string, log_args)
+            download_and_process(
+                network_name="wamr",
+                log_args=log_args,
+                download_args=dl_args,
+                connection_string=connection_string,
+                dry_run=dry_run,
+            )
 
     # WMB
     if "wmb" in networks:
@@ -151,7 +276,13 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
                 warn(warning_msg["not_contained"].format("WMB", "day"))
             # Run it
             dl_args = ["--auth_fname", auth_fname, "--auth_key", "wmb"]
-            download_and_process(dl_args, "wmb", connection_string, log_args)
+            download_and_process(
+                network_name="wmb",
+                log_args=log_args,
+                download_args=dl_args,
+                connection_string=connection_string,
+                dry_run=dry_run,
+            )
 
     # EC_SWOB
     if "ec_swob" in networks:
@@ -159,7 +290,13 @@ def infill(networks, start_time, end_time, auth_fname, connection_string, log_ar
             for hour in hourly_ranges:
                 hour = hour.astimezone(pytz.utc)  # EC files are named in UTC
                 dl_args = ["-d", hour.strftime(time_fmt)]
-                download_and_process(dl_args, partner, connection_string, log_args)
+                download_and_process(
+                    network_name=partner,
+                    log_args=log_args,
+                    download_args=dl_args,
+                    connection_string=connection_string,
+                    dry_run=dry_run,
+                )
 
 
 def round_datetime(d, resolution="hour", direction="down"):
@@ -209,17 +346,18 @@ def datetime_range(start, end, resolution="hour"):
     The 'week' resolution behaves slightly different since its usage
     is currently constrained to the MoTI time parameters and their
     particularities. (MoTI allows you to specify a full time range
-    rather than discrete days/hours). Using the week resoultion rounds
+    rather than discrete days/hours). Using the week resolution rounds
     the beginning time step down to the nearest day and then just uses
-    the end time as is. During initial testing, we found that using
-    the full 7 day time range resulted in many HTTP 500 errors, so
-    we're using a conservative "week" of 6 days.
+    the end time as is.
 
-    The loosely defined 'month' resolution returns 28 day intervals
-    (for CRD).
+    During initial testing, we found that using the full 7 day time range
+    resulted in many HTTP 500 errors, so we're using a conservative "week" of 6 days.
+
+    The loosely defined 'month' resolution returns 28-day intervals
+    (for use by CRD).
 
     Args:
-        start (datetime.datetime): The beginnng of the range
+        start (datetime.datetime): The beginning of the range
         end (datetime.datetime): The end of the range
         resolution (string): 'hour', 'day', 'week' or 'month'
 

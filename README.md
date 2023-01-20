@@ -23,15 +23,6 @@ a guide for installation in a general way.
 
 ## Installation
 
-Note: The scripts installed by this project include both Python programs and
-a set of shell scripts used to download and process data from the various
-networks. We call these "execution scripts" for lack of a better term, and
-their source is in the directory `crmprtd/execution`. They are a recent addition 
-to this repo; formerly they were maintained outside source control.
-
-The execution scripts are installed in the installation environment `bin/` 
-directory (e.g., `venv/bin/`), like all other project scripts.
-
 ### Installation for production
 
 For production usage, install the latest tagged release from PCIC's PyPI server.
@@ -61,9 +52,91 @@ environment.
 
 ## Usage
 
-The most common usage pattern for package `crmprtd` is to configure a number of scripts to run on an hourly or daily basis.
+The most common usage pattern for package `crmprtd` is to configure cron to run a number of scripts on an hourly or daily basis.
 
 Some data sources require authentication. For most scripts, credentials can be provided as command line arguments, or, preferably, entries in a yaml config file. A sample version of this file can be seen [here](https://github.com/pacificclimate/crmprtd/blob/master/auth.yaml). The location of the config is passed with the `--auth` argument and the key with the `--auth_key` argument.
+
+### Performing the download-cache-process sequence
+
+Although the three steps of downloading data, caching it, and processing it can
+be invoked as separate operations, the most common and convenient way to perform
+this sequence is the console script `crmprtd_pipeline`.
+
+The script takes a network argument and a handful of other arguments, formulates
+appropriate command lines for each step, and causes them to be executed.
+
+Here is the help from `crmprtd_pipeline`:
+
+```text
+(crmprtd) rglover@pcic-3002:~/code/crmprtd$ crmprtd_pipeline -h
+usage: crmprtd_pipeline [-h] [--version]
+                        [-D {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,bch,hourly_swobml2,ytnt}]
+                        [--dry_run] -N
+                        {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,bch,hourly_swobml2,ytnt}
+                        [-T TAG] [--log_filename LOG_FILENAME]
+                        [--cache_filename CACHE_FILENAME]
+                        [-c CONNECTION_STRING]
+
+The download-cache-process pipeline. Starts a pipeline of subprocesses
+running, in sequence, (1) script crmprtd_download, (2) an optional cache
+step (tee), and (3) the script crmprtd_process. The third subprocess is
+optional, depending on arguments provided to this command. Arguments to
+each script in the pipeline are provided as appropriate, depending on the
+network(s) and other arguments to this command.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --version             Show version number and exit
+  -D {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,bch,hourly_swobml2,ytnt}, --describe {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,bch,hourly_swobml2,ytnt}
+                        Describe a network name or alias
+  --dry_run             Do a dry run. This prints to stdout all commands
+                        and their arguments (sanitized) that would be run.
+                        The commands are not actually run.
+  -N {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,bch,hourly_swobml2,ytnt}, --network {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,bch,hourly_swobml2,ytnt}
+                        Network identifier (a network name or network
+                        alias) from which to download observations. A
+                        network alias can stand for one or more individual
+                        networks (e.g., 'ytnt' stands for many networks).
+  -T TAG, --tag TAG     Tag for forming default names for log and cache
+                        files
+  --log_filename LOG_FILENAME
+                        Filename for log file. (If omitted, use default
+                        filename generated from network name, tag, and
+                        other parameters.)
+  --cache_filename CACHE_FILENAME
+                        Filename for cache file. (If omitted, use default
+                        filename generated from network name, tag, and
+                        other parameters.)
+  -c CONNECTION_STRING, --connection_string CONNECTION_STRING
+                        Connection string for target database. If absent,
+                        processing step is not performed.
+
+Hints: (1) Use the -D/--describe <name> option to see the network(s)
+designated by <name>, which can be either a single network name or an
+alias, which designates one or more networks (e.g., ytnt). (2) Arguments
+generated for each step of the pipeline depend in a complicated way on the
+network and other arguments provided to this command. Use the --dry_run
+option to print to stdout the command pipeline(s) that would be run using
+the arguments you provide to this command. It is informative, and each line 
+can if you wish be be pasted into a Linux command line and will have the same 
+effect as running this script, except that database passwords are sanitized 
+from the output.
+```
+
+The `--dry_run` option is useful to see what arguments are fed to the scripts
+in the pipeline. Example:
+
+```text
+(crmprtd) rglover@pcic-3002:~/code/crmprtd$ crmprtd_pipeline --dry_run -N ec -F daily -T tag -c DSN
+crmprtd_download -N ec -p bc -F daily -L ~/logging.yaml --log_filename ~/ec/logs/tag_bc_daily_json.log | tee ~/ec/cache/tag_daily_bc_2023-01-19T16:54:04.xml | crmprtd_process -N ec -c DSN -L ~/logging.yaml --log_filename ~/ec/logs/tag_bc_daily_json.log
+crmprtd_download -N ec -p yt -F daily -L ~/logging.yaml --log_filename ~/ec/logs/tag_yt_daily_json.log | tee ~/ec/cache/tag_daily_yt_2023-01-19T16:54:04.xml | crmprtd_process -N ec -c DSN -L ~/logging.yaml --log_filename ~/ec/logs/tag_yt_daily_json.log
+```
+
+A typical use of this script is:
+
+```text
+$ crmprtd_pipeline -N ytnt -T metnorth -c postgresql://user:password@db.uvic.ca/metnorth
+```
 
 ### Downloading data
 
@@ -116,29 +189,6 @@ crmprtd_download -N [network_name] | crmprtd_process -N [network_name]
 crmprtd_download -N [network_name] | tee cache_filename | crmprtd_process -N [network_name]
 ```
 
-### Execution scripts
-
-Most execution scripts receive 2 or more arguments, as follows:
-
-| Script              | Arguments                      |
-|---------------------|--------------------------------|
-| `bch.sh`            | `<tag> <database>`             |
-| `crd.sh`            | `<tag> <database>`             |
-| `ec.sh`             | `<frequency> <tag> <database>` |
-| `hourly_swobml2.sh` | `<tag> <database>`             |
-| `metnorth.sh`       | `<tag> <database>`             |
-| `moti.sh`           | `<tag> <database>`             |
-| `wamr.sh`           | `<tag> <database>`             |
-| `wmb.sh`            | `<tag> <database>`             |
-
-Arguments:
-
-- `<tag>`: A short tag that becomes part of the filepaths for cache and log files.
-  Usually indicates the target database (but is not the database DSN, which
-  is not suitable for forming a filepath). Examples: `crmp`, `metnorth`, `metnorth2`.
-- `<database>`: DSN for target database. Example: `postgresql://crmprtd@db.pcic.uvic.ca:5433/crmp`
-- `<frequency>`: Frequency of observations; used only in EC downloads.
-
 ### Cron usage
 
 Typical usage is to set up a cron job that invokes an execution script at the
@@ -156,16 +206,16 @@ METNORTH_DB=postgresql://crmprtd@dbnorth/metnorth
 METNORTH2_BIN=env_4.0.0/bin
 METNORTH2_DB=postgresql://crmprtd@dbnorth/metnorth2
 
-@hourly                         $CRMP_BIN/hourly_swobml2.sh crmp $CRMP_DB
-@weekly                         $CRMP_BIN/wamr.sh crmp $CRMP_DB
-40 4 * * *                      $CRMP_BIN/wmb.sh crmp $CRMP_DB
-@hourly                         $CRMP_BIN/ec.sh hourly crmp $CRMP_DB
-@daily                          $CRMP_BIN/ec.sh daily crmp $CRMP_DB
-30 * * * *                      $CRMP_BIN/moti.sh crmp $CRMP_DB
-@daily                          $CRMP_BIN/crd.sh crmp $CRMP_DB
-@daily                          $CRMP_BIN/bch.sh crmp $CRMP_DB
-@hourly                         $METNORTH_BIN/ytnt.sh metnorth $METNORTH_DB
-@hourly                         $METNORTH2_BIN/ytnt.sh metnorth2 $METNORTH2_DB
+@hourly                         $CRMP_BIN/crmprtd_pipeline -G hourly_swobml2 -T crmp -c $CRMP_DB
+@weekly                         $CRMP_BIN/crmprtd_pipeline -G wamr -T crmp -c $CRMP_DB
+40 4 * * *                      $CRMP_BIN/crmprtd_pipeline -G wmb -T crmp -c $CRMP_DB
+@hourly                         $CRMP_BIN/crmprtd_pipeline -G ec -F hourly -T crmp -c $CRMP_DB
+@daily                          $CRMP_BIN/crmprtd_pipeline -G ec -F daily -T crmp -c $CRMP_DB
+30 * * * *                      $CRMP_BIN/crmprtd_pipeline -G moti -T crmp -c $CRMP_DB
+@daily                          $CRMP_BIN/crmprtd_pipeline -G crd -T crmp -c $CRMP_DB
+@daily                          $CRMP_BIN/crmprtd_pipeline -G bch -T crmp -c $CRMP_DB
+@hourly                         $METNORTH_BIN/crmprtd_pipeline -G ytnt -T metnorth -c $METNORTH_DB
+@hourly                         $METNORTH2_BIN/crmprtd_pipeline -G ytnt -T metnorth2 -c $METNORTH2_DB
 ```
 
 Notes:
