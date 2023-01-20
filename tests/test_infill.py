@@ -76,6 +76,7 @@ def test_download_and_process_choreography(
         download_args=["--download_args"],
         cache_filename=cache_filename,
         connection_string=connection_string,
+        dry_run=False,
     )
 
     call_args = crmprtd.infill.chain_subprocesses.call_args
@@ -93,7 +94,11 @@ def test_download_and_process_security(mocker, caplog):
     mock_run(mocker)
     with caplog.at_level(logging.DEBUG):
         download_and_process(
-            "moti", [], [], connection_string="postgresql://user:password@db.pcic/somdb"
+            "moti",
+            [],
+            [],
+            connection_string="postgresql://user:password@db.pcic/somdb",
+            dry_run=False,
         )
     for record in caplog.records:
         assert "password" not in record.message
