@@ -9,6 +9,7 @@ pycds.Obs objects. This phase is common to all networks.
 """
 
 import logging
+from types import SimpleNamespace
 
 from sqlalchemy import and_, cast
 from geoalchemy2.functions import (
@@ -40,18 +41,27 @@ for def_ in (
     ureg.define(def_)
 
 
-def cached_function(f):
+def cached_function(attrs):
     """ """
-    cache = {}
 
-    def memoize(sesh, *args, **kwargs):
-        nonlocal cache
-        key = (args) + tuple(kwargs.items())
-        if key not in cache:
-            cache[key] = f(sesh, *args, **kwargs)
-        return cache[key]
+    def wrapper(f):
+        cache = {}
 
-    return memoize
+        def memoize(sesh, *args, **kwargs):
+            nonlocal cache
+            key = (args) + tuple(kwargs.items())
+            if key not in cache:
+                obj = f(sesh, *args, **kwargs)
+                if not obj:
+                    return None
+                cache[key] = SimpleNamespace(
+                    **{attr: getattr(obj, attr) for attr in attrs}
+                )
+            return cache[key]
+
+        return memoize
+
+    return wrapper
 
 
 def histories_within_threshold(sesh, network_name, lon, lat, threshold):
@@ -244,7 +254,7 @@ def create_station_and_history_entry(
     return history
 
 
-@cached_function
+@cached_function(["unit", "id"])
 def get_variable(sesh, network_name, variable_name):
     """
     Find (but not create) a Variable matching the arguments, if possible.
@@ -263,7 +273,7 @@ def get_variable(sesh, network_name, variable_name):
     return variable
 
 
-@cached_function
+@cached_function(["id"])
 def find_or_create_matching_history_and_station(
     sesh, network_name, native_id, lat, lon, diagnostic=False
 ):
@@ -319,10 +329,9 @@ def find_or_create_matching_history_and_station(
         )
 
 
-@cached_function
-def does_network_exist(sesh, network_name):
-    network = sesh.query(Network).filter(Network.name == network_name)
-    return network.count() != 0
+@cached_function(["name"])
+def get_network(sesh, network_name):
+    return sesh.query(Network).filter(Network.name == network_name).first()
 
 
 def has_required_information(row):
@@ -365,7 +374,7 @@ def align(sesh, row, diagnostic=False):
         return None
 
     # Sanity check: specified network exists
-    if not does_network_exist(sesh, row.network_name):
+    if not get_network(sesh, row.network_name):
         log.error(
             "Network does not exist in db",
             extra={"network_name": row.network_name},
@@ -400,15 +409,18 @@ def align(sesh, row, diagnostic=False):
             row.network_name,
         )
         return None
+    else:
+        var_unit = variable.unit
+        var_id = variable.id
 
     # Convert observation value to database units.
-    datum = convert_obs_value_to_db_units(row.val, row.unit, variable.unit)
+    datum = convert_obs_value_to_db_units(row.val, row.unit, var_unit)
     if datum is None:
         log.debug(
             "Unable to confirm data units",
             extra={
                 "unit_obs": row.unit,
-                "unit_db": variable.unit,
+                "unit_db": var_unit,
                 "data": row.val,
                 "network_name": row.network_name,
             },
@@ -419,4 +431,4 @@ def align(sesh, row, diagnostic=False):
     # Note: We are very specifically creating the Obs object here using the ids
     # to avoid SQLAlchemy adding this object to the session as part of its
     # cascading backref behaviour https://goo.gl/Lchhv6
-    return Obs(history_id=history.id, time=row.time, datum=datum, vars_id=variable.id)
+    return Obs(history_id=history.id, time=row.time, datum=datum, vars_id=var_id)

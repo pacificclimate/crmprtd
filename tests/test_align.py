@@ -3,7 +3,7 @@ from datetime import datetime
 from geoalchemy2.functions import ST_X, ST_Y
 
 from crmprtd.align import (
-    does_network_exist,
+    get_network,
     find_or_create_matching_history_and_station,
     get_variable,
     convert_obs_value_to_db_units,
@@ -19,7 +19,7 @@ from pycds import Station, History
     ("network_name", "expected"), [("FLNRO-WMB", True), ("WMB", False)]
 )
 def test_is_network(test_session, network_name, expected):
-    assert does_network_exist(test_session, network_name) == expected
+    assert bool(get_network(test_session, network_name)) == expected
 
 
 def test_get_history_with_no_matches(test_session):

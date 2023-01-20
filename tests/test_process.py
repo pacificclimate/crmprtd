@@ -2,6 +2,7 @@ import re
 import pytz
 import pytest
 import logging
+import importlib
 from datetime import datetime
 from pkg_resources import resource_filename
 
@@ -71,6 +72,10 @@ def num_observations_in_db(session):
 def test_process_by_date(
     start_date, end_date, expected_num_inserts, monkeypatch, caplog, crmp_session
 ):
+    importlib.reload(crmprtd.process)
+    importlib.reload(crmprtd.infer)
+    importlib.reload(crmprtd.align)
+
     # Restrict the logging to just what is important to this test.
     caplog.set_level(logging.WARNING, "sqlalchemy.engine")
     caplog.set_level(logging.DEBUG, "crmprtd")
