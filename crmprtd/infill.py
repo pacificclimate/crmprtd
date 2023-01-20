@@ -107,10 +107,11 @@ def download_and_process(
         )
 
     if dry_run:
-        print(
-            " | ".join([" ".join(command) for command in commands])
-            + (f" > {cache_filename}" if do_cache and not do_process else "")
+        message = " | ".join([" ".join(command) for command in commands]) + (
+            f" > {cache_filename}" if do_cache and not do_process else ""
         )
+        message = re.sub(r"postgresql://(.*?)@", r"postgresql://", message)
+        print(message)
         return
 
     chain_subprocesses(
