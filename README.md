@@ -271,4 +271,4 @@ git commit -m"Bump to version x.x.x"
 git tag -a -m"x.x.x" x.x.x
 git push --follow-tags
 ```
-1. Our Github Actions [workflow](https://github.com/pacificclimate/crmprtd/blob/i71-action-best-practices/.github/workflows/python-ci.yml) will build and release the package
+1. Our GitHub Actions [workflow](https://github.com/pacificclimate/crmprtd/blob/i71-action-best-practices/.github/workflows/python-ci.yml) will build and release the package on our PyPI server.

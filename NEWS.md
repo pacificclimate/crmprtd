@@ -1,5 +1,32 @@
 # News / Release Notes
 
+## 4.1.0
+
+Compatible with database revision 879f0efa125f (PyCDS 4.0.0).
+
+This revision adds two new scripts, `crmp_download` and `crmp_pipeline`, which,
+respectively, dispatch download and download-cache-process operations to the 
+appropriate network-specific methods according to the `-N/--network` argument 
+they both take.
+
+Script `crmp_download` replaces individual invocations of 
+`download -N <network>` scripts and the dynamic console scripts set up in 
+`setup.py` associated with them.
+
+Script `crmp_pipeline` replaces the collection of invocation shell scripts
+that were previously in use.
+
+All other changes are either non-functional or are superseded by later changes
+in this release.
+
+PRs:
+- [Replace execution shell scripts with a Python script](https://github.com/pacificclimate/crmprtd/pull/134)
+- [Fix arg parsing](https://github.com/pacificclimate/crmprtd/pull/133)
+- [Move network-specific code into new module crmprtd.networks](https://github.com/pacificclimate/crmprtd/pull/131)
+- [Replace `download_<network>` scripts with a `download -N <network>` script](https://github.com/pacificclimate/crmprtd/pull/128)
+- [Support multiple target databases](https://github.com/pacificclimate/crmprtd/pull/126)
+- [Bring execution scripts under change control](https://github.com/pacificclimate/crmprtd/pull/124)
+ 
 ## 4.0.0
 
 *16-Dec-2022*

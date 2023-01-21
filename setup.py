@@ -3,7 +3,7 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.command.test import test as TestCommand
 
-__version__ = (4, 0, 0)
+__version__ = (4, 1, 0)
 
 
 # TODO: I believe that adding commands in setup.py is now discouraged. Remove.
