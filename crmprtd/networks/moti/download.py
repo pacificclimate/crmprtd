@@ -17,20 +17,17 @@ that came in late. Gaps can be filled in at any time, so there is
 little risk of missing data.
 """
 
+import logging.config
+import sys
+from argparse import ArgumentParser
+from datetime import datetime, timedelta
 # Standard module
 from typing import List
-import sys
-import logging.config
-from datetime import datetime, timedelta
-from argparse import ArgumentParser
-
 
 # Local
 import crmprtd.download_utils
 from crmprtd import (
-    add_common_auth_arguments,
-    setup_logging,
-    get_version,
+    add_common_auth_arguments, setup_logging, add_version_arg,
 )
 
 log = logging.getLogger(__name__)
@@ -105,6 +102,7 @@ def main(
     desc = globals()["__doc__"]
 
     parser = ArgumentParser(parents=[parent_parser], description=desc)
+    add_version_arg(parser)
     add_common_auth_arguments(parser)
     parser.add_argument(
         "-S",
@@ -137,10 +135,6 @@ def main(
         help="Base URL for the MoTI SAW service",
     )
     args = parser.parse_args(arglist)
-
-    if args.version:
-        print(get_version())
-        return
 
     setup_logging(
         args.log_conf,
