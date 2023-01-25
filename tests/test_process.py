@@ -7,7 +7,9 @@ from pkg_resources import resource_filename
 
 from pycds import Network, Variable, Obs
 from crmprtd.download_utils import verify_date
-from crmprtd.process import process
+
+# from crmprtd.process import process, main
+import crmprtd.process
 
 
 def get_num_obs_to_insert(records):
@@ -99,7 +101,7 @@ def test_process_by_date(
     forestry_data = open(resource_filename("crmprtd", "data/forestry_data.xml"))
     monkeypatch.setattr("sys.stdin", forestry_data)
 
-    process(
+    crmprtd.process.process(
         connection_string=crmp_session.get_bind().url,
         sample_size=50,
         network="bc_forestry",
@@ -115,3 +117,50 @@ def test_process_by_date(
 
     assert num_obs_inserted_in_db == expected_num_inserts
     assert log_num_obs_inserted == expected_num_inserts
+
+
+@pytest.mark.parametrize(
+    "connection_string, sample_size, network, start_date, end_date, infer, diagnostic",
+    [
+        ("DSN", 99, "crd", "2000-01-01", "2000-02-01", False, False),
+    ],
+)
+def test_main(
+    connection_string,
+    sample_size,
+    network,
+    start_date,
+    end_date,
+    infer,
+    diagnostic,
+    mocker,
+):
+    args = []
+    if connection_string is not None:
+        args += f" -c {connection_string}".split()
+    if sample_size is not None:
+        args += f"--sample_size {sample_size}".split()
+    if network is not None:
+        args += f"-N {network}".split()
+    if start_date is not None:
+        args += f"-S {start_date}".split()
+    if end_date is not None:
+        args += f"-E {end_date}".split()
+    if infer:
+        args += f"-I".split()
+    if diagnostic:
+        args += f"-D".split()
+
+    pp = mocker.patch("crmprtd.process.process")
+
+    crmprtd.process.main(args)
+
+    assert pp.called_with(
+        connection_string=connection_string,
+        sample_size=sample_size,
+        network=network,
+        start_date=pytz.utc.localize(verify_date(start_date, datetime.min)),
+        end_date=pytz.utc.localize(verify_date(end_date, datetime.max)),
+        is_diagnostic=diagnostic,
+        do_infer=infer,
+    )
