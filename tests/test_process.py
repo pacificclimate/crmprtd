@@ -122,7 +122,7 @@ def test_process_by_date(
 @pytest.mark.parametrize(
     "connection_string, sample_size, network, start_date, end_date, infer, diagnostic",
     [
-        ("DSN", 99, "crd", "2000-01-01", "2000-02-01", False, False),
+        ("DSN", "99", "crd", "2000-01-01", "2000-02-01", False, False),
     ],
 )
 def test_main(
@@ -137,19 +137,19 @@ def test_main(
 ):
     args = []
     if connection_string is not None:
-        args += f" -c {connection_string}".split()
+        args += ["-c", connection_string]
     if sample_size is not None:
-        args += f"--sample_size {sample_size}".split()
+        args += ["--sample_size", sample_size]
     if network is not None:
-        args += f"-N {network}".split()
+        args += ["-N", network]
     if start_date is not None:
-        args += f"-S {start_date}".split()
+        args += ["-S", start_date]
     if end_date is not None:
-        args += f"-E {end_date}".split()
+        args += ["-E", end_date]
     if infer:
-        args += f"-I".split()
+        args += ["-I"]
     if diagnostic:
-        args += f"-D".split()
+        args += ["-D"]
 
     pp = mocker.patch("crmprtd.process.process")
 
