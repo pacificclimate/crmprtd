@@ -21,13 +21,16 @@ import logging.config
 import sys
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
+
 # Standard module
 from typing import List
 
 # Local
 import crmprtd.download_utils
 from crmprtd import (
-    add_common_auth_arguments, setup_logging, add_version_arg,
+    add_common_auth_arguments,
+    setup_logging,
+    add_version_arg,
 )
 
 log = logging.getLogger(__name__)

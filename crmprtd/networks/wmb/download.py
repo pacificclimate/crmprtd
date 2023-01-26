@@ -23,7 +23,9 @@ from argparse import ArgumentParser
 from crmprtd.download_utils import retry, ftp_connect
 from crmprtd.download_utils import FTPReader, extract_auth
 from crmprtd import (
-    setup_logging, add_common_auth_arguments, add_version_arg,
+    setup_logging,
+    add_common_auth_arguments,
+    add_version_arg,
 )
 
 log = logging.getLogger(__name__)

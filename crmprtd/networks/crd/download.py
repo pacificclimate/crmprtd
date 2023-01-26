@@ -25,7 +25,9 @@ import dateutil.parser
 
 import crmprtd.download_utils
 from crmprtd import (
-    setup_logging, add_common_auth_arguments, add_version_arg,
+    setup_logging,
+    add_common_auth_arguments,
+    add_version_arg,
 )
 
 log = logging.getLogger(__name__)
