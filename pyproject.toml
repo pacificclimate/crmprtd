@@ -23,7 +23,7 @@ crmprtd = [
 name = "crmprtd"
 version = "4.1.0"
 description = "Utility to download Environment Canada MPO-XML and insert it into PCIC's database"
-keywords = "sql database data science climate oceanography meteorology"
+keywords = ["sql", "database", "data", "science", "climate", "oceanography", "meteorology"]
 requires-python = ">=3.8"
 authors=[
     {name = "James Hiebert", email = "hiebert@uvic.ca"},
