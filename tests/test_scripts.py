@@ -1,4 +1,5 @@
 from datetime import datetime
+
 import pytest
 import pytz
 
@@ -8,6 +9,7 @@ from crmprtd.download_utils import verify_date
 
 # Must import the module, not objects from it, so we can mock the objects.
 import crmprtd.process
+import crmprtd.download
 
 
 @pytest.mark.parametrize(
@@ -20,6 +22,7 @@ import crmprtd.process
     ],
 )
 def test_version_option(capsys, name):
+    """Test that CLI scripts accept --version arg and return the expected value."""
     entry_point = crmprtd.pkg_resources.get_entry_map("crmprtd")["console_scripts"][
         name
     ].load()
@@ -27,6 +30,35 @@ def test_version_option(capsys, name):
         entry_point(["--version"])
     captured = capsys.readouterr()
     assert captured.out == f"{get_version()}\n"
+
+
+@pytest.mark.parametrize(
+    "network, other_args",
+    [
+        # Non-SWOB networks
+        ("bc_hydro", "".split()),
+        ("crd", "--username u --password p".split()),
+        ("ec", "-F daily".split()),
+        ("moti", "--username u --password p".split()),
+        ("wamr", "".split()),
+        ("wmb", "--username u --password p".split()),
+        # A SWOB network
+        (crmprtd.SWOB_PARTNERS[0], "".split())
+    ]
+)
+def test_download_main(network, other_args, mocker):
+    """
+    Test that per-network `main`s don't error out when given reasonable args.
+    This test could be more comprehensive ... but more work.
+    """
+    args = ["-N", network] + other_args
+
+    nw = "ec_swob" if network in crmprtd.SWOB_PARTNERS else network
+    pd = mocker.patch(f"crmprtd.networks.{nw}.download.download")
+
+    crmprtd.download.main(args)
+
+    pd.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -45,6 +77,7 @@ def test_process_main(
     diagnostic,
     mocker,
 ):
+    """Test that crmprtd.process.main works with some plausible args."""
     args = []
     if connection_string is not None:
         args += ["-c", connection_string]
