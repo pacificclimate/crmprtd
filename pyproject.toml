@@ -4,9 +4,24 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools.packages.find]
+exclude = ["speed_test"]
+
+[tool.setuptools]
+# By default, include-package-data is true, so this line is optional.
+include-package-data = true
+
+[tool.setuptools.package-data]
+crmprtd = [
+    "data/*.yaml",
+    "data/*.xsl",
+    "tests/data/*",
+    "wamr/station_substitutions.yaml",
+]
+
 [project]
 name = "crmprtd"
-version = "4.0.0"
+version = "4.1.0"
 description = "Utility to download Environment Canada MPO-XML and insert it into PCIC's database"
 keywords = "sql database data science climate oceanography meteorology"
 requires-python = ">=3.8"
@@ -40,6 +55,14 @@ test = [
 ]
 jsonlogger = ["python-json-logger"]
 
+[project.scripts]
+crmprtd_dcp = "crmprtd.download_cache_process:main"
+crmprtd_download = "crmprtd.download:main"
+crmprtd_process = "crmprtd.process:main"
+crmprtd_infill_all = "scripts.infill_all:main"
+# Adding other scripts in scripts/ will require refactoring them slightly so that main()
+# can be invoked without arguments (i.e., put arg parsing in main()).
+
 [project.urls]
 homepage = "http://www.pacificclimate.org/"
-
+repository = "https://github.com/pacificclimate/crmprtd"
