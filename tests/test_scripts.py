@@ -43,8 +43,8 @@ def test_version_option(capsys, name):
         ("wamr", "".split()),
         ("wmb", "--username u --password p".split()),
         # A SWOB network
-        (crmprtd.SWOB_PARTNERS[0], "".split())
-    ]
+        (crmprtd.SWOB_PARTNERS[0], "".split()),
+    ],
 )
 def test_download_main(network, other_args, mocker):
     """
@@ -107,4 +107,3 @@ def test_process_main(
         is_diagnostic=diagnostic,
         do_infer=infer,
     )
-
