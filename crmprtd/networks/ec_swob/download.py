@@ -25,7 +25,7 @@ from lxml import html
 import requests
 
 from crmprtd.download_utils import https_download, verify_date
-from crmprtd import setup_logging, add_version_arg
+from crmprtd import setup_logging
 
 log = logging.getLogger(__name__)
 
@@ -125,7 +125,6 @@ def main(
     desc = globals()["__doc__"]
 
     parser = ArgumentParser(parents=[parent_parser], description=desc)
-    add_version_arg(parser)
     parser.add_argument(
         "-d",
         "--date",

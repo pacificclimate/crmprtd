@@ -23,7 +23,7 @@ from argparse import ArgumentParser
 
 # Local
 from crmprtd.networks.ec import makeurl
-from crmprtd import setup_logging, add_version_arg
+from crmprtd import setup_logging
 from crmprtd.download_utils import https_download, verify_date
 
 log = logging.getLogger(__name__)
@@ -66,7 +66,6 @@ def main(arglist: List[str] = None, parent_parser: ArgumentParser = None) -> Non
     desc = globals()["__doc__"]
 
     parser = ArgumentParser(parents=[parent_parser], description=desc)
-    add_version_arg(parser)
     parser.add_argument("-p", "--province", help="2 letter province code")
     parser.add_argument(
         "-g",

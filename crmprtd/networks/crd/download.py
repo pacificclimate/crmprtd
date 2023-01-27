@@ -27,7 +27,6 @@ import crmprtd.download_utils
 from crmprtd import (
     setup_logging,
     add_common_auth_arguments,
-    add_version_arg,
 )
 
 log = logging.getLogger(__name__)
@@ -80,7 +79,6 @@ def main(
     :param parent_parser: Argument parser common to all network downloads.
     """
     parser = ArgumentParser(parents=[parent_parser], description=globals()["__doc__"])
-    add_version_arg(parser)
     add_common_auth_arguments(parser)
     parser.add_argument(
         "-S",

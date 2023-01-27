@@ -30,7 +30,6 @@ import crmprtd.download_utils
 from crmprtd import (
     add_common_auth_arguments,
     setup_logging,
-    add_version_arg,
 )
 
 log = logging.getLogger(__name__)
@@ -105,7 +104,6 @@ def main(
     desc = globals()["__doc__"]
 
     parser = ArgumentParser(parents=[parent_parser], description=desc)
-    add_version_arg(parser)
     add_common_auth_arguments(parser)
     parser.add_argument(
         "-S",

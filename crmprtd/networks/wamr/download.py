@@ -21,7 +21,7 @@ from argparse import ArgumentParser
 # Local
 from crmprtd.download_utils import retry, ftp_connect
 from crmprtd.download_utils import FTPReader
-from crmprtd import setup_logging, add_version_arg
+from crmprtd import setup_logging
 
 log = logging.getLogger(__name__)
 
@@ -94,7 +94,6 @@ def main(
     desc = globals()["__doc__"]
 
     parser = ArgumentParser(parents=[parent_parser], description=desc)
-    add_version_arg(parser)
     parser.add_argument(
         "-f",
         "--ftp_server",

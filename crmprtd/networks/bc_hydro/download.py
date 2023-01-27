@@ -24,7 +24,7 @@ from contextlib import contextmanager
 from dateutil import relativedelta
 
 from crmprtd.download_utils import verify_date
-from crmprtd import setup_logging, add_version_arg
+from crmprtd import setup_logging
 
 log = logging.getLogger(__name__)
 
@@ -127,7 +127,6 @@ def main(
     start = end - relativedelta.relativedelta(months=1)
 
     parser = ArgumentParser(parents=[parent_parser], description=desc)
-    add_version_arg(parser)
     parser.add_argument(
         "-u", "--username", default="pcic", help="Username for the ftp server "
     )
