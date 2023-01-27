@@ -7,7 +7,9 @@ from pkg_resources import resource_filename
 
 from pycds import Network, Variable, Obs
 from crmprtd.download_utils import verify_date
-from crmprtd.process import process
+
+# Must import the module, not objects from it, so we can mock the objects.
+import crmprtd.process
 
 
 def get_num_obs_to_insert(records):
@@ -99,7 +101,7 @@ def test_process_by_date(
     forestry_data = open(resource_filename("crmprtd", "data/forestry_data.xml"))
     monkeypatch.setattr("sys.stdin", forestry_data)
 
-    process(
+    crmprtd.process.process(
         connection_string=crmp_session.get_bind().url,
         sample_size=50,
         network="bc_forestry",

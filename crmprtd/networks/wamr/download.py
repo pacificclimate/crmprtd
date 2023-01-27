@@ -21,7 +21,7 @@ from argparse import ArgumentParser
 # Local
 from crmprtd.download_utils import retry, ftp_connect
 from crmprtd.download_utils import FTPReader
-from crmprtd import setup_logging, get_version
+from crmprtd import setup_logging
 
 log = logging.getLogger(__name__)
 
@@ -107,10 +107,6 @@ def main(
         help="FTP Directory containing WAMR's data files",
     )
     args = parser.parse_args(arglist)
-
-    if args.version:
-        print(get_version())
-        return
 
     setup_logging(
         args.log_conf,

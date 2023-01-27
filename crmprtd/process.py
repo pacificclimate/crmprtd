@@ -18,7 +18,6 @@ from crmprtd import (
     add_logging_args,
     setup_logging,
     NETWORKS,
-    get_version,
 )
 
 
@@ -192,10 +191,6 @@ def main(args=None):
     setup_logging(
         args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"
     )
-
-    if args.version:
-        print(get_version())
-        return
 
     utc = pytz.utc
 

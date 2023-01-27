@@ -15,11 +15,11 @@ CRD's data has a unique and pseudo-secret client ID. This client id
 can be supplied as the username in the authentication file or via the
 --username paramenter. No password is necessary.
 """
-from typing import List
+import logging
 import sys
 from argparse import ArgumentParser
-import logging
 from datetime import timedelta
+from typing import List
 
 import dateutil.parser
 
@@ -27,7 +27,6 @@ import crmprtd.download_utils
 from crmprtd import (
     setup_logging,
     add_common_auth_arguments,
-    get_version,
 )
 
 log = logging.getLogger(__name__)
@@ -102,10 +101,6 @@ def main(
         ),
     )
     args = parser.parse_args(arglist)
-
-    if args.version:
-        print(get_version())
-        return
 
     setup_logging(
         args.log_conf,

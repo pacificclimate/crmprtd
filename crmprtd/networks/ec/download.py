@@ -23,7 +23,7 @@ from argparse import ArgumentParser
 
 # Local
 from crmprtd.networks.ec import makeurl
-from crmprtd import setup_logging, get_version
+from crmprtd import setup_logging
 from crmprtd.download_utils import https_download, verify_date
 
 log = logging.getLogger(__name__)
@@ -111,10 +111,6 @@ def main(arglist: List[str] = None, parent_parser: ArgumentParser = None) -> Non
         ),
     )
     args = parser.parse_args(arglist)
-
-    if args.version:
-        print(get_version())
-        return
 
     setup_logging(
         args.log_conf,

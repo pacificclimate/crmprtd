@@ -25,7 +25,6 @@ from crmprtd.download_utils import FTPReader, extract_auth
 from crmprtd import (
     setup_logging,
     add_common_auth_arguments,
-    get_version,
 )
 
 log = logging.getLogger(__name__)
@@ -101,10 +100,6 @@ def main(
         help="Filename to open on the Wildfire Management Branch's ftp site",
     )
     args = parser.parse_args(arglist)
-
-    if args.version:
-        print(get_version())
-        return
 
     setup_logging(
         args.log_conf,
