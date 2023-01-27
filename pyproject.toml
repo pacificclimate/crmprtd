@@ -56,7 +56,7 @@ test = [
 jsonlogger = ["python-json-logger"]
 
 [project.scripts]
-crmprtd_dcp = "crmprtd.download_cache_process:main"
+crmprtd_pipeline = "crmprtd.download_cache_process:main"
 crmprtd_download = "crmprtd.download:main"
 crmprtd_process = "crmprtd.process:main"
 crmprtd_infill_all = "scripts.infill_all:main"
