@@ -37,10 +37,13 @@ pip install -i https://pypi.pacificclimate.org/simple crmprtd[jsonlogger]
 
 For development, clone the repo and install it using Pipenv from your 
 local source tree. This is similar to how the Python CI environment is set up.
+Note: You must have a `pip>=21.3` installed to install a pyproject.toml 
+project as editable (`-e` option). Hence the upgrade of pip below. 
 
 ```bash
 git clone git@github.com:pacificclimate/crmprtd
 pipenv install --dev .
+pipenv run pip install -U pip
 pipenv run pip install -e .
 ```
 
