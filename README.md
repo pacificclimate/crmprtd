@@ -23,6 +23,13 @@ a guide for installation in a general way.
 
 ## Installation
 
+### pyproject.toml
+
+Note: This project's metadata is stored in the file 
+[`pyproject.toml`](https://peps.python.org/pep-0621/#abstract).
+Packaging and installation tools consume this file. 
+There is no `setup.py`.
+
 ### Installation for production
 
 For production usage, install the latest tagged release from PCIC's PyPI server.
@@ -265,11 +272,11 @@ pre-commit install
 
 ## Releasing
 
-1. Increment `__version__` in `setup.py`
+1. Increment `project.version` in `pyproject.toml`
 1. Summarize release changes in `NEWS.md`
 1. Commit these changes, then tag the release
 ```bash
-git add setup.py NEWS.md
+git add pyproject.toml NEWS.md
 git commit -m"Bump to version x.x.x"
 git tag -a -m"x.x.x" x.x.x
 git push --follow-tags
