@@ -21,8 +21,7 @@ crmprtd = [
 
 [project]
 name = "crmprtd"
-# Alphabetic suffixes for testing build and publish actions only.
-version = "4.1.0a"
+version = "4.1.0"
 description = "Utility to download near real time weather data and insert it into PCIC's database"
 keywords = ["sql", "database", "data", "science", "climate", "oceanography", "meteorology"]
 requires-python = ">=3.8"
