@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-    "setuptools >= 40.9.0",
+    "setuptools >= 40.9.0", "wheel"
 ]
 build-backend = "setuptools.build_meta"
 
@@ -21,7 +21,8 @@ crmprtd = [
 
 [project]
 name = "crmprtd"
-version = "4.1.0"
+# Alphabetic suffixes for testing build and publish actions only.
+version = "4.1.0a"
 description = "Utility to download near real time weather data and insert it into PCIC's database"
 keywords = ["sql", "database", "data", "science", "climate", "oceanography", "meteorology"]
 requires-python = ">=3.8"
