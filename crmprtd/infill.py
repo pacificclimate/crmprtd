@@ -28,7 +28,7 @@ def chain_subprocesses(
     :param commands: List of commands to be run in a subprocess and changed. A command
         itself is a list of strings, and is the main argument for subprocess.run.
     :param run_kwargs: Passed through to subprocesses.run. If None, the default value
-        {"shell": True} is used.
+        {"shell": True, "check": True} is used.
     :param final_destination: Optional text file object to which the output of the
         last process can be directed.
     :return: None.
@@ -36,7 +36,7 @@ def chain_subprocesses(
     Side effects: Run the commands.
     """
     if run_kwargs is None:
-        run_kwargs = {"shell": True}
+        run_kwargs = {"shell": True, "check": True}
     shell = run_kwargs.get("shell", False)
     proc = None
     for i, command in enumerate(commands):
