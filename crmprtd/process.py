@@ -103,9 +103,10 @@ def process(
 
     if network is None:
         log.error(
-            "No module name given, cannot continue pipeline", extra={"network": network}
+            "No network name given, cannot continue pipeline",
+            extra={"network": network},
         )
-        raise Exception("No module name given")
+        raise ValueError("No network name given")
 
     # Get the normalizer for the specified network.
     download_stream = sys.stdin.buffer
