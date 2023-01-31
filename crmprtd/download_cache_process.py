@@ -161,6 +161,8 @@ def download_args(
     net_args = None
 
     # Set net_args per network.
+    if network_name == "_test":
+        net_args = []
     if network_name == "bc_hydro":
         net_args = "-f sftp2.bchydro.com -F pcic -S ~/.ssh/id_rsa".split()
     if network_name == "crd":
@@ -215,7 +217,16 @@ def dispatch_network(
     network_name = kwargs["network_name"]
     check_network_name(network_name)
 
-    if network_name == "ec":
+    if network_name == "_test":
+        download_and_process(
+            network_name=network_name,
+            log_args=log_args(**kwargs),
+            download_args=download_args(**kwargs),
+            cache_filename=the_cache_filename(cache_filename=cache_filename, **kwargs),
+            connection_string=connection_string,
+            dry_run=dry_run,
+        )
+    elif network_name == "ec":
         for province in ("BC", "YT"):
             download_and_process(
                 network_name=network_name,
