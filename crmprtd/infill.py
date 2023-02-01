@@ -11,6 +11,8 @@ from pycds import Station, Network
 from dateutil.tz import tzlocal
 import pytz
 
+from crmprtd import expand_path
+
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +128,9 @@ def download_and_process(
     chain_subprocesses(
         commands,
         final_destination=(
-            open(cache_filename, "w") if do_cache and not do_process else None
+            open(expand_path(cache_filename), "w")
+            if do_cache and not do_process
+            else None
         ),
     )
 
