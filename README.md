@@ -286,20 +286,20 @@ pre-commit install
 1. Our GitHub Actions [workflow](https://github.com/pacificclimate/crmprtd/blob/i71-action-best-practices/.github/workflows/python-ci.yml) will build and release the package on our PyPI server.
 
 
-## Creating a test release
+## Creating a dev/test release
 
 The process is very similar to a production release, but uses a different
 version number convention, and omits any notice in NEWS.md.
 
 1. Modify `project.version` in `pyproject.toml` with a suffix in the pattern
-   `-test-NNN`, where NNN is any number of numeric digits (e.g., `1.2.3-test-11`).
+   `.devN`, where N is any number of numeric digits (e.g., `1.2.3.dev11`).
    Our convention is to reserve those for test releases
-   (e.g., `1.2.3` is a release build, `1.2.3-test-11` is a test build).
+   (e.g., `1.2.3` is a release build, `1.2.3.dev11` is a test build). 
 2. Commit changes and tag the release:
    ```bash
    git add pyproject.toml
-   git commit -m"Test version x.x.x-test-x"
-   git tag -a -m"x.x.x-test-x" x.x.x-test-x
+   git commit -m"Test version X.Y.Z.devN"
+   git tag -a -m"X.Y.Z.devN" X.Y.Z.devN
    git push --follow-tags
    ```
 1. Our GitHub Actions [workflow](https://github.com/pacificclimate/crmprtd/blob/i71-action-best-practices/.github/workflows/python-ci.yml) will build and release the package on our PyPI server.
