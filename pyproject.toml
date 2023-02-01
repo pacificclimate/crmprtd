@@ -44,7 +44,7 @@ name = "crmprtd"
 version = "4.1.0.dev3"
 description = "Utility to download near real time weather data and insert it into PCIC's database"
 keywords = ["sql", "database", "data", "science", "climate", "oceanography", "meteorology"]
-requires-python = ">=3.8"
+requires-python = ">=3.6"
 authors=[
     {name = "James Hiebert", email = "hiebert@uvic.ca"},
     {name = "Rod Glover", email = "rglover@uvic.ca"},
