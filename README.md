@@ -34,6 +34,28 @@ There is no `setup.py`.
 
 For production usage, install the latest tagged release from PCIC's PyPI server.
 
+It is best practice to install in a virtual environment. Python version >= 3.8
+is now required in the environment in which this package is installed.
+
+Some of our servers do not by default provide Python >= 3.8. If the server
+includes the module facility (which `crmprtd.pcic` fortunately does), then
+you can obtain a suitable Python environment by loading the appropriate module.
+For example:
+
+```bash
+module load python/3.8.6
+```
+
+Create the virtual environment:
+
+```bash
+python3 -m venv venv
+. venv/bin/activate
+pip install -U pip  # Essential on current crmprtd server
+```
+
+Then install (with virtual environment still activated):
+
 ```bash
 pip install -i https://pypi.pacificclimate.org/simple crmprtd
 # or with JSON logging functionality
@@ -202,37 +224,49 @@ crmprtd_download -N [network_name] | tee cache_filename | crmprtd_process -N [ne
 ### Cron usage
 
 Typical usage is to set up a cron job that invokes an execution script at the
-appropriate times. An example partial crontab using the above scripts is:
+appropriate times. Below is an example _partial_ crontab using the above 
+scripts. Notes:
+
+- This crontab portion is taken from actual usage at the time of writing.
+- This is only _part_ of the complete crontab. It omits some legacy job lines
+  that will be replaced in future updates.
+- It demonstrates its use targeting some test/transitional databases.
+- The pattern below -- using variables defined in the crontab, to factor out
+  repeated elements -- is recommended.
+- Different database targets use different tags to
+  distinguish the cache and log files produced for each target.
 
 ```text
-SHELL=/bin/bash
+CRMP2_PATH=~/env_4.2.0/bin:~/bin:/usr/local/bin:/usr/bin:/bin
+CRMP2_DB=postgresql://crmprtd@dbtest01.pcic.uvic.ca:5433/crmp2
+CRMP2_TAG=crmp2
 
-CRMP_BIN=env_3.5.1/bin
-CRMP_DB=postgresql://crmprtd@db.pcic.uvic.ca:5433/crmp
+METNORTH2_PATH=~/env_4.2.0/bin:~/bin:/usr/local/bin:/usr/bin:/bin
+METNORTH2_DB=postgresql://crmprtd@metnorth.pcic.uvic.ca:5433/metnorth2
+METNORTH2_TAG=metnorth2
 
-METNORTH_BIN=env_3.5.1/bin
-METNORTH_DB=postgresql://crmprtd@dbnorth/metnorth
+# CRMP2
 
-METNORTH2_BIN=env_4.0.0/bin
-METNORTH2_DB=postgresql://crmprtd@dbnorth/metnorth2
+@hourly                         echo "PATH=$CRMP2_PATH crmprtd_pipeline -T $CRMP2_TAG -N hourly_swobml2 -c $CRMP2_DB" | batch
+@weekly                         echo "PATH=$CRMP2_PATH crmprtd_pipeline -T $CRMP2_TAG -N wamr -c $CRMP2_DB" | batch
+40 4 * * *                      echo "PATH=$CRMP2_PATH crmprtd_pipeline -T $CRMP2_TAG -N wmb -c $CRMP2_DB" | batch
+@hourly                         echo "PATH=$CRMP2_PATH crmprtd_pipeline -T $CRMP2_TAG -N ec -F hourly -c $CRMP2_DB" | batch
+@daily                          echo "PATH=$CRMP2_PATH crmprtd_pipeline -T $CRMP2_TAG -N ec -F daily -c $CRMP2_DB" | batch
+30 * * * *                      echo "PATH=$CRMP2_PATH crmprtd_pipeline -T $CRMP2_TAG -N moti -c $CRMP2_DB" | batch
+@daily                          echo "PATH=$CRMP2_PATH crmprtd_pipeline -T $CRMP2_TAG -N crd -c $CRMP2_DB" | batch
+@daily                          echo "PATH=$CRMP2_PATH crmprtd_pipeline -T $CRMP2_TAG -N bch -c $CRMP2_DB" | batch
+0 7 1,15,28,29,30,31 * *        echo "bash /home/crmprtd/code/crmp_fanslow/read_NRT_ASP_snow_pillow_data_by_variable.sh" | batch
+30 2 27-31,1-4 * *              echo "bash /home/crmprtd/code/crmp_fanslow/ec_csv_runner.sh" | batch 
+@daily                          echo "psql -h db.pcic.uvic.ca -U crmprtd -d crmp2 -p 5433 -f ~/bin/update_matviews_lazy.sql" | batch
+@monthly                        echo "PATH=$CRMP2_PATH manage-views.py -d $CRMP2_DB refresh all" | batch
 
-@hourly                         $CRMP_BIN/crmprtd_pipeline -G hourly_swobml2 -T crmp -c $CRMP_DB
-@weekly                         $CRMP_BIN/crmprtd_pipeline -G wamr -T crmp -c $CRMP_DB
-40 4 * * *                      $CRMP_BIN/crmprtd_pipeline -G wmb -T crmp -c $CRMP_DB
-@hourly                         $CRMP_BIN/crmprtd_pipeline -G ec -F hourly -T crmp -c $CRMP_DB
-@daily                          $CRMP_BIN/crmprtd_pipeline -G ec -F daily -T crmp -c $CRMP_DB
-30 * * * *                      $CRMP_BIN/crmprtd_pipeline -G moti -T crmp -c $CRMP_DB
-@daily                          $CRMP_BIN/crmprtd_pipeline -G crd -T crmp -c $CRMP_DB
-@daily                          $CRMP_BIN/crmprtd_pipeline -G bch -T crmp -c $CRMP_DB
-@hourly                         $METNORTH_BIN/crmprtd_pipeline -G ytnt -T metnorth -c $METNORTH_DB
-@hourly                         $METNORTH2_BIN/crmprtd_pipeline -G ytnt -T metnorth2 -c $METNORTH2_DB
+# Metnorth2
+
+@hourly                         echo "PATH=$METNORTH2_PATH crmprtd_pipeline -T $METNORTH2_TAG -N ytnt -c $METNORTH2_DB" | batch
+# I think we need at least the following also. Can we omit the other 2 fanslow scripts as I have done?
+@daily                          echo "psql -h dbnorth.pcic.uvic.ca -U crmprtd -d metnorth2 -p 5433 -f ~/bin/update_matviews_lazy.sql" | batch
+@monthly                        echo "PATH=$METNORTH2_PATH manage-views.py -d $METNORTH2_DB refresh all" | batch
 ```
-
-Notes:
-- Variables defined inside the crontab are used to shorten the script invocations
-  and to simpify maintenance.
-- The Metnorth processing targets different databases with different tags to
-  distinguish the cache and log files produced by each job.
 
 ### Logging
 
@@ -279,8 +313,8 @@ pre-commit install
 1. Commit these changes, then tag the release
    ```bash
    git add pyproject.toml NEWS.md
-   git commit -m"Bump to version x.x.x"
-   git tag -a -m"x.x.x" x.x.x
+   git commit -m"Bump to version X.Y.Z"
+   git tag -a -m"X.Y.Z" X.Y.Z
    git push --follow-tags
    ```
 1. Our GitHub Actions [workflow](https://github.com/pacificclimate/crmprtd/blob/i71-action-best-practices/.github/workflows/python-ci.yml) will build and release the package on our PyPI server.
@@ -298,7 +332,7 @@ version number convention, and omits any notice in NEWS.md.
 2. Commit changes and tag the release:
    ```bash
    git add pyproject.toml
-   git commit -m"Test version X.Y.Z.devN"
+   git commit -m"Create test version X.Y.Z.devN"
    git tag -a -m"X.Y.Z.devN" X.Y.Z.devN
    git push --follow-tags
    ```
