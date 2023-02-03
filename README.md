@@ -306,9 +306,10 @@ pre-commit install
 
 ## Creating a production release
 
-1. Increment `project.version` in `pyproject.toml`. First remove any suffix
+1. Modify `project.version` in `pyproject.toml`: First remove any suffix
    to the version number, as our convention is to reserve those for test builds
-   (e.g., `1.2.3` is a release build, `1.2.3-test-7` is a test build).
+   (e.g., `1.2.3` is a release build, `1.2.3.dev7` is a test build).
+   Then increment the release build version.
 1. Summarize release changes in `NEWS.md`
 1. Commit these changes, then tag the release
    ```bash
@@ -325,8 +326,8 @@ pre-commit install
 The process is very similar to a production release, but uses a different
 version number convention, and omits any notice in NEWS.md.
 
-1. Modify `project.version` in `pyproject.toml` with a suffix in the pattern
-   `.devN`, where N is any number of numeric digits (e.g., `1.2.3.dev11`).
+1. Modify `project.version` in `pyproject.toml`: Add or increment the suffix 
+   in the pattern `.devN`, where N is any number of numeric digits (e.g., `1.2.3.dev11`).
    Our convention is to reserve those for test releases
    (e.g., `1.2.3` is a release build, `1.2.3.dev11` is a test build). 
 2. Commit changes and tag the release:
