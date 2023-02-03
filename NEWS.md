@@ -1,6 +1,22 @@
 # News / Release Notes
 
+## 4.2.0
+
+_2023-Feb-02_
+
+Compatible with database revision 879f0efa125f (PyCDS 4.0.0).
+
+This version has been tested in the field targeting the Metnorth2 database.
+
+PRs:
+
+- [Fix problems for actual use #142](https://github.com/pacificclimate/crmprtd/pull/142)
+- [Convert to pyproject.toml #140](https://github.com/pacificclimate/crmprtd/pull/140)
+- [Fix version arg bug #138](https://github.com/pacificclimate/crmprtd/pull/138)
+
 ## 4.1.0
+
+_2023-Jan-20_
 
 Compatible with database revision 879f0efa125f (PyCDS 4.0.0).
 
