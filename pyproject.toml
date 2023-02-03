@@ -4,24 +4,9 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-exclude = ["speed_test"]
-
-[tool.setuptools]
-# By default, include-package-data is true, so this line is optional.
-include-package-data = true
-
-[tool.setuptools.package-data]
-crmprtd = [
-    "data/*.yaml",
-    "data/*.xsl",
-    "tests/data/*",
-    "wamr/station_substitutions.yaml",
-]
-
 [project]
 name = "crmprtd"
-version = "4.1.0"
+version = "4.1.0.dev6"
 description = "Utility to download near real time weather data and insert it into PCIC's database"
 keywords = ["sql", "database", "data", "science", "climate", "oceanography", "meteorology"]
 requires-python = ">=3.8"
@@ -60,9 +45,45 @@ crmprtd_pipeline = "crmprtd.download_cache_process:main"
 crmprtd_download = "crmprtd.download:main"
 crmprtd_process = "crmprtd.process:main"
 crmprtd_infill_all = "scripts.infill_all:main"
-# Adding other scripts in scripts/ will require refactoring them slightly so that main()
-# can be invoked without arguments (i.e., put arg parsing in main()).
+# Adding the other scripts in scripts/ will require refactoring them slightly so
+# that main() can be invoked without arguments (i.e., put arg parsing in main()).
+# As a temporary expedient, they have been added to script-files in [tools.setuptools].
 
 [project.urls]
 homepage = "http://www.pacificclimate.org/"
 repository = "https://github.com/pacificclimate/crmprtd"
+
+[tool.setuptools.packages.find]
+exclude = ["speed_test"]
+
+[tool.setuptools]
+# By default, include-package-data is true, so this line is optional.
+include-package-data = true
+# The following files are copied into the installation bin/ directory.
+# Warning: script-files is deprecated. For more info see
+# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html#setuptools-specific-configuration
+script-files = [
+    # Python scripts. It would be better to put them in [project.scripts] as noted below.
+    "scripts/ec_recovery_helper.py",
+    "scripts/ec_recovery.py",
+    "scripts/infill_all.py",
+    "scripts/load_wamr_stns.py",
+    "scripts/moti_infill_download.py",
+    "scripts/moti_infill_insert.py",
+    "scripts/moti_insert_files.py",
+
+    # Execution scripts. Some of these may no longer be useful.
+    # These can't go in [project.scripts]
+    "crmprtd/execution/crmprtd_inserts.sh",
+    "crmprtd/execution/hourly_swobml2.sh",
+    "crmprtd/execution/update_matviews_lazy.sql",
+    "crmprtd/execution/wamr_backpatch_20201118.sh"
+]
+
+[tool.setuptools.package-data]
+crmprtd = [
+    "data/*.yaml",
+    "data/*.xsl",
+    "tests/data/*",
+    "wamr/station_substitutions.yaml",
+]

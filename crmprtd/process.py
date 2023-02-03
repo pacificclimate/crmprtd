@@ -1,3 +1,4 @@
+import os
 import sys
 import pytz
 from importlib import import_module
@@ -19,6 +20,8 @@ from crmprtd import (
     setup_logging,
     NETWORKS,
 )
+
+log = logging.getLogger(__name__)
 
 
 def add_process_args(parser):  # pragma: no cover
@@ -93,13 +96,17 @@ def process(
     3. "Align" the input observations, and remove those not in the specified time range.
     4. Insert the resulting observations.
     """
-    log = logging.getLogger("crmprtd")
+    if network == "_test":
+        log.info(f"PATH={os.environ['PATH']}")
+        log.info(f"Network {network}: No-op")
+        return
 
     if network is None:
         log.error(
-            "No module name given, cannot continue pipeline", extra={"network": network}
+            "No network name given, cannot continue pipeline",
+            extra={"network": network},
         )
-        raise Exception("No module name given")
+        raise ValueError("No network name given")
 
     # Get the normalizer for the specified network.
     download_stream = sys.stdin.buffer

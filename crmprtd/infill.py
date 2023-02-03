@@ -11,12 +11,16 @@ from pycds import Station, Network
 from dateutil.tz import tzlocal
 import pytz
 
+from crmprtd import expand_path
+
 
 logger = logging.getLogger(__name__)
 
 
 def chain_subprocesses(
-    commands: List[List[str]], final_destination: Optional[TextIO] = None
+    commands: List[List[str]],
+    run_kwargs=None,
+    final_destination: Optional[TextIO] = None,
 ) -> None:
     """
     Chain a series of commands by starting a subprocess for each and piping the output
@@ -25,16 +29,23 @@ def chain_subprocesses(
 
     :param commands: List of commands to be run in a subprocess and changed. A command
         itself is a list of strings, and is the main argument for subprocess.run.
+    :param run_kwargs: Passed through to subprocesses.run. If None, the default value
+        {"shell": True, "check": True} is used.
     :param final_destination: Optional text file object to which the output of the
         last process can be directed.
     :return: None.
 
     Side effects: Run the commands.
     """
+    if run_kwargs is None:
+        run_kwargs = {"shell": True, "check": True}
+    shell = run_kwargs.get("shell", False)
     proc = None
     for i, command in enumerate(commands):
         proc = run(
-            command,
+            # Command must be a single string if shell is True
+            " ".join(command) if shell else command,
+            **run_kwargs,
             input=(proc and proc.stdout),
             stdout=PIPE if i < len(commands) - 1 else final_destination,
         )
@@ -117,7 +128,9 @@ def download_and_process(
     chain_subprocesses(
         commands,
         final_destination=(
-            open(cache_filename, "w") if do_cache and not do_process else None
+            open(expand_path(cache_filename), "w")
+            if do_cache and not do_process
+            else None
         ),
     )
 

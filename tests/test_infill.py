@@ -43,9 +43,11 @@ def test_chain_subprocesses(commands, final_destination, mocker):
     chain_subprocesses(commands, final_destination)
     expected_calls = [
         call(
-            cmd,
+            " ".join(cmd),
             stdout=PIPE if i != len(commands) - 1 else final_destination,
             input=None if i == 0 else return_value.stdout,
+            shell=True,
+            check=True,
         )
         for i, cmd in enumerate(commands)
     ]

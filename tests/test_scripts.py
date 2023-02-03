@@ -139,7 +139,7 @@ def assert_match_args(*args):
                     r"crmprtd_download -N bc_hydro",
                 ],
             ],
-            r"~/bc_hydro/cache/tag_bc_hydro_.*\.txt",
+            r".*/bc_hydro/cache/tag_bc_hydro_.*\.txt",
         ),
         *(
             (

@@ -50,6 +50,8 @@ speed and reliability. This phase is common to all networks.
 
 import logging
 import logging.config
+import os.path
+
 import pkg_resources
 from pkg_resources import resource_stream
 from collections import namedtuple
@@ -70,7 +72,7 @@ SWOB_PARTNERS = (
     "dfo_ccg_lighthouse",
 )
 
-NETWORKS = SWOB_PARTNERS + ("bc_hydro", "crd", "ec", "moti", "wamr", "wmb")
+NETWORKS = SWOB_PARTNERS + ("bc_hydro", "crd", "ec", "moti", "wamr", "wmb", "_test")
 
 Row = namedtuple(
     "Row",
@@ -79,7 +81,7 @@ Row = namedtuple(
 
 
 # This method for --version avoids an error in testing that is provoked by using the
-# action='version' method as used in add_version_arg. Reason for error unknown.
+# action='version' method. Reason for error unknown.
 def add_version_arg(parser):
     parser.add_argument(
         "--version",
@@ -199,11 +201,15 @@ def add_common_auth_arguments(parser):  # pragma: no cover
     return parser
 
 
+def expand_path(path):
+    return os.path.expanduser(os.path.expandvars(path))
+
+
 def setup_logging(log_conf, log_filename, error_email, log_level, name):
     import yaml
 
     if log_conf:
-        with open(log_conf, "rb") as f:
+        with open(expand_path(log_conf), "rb") as f:
             base_config = yaml.safe_load(f)
     else:
         with resource_stream("crmprtd", "data/logging.yaml") as f:
