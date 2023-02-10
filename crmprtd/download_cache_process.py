@@ -64,9 +64,12 @@ def default_log_filename(
     """
     check_network_name(network_name)
     filepath = f"~/{network_name}/logs"
+    tag_prefix = f"{tag}_" if tag is not None else ""
     if network_name in ("ec",):
-        return f"{filepath}/{tag}_{province.lower()}_{frequency}_json.log"
-    return f"{filepath}/{tag}_{network_name}_json.log"
+        assert frequency is not None
+        assert province is not None
+        return f"{filepath}/{tag_prefix}{province.lower()}_{frequency}_json.log"
+    return f"{filepath}/{tag_prefix}{network_name}_json.log"
 
 
 def the_log_filename(log_filename: str = None, **kwargs):
@@ -98,8 +101,11 @@ def default_cache_filename(
     check_network_name(network_name)
     ts = timestamp.strftime(timestamp_format)
     filepath = f"~/{network_name}/cache"
+    tag_prefix = f"{tag}_" if tag is not None else ""
     if network_name in ("ec",):
-        return f"{filepath}/{tag}_{frequency}_{province.lower()}_{ts}.xml"
+        assert frequency is not None
+        assert province is not None
+        return f"{filepath}/{tag_prefix}{frequency}_{province.lower()}_{ts}.xml"
     if network_name in (
         "bc_env_snow",
         "bc_forestry",
@@ -112,8 +118,8 @@ def default_cache_filename(
         "yt_avalanche",
         "yt_firewx",
     ):
-        return f"{filepath}/{tag}_{network_name}_{ts}.xml"
-    return f"{filepath}/{tag}_{network_name}_{ts}.txt"
+        return f"{filepath}/{tag_prefix}{network_name}_{ts}.xml"
+    return f"{filepath}/{tag_prefix}{network_name}_{ts}.txt"
 
 
 def the_cache_filename(cache_filename: str = None, **kwargs) -> str:

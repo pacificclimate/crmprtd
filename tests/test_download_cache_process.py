@@ -10,25 +10,39 @@ from crmprtd.download_cache_process import (
 
 
 @pytest.mark.parametrize(
-    "network_name, frequency, province, expected",
+    "network_name, tag, frequency, province, expected",
     [
         # A representative sample, copied from all present execution scripts.
         # Some changes due to simplification of filename pattern.
-        ("bc_hydro", None, None, "~/bc_hydro/logs/tag_bc_hydro_json.log"),
-        ("crd", None, None, "~/crd/logs/tag_crd_json.log"),
-        ("ec", "freq", "PR", "~/ec/logs/tag_pr_freq_json.log"),
-        ("bc_env_snow", None, None, "~/bc_env_snow/logs/tag_bc_env_snow_json.log"),
-        ("moti", None, None, "~/moti/logs/tag_moti_json.log"),
-        ("wamr", None, None, "~/wamr/logs/tag_wamr_json.log"),
-        ("wmb", None, None, "~/wmb/logs/tag_wmb_json.log"),
-        ("nt_forestry", None, None, "~/nt_forestry/logs/tag_nt_forestry_json.log"),
+        ("bc_hydro", "tag", None, None, "~/bc_hydro/logs/tag_bc_hydro_json.log"),
+        ("crd", "tag", None, None, "~/crd/logs/tag_crd_json.log"),
+        ("ec", "tag", "freq", "PR", "~/ec/logs/tag_pr_freq_json.log"),
+        (
+            "bc_env_snow",
+            "tag",
+            None,
+            None,
+            "~/bc_env_snow/logs/tag_bc_env_snow_json.log",
+        ),
+        ("moti", "tag", None, None, "~/moti/logs/tag_moti_json.log"),
+        ("wamr", "tag", None, None, "~/wamr/logs/tag_wamr_json.log"),
+        ("wmb", "tag", None, None, "~/wmb/logs/tag_wmb_json.log"),
+        (
+            "nt_forestry",
+            "tag",
+            None,
+            None,
+            "~/nt_forestry/logs/tag_nt_forestry_json.log",
+        ),
+        # And one with no tag
+        ("nt_forestry", None, None, None, "~/nt_forestry/logs/nt_forestry_json.log"),
     ],
 )
-def test_default_log_filename(network_name, frequency, province, expected):
+def test_default_log_filename(network_name, tag, frequency, province, expected):
     assert (
         default_log_filename(
             network_name=network_name,
-            tag="tag",
+            tag=tag,
             frequency=frequency,
             province=province,
         )
@@ -37,41 +51,51 @@ def test_default_log_filename(network_name, frequency, province, expected):
 
 
 @pytest.mark.parametrize(
-    "network_name, frequency, province, expected",
+    "network_name, tag, frequency, province, expected",
     [
         # A representative sample, copied from all present execution scripts.
         # Some changes due to simplification of filename pattern.
         (
             "bc_hydro",
+            "tag",
             None,
             None,
             "~/bc_hydro/cache/tag_bc_hydro_2020-01-02T03:04:05.txt",
         ),
-        ("crd", None, None, "~/crd/cache/tag_crd_2020-01-02T03:04:05.txt"),
-        ("ec", "freq", "PR", "~/ec/cache/tag_freq_pr_2020-01-02T03:04:05.xml"),
+        ("crd", "tag", None, None, "~/crd/cache/tag_crd_2020-01-02T03:04:05.txt"),
+        ("ec", "tag", "freq", "PR", "~/ec/cache/tag_freq_pr_2020-01-02T03:04:05.xml"),
         (
             "bc_env_snow",
+            "tag",
             None,
             None,
             "~/bc_env_snow/cache/tag_bc_env_snow_2020-01-02T03:04:05.xml",
         ),
-        ("moti", None, None, "~/moti/cache/tag_moti_2020-01-02T03:04:05.txt"),
-        ("wamr", None, None, "~/wamr/cache/tag_wamr_2020-01-02T03:04:05.txt"),
-        ("wmb", None, None, "~/wmb/cache/tag_wmb_2020-01-02T03:04:05.txt"),
+        ("moti", "tag", None, None, "~/moti/cache/tag_moti_2020-01-02T03:04:05.txt"),
+        ("wamr", "tag", None, None, "~/wamr/cache/tag_wamr_2020-01-02T03:04:05.txt"),
+        ("wmb", "tag", None, None, "~/wmb/cache/tag_wmb_2020-01-02T03:04:05.txt"),
         (
             "nt_forestry",
+            "tag",
             None,
             None,
             "~/nt_forestry/cache/tag_nt_forestry_2020-01-02T03:04:05.xml",
         ),
+        (
+            "nt_forestry",
+            None,
+            None,
+            None,
+            "~/nt_forestry/cache/nt_forestry_2020-01-02T03:04:05.xml",
+        ),
     ],
 )
-def test_default_cache_filename(network_name, frequency, province, expected):
+def test_default_cache_filename(network_name, tag, frequency, province, expected):
     assert (
         default_cache_filename(
             timestamp=datetime.datetime(2020, 1, 2, 3, 4, 5),
             network_name=network_name,
-            tag="tag",
+            tag=tag,
             frequency=frequency,
             province=province,
         )
