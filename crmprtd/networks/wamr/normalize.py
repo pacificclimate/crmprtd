@@ -65,6 +65,7 @@ def normalize(file_stream):
             val = get_one_of((rep_val, raw_val))
         except ValueError:
             # skip over empty values
+            log.warning("Unable to get value from row", extra={"row": row})
             continue
 
         try:
