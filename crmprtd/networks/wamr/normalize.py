@@ -123,7 +123,6 @@ def normalize(file_stream):
             station_id = reported_station_id
             network_name = "ENV-AQN"
 
-        log.info("Yielding row")
         yield Row(
             time=dt,
             val=value,
