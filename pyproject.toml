@@ -85,5 +85,5 @@ crmprtd = [
     "data/*.yaml",
     "data/*.xsl",
     "tests/data/*",
-    "wamr/station_substitutions.yaml",
+    "networks/wamr/station_substitutions.yaml",
 ]
