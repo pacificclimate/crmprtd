@@ -1,5 +1,16 @@
 # News / Release Notes
 
+## 4.2.1
+
+_2023-Feb-24_
+
+Compatible with database revision 879f0efa125f (PyCDS 4.0.0).
+
+This version has been tested in the field targeting the CRMP2 database.
+
+PRs:
+- [Fix WAMR normalization](https://github.com/pacificclimate/crmprtd/pull/150)
+
 ## 4.2.0
 
 _2023-Feb-02_
