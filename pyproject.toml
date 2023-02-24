@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "crmprtd"
-version = "4.2.0"
+version = "4.2.0.dev3"
 description = "Utility to download near real time weather data and insert it into PCIC's database"
 keywords = ["sql", "database", "data", "science", "climate", "oceanography", "meteorology"]
 requires-python = ">=3.8"
@@ -85,5 +85,5 @@ crmprtd = [
     "data/*.yaml",
     "data/*.xsl",
     "tests/data/*",
-    "wamr/station_substitutions.yaml",
+    "networks/wamr/station_substitutions.yaml",
 ]

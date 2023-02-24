@@ -113,7 +113,9 @@ def process(
     norm_mod = get_normalization_module(network)
 
     # The normalizer returns a generator that yields `Row`s. Convert to a list of Rows.
+    log.info("Normalize: start")
     rows = list(norm_mod.normalize(download_stream))
+    log.info("Normalize: done")
 
     engine = create_engine(connection_string)
     Session = sessionmaker(engine)
@@ -124,6 +126,7 @@ def process(
         infer(sesh, rows, is_diagnostic)
 
     # Filter the observations by time period, then align them.
+    log.info("Align + filter: start")
     observations = list(
         # Note: filter(None, <collection>) removes falsy values from <collection>,
         # in this case possible None values returned by align.
@@ -136,6 +139,7 @@ def process(
             ),
         )
     )
+    log.info("Align + filter: done")
 
     log.info(f"Count of observations to process: {len(observations)}")
     if is_diagnostic:
@@ -143,7 +147,9 @@ def process(
             log.info(obs)
         return
 
+    log.info("Insert: start")
     results = insert(sesh, observations, sample_size)
+    log.info("Insert: done")
     log.info("Data insertion results", extra={"results": results, "network": network})
 
 

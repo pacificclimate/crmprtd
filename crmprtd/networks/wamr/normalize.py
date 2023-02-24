@@ -19,13 +19,33 @@ log = logging.getLogger(__name__)
 
 def get_one_of(elements):
     for e in elements:
+        # FIXME: Condition should probably be `e is not None`
         if e:
             return e
+    # FIXME: {e} should probably be {elements}
     raise ValueError(f"No elements of {e} have a truthy value")
 
 
 def normalize(file_stream):
     log.info("Starting WAMR data normalization")
+
+    # There is a set of Metro Vancouver's stations that are being
+    # delivered to us by WAMR, but it is desired that they are re-
+    # associated with the correct network. Attempting this by altering the
+    # normalization to the correct station_id and the correct network
+    # name. Issue here is that the metrovan variables need to match the ENV-AQN
+    # variables. Will work on that in the database.
+
+    station_substitutions_fp = "networks/wamr/station_substitutions.yaml"
+    try:
+        with resource_stream("crmprtd", station_substitutions_fp) as f:
+            station_substitutions = yaml.safe_load(f)
+    except FileNotFoundError:
+        log.error(
+            f"Cannot open resource file '{station_substitutions_fp}'. "
+            f"Normalization cannot proceed."
+        )
+        return
 
     string_stream = io.StringIO(file_stream.read().decode("utf-8"))
     reader = csv.DictReader(string_stream)
@@ -65,6 +85,7 @@ def normalize(file_stream):
             val = get_one_of((rep_val, raw_val))
         except ValueError:
             # skip over empty values
+            log.warning("Unable to get value from row", extra={"row": row})
             continue
 
         try:
@@ -86,25 +107,17 @@ def normalize(file_stream):
             log.error("Unable to convert date string to datetime", extra={"time": time})
             continue
 
-        substitutions = [("% RH", "%"), ("\u00b0C", "celsius"), ("mb", "millibar")]
-        for src, dest in substitutions:
+        variable_substitutions = [
+            ("% RH", "%"),
+            ("\u00b0C", "celsius"),
+            ("mb", "millibar"),
+        ]
+        for src, dest in variable_substitutions:
             if unit == src:
                 unit = re.sub(src, dest, unit)
 
-        # There is a set of Metro Vancouver's stations that are being
-        # delivered to us by WAMR, but it is desired that they are re-
-        # associated with the correct network. Attempting this by altering the
-        # normalization to the correct station_id and the correct network
-        # name. Issue here is that the metrovan variables need to match the ENV-AQN
-        # variables. Will work on that in the database.
-
-        with resource_stream(
-            "crmprtd", "networks/wamr/station_substitutions.yaml"
-        ) as f:
-            substitutions = yaml.safe_load(f)
-
-        if reported_station_id in substitutions:
-            station_id = substitutions[reported_station_id]
+        if reported_station_id in station_substitutions:
+            station_id = station_substitutions[reported_station_id]
             network_name = "MVan"
         else:
             station_id = reported_station_id
