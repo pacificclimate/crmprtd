@@ -4,6 +4,8 @@ import logging
 from itertools import islice
 from time import perf_counter
 from contextlib import contextmanager
+from pkg_resources import resource_stream
+import yaml
 
 from dateutil import parser as date_parse
 import pytz
@@ -24,6 +26,17 @@ def normalize(file_stream):
 
     # Detect if numbers are convertible
     num_pattern = re.compile(r"-?\d+(\.\d+)?$")
+
+    variable_substitutions_path = "networks/bc_hydro/variable_substitutions.yaml"
+    try:
+        with resource_stream("crmprtd", variable_substitutions_path) as f:
+            variable_substitutions = yaml.safe_load(f)
+    except FileNotFoundError:
+        log.warn(
+            f"Cannot open resource file '{variable_substitutions_path}'. "
+            f"Proceeding with normalization, but there's a risk that variable names will not be recognized."
+        )
+        return
 
     for line in file_stream:
         line = line.decode("utf-8")
@@ -65,6 +78,10 @@ def normalize(file_stream):
 
                 elif num_pattern.match(value):
                     value = float(value)
+
+                    if varname in variable_substitutions:
+                        varname = variable_substitutions[varname]
+
                     yield Row(
                         time=obs_time,
                         val=value,

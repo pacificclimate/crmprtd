@@ -1,0 +1,8 @@
+# Defines a mapping between variable names given to us by BC Hydro
+# c.a. 2022 and what the variables were named in the PCDS (a.k.a. their
+# "historic" name)
+# Values should be of the form: "name_in_near_real_time_feed": "net_var_name-in-pcds"
+
+'SNOW_DEPTH_INST': 'SNOW_ON_THE_GROUND'
+'SWE_INST_VAL': 'Snow_WE'
+'TEMP_INST_VAL': 'AirTemp'
