@@ -1,5 +1,15 @@
 # News / Release Notes
 
+## 4.3.0
+
+_2023-Apr-05_
+
+Compatible with database revision 879f0efa125f (PyCDS 4.3.0).
+
+Upgrades to PyCDS 4.3.0, which installs script `manage-scripts`.
+
+- [Upgrade to pycds ~= 4.3](https://github.com/pacificclimate/crmprtd/pull/153)
+
 ## 4.2.1
 
 _2023-Feb-24_
