@@ -42,7 +42,6 @@ def download(ftp_server, ftp_dir):
         with SpooledTemporaryFile(
             max_size=int(os.environ.get("CRMPRTD_MAX_CACHE", 2**20)), mode="r+"
         ) as tempfile:
-
             for filename in ftpreader.filenames:
 
                 def callback(line):

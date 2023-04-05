@@ -87,7 +87,6 @@ def copy_stations_to_sqlite(src_dsn, dest_dsn):
 
 
 if __name__ == "__main__":
-
     parser = OptionParser()
     parser.add_option(
         "-c", "--connection_string", dest="connection_string", help="SQLALchemy DSN"

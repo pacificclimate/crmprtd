@@ -27,7 +27,7 @@ dependencies=[
     "python-dateutil",
     "pytz",
     "requests[security]",
-    "pycds == 4.*",
+    "pycds ~= 4.3",
     "pint",
     "pysftp",
 ]

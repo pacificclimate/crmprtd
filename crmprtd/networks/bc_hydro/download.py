@@ -32,7 +32,6 @@ log = logging.getLogger(__name__)
 def download(
     username, gpg_private_key, ftp_server, ftp_dir, start_date, end_date
 ):  # pragma: no cover
-
     # Connect FTP server and retrieve directory
     try:
         connection = pysftp.Connection(

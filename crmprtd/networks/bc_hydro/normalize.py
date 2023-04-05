@@ -25,7 +25,6 @@ def normalize(file_stream):
     num_pattern = re.compile(rb"-?\d+(\.\d+)?$")
 
     for line in file_stream:
-
         # Heuristically guess whether each line is one of three types:
         # a) a free form station name
         # b) a heading line containing variable names, or

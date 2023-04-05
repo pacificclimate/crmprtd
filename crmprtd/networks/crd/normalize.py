@@ -25,7 +25,6 @@ def normalize(stream):
     log.debug("Found variables %s", var_names)
 
     for record in data["DATA"]:
-
         # Timezone information isn't provided by CRD, but the
         # observations appear to be in local time. The max time
         # value found in a request is the most recent hour local
@@ -34,7 +33,6 @@ def normalize(stream):
         date = tz.localize(date).astimezone(pytz.utc)
 
         for var_name in var_names:
-
             # CRD uses -9999 and null for missing values. Skip these.
             # See page 2 here: https://tinyurl.com/quczs93
             val = record[var_name]

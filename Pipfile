@@ -12,7 +12,7 @@ name = "pypipacificclimate"
 lxml = "==4.6.3"
 Pint = "==0.9"
 psycopg2 = "==2.8"
-pycds = { version = "==4.0.0", index = "pypipacificclimate" }
+pycds = { version = "==4.3.0", index = "pypipacificclimate" }
 python-dateutil = "==2.8"
 pytz = "==2019.3"
 PyYAML = "==5.4"
