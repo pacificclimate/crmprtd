@@ -36,7 +36,6 @@ def main(opts, args):
 
 
 if __name__ == "__main__":
-
     parser = OptionParser()
     parser.add_option(
         "-c",

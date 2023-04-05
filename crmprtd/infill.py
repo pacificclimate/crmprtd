@@ -212,7 +212,6 @@ def infill(
 
     # MOTI
     if "moti" in networks:
-
         # Query all existing stations
         stations = get_moti_stations(connection_string)
 
