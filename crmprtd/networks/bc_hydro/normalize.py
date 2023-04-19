@@ -13,7 +13,7 @@ import pytz
 from crmprtd import Row
 from crmprtd import setup_logging
 
-log = logging.getLogger("crmprtd")
+log = logging.getLogger(__name__)
 
 
 def normalize(file_stream):
@@ -32,7 +32,7 @@ def normalize(file_stream):
         with resource_stream("crmprtd", variable_substitutions_path) as f:
             variable_substitutions = yaml.safe_load(f)
     except FileNotFoundError:
-        log.warn(
+        log.warning(
             f"Cannot open resource file '{variable_substitutions_path}'. "
             f"Proceeding with normalization, but there's a risk that variable names will not be recognized."
         )

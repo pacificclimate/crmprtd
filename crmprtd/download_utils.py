@@ -4,11 +4,13 @@ import ftplib
 import logging
 import csv
 import dateutil.parser
-from warnings import warn
 from functools import wraps
 
 import yaml
 import requests
+
+
+log = logging.getLogger(__name__)
 
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
@@ -85,7 +87,7 @@ class FTPReader(object):
         # Just store the lines in memory
         # It's non-ideal but neither classes support coroutine send/yield
         if not log:
-            log = logging.getLogger("__name__")
+            log = logging.getLogger(__name__)
         lines = []
 
         def callback(line):
@@ -171,7 +173,7 @@ def verify_date(datestring, default, label="date/time"):
     try:
         return dateutil.parser.parse(datestring)
     except (ValueError, TypeError):
-        warn(
+        log.warning(
             f"Parameter {label} '{datestring}' is undefined or unparseable. Using the "
             f"default '{default:%Y-%m-%d %H:%M:%S}'"
         )

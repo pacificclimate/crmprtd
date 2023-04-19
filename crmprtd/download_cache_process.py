@@ -8,12 +8,17 @@ TODO: More doc.
 import datetime
 from argparse import ArgumentParser
 from typing import List
+import logging
 
 import pytz
 
 from crmprtd import NETWORKS, add_version_arg
 from crmprtd.argparse_helpers import OneAndDoneAction
 from crmprtd.infill import download_and_process
+
+
+log = logging.getLogger(__name__)
+
 
 # Maps a network alias to a *list* of networks (names). This allows for both groups
 # and single-network aliases.
@@ -337,116 +342,120 @@ def main(arglist: List[str] = None) -> None:
         if None then sys.argv is used.
     :return: None.
     """
-
-    parser = ArgumentParser(
-        description="""
-            The download-cache-process pipeline. Starts a pipeline of subprocesses
-            running, in sequence, (1) script crmprtd_download, (2) an optional cache step 
-            (tee), and (3) the script crmprtd_process. The third subprocess
-            is optional, depending on arguments provided to this command. Arguments to 
-            each script in the pipeline are provided as appropriate, depending on the 
-            network(s) and other arguments to this command.
-        """,
-        epilog="""
-            Hints:
-            (1) Use the -D/--describe <name> option to see the network(s) designated by
-            <name>, which can be either a single network name or an alias, which 
-            designates one or more networks (e.g., ytnt).
-            (2) Arguments generated for each step of the pipeline depend in a complicated
-            way on the network and other arguments provided to this command. Use the
-            --dry_run option to print to stdout the command pipeline(s) that would be
-            run using the arguments you provide to this command. It is informative, 
-            and each line can if you wish be be pasted into a Linux command line and 
-            will have the same effect as running this script, except that database 
-            passwords are sanitized from the output.
-        """,
-    )
-
-    # Utility options.
-
-    add_version_arg(parser)
-
-    parser.add_argument(
-        "-D",
-        "--describe",
-        nargs=1,
-        choices=NETWORKS + network_alias_names,
-        action=OneAndDoneAction,
-        function=describe_network,
-        help="Describe a network name or alias",
-    )
-
-    parser.add_argument(
-        "--dry_run",
-        action="store_true",
-        help=(
-            "Do a dry run. This prints to stdout all commands and their arguments "
-            "(sanitized) that would be run. The commands are not actually run."
-        ),
-    )
-
-    parser.add_argument(
-        "-N",
-        "--network",
-        choices=NETWORKS + network_alias_names,
-        required=True,
-        help=(
-            "Network identifier (a network name or network alias) from which to "
-            "download observations. A network alias can stand for one or more "
-            "individual networks (e.g., 'ytnt' stands for many networks)."
-        ),
-    )
-
-    # Log and cache filenames
-
-    parser.add_argument(
-        "-T",
-        "--tag",
-        help="Tag for forming default names for log and cache files",
-    )
-    parser.add_argument(
-        "--log_filename",
-        help=(
-            "Filename for log file. (If omitted, use default filename generated "
-            "from network name, tag, and other parameters.)"
-        ),
-    )
-    parser.add_argument(
-        "--cache_filename",
-        help=(
-            "Filename for cache file. (If omitted, use default filename generated "
-            "from network name, tag, and other parameters.)"
-        ),
-    )
-
-    # Processing step
-
-    parser.add_argument(
-        "-c",
-        "--connection_string",
-        help=(
-            "Connection string for target database. "
-            "If absent, processing step is not performed."
-        ),
-    )
-
-    args, _ = parser.parse_known_args(arglist)
-
-    # Network-dependent args
-    if args.network == "ec":
-        parser.add_argument(
-            "-F",
-            "--frequency",
-            choices=["daily", "hourly"],
-            required=True,
-            help="Frequency of download (network ec only)",
+    try:
+        parser = ArgumentParser(
+            description="""
+                The download-cache-process pipeline. Starts a pipeline of subprocesses
+                running, in sequence, (1) script crmprtd_download, (2) an optional cache step 
+                (tee), and (3) the script crmprtd_process. The third subprocess
+                is optional, depending on arguments provided to this command. Arguments to 
+                each script in the pipeline are provided as appropriate, depending on the 
+                network(s) and other arguments to this command.
+            """,
+            epilog="""
+                Hints:
+                (1) Use the -D/--describe <name> option to see the network(s) designated by
+                <name>, which can be either a single network name or an alias, which 
+                designates one or more networks (e.g., ytnt).
+                (2) Arguments generated for each step of the pipeline depend in a complicated
+                way on the network and other arguments provided to this command. Use the
+                --dry_run option to print to stdout the command pipeline(s) that would be
+                run using the arguments you provide to this command. It is informative, 
+                and each line can if you wish be be pasted into a Linux command line and 
+                will have the same effect as running this script, except that database 
+                passwords are sanitized from the output.
+            """,
         )
-        args = parser.parse_args(arglist)
 
-    # TODO: Add network-dependent time arg here? Currently, it is hardwired in code to
-    #  "now".
+        # Utility options.
 
-    dispatch(**vars(args))
+        add_version_arg(parser)
+
+        parser.add_argument(
+            "-D",
+            "--describe",
+            nargs=1,
+            choices=NETWORKS + network_alias_names,
+            action=OneAndDoneAction,
+            function=describe_network,
+            help="Describe a network name or alias",
+        )
+
+        parser.add_argument(
+            "--dry_run",
+            action="store_true",
+            help=(
+                "Do a dry run. This prints to stdout all commands and their arguments "
+                "(sanitized) that would be run. The commands are not actually run."
+            ),
+        )
+
+        parser.add_argument(
+            "-N",
+            "--network",
+            choices=NETWORKS + network_alias_names,
+            required=True,
+            help=(
+                "Network identifier (a network name or network alias) from which to "
+                "download observations. A network alias can stand for one or more "
+                "individual networks (e.g., 'ytnt' stands for many networks)."
+            ),
+        )
+
+        # Log and cache filenames
+
+        parser.add_argument(
+            "-T",
+            "--tag",
+            help="Tag for forming default names for log and cache files",
+        )
+        parser.add_argument(
+            "--log_filename",
+            help=(
+                "Filename for log file. (If omitted, use default filename generated "
+                "from network name, tag, and other parameters.)"
+            ),
+        )
+        parser.add_argument(
+            "--cache_filename",
+            help=(
+                "Filename for cache file. (If omitted, use default filename generated "
+                "from network name, tag, and other parameters.)"
+            ),
+        )
+
+        # Processing step
+
+        parser.add_argument(
+            "-c",
+            "--connection_string",
+            help=(
+                "Connection string for target database. "
+                "If absent, processing step is not performed."
+            ),
+        )
+
+        args, _ = parser.parse_known_args(arglist)
+
+        # Network-dependent args
+        if args.network == "ec":
+            parser.add_argument(
+                "-F",
+                "--frequency",
+                choices=["daily", "hourly"],
+                required=True,
+                help="Frequency of download (network ec only)",
+            )
+            args = parser.parse_args(arglist)
+
+        # TODO: Add network-dependent time arg here? Currently, it is hardwired in code to
+        #  "now".
+
+        dispatch(**vars(args))
+    except Exception:
+        log.exception(
+            "Unhandled exception during 'download - cache - process' pipeline"
+        )
 
 
 if __name__ == "__main__":

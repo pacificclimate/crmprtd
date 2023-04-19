@@ -2,7 +2,6 @@ import re
 import logging
 import datetime
 from typing import List, TextIO, Optional
-from warnings import warn
 from subprocess import run, PIPE
 
 from sqlalchemy import create_engine
@@ -84,7 +83,7 @@ def download_and_process(
     do_download = do_cache or do_process
 
     if not do_download:
-        warn(
+        logger.warning(
             f"Network {network_name}: Data is to be neither cached nor processed. "
             f"Nothing to do."
         )
@@ -263,10 +262,10 @@ def infill(
         last_month = (now - datetime.timedelta(days=30), now)
         # Warn if not
         if not interval_overlaps((start_time, end_time), last_month):
-            warn(warning_msg["disjoint"].format("WAMR", "one month"))
+            logger.warning(warning_msg["disjoint"].format("WAMR", "one month"))
         else:
             if not interval_contains((start_time, end_time), last_month):
-                warn(warning_msg["not_contained"].format("WAMR", "one_month"))
+                logger.warning(warning_msg["not_contained"].format("WAMR", "one_month"))
             dl_args = []
             download_and_process(
                 network_name="wamr",
@@ -282,10 +281,10 @@ def infill(
         # Check that the interval overlaps with the last day
         # Warn if not
         if not interval_overlaps((start_time, end_time), yesterday):
-            warn(warning_msg["disjoint"].format("WMB", "day"))
+            logger.warning(warning_msg["disjoint"].format("WMB", "day"))
         else:
             if not interval_contains((start_time, end_time), yesterday):
-                warn(warning_msg["not_contained"].format("WMB", "day"))
+                logger.warning(warning_msg["not_contained"].format("WMB", "day"))
             # Run it
             dl_args = ["--auth_fname", auth_fname, "--auth_key", "wmb"]
             download_and_process(

@@ -1,3 +1,5 @@
+import logging
+
 import pytest
 import datetime
 
@@ -45,11 +47,12 @@ def test_verify_date(datestring, default):
 
 
 @pytest.mark.parametrize(("datestring"), (("not-a-datestring"), (None)))
-def test_verify_date_exception(datestring):
+def test_verify_date_exception(caplog, datestring):
+    caplog.set_level(logging.WARNING)
     default = datetime.datetime.now()
     warning = (
         f"Parameter  '{datestring}' is undefined or unparseable. Using the "
         f"default '{default:%Y-%m-%d %H:%M:%S}'"
     )
-    with pytest.warns(UserWarning, match=warning):
-        assert verify_date(datestring, default, "") == default
+    assert verify_date(datestring, default, "") == default
+    assert warning in caplog.text
