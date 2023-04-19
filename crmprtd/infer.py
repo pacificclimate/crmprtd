@@ -36,7 +36,7 @@ from pycds import Network, Variable
 from crmprtd.align import get_variable, find_or_create_matching_history_and_station
 
 
-log = logging.getLogger("crmprtd")
+log = logging.getLogger(__name__)
 
 
 def create_variable(

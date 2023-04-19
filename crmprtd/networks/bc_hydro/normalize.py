@@ -13,7 +13,7 @@ import pytz
 from crmprtd import Row
 from crmprtd import setup_logging
 
-log = logging.getLogger("crmprtd")
+log = logging.getLogger(__name__)
 
 
 def normalize(file_stream):

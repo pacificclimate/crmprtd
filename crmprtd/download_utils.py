@@ -85,7 +85,7 @@ class FTPReader(object):
         # Just store the lines in memory
         # It's non-ideal but neither classes support coroutine send/yield
         if not log:
-            log = logging.getLogger("__name__")
+            log = logging.getLogger(__name__)
         lines = []
 
         def callback(line):

@@ -18,7 +18,7 @@ from crmprtd.db_exceptions import InsertionError
 from pycds import Obs
 
 
-log = logging.getLogger("crmprtd.insert")
+log = logging.getLogger(__name__)
 
 
 class DBMetrics(object):
