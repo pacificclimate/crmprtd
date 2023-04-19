@@ -1,5 +1,13 @@
 # News / Release Notes
 
+## 4.3.1
+
+_2023-Apr-19_
+
+Compatible with database revision 879f0efa125f (PyCDS 4.3.0).
+
+- [Completes BC Hydro data feed support](https://github.com/pacificclimate/crmprtd/pull/158)
+
 ## 4.3.0
 
 _2023-Apr-05_
