@@ -2,14 +2,35 @@ import re
 import pytz
 import pytest
 import logging
+import importlib
 from datetime import datetime
 from pkg_resources import resource_filename
 
-from pycds import Network, Variable, Obs
+from sqlalchemy.exc import IntegrityError
+
+from pycds import Network, History, Variable, Obs
 from crmprtd.download_utils import verify_date
 
 # Must import the module, not objects from it, so we can mock the objects.
 import crmprtd.process
+
+
+def test_dups(ec_session):
+    sechelt1 = ec_session.query(History).filter(History.id == 20000).one()
+    ec_precip = ec_session.query(Variable).filter(Variable.id == 100).one()
+
+    for _ in range(2):
+        ec_session.add(
+            Obs(
+                history=sechelt1,
+                datum=2.5,
+                variable=ec_precip,
+                time=datetime(2012, 9, 24, 6),
+            )
+        )
+
+    with pytest.raises(IntegrityError):
+        ec_session.commit()
 
 
 def get_num_obs_to_insert(records):
@@ -51,6 +72,16 @@ def num_observations_in_db(session):
 def test_process_by_date(
     start_date, end_date, expected_num_inserts, monkeypatch, caplog, crmp_session
 ):
+    # align has several functions that reach out to the database and
+    # subsequently cache results While this speeds up align
+    # *significantly* reducing round trips to the database, an
+    # unwanted side-effect is that each of these test runs are not
+    # independent. If we reload the infer, align and process modules,
+    # the function local cache gets cleared
+    importlib.reload(crmprtd.process)
+    importlib.reload(crmprtd.infer)
+    importlib.reload(crmprtd.align)
+
     # Restrict the logging to just what is important to this test.
     caplog.set_level(logging.WARNING, "sqlalchemy.engine")
     caplog.set_level(logging.DEBUG, "crmprtd")

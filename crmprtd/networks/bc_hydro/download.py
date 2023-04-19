@@ -82,7 +82,9 @@ def download_relevant_bch_zipfiles(start_date, end_date, connection, remote_file
     output to standard output.
 
     """
-    pattern = r"PCIC_BCHhourly_([0-9]{6}).zip"
+    # match filenames such as PCIC_230220.zip or PCIC_BCHhourly_200421.zip
+    # and capture the part of the filename that references a date
+    pattern = r"PCIC(?:_BCHhourly)?_([0-9]{6}).zip"
     match = re.search(pattern, remote_filename)
 
     if not match:
