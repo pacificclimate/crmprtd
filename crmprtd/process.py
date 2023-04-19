@@ -21,6 +21,7 @@ from crmprtd import (
     NETWORKS,
 )
 
+
 log = logging.getLogger(__name__)
 
 
@@ -199,32 +200,41 @@ def run_data_pipeline(
 
 
 def main(args=None):
-    parser = ArgumentParser()
-    add_version_arg(parser)
-    add_process_args(parser)
-    add_logging_args(parser)
-    args = parser.parse_args(args)
+    try:
+        parser = ArgumentParser()
+        add_version_arg(parser)
+        add_process_args(parser)
+        add_logging_args(parser)
+        args = parser.parse_args(args)
 
-    setup_logging(
-        args.log_conf, args.log_filename, args.error_email, args.log_level, "crmprtd"
-    )
+        setup_logging(
+            args.log_conf,
+            args.log_filename,
+            args.error_email,
+            args.log_level,
+            "crmprtd",
+        )
 
-    utc = pytz.utc
+        utc = pytz.utc
 
-    args.start_date = utc.localize(
-        verify_date(args.start_date, datetime.min, "start date")
-    )
-    args.end_date = utc.localize(verify_date(args.end_date, datetime.max, "end date"))
+        args.start_date = utc.localize(
+            verify_date(args.start_date, datetime.min, "start date")
+        )
+        args.end_date = utc.localize(
+            verify_date(args.end_date, datetime.max, "end date")
+        )
 
-    process(
-        connection_string=args.connection_string,
-        sample_size=args.sample_size,
-        network=args.network,
-        start_date=args.start_date,
-        end_date=args.end_date,
-        is_diagnostic=args.diag,
-        do_infer=args.infer,
-    )
+        process(
+            connection_string=args.connection_string,
+            sample_size=args.sample_size,
+            network=args.network,
+            start_date=args.start_date,
+            end_date=args.end_date,
+            is_diagnostic=args.diag,
+            do_infer=args.infer,
+        )
+    except Exception:
+        log.exception("Unhandled exception during 'process'")
 
 
 if __name__ == "__main__":

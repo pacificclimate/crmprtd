@@ -22,6 +22,7 @@ to scripts that use it.
 from typing import List
 from importlib import import_module
 from argparse import ArgumentParser
+import logging
 
 from crmprtd import (
     add_version_arg,
@@ -30,32 +31,38 @@ from crmprtd import (
 )
 
 
+log = logging.getLogger(__name__)
+
+
 def get_download_module(network):
     return import_module(f"crmprtd.networks.{network}.download")
 
 
 def main(arglist: List[str] = None):
-    parser = ArgumentParser(add_help=False)
+    try:
+        parser = ArgumentParser(add_help=False)
 
-    # Basic args
-    add_version_arg(parser)
-    add_logging_args(parser)
+        # Basic args
+        add_version_arg(parser)
+        add_logging_args(parser)
 
-    # Network arg
-    parser.add_argument(
-        "-N",
-        "--network",
-        required=True,
-        choices=NETWORKS,
-        help="Network from which to download observations",
-    )
+        # Network arg
+        parser.add_argument(
+            "-N",
+            "--network",
+            required=True,
+            choices=NETWORKS,
+            help="Network from which to download observations",
+        )
 
-    # parse_known_args allows unrecognized args to be present.
-    args, _ = parser.parse_known_args(arglist)
+        # parse_known_args allows unrecognized args to be present.
+        args, _ = parser.parse_known_args(arglist)
 
-    # Each download module adds its own network-specific args.
-    download_module = get_download_module(args.network)
-    download_module.main(arglist=arglist, parent_parser=parser)
+        # Each download module adds its own network-specific args.
+        download_module = get_download_module(args.network)
+        download_module.main(arglist=arglist, parent_parser=parser)
+    except Exception:
+        log.exception("Unhandled exception during 'download'")
 
 
 if __name__ == "__main__":
