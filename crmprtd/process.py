@@ -118,7 +118,7 @@ def process(
     log.info("Normalize: start")
 
     rows = {row for row in norm_mod.normalize(download_stream)}
-    print(f"Found {len(rows)} rows.")
+    log.debug(f"Found {len(rows)} rows.")
     log.info("Normalize: done")
 
     engine = create_engine(connection_string)

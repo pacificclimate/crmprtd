@@ -72,6 +72,12 @@ def num_observations_in_db(session):
 def test_process_by_date(
     start_date, end_date, expected_num_inserts, monkeypatch, caplog, crmp_session
 ):
+    # align has several functions that reach out to the database and
+    # subsequently cache results While this speeds up align
+    # *significantly* reducing round trips to the database, an
+    # unwanted side-effect is that each of these test runs are not
+    # independent. If we reload the infer, align and process modules,
+    # the function local cache gets cleared
     importlib.reload(crmprtd.process)
     importlib.reload(crmprtd.infer)
     importlib.reload(crmprtd.align)
