@@ -16,10 +16,6 @@ jobs:
       with:
         python-version: 3.8
 
-    - name: Install pipenv
-      run: |
-        pip install -U pipenv==2022.3.28
-
     - name: Install OS dependencies
       run: |
         sudo apt update
@@ -27,12 +23,13 @@ jobs:
         sudo apt purge postgresql-client-14 postgresql-server-dev-all
         sudo apt install postgresql-12-postgis-3
 
-    - name: Install Python dependencies
-      env:
-        PIP_INDEX_URL: https://pypi.pacificclimate.org/simple
+    - name: Install Poetry
       run: |
-        pipenv install --deploy --dev
-        pipenv run pip install .
+        curl -sSL https://install.python-poetry.org | python3 -
+
+    - name: Install project
+      run: |
+        poetry install
 
     - name: Test with pytest
       env:
