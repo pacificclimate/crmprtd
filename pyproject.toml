@@ -1,90 +1,112 @@
 [build-system]
-requires = [
-    "setuptools >= 40.9.0", "wheel"
-]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "crmprtd"
-version = "4.3.1"
+version = "4.3.1.dev0"
 description = "Utility to download near real time weather data and insert it into PCIC's database"
-keywords = ["sql", "database", "data", "science", "climate", "oceanography", "meteorology"]
-requires-python = ">=3.8"
-authors=[
-    {name = "James Hiebert", email = "hiebert@uvic.ca"},
-    {name = "Rod Glover", email = "rglover@uvic.ca"},
-    {name = "Nik Rados"}
+license = "GPL-3.0-only"
+authors = [
+    "James Hiebert <hiebert@uvic.ca>",
+    "Rod Glover <rglover@uvic.ca>",
+    "Nik Rados"
 ]
+readme = "README.md"
+homepage = "http://www.pacificclimate.org/"
+repository = "https://github.com/pacificclimate/crmprtd"
+keywords = ["sql", "database", "data", "science", "climate", "oceanography", "meteorology"]
 classifiers = [
     "Programming Language :: Python :: 3.7",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
 ]
-dependencies=[
-    "lxml",
-    "psycopg2",
-    "pyyaml",
-    "python-dateutil",
-    "pytz",
-    "requests[security]",
-    "pycds ~= 4.3",
-    "pint",
-    "pysftp",
+packages = [
+    { include = "crmprtd" },
 ]
-
-[project.optional-dependencies]
-test = [
-    "pytest",
-    "pysqlite",
-    "requests_mock"
-]
-jsonlogger = ["python-json-logger"]
-
-[project.scripts]
-crmprtd_pipeline = "crmprtd.download_cache_process:main"
-crmprtd_download = "crmprtd.download:main"
-crmprtd_process = "crmprtd.process:main"
-crmprtd_infill_all = "scripts.infill_all:main"
-# Adding the other scripts in scripts/ will require refactoring them slightly so
-# that main() can be invoked without arguments (i.e., put arg parsing in main()).
-# As a temporary expedient, they have been added to script-files in [tools.setuptools].
-
-[project.urls]
-homepage = "http://www.pacificclimate.org/"
-repository = "https://github.com/pacificclimate/crmprtd"
-
-[tool.setuptools.packages.find]
-exclude = ["speed_test"]
-
-[tool.setuptools]
-# By default, include-package-data is true, so this line is optional.
-include-package-data = true
-# The following files are copied into the installation bin/ directory.
-# Warning: script-files is deprecated. For more info see
-# https://setuptools.pypa.io/en/latest/userguide/pyproject_config.html#setuptools-specific-configuration
-script-files = [
-    # Python scripts. It would be better to put them in [project.scripts] as noted below.
-    "scripts/ec_recovery_helper.py",
-    "scripts/ec_recovery.py",
-    "scripts/infill_all.py",
-    "scripts/load_wamr_stns.py",
-    "scripts/moti_infill_download.py",
-    "scripts/moti_infill_insert.py",
-    "scripts/moti_insert_files.py",
-
-    # Execution scripts. Some of these may no longer be useful.
-    # These can't go in [project.scripts]
-    "crmprtd/execution/crmprtd_inserts.sh",
-    "crmprtd/execution/hourly_swobml2.sh",
-    "crmprtd/execution/update_matviews_lazy.sql",
-    "crmprtd/execution/wamr_backpatch_20201118.sh"
-]
-
-[tool.setuptools.package-data]
-crmprtd = [
+include = [
     "data/*.yaml",
     "data/*.xsl",
     "tests/data/*",
     "networks/wamr/station_substitutions.yaml",
     "networks/bc_hydro/variable_substitutions.yaml",
 ]
+
+[[tool.poetry.source]]
+name = "pcic-pypi"
+url = "https://pypi.pacificclimate.org/simple/"
+secondary = true
+
+[tool.poetry.dependencies]
+# Mandatory dependencies.
+python = "^3.8"
+lxml = "*"
+psycopg2 = "*"
+pyyaml = "*"
+python-dateutil = "*"
+pytz = "*"
+requests = { version = "*", extras = ["security"] }
+pycds = { version = "4.3.0", source = "pcic-pypi" }
+pint = "*"
+pysftp = "*"
+
+# Optional dependencies, added via the extras facility, using the `jsonlogger` extra
+# defined below.
+"python-json-logger" = { version = "*", optional = true }
+
+[tool.poetry.extras]
+# This allows installs with extras of the following form
+#   pip install crmprtd[jsonlogger]
+#   poetry install -E jsonlogger
+# and causes the optional package `python-json-logger` to be installed.
+jsonlogger = ["python-json-logger"]
+
+# TODO: Remove, almost certainly unnecessary and possibly wrong.
+# The following allows the user to install `crmprtd` with the `jsonlogger` extra.
+# See https://python-poetry.org/docs/pyproject#extras
+# There may be an easier way to do this. It's not even clear it does this.
+# Going to add it the apparently correct way.
+#[tool.poetry.group.jsonlogger]
+#optional = true
+#
+#[tool.poetry.group.jsonlogger.dependencies]
+#"python-json-logger" = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+requests_mock = "*"
+pytest-cov = "*"
+python-json-logger = "*"
+"testing.postgresql" = "*"
+pytest-mock = "*"
+black = "*"
+pre-commit = "*"
+
+[tool.poetry.scripts]
+crmprtd_pipeline = "crmprtd.download_cache_process:main"
+crmprtd_download = "crmprtd.download:main"
+crmprtd_process = "crmprtd.process:main"
+# Adding the scripts in scripts/ will
+# EITHER require refactoring them so that they are (a)
+# in the crmprtd package, and (b) `main()` can be invoked without arguments (i.e., put
+# arg parsing in `main()`).
+# OR make scripts/ a "package" and include it in the [tool.poetry.packages] table
+# Not sure which would be better.
+#
+# These are the Python scripts to be added.
+#
+#    "scripts/ec_recovery_helper.py",
+#    "scripts/ec_recovery.py",
+#    "scripts/infill_all.py",
+#    "scripts/load_wamr_stns.py",
+#    "scripts/moti_infill_download.py",
+#    "scripts/moti_infill_insert.py",
+#    "scripts/moti_insert_files.py",
+#
+#  Execution scripts. These are deprecated now. If we wish to include them nontheless,
+#  they will have to be added to the [tool.poetry] include key.
+#
+#    "crmprtd/execution/crmprtd_inserts.sh",
+#    "crmprtd/execution/hourly_swobml2.sh",
+#    "crmprtd/execution/update_matviews_lazy.sql",
+#    "crmprtd/execution/wamr_backpatch_20201118.sh"

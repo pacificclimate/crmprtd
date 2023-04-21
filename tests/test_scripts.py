@@ -22,7 +22,7 @@ import crmprtd.download_cache_process
         "crmprtd_pipeline",
         "crmprtd_download",
         "crmprtd_process",
-        "crmprtd_infill_all",
+        # "crmprtd_infill_all",
     ],
 )
 def test_version_option(capsys, name):
