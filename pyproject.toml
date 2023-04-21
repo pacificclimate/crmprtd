@@ -46,7 +46,7 @@ pyyaml = "*"
 python-dateutil = "*"
 pytz = "*"
 requests = { version = "*", extras = ["requests"] }
-pycds = { version = "== 4.3.0", source = "pcic-pypi" }
+pycds = { version = "4.3.0", source = "pcic-pypi" }
 pint = "*"
 pysftp = "*"
 
