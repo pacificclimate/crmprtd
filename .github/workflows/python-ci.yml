@@ -35,7 +35,7 @@ jobs:
       env:
         TZ: Canada/Pacific
       run: |
-        pipenv run pytest -m "not online" -v --tb=short --cov --cov-report=term-missing
+        poetry run pytest -m "not online" -v --tb=short --cov --cov-report=term-missing
 
     - name: Code format check
-      run: pipenv run black . --check
+      run: poetry run black . --check
