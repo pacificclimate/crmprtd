@@ -1,7 +1,5 @@
 # crmprtd
 
-TODO: Update crontab in Usage
-
 ![Python CI](https://github.com/pacificclimate/crmprtd/workflows/Python%20CI/badge.svg?branch=master)
 ![Pypi Publishing](https://github.com/pacificclimate/crmprtd/workflows/Pypi%20Publishing/badge.svg?branch=master)
 
@@ -21,7 +19,7 @@ PCDS-type databases (e.g., CRMP, Metnorth).
 
 ## Creating a production release
 
-1. Modify `project.version` in `pyproject.toml`: First remove any suffix
+1. Modify `tool.poetry.version` in `pyproject.toml`: First remove any suffix
    to the version number, as our convention is to reserve those for test builds
    (e.g., `1.2.3` is a release build, `1.2.3.dev7` is a test build).
    Then increment the release build version.
@@ -41,7 +39,7 @@ PCDS-type databases (e.g., CRMP, Metnorth).
 The process is very similar to a production release, but uses a different
 version number convention, and omits any notice in NEWS.md.
 
-1. Modify `project.version` in `pyproject.toml`: Add or increment the suffix 
+1. Modify `tool.poetry.version` in `pyproject.toml`: Add or increment the suffix 
    in the pattern `.devN`, where N is any number of numeric digits (e.g., `1.2.3.dev11`).
    Our convention is to reserve those for test releases
    (e.g., `1.2.3` is a release build, `1.2.3.dev11` is a test build). 
