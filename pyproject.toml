@@ -45,7 +45,7 @@ psycopg2 = "*"
 pyyaml = "*"
 python-dateutil = "*"
 pytz = "*"
-requests = { version = "*", extras = ["requests"] }
+requests = { version = "*", extras = ["security"] }
 pycds = { version = "4.3.0", source = "pcic-pypi" }
 pint = "*"
 pysftp = "*"

@@ -976,7 +976,6 @@ python-versions = ">=3.8,<4.0"
 files = [
     {file = "pycds-4.3.0-py3-none-any.whl", hash = "sha256:289c543767fdac7b964034d6b17dbd784d2d31aa802a1019a47b26f12c08ac72"},
     {file = "pycds-4.3.0.tar.gz", hash = "sha256:66171bcd746d629009d0b8881533bccd329525cc82aff6349ccc4697cc52ddb5"},
-    {file = "pycds-4.3.0.tar.gz", hash = "md5:4afc81c346a131b672902675603eba84"},
 ]
 
 [package.dependencies]
@@ -1472,4 +1471,4 @@ jsonlogger = ["python-json-logger"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "ab4fd5c855f94dddbde9b7d823ecba9fe74f4ec1dd5e440d5ad773e6e8161e53"
+content-hash = "849541a2e2c8f9b96a732467126b5906351db23843fd72eee06ab52cdf06f6d9"
