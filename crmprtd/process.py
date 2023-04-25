@@ -57,14 +57,12 @@ def add_process_args(parser):  # pragma: no cover
         "--start_date",
         help="Optional start time to use for processing "
         "(interpreted with dateutil.parser.parse).",
-        default=str(datetime.min),
     )
     parser.add_argument(
         "-E",
         "--end_date",
         help="Optional end time to use for processing "
         "(interpreted with dateutil.parser.parse).",
-        default=str(datetime.max),
     )
     parser.add_argument(
         "-I",
@@ -115,9 +113,10 @@ def process(
     download_stream = sys.stdin.buffer
     norm_mod = get_normalization_module(network)
 
-    # The normalizer returns a generator that yields `Row`s. Convert to a set of Rows.
     log.info("Normalize: start")
-
+    # The normalizer returns a generator that yields `Row`s. Convert to a set of Rows.
+    # It is probably better to use a dict for this to preserve order.
+    # See https://stackoverflow.com/a/9792680
     rows = {row for row in norm_mod.normalize(download_stream)}
     log.debug(f"Found {len(rows)} rows.")
     log.info("Normalize: done")
@@ -217,9 +216,9 @@ def main(args=None):
 
         utc = pytz.utc
 
-        args.start_date = utc.localize(
-            verify_date(args.start_date, datetime.min, "start date")
-        )
+        # Value of None for start_date is meaningful: it means, for some networks,
+        # determine from database.
+        args.start_date = utc.localize(verify_date(args.start_date, None, "start date"))
         args.end_date = utc.localize(
             verify_date(args.end_date, datetime.max, "end date")
         )
