@@ -127,7 +127,7 @@ def insert_single_obs(sesh, obs):
 def single_insert_strategy(sesh, observations):
     dbm = DBMetrics(0, 0, 0)
     for obs in observations:
-        insert_single_obs(sesh, obs)
+        dbm += insert_single_obs(sesh, obs)
     return dbm
 
 
@@ -160,7 +160,7 @@ def bisect_insert_strategy(sesh, observations):
     if len(observations) < 1:
         return DBMetrics(0, 0, 0)
     elif len(observations) == 1:
-        insert_single_obs(sesh, observations[0])
+        return insert_single_obs(sesh, observations[0])
     # The happy case: add everything at once
     else:
         try:

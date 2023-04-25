@@ -5,7 +5,7 @@ from importlib import import_module
 from itertools import tee
 import logging
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -109,7 +109,7 @@ def process(
             # For the sake of safety, assume that some new values include values
             # for observations dated not just in the past week, but a week before
             # as well. Is this actually possible?
-            "bc_hydro": datetime.timedelta(days=14),
+            "bc_hydro": timedelta(days=14),
         }
 
     if network == "_test":
