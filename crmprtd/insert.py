@@ -95,27 +95,39 @@ def contains_all_duplicates(sesh, observations, sample_size):
     return True
 
 
-def single_insert_obs(sesh, obs):
-    dbm = DBMetrics(0, 0, 0)
-    for o in obs:
-        if obs_exist(sesh, o.history_id, o.vars_id, o.time):
-            dbm.skips += 1
-            log.debug("Observation already exists in database", extra={"obs_id": o.id})
-            continue
+def insert_single_obs(sesh, obs):
+    """Insert a single observation"""
+    try:
+        # Create a nested SAVEPOINT context manager to rollback to in the
+        # event of unique constraint errors
+        log.debug("New SAVEPOINT for single observation")
+        with sesh.begin_nested():
+            sesh.add(obs)
+    except IntegrityError as e:
+        log.debug(
+            "Failure, observation already exists",
+            extra={"observation": obs, "exception": e},
+        )
+        db_metrics = DBMetrics(0, 1, 0)
+    except InsertionError as e:
+        # TODO: InsertionError is an defined by crmprtd. It can't be raised by
+        #   SQLAlchemy unless something very tricky is going on. Why is this here?
+        log.warning(
+            "Failure occured during insertion",
+            extra={"observation": obs, "exception": e},
+        )
+        db_metrics = DBMetrics(0, 0, 1)
+    else:
+        log.info("Successfully inserted observations: 1")
+        db_metrics = DBMetrics(1, 0, 0)
+    sesh.commit()
+    return db_metrics
 
-        # value does not exist in obs_raw, continue with insertion
-        try:
-            sesh.add(o)
-            sesh.commit()
-            log.debug("Successfully inserted observation")
-            dbm.successes += 1
-        except Exception as e:
-            log.warning("Failure, an error occured.", extra={"e": e})
-            sesh.rollback()
-            dbm.failures += 1
-            raise InsertionError(
-                obs_time=o.time, datum=o.datum, vars_id=o.vars_id, hid=o.history_id, e=e
-            )
+
+def single_insert_strategy(sesh, observations):
+    dbm = DBMetrics(0, 0, 0)
+    for obs in observations:
+        insert_single_obs(sesh, obs)
     return dbm
 
 
@@ -129,7 +141,7 @@ def split(tuple_):
         return (tuple_[:i], tuple_[i:])
 
 
-def bisect_insert_strategy(sesh, obs):
+def bisect_insert_strategy(sesh, observations):
     """This function implements a recursive Obs insert strategy to
     handle unique constraint errors on members of the set. The
     strategy used is to optimistically attempt to insert the entire
@@ -142,56 +154,33 @@ def bisect_insert_strategy(sesh, obs):
     but in the optimal case it reduces the transactions to a constant
     1.
     """
-    log.debug("Begin mass observation insertion", extra={"num_obs": len(obs)})
+    log.debug("Begin mass observation insertion", extra={"num_obs": len(observations)})
 
     # Base cases
-    if len(obs) < 1:
+    if len(observations) < 1:
         return DBMetrics(0, 0, 0)
-    elif len(obs) == 1:
-        try:
-            # Create a nested SAVEPOINT context manager to rollback to in the
-            # event of unique constraint errors
-            log.debug("New SAVEPOINT for single observation")
-            with sesh.begin_nested():
-                sesh.add(obs[0])
-        except IntegrityError as e:
-            log.debug(
-                "Failure, observation already exists",
-                extra={"obs": obs, "exception": e},
-            )
-            db_metrics = DBMetrics(0, 1, 0)
-        except InsertionError as e:
-            log.warning(
-                "Failure occured during insertion", extra={"obs": obs, "exception": e}
-            )
-            db_metrics = DBMetrics(0, 0, 1)
-        else:
-            log.debug("Success for single observation")
-            log.info("Successfully inserted observations: 1")
-            db_metrics = DBMetrics(1, 0, 0)
-        sesh.commit()
-        return db_metrics
-
+    elif len(observations) == 1:
+        insert_single_obs(sesh, observations[0])
     # The happy case: add everything at once
     else:
         try:
             with sesh.begin_nested():
-                log.debug("New SAVEPOINT", extra={"num_obs": len(obs)})
-                sesh.add_all(obs)
+                log.debug("New SAVEPOINT", extra={"num_obs": len(observations)})
+                sesh.add_all(observations)
         except IntegrityError:
             log.debug("Failed, splitting observations.")
             sesh.rollback()
 
-            a, b = split(obs)
+            a, b = split(observations)
             dbm_a = bisect_insert_strategy(sesh, a)
             dbm_b = bisect_insert_strategy(sesh, b)
             return dbm_a + dbm_b
         else:
             log.info(
-                f"Successfully inserted observations: {len(obs)}",
-                extra={"num_obs": len(obs)},
+                f"Successfully inserted observations: {len(observations)}",
+                extra={"num_obs": len(observations)},
             )
-            db_metrics = DBMetrics(len(obs), 0, 0)
+            db_metrics = DBMetrics(len(observations), 0, 0)
         sesh.commit()
         return db_metrics
 
@@ -213,7 +202,7 @@ def insert(sesh, observations, sample_size):
     if contains_all_duplicates(sesh, observations, sample_size):
         log.info("Using Single Insert Strategy")
         with Timer() as tmr:
-            dbm = single_insert_obs(sesh, observations)
+            dbm = single_insert_strategy(sesh, observations)
 
     else:
         log.info("Using Chunk + Bisection Strategy")
