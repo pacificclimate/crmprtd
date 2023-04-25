@@ -150,6 +150,10 @@ def process(
     # At present, this is impossible, but hey, it's cheap insurance.
     if end_date is None:
         start_date = datetime.max
+    log.info(
+        f"Final time filter parameters: "
+        f"start_date = {start_date}, end_date = {end_date}"
+    )
 
     # Get the normalizer for the specified network.
     download_stream = sys.stdin.buffer
