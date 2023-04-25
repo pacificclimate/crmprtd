@@ -10,6 +10,8 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from pycds import Obs, Variable, Network
+
 from crmprtd.align import align
 from crmprtd.insert import insert
 from crmprtd.download_utils import verify_date
@@ -57,14 +59,12 @@ def add_process_args(parser):  # pragma: no cover
         "--start_date",
         help="Optional start time to use for processing "
         "(interpreted with dateutil.parser.parse).",
-        default=str(datetime.min),
     )
     parser.add_argument(
         "-E",
         "--end_date",
         help="Optional end time to use for processing "
         "(interpreted with dateutil.parser.parse).",
-        default=str(datetime.max),
     )
     parser.add_argument(
         "-I",
@@ -86,8 +86,9 @@ def process(
     connection_string,
     sample_size,
     network,
-    start_date,
-    end_date,
+    start_date=None,
+    end_date=None,
+    publication_lags=None,
     is_diagnostic=False,
     do_infer=False,
 ):
@@ -99,6 +100,18 @@ def process(
     3. "Align" the input observations, and remove those not in the specified time range.
     4. Insert the resulting observations.
     """
+    # Default value for publication_lags. Too bad there's no (convenient) frozen dict.
+    # These values are, I hope, very conservative.
+    # TODO: This should be a config value or script arg. Ick.
+    if publication_lags is None:
+        publication_lags = {
+            # BCH: New values are published weekly in a 3-month rolling window.
+            # For the sake of safety, assume that some new values include values
+            # for observations dated not just in the past week, but a week before
+            # as well. Is this actually possible?
+            "bc_hydro": datetime.timedelta(days=14),
+        }
+
     if network == "_test":
         log.info(f"PATH={os.environ['PATH']}")
         log.info(f"Network {network}: No-op")
@@ -111,20 +124,44 @@ def process(
         )
         raise ValueError("No network name given")
 
+    # Establish a database session
+    engine = create_engine(connection_string)
+    Session = sessionmaker(engine)
+    sesh = Session()
+
+    # For network bc_hydro (at present, # *only* bc_hydro): If start_date is not
+    # specified, determine it from latest obs time in database.
+    # This typically takes on the order of 90 s, but that cost is not remotely the cost
+    # of trying to insert - one by one - observations that are already present.
+    if network == "bc_hydro" and start_date is None:
+        latest_obs_time = (
+            sesh.query(func.max(Obs.time))
+            .select_from(Obs)
+            .join(Variable)
+            .join(Network)
+            .filter(Network.name == "bc_hydro")
+            .scalar()
+        )
+        start_date = latest_obs_time - publication_lags["bc_hydro"]
+
+    # For all other cases, replace start_date == None with datetime.min.
+    if start_date is None:
+        start_date = datetime.min
+    # At present, this is impossible, but hey, it's cheap insurance.
+    if end_date is None:
+        start_date = datetime.max
+
     # Get the normalizer for the specified network.
     download_stream = sys.stdin.buffer
     norm_mod = get_normalization_module(network)
 
-    # The normalizer returns a generator that yields `Row`s. Convert to a set of Rows.
     log.info("Normalize: start")
-
+    # The normalizer returns a generator that yields `Row`s. Convert to a set of Rows.
+    # It is probably better to use a dict for this to preserve order.
+    # See https://stackoverflow.com/a/9792680
     rows = {row for row in norm_mod.normalize(download_stream)}
     log.debug(f"Found {len(rows)} rows.")
     log.info("Normalize: done")
-
-    engine = create_engine(connection_string)
-    Session = sessionmaker(engine)
-    sesh = Session()
 
     # Optionally infer variables and stations/histories.
     if do_infer:
@@ -217,9 +254,9 @@ def main(args=None):
 
         utc = pytz.utc
 
-        args.start_date = utc.localize(
-            verify_date(args.start_date, datetime.min, "start date")
-        )
+        # Value of None for start_date is meaningful: it means, for some networks,
+        # determine from database.
+        args.start_date = utc.localize(verify_date(args.start_date, None, "start date"))
         args.end_date = utc.localize(
             verify_date(args.end_date, datetime.max, "end date")
         )
