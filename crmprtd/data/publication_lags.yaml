@@ -1,0 +1,9 @@
+# This configuration is a set of key-value pairs that configure publication
+# lags for the processing step (`process.py`).
+#
+# The key is the network name. The value is the default publication lag in days,
+# if one is not specified by the user.
+#
+# Any network not configured here does not use publication lags.
+
+bc_hydro: 14

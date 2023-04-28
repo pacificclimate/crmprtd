@@ -1,12 +1,14 @@
 import os
 import sys
 import pytz
-from importlib import import_module
+from importlib import import_module, resources
+from pkg_resources import resource_stream
 from itertools import tee
 import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
+import yaml
 from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
 
@@ -62,6 +64,19 @@ def add_process_args(parser):  # pragma: no cover
         "(interpreted with dateutil.parser.parse).",
     )
     parser.add_argument(
+        "-P",
+        "--publication_lag",
+        type=int,
+        help=(
+            "Publication lag in days; used to set default start date. "
+            "For networks where the default start date is determined from "
+            "the latest observation date in the database, this parameter "
+            "defines the number of days that should be subtracted from the "
+            "latest observation date to set the start date. Currently this"
+            "parameter is used only for network 'bc_hydro'."
+        ),
+    )
+    parser.add_argument(
         "-I",
         "--infer",
         default=False,
@@ -83,7 +98,7 @@ def process(
     network,
     start_date=None,
     end_date=None,
-    publication_lags=None,
+    publication_lag=None,
     is_diagnostic=False,
     do_infer=False,
 ):
@@ -95,20 +110,6 @@ def process(
     3. "Align" the input observations, and remove those not in the specified time range.
     4. Insert the resulting observations.
     """
-    # Default value for publication_lags. Too bad there's no (convenient) frozen dict.
-    # These values are, I hope, very conservative.
-    # TODO: This should be a config value or script arg. Ick.
-    #   Also default unspecified networks to a particular timedelta. Hard to say
-    #   what.
-    if publication_lags is None:
-        publication_lags = {
-            # BCH: New values are published weekly in a 3-month rolling window.
-            # For the sake of safety, assume that some new values include values
-            # for observations dated not just in the past week, but a week before
-            # as well. Is this actually possible?
-            "bc_hydro": timedelta(days=14)
-        }
-
     if network == "_test":
         log.info(f"PATH={os.environ['PATH']}")
         log.info(f"Network {network}: No-op")
@@ -126,12 +127,18 @@ def process(
     Session = sessionmaker(engine)
     sesh = Session()
 
-    # For network bc_hydro (at present, # *only* bc_hydro): If start_date is not
-    # specified, determine it from latest obs time in database.
-    # This typically takes on the order of 90 s, but that cost is not remotely the cost
-    # of trying to insert - one by one - observations that are already present.
-    if network == "bc_hydro" and start_date is None:
-        log.info("Querying database for latest obs time...")
+    # For certain networks configured in `data/publication_lags.yaml`:
+    # If start_date is not specified, determine it from latest obs time in database.
+    # This query typically takes on the order of 90 s, but that cost is far lower than
+    # that of trying to insert - one by one - observations that are already present.
+    # A publication lag (days) is subtracted from the latest obs time to determine
+    # the start_date.
+
+    with resource_stream("crmprtd", "data/publication_lags.yaml") as pl_f:
+        publication_lags = yaml.safe_load(pl_f)
+
+    if network in publication_lags and start_date is None:
+        log.info(f"Querying database for latest obs time for network {network}...")
         latest_obs_time = (
             sesh.query(func.max(Obs.time))
             .select_from(Obs)
@@ -140,25 +147,30 @@ def process(
             .filter(Network.name == "BCH")
             .scalar()
         )
-        log.info(
-            f"For network {network}, latest obs time from query = {latest_obs_time}"
+        log.info(f"Latest obs time for network {network}: {latest_obs_time}")
+        if latest_obs_time is not None:
+            # Obs.time is implicitly UTC, but we need to apply that info to the
+            # unlocalized value we get from the database.
+            start_date = pytz.utc.localize(latest_obs_time) - timedelta(
+                days=(publication_lag or publication_lags[network])
+            )
+        else:
+            start_date = datetime.min
+
+    if network not in publication_lags and publication_lag is not None:
+        log.warning(
+            f"Publication lag (value {publication_lag}) is specified for "
+            f"network {network}, which does not use it."
         )
-        # Obs.time is implicitly UTC, but we need to add that info to the unlocalized
-        # value we get from the database. Also, handle case where the query returns no
-        # value.
-        latest_obs_time = (
-            pytz.utc.localize(latest_obs_time)
-            if latest_obs_time is not None
-            else datetime.min
-        )
-        start_date = latest_obs_time - publication_lags[network]
 
     # For all other cases, replace start_date == None with datetime.min.
     if start_date is None:
         start_date = datetime.min
+
     # At present, this is impossible, but hey, it's cheap insurance.
     if end_date is None:
         start_date = datetime.max
+
     log.info(
         f"Final time filter parameters: "
         f"start_date = {start_date}, end_date = {end_date}"
@@ -283,6 +295,7 @@ def main(args=None):
             network=args.network,
             start_date=args.start_date,
             end_date=args.end_date,
+            publication_lag=args.publication_lag,
             is_diagnostic=args.diag,
             do_infer=args.infer,
         )
