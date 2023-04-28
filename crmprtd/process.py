@@ -7,7 +7,7 @@ import logging
 from argparse import ArgumentParser
 from datetime import datetime, timedelta
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, func
 from sqlalchemy.orm import sessionmaker
 
 from pycds import Obs, Variable, Network
@@ -16,12 +16,7 @@ from crmprtd.align import align
 from crmprtd.insert import insert
 from crmprtd.download_utils import verify_date
 from crmprtd.infer import infer
-from crmprtd import (
-    add_version_arg,
-    add_logging_args,
-    setup_logging,
-    NETWORKS,
-)
+from crmprtd import add_version_arg, add_logging_args, setup_logging, NETWORKS
 
 
 log = logging.getLogger(__name__)
@@ -103,13 +98,15 @@ def process(
     # Default value for publication_lags. Too bad there's no (convenient) frozen dict.
     # These values are, I hope, very conservative.
     # TODO: This should be a config value or script arg. Ick.
+    #   Also default unspecified networks to a particular timedelta. Hard to say
+    #   what.
     if publication_lags is None:
         publication_lags = {
             # BCH: New values are published weekly in a 3-month rolling window.
             # For the sake of safety, assume that some new values include values
             # for observations dated not just in the past week, but a week before
             # as well. Is this actually possible?
-            "bc_hydro": timedelta(days=14),
+            "bc_hydro": timedelta(days=14)
         }
 
     if network == "_test":
@@ -134,15 +131,27 @@ def process(
     # This typically takes on the order of 90 s, but that cost is not remotely the cost
     # of trying to insert - one by one - observations that are already present.
     if network == "bc_hydro" and start_date is None:
+        log.info("Querying database for latest obs time...")
         latest_obs_time = (
             sesh.query(func.max(Obs.time))
             .select_from(Obs)
             .join(Variable)
             .join(Network)
-            .filter(Network.name == "bc_hydro")
+            .filter(Network.name == "BCH")
             .scalar()
         )
-        start_date = latest_obs_time - publication_lags["bc_hydro"]
+        log.info(
+            f"For network {network}, latest obs time from query = {latest_obs_time}"
+        )
+        # Obs.time is implicitly UTC, but we need to add that info to the unlocalized
+        # value we get from the database. Also, handle case where the query returns no
+        # value.
+        latest_obs_time = (
+            pytz.utc.localize(latest_obs_time)
+            if latest_obs_time is not None
+            else datetime.min
+        )
+        start_date = latest_obs_time - publication_lags[network]
 
     # For all other cases, replace start_date == None with datetime.min.
     if start_date is None:
@@ -259,8 +268,11 @@ def main(args=None):
         utc = pytz.utc
 
         # Value of None for start_date is meaningful: it means, for some networks,
-        # determine from database.
-        args.start_date = utc.localize(verify_date(args.start_date, None, "start date"))
+        # determine from database. Pass that through.
+        args.start_date = args.start_date and utc.localize(
+            verify_date(args.start_date, datetime.max, "start date")
+        )
+        # Not so for end_date.
         args.end_date = utc.localize(
             verify_date(args.end_date, datetime.max, "end date")
         )
