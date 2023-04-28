@@ -173,7 +173,7 @@ def process(
     # It is probably better to use a dict for this to preserve order.
     # See https://stackoverflow.com/a/9792680
     rows = {row for row in norm_mod.normalize(download_stream)}
-    log.debug(f"Found {len(rows)} rows.")
+    log.info(f"Normalized {len(rows)} rows.")
     log.info("Normalize: done")
 
     # Optionally infer variables and stations/histories.
