@@ -72,8 +72,9 @@ def add_process_args(parser):  # pragma: no cover
             "For networks where the default start date is determined from "
             "the latest observation date in the database, this parameter "
             "defines the number of days that should be subtracted from the "
-            "latest observation date to set the start date. Currently this"
-            "parameter is used only for network 'bc_hydro'."
+            "latest observation date to set the start date. Publication lag "
+            "is used only for certain networks; they are configured in the "
+            "internal file 'crmprtd/data/publication_lags.yaml'."
         ),
     )
     parser.add_argument(
@@ -149,8 +150,8 @@ def process(
         )
         log.info(f"Latest obs time for network {network}: {latest_obs_time}")
         if latest_obs_time is not None:
-            # Obs.time is implicitly UTC, but we need to apply that info to the
-            # unlocalized value we get from the database.
+            # Obs.time is implicitly UTC but is unlocalized in the database.
+            # We have to make that explicit. Then subtract publication lag.
             start_date = pytz.utc.localize(latest_obs_time) - timedelta(
                 days=(publication_lag or publication_lags[network])
             )
