@@ -446,4 +446,13 @@ def align(sesh, row, diagnostic=False):
     # Note: We are very specifically creating the Obs object here using the ids
     # to avoid SQLAlchemy adding this object to the session as part of its
     # cascading backref behaviour https://goo.gl/Lchhv6
-    return Obs(history_id=history.id, time=row.time, datum=datum, vars_id=var_id)
+    # return Obs(history_id=history.id, time=row.time, datum=datum, vars_id=var_id)
+
+    # To allow the use of the PostgreSQL dialect-specific `insert` function, we return a
+    # dict with the relevant key-value mapping. And native table key names.
+    return {
+        "history_id": history.id,
+        "obs_time": row.time,
+        "datum": datum,
+        "vars_id": var_id,
+    }

@@ -8,11 +8,13 @@ speed and reliability. This phase is common to all networks.
 """
 
 from math import floor, log as mathlog
-from sqlalchemy import and_
 import logging
 import time
-from sqlalchemy.exc import IntegrityError
 import random
+
+from sqlalchemy import and_
+from sqlalchemy.dialects.postgresql import insert as pg_insert
+from sqlalchemy.exc import IntegrityError
 
 from crmprtd.db_exceptions import InsertionError
 from pycds import Obs
@@ -185,6 +187,37 @@ def bisect_insert_strategy(sesh, observations):
         return db_metrics
 
 
+def bulk_insert_strategy(sesh, observations):
+    """
+    This method performs a bulk insert of observations using the PostgreSQL dialect
+    INSERT ... ON CONFLICT DO IGNORE clause that allows bulk inserts with duplicates
+    to proceed without raising an exception (dups are ignored; new rows are inserted).
+
+    :param sesh:
+    :param observations:
+    :return:
+    """
+    # TODO: Break into chunks? Necessary? How big?
+
+    num_to_insert = len(observations)
+    # If you try to insert no rows with pg_insert, there's an unexpected insertion.
+    # Avoid that.
+    if num_to_insert == 0:
+        return DBMetrics(0, 0, 0)
+
+    query = (
+        pg_insert(Obs)
+        .values(observations)
+        .on_conflict_do_nothing()
+        # I think we can do this!
+        .returning(Obs.id)
+    )
+    result = sesh.execute(query).fetchall()
+    num_inserted = len(result)
+    dbm = DBMetrics(num_inserted, num_to_insert - num_inserted, 0)
+    return dbm
+
+
 def insert(sesh, observations, sample_size):
     """
     Insert a collection of observations.
@@ -199,17 +232,19 @@ def insert(sesh, observations, sample_size):
     # in the database.
     sesh.commit()
 
-    if contains_all_duplicates(sesh, observations, sample_size):
-        log.info("Using Single Insert Strategy")
-        with Timer() as tmr:
-            dbm = single_insert_strategy(sesh, observations)
+    dbm = bulk_insert_strategy(sesh, observation)
 
-    else:
-        log.info("Using Chunk + Bisection Strategy")
-        with Timer() as tmr:
-            dbm = DBMetrics(0, 0, 0)
-            for chunk in chunks(observations):
-                dbm += bisect_insert_strategy(sesh, chunk)
+    # if contains_all_duplicates(sesh, observations, sample_size):
+    #     log.info("Using Single Insert Strategy")
+    #     with Timer() as tmr:
+    #         dbm = single_insert_strategy(sesh, observations)
+    #
+    # else:
+    #     log.info("Using Chunk + Bisection Strategy")
+    #     with Timer() as tmr:
+    #         dbm = DBMetrics(0, 0, 0)
+    #         for chunk in chunks(observations):
+    #             dbm += bisect_insert_strategy(sesh, chunk)
 
     log.info("Data insertion complete")
     return {

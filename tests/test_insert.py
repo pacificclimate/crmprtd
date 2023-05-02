@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from itertools import chain
 
 import pytest
 import pytz
@@ -13,7 +14,12 @@ from crmprtd.insert import (
     contains_all_duplicates,
     contains_all_duplicates,
     single_insert_strategy,
+    bulk_insert_strategy,
+    Timer,
 )
+
+
+many_days = 1000
 
 
 @pytest.mark.parametrize(
@@ -27,10 +33,60 @@ from crmprtd.insert import (
         ("duplicates", [0 for _ in range(5)], 1),
         # None
         ("none", [], 0),
+        (
+            "many duplicates",
+            chain(range(many_days), range(many_days), range(many_days)),
+            many_days,
+        ),
+    ],
+)
+def test_bulk_insert_strategy(test_session, label, days, expected):
+    # Just pick a random variable and history entry (doesn't matter which)
+    history = test_session.query(History).first()
+    variable = history.station.network.variables[0]
+
+    obs = [
+        {
+            "history_id": history.id,
+            "datum": 2.5,
+            "vars_id": variable.id,
+            "obs_time": datetime(2017, 8, 6, 0, tzinfo=pytz.utc) + timedelta(days=d),
+        }
+        # Obs(
+        #     history=history,
+        #     datum=2.5,
+        #     variable=variable,
+        #     time=datetime(2017, 8, 6, d, tzinfo=pytz.utc),
+        # )
+        for d in days
+    ]
+
+    with Timer() as tmr:
+        dbm = bulk_insert_strategy(test_session, obs)
+    assert dbm.successes == expected
+    print("insertions_per_sec", round(dbm.successes / tmr.run_time, 2))
+
+
+@pytest.mark.parametrize(
+    ("label", "days", "expected"),
+    [
+        # Each obs is for a unique time
+        # All should be inserted
+        ("unique", range(7), 7),
+        # Create 5 observations that are exactly the same
+        # Repeat insertions will fail unique contraint on history/time/variable
+        ("duplicates", [0 for _ in range(5)], 1),
+        # None
+        ("none", [], 0),
+        (
+            "many duplicates",
+            chain(range(many_days), range(many_days), range(many_days)),
+            many_days,
+        ),
     ],
 )
 def test_bisect_insert_strategy(test_session, label, days, expected):
-    # Just pick a randon variable and history entry (doesn't matter which)
+    # Just pick a random variable and history entry (doesn't matter which)
     history = test_session.query(History).first()
     variable = history.station.network.variables[0]
 
@@ -39,13 +95,15 @@ def test_bisect_insert_strategy(test_session, label, days, expected):
             history=history,
             datum=2.5,
             variable=variable,
-            time=datetime(2017, 8, 6, d, tzinfo=pytz.utc),
+            time=datetime(2017, 8, 6, 0, tzinfo=pytz.utc) + timedelta(days=d),
         )
         for d in days
     ]
 
-    dbm = bisect_insert_strategy(test_session, obs)
+    with Timer() as tmr:
+        dbm = bisect_insert_strategy(test_session, obs)
     assert dbm.successes == expected
+    print("insertions_per_sec", round(dbm.successes / tmr.run_time, 2))
 
 
 def test_mass_insert_obs_weird(test_session):
