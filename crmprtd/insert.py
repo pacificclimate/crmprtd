@@ -94,7 +94,6 @@ def get_sample_indices(num_obs, sample_size):
     return random.sample(range(num_obs), sample_size)
 
 
-# TODO: Remove, no longer used
 def obs_exist(sesh, history_id, vars_id, time):
     q = sesh.query(Obs).filter(
         and_(Obs.history_id == history_id, Obs.vars_id == vars_id, Obs.time == time)
