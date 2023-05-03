@@ -10,6 +10,9 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from pycds import Obs, Variable, Network
+
+from crmprtd.constants import InsertStrategy
 from crmprtd.align import align
 from crmprtd.insert import insert
 from crmprtd.download_utils import verify_date
@@ -88,6 +91,7 @@ def process(
     end_date,
     is_diagnostic=False,
     do_infer=False,
+    insert_strategy=InsertStrategy.BULK,
 ):
     """
     Executes stages of the data processing pipeline.
@@ -114,11 +118,15 @@ def process(
     norm_mod = get_normalization_module(network)
 
     log.info("Normalize: start")
-    # The normalizer returns a generator that yields `Row`s. Convert to a set of Rows.
+    # The normalizer returns a generator that yields `Row`s. Convert to a set of `Row`s.
     # It is probably better to use a dict for this to preserve order.
     # See https://stackoverflow.com/a/9792680
-    rows = {row for row in norm_mod.normalize(download_stream)}
-    log.info(f"Normalized {len(rows)} rows.")
+    # Note: Normalization is important. In some datasets, there is a lot of repetition
+    # (factor of 6 in the case of BCH).
+    raw_rows = tuple(norm_mod.normalize(download_stream))
+    log.info(f"Normalized {len(raw_rows)} rows")
+    rows = set(raw_rows)
+    log.info(f"Unique normalized rows: {len(rows)}")
     log.info("Normalize: done")
 
     engine = create_engine(connection_string)
@@ -152,7 +160,9 @@ def process(
         return
 
     log.info("Insert: start")
-    results = insert(sesh, observations, sample_size)
+    results = insert(
+        sesh, observations, strategy=insert_strategy, sample_size=sample_size
+    )
     log.info("Insert: done")
     log.info("Data insertion results", extra={"results": results, "network": network})
 

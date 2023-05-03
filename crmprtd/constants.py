@@ -1,3 +1,3 @@
 from enum import Enum
 
-InsertStrategy = Enum("InsertStrategy", ["BULK", "OTHER"])
+InsertStrategy = Enum("InsertStrategy", ["BULK", "BISECTION"])

@@ -1,25 +1,38 @@
 from datetime import datetime, timedelta
-from itertools import chain
+from math import ceil
 
 import pytest
 import pytz
 
+from crmprtd.more_itertools import cycles
 from pycds import History, Obs
 from crmprtd.insert import (
     bisect_insert_strategy,
     split,
-    chunks,
+    bisection_chunks,
     get_sample_indices,
     obs_exist,
     contains_all_duplicates,
-    contains_all_duplicates,
     single_insert_strategy,
+    fixed_length_chunks,
     bulk_insert_strategy,
     Timer,
 )
 
 
-many_days = 1000
+@pytest.mark.parametrize("list_length, chunk_size", [(100, 20), (101, 20)])
+def test_fixed_length_chunks(list_length, chunk_size):
+    chunks = list(fixed_length_chunks(list(range(list_length)), chunk_size))
+    expected_num_chunks = ceil(list_length / chunk_size)
+    assert len(chunks) == expected_num_chunks
+    last_chunk_length = list_length % chunk_size
+    assert list(map(len, chunks)) == ([chunk_size] * (expected_num_chunks - 1)) + (
+        [chunk_size] if last_chunk_length == 0 else [last_chunk_length]
+    )
+
+
+unique_rows = 100
+total_rows = 3000
 
 
 @pytest.mark.parametrize(
@@ -35,8 +48,8 @@ many_days = 1000
         ("none", [], 0),
         (
             "many duplicates",
-            chain(range(many_days), range(many_days), range(many_days)),
-            many_days,
+            cycles(unique_rows, total_rows),
+            unique_rows,
         ),
     ],
 )
@@ -52,12 +65,6 @@ def test_bulk_insert_strategy(test_session, label, days, expected):
             "vars_id": variable.id,
             "obs_time": datetime(2017, 8, 6, 0, tzinfo=pytz.utc) + timedelta(days=d),
         }
-        # Obs(
-        #     history=history,
-        #     datum=2.5,
-        #     variable=variable,
-        #     time=datetime(2017, 8, 6, d, tzinfo=pytz.utc),
-        # )
         for d in days
     ]
 
@@ -80,8 +87,8 @@ def test_bulk_insert_strategy(test_session, label, days, expected):
         ("none", [], 0),
         (
             "many duplicates",
-            chain(range(many_days), range(many_days), range(many_days)),
-            many_days,
+            cycles(unique_rows, total_rows),
+            unique_rows,
         ),
     ],
 )
@@ -152,12 +159,8 @@ def test_split(tuple, expected_a, expected_b):
     ("list_size", "expected"),
     [(1200, [1024, 128, 32, 16]), (1201, [1024, 128, 32, 16, 1])],
 )
-def test_chunks(list_size, expected):
-    test_list = []
-    for i in range(list_size):
-        test_list.append(i)
-
-    for chunk in chunks(test_list):
+def test_bisection_chunks(list_size, expected):
+    for chunk in bisection_chunks(list(range(list_size))):
         assert len(chunk) in expected
 
 

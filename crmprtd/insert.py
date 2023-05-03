@@ -14,8 +14,9 @@ import random
 
 from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import insert as pg_insert
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, DBAPIError
 
+from crmprtd.constants import InsertStrategy
 from crmprtd.db_exceptions import InsertionError
 from pycds import Obs
 
@@ -49,24 +50,41 @@ class Timer(object):
         self.run_time = self.end - self.start
 
 
-def pow_two_chunk(num):
+def max_power_of_two(num):
     return 2 ** floor(mathlog(num, 2))
 
 
-def get_chunk_sizes(remainder):
+def get_bisection_chunk_sizes(remainder):
     chunk_list = []
     while remainder != 0:
-        chunk_size = pow_two_chunk(remainder)
+        chunk_size = max_power_of_two(remainder)
         remainder -= chunk_size
         chunk_list.append(chunk_size)
     return chunk_list
 
 
-def chunks(obs):
+def bisection_chunks(obs):
     pos = 0
-    for chunk_size in get_chunk_sizes(len(obs)):
+    for chunk_size in get_bisection_chunk_sizes(len(obs)):
         yield obs[pos : pos + chunk_size]
         pos += chunk_size
+
+
+def fixed_length_chunks(a, chunk_size):
+    """
+    Chunk a list into pieces of fixed size (except the last, which may be shorter).
+    Returns a generator that yields chunks.
+
+    :param a:
+    :param chunk_size:
+    :yield: Chunk of array
+    """
+    n = len(a)
+    i = 0
+    while i < n:
+        j = min(i + chunk_size, n)
+        yield a[i:j]
+        i = j
 
 
 def get_sample_indices(num_obs, sample_size):
@@ -76,6 +94,7 @@ def get_sample_indices(num_obs, sample_size):
     return random.sample(range(num_obs), sample_size)
 
 
+# TODO: Remove, no longer used
 def obs_exist(sesh, history_id, vars_id, time):
     q = sesh.query(Obs).filter(
         and_(Obs.history_id == history_id, Obs.vars_id == vars_id, Obs.time == time)
@@ -193,37 +212,43 @@ def bulk_insert_strategy(sesh, observations):
     INSERT ... ON CONFLICT DO IGNORE clause that allows bulk inserts with duplicates
     to proceed without raising an exception (dups are ignored; new rows are inserted).
 
-    :param sesh:
-    :param observations:
-    :return:
-    """
-    # TODO: Break into chunks? Necessary? How big?
+    NOTE: This only works for PostgreSQL databases. Other dialects may support a
+    similar operation, but this code does not handle those cases.
 
+    :param sesh: SQLAlchemy database session
+    :param observations: List of observations to insert
+    :return: DMMetrics describing result of insertion
+    """
     num_to_insert = len(observations)
+
     # If you try to insert no rows with pg_insert, there's an unexpected insertion.
     # Avoid that.
     if num_to_insert == 0:
         return DBMetrics(0, 0, 0)
 
-    query = (
-        pg_insert(Obs)
-        .values(observations)
-        .on_conflict_do_nothing()
-        # I think we can do this!
-        .returning(Obs.id)
-    )
-    result = sesh.execute(query).fetchall()
+    try:
+        result = sesh.execute(
+            pg_insert(Obs)
+            .values(observations)
+            .on_conflict_do_nothing()
+            .returning(Obs.id)
+        ).fetchall()
+    except DBAPIError:
+        # This happens only if something really unanticipated happens. Duplicate
+        # rows do not trigger an exception.
+        return DBMetrics(0, 0, num_to_insert)
+
     num_inserted = len(result)
-    dbm = DBMetrics(num_inserted, num_to_insert - num_inserted, 0)
-    return dbm
+    return DBMetrics(num_inserted, num_to_insert - num_inserted, 0)
 
 
-def insert(sesh, observations, sample_size):
+def insert(sesh, observations, strategy=InsertStrategy.BULK, sample_size=50):
     """
     Insert a collection of observations.
 
     :param sesh: SQLAlchemy database session
     :param observations: Obs objects to insert
+    :param strategy: Insertion strategy. BULK is currently fastest.
     :param sample_size: Size of sample of observations to use to test if all duplicates.
     :return: dict with information about insertions
     """
@@ -232,19 +257,23 @@ def insert(sesh, observations, sample_size):
     # in the database.
     sesh.commit()
 
-    dbm = bulk_insert_strategy(sesh, observation)
-
-    # if contains_all_duplicates(sesh, observations, sample_size):
-    #     log.info("Using Single Insert Strategy")
-    #     with Timer() as tmr:
-    #         dbm = single_insert_strategy(sesh, observations)
-    #
-    # else:
-    #     log.info("Using Chunk + Bisection Strategy")
-    #     with Timer() as tmr:
-    #         dbm = DBMetrics(0, 0, 0)
-    #         for chunk in chunks(observations):
-    #             dbm += bisect_insert_strategy(sesh, chunk)
+    with Timer() as tmr:
+        if strategy == InsertStrategy.BULK:
+            log.info("Using Bulk Insert Strategy")
+            dbm = DBMetrics(0, 0, 0)
+            for chunk in fixed_length_chunks(observations, chunk_size=1000):
+                dbm += bulk_insert_strategy(sesh, chunk)
+        elif strategy == InsertStrategy.BISECTION:
+            if contains_all_duplicates(sesh, observations, sample_size):
+                log.info("Using Single Insert Strategy")
+                dbm = single_insert_strategy(sesh, observations)
+            else:
+                log.info("Using Chunk + Bisection Strategy")
+                dbm = DBMetrics(0, 0, 0)
+                for chunk in bisection_chunks(observations):
+                    dbm += bisect_insert_strategy(sesh, chunk)
+        else:
+            raise ValueError(f"Insert strategy has an unrecognized value: {strategy}")
 
     log.info("Data insertion complete")
     return {
