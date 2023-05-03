@@ -76,6 +76,19 @@ def add_process_args(parser):  # pragma: no cover
         "determines what metadata insertions could be made based"
         "on the observed data available",
     )
+    parser.add_argument(
+        "-R",
+        "--insert_strategy",
+        choices=[s.name for s in InsertStrategy],
+        default="BULK",
+        help=(
+            "Strategy to use for inserting observations. The default BULK strategy "
+            "handles duplicate observation conflicts inside the database; it is "
+            "fastest and is the recommended strategy. The BISECTION strategy handles "
+            "duplicate observation conflicts in the code and is considerably slower. "
+            "It is preserved mainly for experimentation and comparison.",
+        ),
+    )
     return parser
 
 
@@ -241,6 +254,7 @@ def main(args=None):
             end_date=args.end_date,
             is_diagnostic=args.diag,
             do_infer=args.infer,
+            insert_strategy=InsertStrategy[args.insert_strategy],
         )
     except Exception:
         log.exception("Unhandled exception during 'process'")

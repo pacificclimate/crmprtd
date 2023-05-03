@@ -101,6 +101,10 @@ def obs_exist(sesh, history_id, vars_id, time):
     return q.count() > 0
 
 
+# TODO: Individual queries here could be replaced with a single query for all
+#   sample observations at once, increasing speed significantly. However, this
+#   function is used only for the semi-deprecated BISECTION insert strategy, so not
+#   worth rewriting now.
 def contains_all_duplicates(sesh, observations, sample_size):
     sample_obs = []
     sample_indices = get_sample_indices(len(observations), sample_size)
@@ -241,14 +245,23 @@ def bulk_insert_strategy(sesh, observations):
     return DBMetrics(num_inserted, num_to_insert - num_inserted, 0)
 
 
-def insert(sesh, observations, strategy=InsertStrategy.BULK, sample_size=50):
+def insert(
+    sesh,
+    observations,
+    strategy=InsertStrategy.BULK,
+    bulk_chunk_size=1000,
+    sample_size=50,
+):
     """
     Insert a collection of observations.
 
     :param sesh: SQLAlchemy database session
-    :param observations: Obs objects to insert
-    :param strategy: Insertion strategy. BULK is currently fastest.
-    :param sample_size: Size of sample of observations to use to test if all duplicates.
+    :param observations: For BULK insert strategy, list of dicts containing Obs rows
+        to insert. For OTHER insert strategy, list of Obs objects to insert.
+    :param strategy: Insert strategy. BULK is currently fastest.
+    :param bulk_chunk_size: Fixed chunk size for BULK insert strategy.
+    :param sample_size: Size of sample of observations to use to test for duplicates
+        for BISECTION insert strategy.
     :return: dict with information about insertions
     """
 
@@ -260,9 +273,21 @@ def insert(sesh, observations, strategy=InsertStrategy.BULK, sample_size=50):
         if strategy == InsertStrategy.BULK:
             log.info("Using Bulk Insert Strategy")
             dbm = DBMetrics(0, 0, 0)
-            for chunk in fixed_length_chunks(observations, chunk_size=1000):
+            for chunk in fixed_length_chunks(observations, chunk_size=bulk_chunk_size):
                 dbm += bulk_insert_strategy(sesh, chunk)
         elif strategy == InsertStrategy.BISECTION:
+            # Output of align is a list of dicts. These must be converted to Obs
+            # objects for the consumption of BISECTION strategy. Because the ORM
+            # doesn't use the same column names as the native table, this is tedious.
+            observations = [
+                Obs(
+                    history_id=o["history_id"],
+                    time=o["obs_time"],
+                    datum=o["datum"],
+                    vars_id=o["vars_id"],
+                )
+                for o in observations
+            ]
             if contains_all_duplicates(sesh, observations, sample_size):
                 log.info("Using Single Insert Strategy")
                 dbm = single_insert_strategy(sesh, observations)
