@@ -129,6 +129,9 @@ def add_logging_args(parser):
     return parser
 
 
+# TODO: What is a "common" argument and what are phase-specific arguments needs to be
+#   reviewed. There are several arguments specific to the process phase here; others
+#   specific to it are in add_process_arguments.
 def common_script_arguments(parser):  # pragma: no cover
     parser.add_argument(
         "-c", "--connection_string", help="PostgreSQL connection string"
@@ -180,7 +183,7 @@ def common_script_arguments(parser):  # pragma: no cover
         default=50,
         help="Number of samples to be taken from observations "
         "when searching for duplicates "
-        "to determine which insertion strategy to use",
+        "to determine how to handle bisection strategy",
     )
     return parser
 
