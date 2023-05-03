@@ -10,8 +10,6 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from pycds import Obs, Variable, Network
-
 from crmprtd.constants import InsertStrategy
 from crmprtd.align import align
 from crmprtd.insert import insert
