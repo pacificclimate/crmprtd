@@ -216,9 +216,9 @@ def main(args=None):
 
         utc = pytz.utc
 
-        # Value of None for start_date is meaningful: it means, for some networks,
-        # determine from database.
-        args.start_date = utc.localize(verify_date(args.start_date, None, "start date"))
+        args.start_date = utc.localize(
+            verify_date(args.start_date, datetime.min, "start date")
+        )
         args.end_date = utc.localize(
             verify_date(args.end_date, datetime.max, "end date")
         )
