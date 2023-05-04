@@ -84,7 +84,7 @@ def test_process_by_date(
 
     # Restrict the logging to just what is important to this test.
     caplog.set_level(logging.WARNING, "sqlalchemy.engine")
-    caplog.set_level(logging.DEBUG, "crmprtd")
+    caplog.set_level(logging.INFO, "crmprtd")
 
     utc = pytz.utc
 

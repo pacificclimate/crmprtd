@@ -230,18 +230,25 @@ def bulk_insert_strategy(sesh, observations):
         return DBMetrics(0, 0, 0)
 
     try:
-        result = sesh.execute(
-            pg_insert(Obs)
-            .values(observations)
-            .on_conflict_do_nothing()
-            .returning(Obs.id)
-        ).fetchall()
-    except DBAPIError:
-        # This happens only if something really unanticipated happens. Duplicate
-        # rows do not trigger an exception.
+        with sesh.begin_nested():
+            result = sesh.execute(
+                pg_insert(Obs)
+                .values(observations)
+                .on_conflict_do_nothing()
+                .returning(Obs.id)
+            ).fetchall()
+    except DBAPIError as e:
+        # Something really unanticipated happened. Duplicate rows do not trigger an
+        # exception.
+        log.warning(f"Unexpected error during bulk insertion: {e}")
         return DBMetrics(0, 0, num_to_insert)
-
-    num_inserted = len(result)
+    else:
+        num_inserted = len(result)
+        log.info(
+            f"Successfully inserted observations: {num_inserted}",
+            extra={"num_obs": num_inserted},
+        )
+    sesh.commit()
     return DBMetrics(num_inserted, num_to_insert - num_inserted, 0)
 
 
