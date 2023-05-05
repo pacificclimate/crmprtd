@@ -15,12 +15,7 @@ from crmprtd.align import align
 from crmprtd.insert import insert
 from crmprtd.download_utils import verify_date
 from crmprtd.infer import infer
-from crmprtd import (
-    add_version_arg,
-    add_logging_args,
-    setup_logging,
-    NETWORKS,
-)
+from crmprtd import add_version_arg, add_logging_args, setup_logging, NETWORKS
 
 
 log = logging.getLogger(__name__)
@@ -87,6 +82,18 @@ def add_process_args(parser):  # pragma: no cover
             "It is preserved mainly for experimentation and comparison.",
         ),
     )
+    parser.add_argument(
+        "-C",
+        "--bulk_chunk_size",
+        type=int,
+        default=1000,
+        help=(
+            "Fixed-length chunk size to use for BULK insertion strategy. Larger "
+            "groups of observations to insert are broken into groups of no greater "
+            "than this size to prevent possible problems with excessively large "
+            "queries."
+        ),
+    )
     return parser
 
 
@@ -103,6 +110,7 @@ def process(
     is_diagnostic=False,
     do_infer=False,
     insert_strategy=InsertStrategy.BULK,
+    bulk_chunk_size=1000,
 ):
     """
     Executes stages of the data processing pipeline.
@@ -172,7 +180,11 @@ def process(
 
     log.info("Insert: start")
     results = insert(
-        sesh, observations, strategy=insert_strategy, sample_size=sample_size
+        sesh,
+        observations,
+        strategy=insert_strategy,
+        bulk_chunk_size=bulk_chunk_size,
+        sample_size=sample_size,
     )
     log.info("Insert: done")
     log.info("Data insertion results", extra={"results": results, "network": network})
@@ -253,6 +265,7 @@ def main(args=None):
             is_diagnostic=args.diag,
             do_infer=args.infer,
             insert_strategy=InsertStrategy[args.insert_strategy],
+            bulk_chunk_size=args.bulk_chunk_size,
         )
     except Exception:
         log.exception("Unhandled exception during 'process'")
