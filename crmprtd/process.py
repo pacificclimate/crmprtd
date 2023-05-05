@@ -77,9 +77,17 @@ def add_process_args(parser):  # pragma: no cover
         help=(
             "Strategy to use for inserting observations. The default BULK strategy "
             "handles duplicate observation conflicts inside the database; it is "
-            "fastest and is the recommended strategy. The BISECTION strategy handles "
-            "duplicate observation conflicts in the code and is considerably slower. "
-            "It is preserved mainly for experimentation and comparison.",
+            "fastest and is the recommended strategy. The other strategies handle "
+            "duplicate observation conflicts outside the database (that is, in this "
+            "client), and are considerably slower. They are preserved mainly for "
+            "experimentation and comparison. The SINGLE strategy tries inserting the "
+            "observations one at a time. The CHUNK_BISECT strategy tries inserting the "
+            "observations in fairly large sized chunks, and seeks small sized "
+            "sub-chunks if any given chunk fails (because it contains a duplicate). "
+            "The ADAPTIVE strategy chooses between SINGLE or CHUNK_BISECT based on a "
+            "small randomly selected sample of the observations to be inserted; if all "
+            "the observations in this sample are duplicates, it uses SINGLE; "
+            "if not, it uses CHUNK_BISECT."
         ),
     )
     parser.add_argument(

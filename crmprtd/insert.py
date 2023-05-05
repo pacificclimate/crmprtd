@@ -149,6 +149,7 @@ def insert_single_obs(sesh, obs):
 
 
 def single_insert_strategy(sesh, observations):
+    log.info("Using Single Insert Strategy")
     dbm = DBMetrics(0, 0, 0)
     for obs in observations:
         dbm += insert_single_obs(sesh, obs)
@@ -217,6 +218,14 @@ def bisect_insert_strategy(sesh, observations):
         return db_metrics
 
 
+def chunk_bisect_insert_strategy(sesh, observations):
+    log.info("Using Chunk + Bisection Strategy")
+    dbm = DBMetrics(0, 0, 0)
+    for chunk in bisection_chunks(observations):
+        dbm += bisect_insert_strategy(sesh, chunk)
+    return dbm
+
+
 def obs_to_pg_insert_dict(obs):
     """
     Convert an Obs object to a dict suitable for consumption by pg_insert.
@@ -283,6 +292,7 @@ def bulk_insert_strategy(sesh, observations, chunk_size=1000):
     :param chunk_size: Size of chunks.
     :return: DMMetrics describing result of insertion
     """
+    log.info("Using Bulk Insert Strategy")
     dbm = DBMetrics(0, 0, 0)
     for chunk in fixed_length_chunks(observations, chunk_size=chunk_size):
         dbm += insert_bulk_obs(sesh, chunk)
@@ -315,17 +325,16 @@ def insert(
 
     with Timer() as tmr:
         if strategy is InsertStrategy.BULK:
-            log.info("Using Bulk Insert Strategy")
             dbm = bulk_insert_strategy(sesh, observations, chunk_size=bulk_chunk_size)
-        elif strategy is InsertStrategy.BISECTION:
+        elif strategy is InsertStrategy.SINGLE:
+            dbm = single_insert_strategy(sesh, observations)
+        elif strategy is InsertStrategy.CHUNK_BISECT:
+            dbm = chunk_bisect_insert_strategy(sesh, observations)
+        elif strategy is InsertStrategy.ADAPTIVE:
             if contains_all_duplicates(sesh, observations, sample_size):
-                log.info("Using Single Insert Strategy")
                 dbm = single_insert_strategy(sesh, observations)
             else:
-                log.info("Using Chunk + Bisection Strategy")
-                dbm = DBMetrics(0, 0, 0)
-                for chunk in bisection_chunks(observations):
-                    dbm += bisect_insert_strategy(sesh, chunk)
+                dbm = chunk_bisect_insert_strategy(sesh, observations)
         else:
             raise ValueError(f"Insert strategy has an unrecognized value: {strategy}")
 
