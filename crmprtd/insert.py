@@ -72,12 +72,12 @@ def bisection_chunks(obs):
 
 def fixed_length_chunks(a, chunk_size):
     """
-    Chunk a list into pieces of fixed size (except the last, which may be shorter).
-    Returns a generator that yields chunks.
+    Chunk a list into pieces of fixed size (except the last, which is limited by the
+    length of the list). Returns a generator that yields chunks.
 
-    :param a:
-    :param chunk_size:
-    :yield: Chunk of array
+    :param a: List to chunk.
+    :param chunk_size: Length of chunks.
+    :yield: Chunk of list.
     """
     n = len(a)
     i = 0
@@ -165,6 +165,14 @@ def split(tuple_):
         return (tuple_[:i], tuple_[i:])
 
 
+# TODO: NOTE: This is probably unnecessary given the bulk insert strategy, but ...
+#   An alternative to the naive bisect strategy, which seeks blocks of non-duplicate
+#   observations to insert successfully via bisection: Query the database to determine
+#   which of the prospective observations to insert already exist. Remove those from
+#   the list (set) to insert. Insert the remaining ones, which are almost certain still
+#   not to exist. Handle failures, of course. Probably best to do this in chunks, i.e.,
+#   not to query on the full list (which could have hundreds of thousands of elements),
+#   but on smaller pieces.
 def bisect_insert_strategy(sesh, observations):
     """This function implements a recursive Obs insert strategy to
     handle unique constraint errors on members of the set. The
@@ -209,7 +217,7 @@ def bisect_insert_strategy(sesh, observations):
         return db_metrics
 
 
-def bulk_insert_strategy(sesh, observations):
+def insert_bulk_obs(sesh, observations):
     """
     This method performs a bulk insert of observations using the PostgreSQL dialect
     INSERT ... ON CONFLICT DO IGNORE clause that allows bulk inserts with duplicates
@@ -252,6 +260,23 @@ def bulk_insert_strategy(sesh, observations):
     return DBMetrics(num_inserted, num_to_insert - num_inserted, 0)
 
 
+def bulk_insert_strategy(sesh, observations, chunk_size=1000):
+    """
+    Breaks observations (which may number in the hundreds of thousands) into smaller
+    chunks and inserts each chunk in bulk. Currently, fixed-length chunks are inserted.
+    There seems no reason for any other chunking strategy.
+
+    :param sesh: SQLAlchemy database session
+    :param observations: List of observations to insert
+    :param chunk_size: Size of chunks.
+    :return: DMMetrics describing result of insertion
+    """
+    dbm = DBMetrics(0, 0, 0)
+    for chunk in fixed_length_chunks(observations, chunk_size=chunk_size):
+        dbm += insert_bulk_obs(sesh, chunk)
+    return dbm
+
+
 def insert(
     sesh,
     observations,
@@ -279,9 +304,7 @@ def insert(
     with Timer() as tmr:
         if strategy is InsertStrategy.BULK:
             log.info("Using Bulk Insert Strategy")
-            dbm = DBMetrics(0, 0, 0)
-            for chunk in fixed_length_chunks(observations, chunk_size=bulk_chunk_size):
-                dbm += bulk_insert_strategy(sesh, chunk)
+            dbm = bulk_insert_strategy(sesh, observations, chunk_size=bulk_chunk_size)
         elif strategy is InsertStrategy.BISECTION:
             # Output of align is a list of dicts. These must be converted to Obs
             # objects for the consumption of BISECTION strategy. Because the ORM
