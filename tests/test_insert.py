@@ -99,9 +99,9 @@ def test_bisect_insert_strategy(test_session, label, days, expected):
 
     obs = [
         Obs(
-            history=history,
+            history_id=history.id,
             datum=2.5,
-            variable=variable,
+            vars_id=variable.id,
             time=datetime(2017, 8, 6, 0, tzinfo=pytz.utc) + timedelta(days=d),
         )
         for d in days
