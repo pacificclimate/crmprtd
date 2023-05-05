@@ -240,10 +240,10 @@ def test_align_successes(
     test_session, obs_tuple, expected_hid, expected_time, expeceted_vid, expected_datum
 ):
     ob = align(test_session, obs_tuple)
-    assert ob["history_id"] == expected_hid
-    assert ob["obs_time"] == expected_time
-    assert ob["vars_id"] == expeceted_vid
-    assert ob["datum"] == expected_datum
+    assert ob.history_id == expected_hid
+    assert ob.time == expected_time
+    assert ob.vars_id == expeceted_vid
+    assert ob.datum == expected_datum
 
 
 @pytest.mark.parametrize(
