@@ -245,10 +245,10 @@ def insert_bulk_obs(sesh, observations):
                 .on_conflict_do_nothing()
                 .returning(Obs.id)
             ).fetchall()
-    except DBAPIError as e:
+    except DBAPIError:
         # Something really unanticipated happened. Duplicate rows do not trigger an
         # exception.
-        log.warning(f"Unexpected error during bulk insertion: {e}")
+        log.exception("Unexpected error during bulk insertion")
         return DBMetrics(0, 0, num_to_insert)
     else:
         num_inserted = len(result)
