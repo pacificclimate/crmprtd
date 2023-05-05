@@ -35,6 +35,7 @@ unique_rows = 100
 total_rows = 3000
 
 
+@pytest.mark.parametrize("method", (bisect_insert_strategy, bulk_insert_strategy))
 @pytest.mark.parametrize(
     ("label", "days", "expected"),
     [
@@ -48,17 +49,21 @@ total_rows = 3000
         ("none", [], 0),
         (
             "many duplicates",
-            cycles(unique_rows, total_rows),
+            list(cycles(unique_rows, total_rows)),
             unique_rows,
         ),
     ],
 )
-def test_bulk_insert_strategy(test_session, label, days, expected):
+def test_many_insert_strategy(test_session, method, label, days, expected):
+    """Test the non-single insert strategies."""
     # Just pick a random variable and history entry (doesn't matter which)
     history = test_session.query(History).first()
     variable = history.station.network.variables[0]
 
     obs = [
+        # Important: We are very specifically creating the Obs object here using the ids
+        #  to avoid SQLAlchemy adding this object to the session as part of its
+        #  cascading backref behaviour https://goo.gl/Lchhv6
         Obs(
             history_id=history.id,
             datum=2.5,
@@ -69,46 +74,7 @@ def test_bulk_insert_strategy(test_session, label, days, expected):
     ]
 
     with Timer() as tmr:
-        dbm = bulk_insert_strategy(test_session, obs)
-    assert dbm.successes == expected
-    print("insertions_per_sec", round(dbm.successes / tmr.run_time, 2))
-
-
-@pytest.mark.parametrize(
-    ("label", "days", "expected"),
-    [
-        # Each obs is for a unique time
-        # All should be inserted
-        ("unique", range(7), 7),
-        # Create 5 observations that are exactly the same
-        # Repeat insertions will fail unique contraint on history/time/variable
-        ("duplicates", [0 for _ in range(5)], 1),
-        # None
-        ("none", [], 0),
-        (
-            "many duplicates",
-            cycles(unique_rows, total_rows),
-            unique_rows,
-        ),
-    ],
-)
-def test_bisect_insert_strategy(test_session, label, days, expected):
-    # Just pick a random variable and history entry (doesn't matter which)
-    history = test_session.query(History).first()
-    variable = history.station.network.variables[0]
-
-    obs = [
-        Obs(
-            history_id=history.id,
-            datum=2.5,
-            vars_id=variable.id,
-            time=datetime(2017, 8, 6, 0, tzinfo=pytz.utc) + timedelta(days=d),
-        )
-        for d in days
-    ]
-
-    with Timer() as tmr:
-        dbm = bisect_insert_strategy(test_session, obs)
+        dbm = method(test_session, obs)
     assert dbm.successes == expected
     print("insertions_per_sec", round(dbm.successes / tmr.run_time, 2))
 
