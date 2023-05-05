@@ -59,12 +59,12 @@ def test_bulk_insert_strategy(test_session, label, days, expected):
     variable = history.station.network.variables[0]
 
     obs = [
-        {
-            "history_id": history.id,
-            "datum": 2.5,
-            "vars_id": variable.id,
-            "obs_time": datetime(2017, 8, 6, 0, tzinfo=pytz.utc) + timedelta(days=d),
-        }
+        Obs(
+            history_id=history.id,
+            datum=2.5,
+            vars_id=variable.id,
+            time=datetime(2017, 8, 6, 0, tzinfo=pytz.utc) + timedelta(days=d),
+        )
         for d in days
     ]
 

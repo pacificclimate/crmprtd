@@ -217,6 +217,18 @@ def bisect_insert_strategy(sesh, observations):
         return db_metrics
 
 
+def obs_to_pg_insert_dict(obs):
+    """
+    Convert an Obs object to a dict suitable for consumption by pg_insert.
+    """
+    return {
+        "history_id": obs.history_id,
+        "obs_time": obs.time,
+        "datum": obs.datum,
+        "vars_id": obs.vars_id,
+    }
+
+
 def insert_bulk_obs(sesh, observations):
     """
     This method performs a bulk insert of observations using the PostgreSQL dialect
@@ -241,11 +253,11 @@ def insert_bulk_obs(sesh, observations):
         with sesh.begin_nested():
             result = sesh.execute(
                 pg_insert(Obs)
-                .values(observations)
+                .values([obs_to_pg_insert_dict(o) for o in observations])
                 .on_conflict_do_nothing()
                 .returning(Obs.id)
             ).fetchall()
-    except DBAPIError:
+    except DBAPIError as e:
         # Something really unanticipated happened. Duplicate rows do not trigger an
         # exception.
         log.exception("Unexpected error during bulk insertion")
@@ -306,18 +318,6 @@ def insert(
             log.info("Using Bulk Insert Strategy")
             dbm = bulk_insert_strategy(sesh, observations, chunk_size=bulk_chunk_size)
         elif strategy is InsertStrategy.BISECTION:
-            # Output of align is a list of dicts. These must be converted to Obs
-            # objects for the consumption of BISECTION strategy. Because the ORM
-            # doesn't use the same column names as the native table, this is tedious.
-            observations = [
-                Obs(
-                    history_id=o["history_id"],
-                    time=o["obs_time"],
-                    datum=o["datum"],
-                    vars_id=o["vars_id"],
-                )
-                for o in observations
-            ]
             if contains_all_duplicates(sesh, observations, sample_size):
                 log.info("Using Single Insert Strategy")
                 dbm = single_insert_strategy(sesh, observations)
