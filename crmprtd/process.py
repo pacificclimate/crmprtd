@@ -132,7 +132,7 @@ def process(
     # The normalizer returns a generator that yields `Row`s. Convert to a set of `Row`s.
     # It is probably better to use a dict for this to preserve order.
     # See https://stackoverflow.com/a/9792680
-    # Note: Normalization is important. In some datasets, there is a lot of repetition
+    # Note: Deduplication is important. In some datasets, there is a lot of repetition
     # (factor of 6 in the case of BCH).
     raw_rows = tuple(norm_mod.normalize(download_stream))
     log.info(f"Normalized {len(raw_rows)} rows")
