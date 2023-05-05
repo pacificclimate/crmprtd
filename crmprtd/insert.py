@@ -277,12 +277,12 @@ def insert(
     sesh.commit()
 
     with Timer() as tmr:
-        if strategy == InsertStrategy.BULK:
+        if strategy is InsertStrategy.BULK:
             log.info("Using Bulk Insert Strategy")
             dbm = DBMetrics(0, 0, 0)
             for chunk in fixed_length_chunks(observations, chunk_size=bulk_chunk_size):
                 dbm += bulk_insert_strategy(sesh, chunk)
-        elif strategy == InsertStrategy.BISECTION:
+        elif strategy is InsertStrategy.BISECTION:
             # Output of align is a list of dicts. These must be converted to Obs
             # objects for the consumption of BISECTION strategy. Because the ORM
             # doesn't use the same column names as the native table, this is tedious.
