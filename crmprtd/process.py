@@ -16,7 +16,7 @@ from crmprtd.insert import insert
 from crmprtd.download_utils import verify_date
 from crmprtd.infer import infer
 from crmprtd import add_version_arg, add_logging_args, setup_logging, NETWORKS
-
+from crmprtd.more_itertools import tap, log_progress
 
 log = logging.getLogger(__name__)
 
@@ -171,10 +171,15 @@ def process(
         # in this case possible None values returned by align.
         filter(
             None,
-            (
-                align(sesh, row, is_diagnostic)
-                for row in rows
-                if start_date <= row.time <= end_date
+            tap(
+                log_progress(
+                    (1, 2, 10, 100, 1000, 10000), "align progress: {count}", log.info
+                ),
+                (
+                    align(sesh, row, is_diagnostic)
+                    for row in rows
+                    if start_date <= row.time <= end_date
+                ),
             ),
         )
     )
