@@ -24,8 +24,8 @@ def tap(f, iterable):
 def log_progress(when=(10,), message="progress: {count}", log=None):
     """
     Return a function that logs a message periodically. This function is typically used
-    to log progress updates during a long iteration, when such an update would be
-    too bulky or intrusive if logged on every iteration.
+    to log progress updates during a long iteration, when such updates would be too
+    bulky or intrusive if logged on every iteration.
 
     The function returned accepts an optional keyword argument, `item`, that can be
     used to pass in other information, e.g., the current iteration item. This is its
@@ -39,10 +39,20 @@ def log_progress(when=(10,), message="progress: {count}", log=None):
     `when` or when it is a multiple of the last integer in `when`. This enables
     messages to be logged more frequently in the early parts of an iteration and less
     frequently in the later parts.
+
+    The message is defined by argument `message`, which is a template string that is
+    formatted with arguments `count` (function call count) and `item` (function
+    argument) when a message is logged.
+
+    The logger is given by the argument `log`, which is typically a Python logger
+    function.
+
+    Interesting that the explanation is 3x as long as the code.
     """
     count = 0
     when = tuple(when)
     front, last = when[0 : len(when) - 1], when[len(when) - 1]
+    log(f"log_progress: when={when}, front={front}, last={last}")
 
     def f(item=None):
         if log is None:
