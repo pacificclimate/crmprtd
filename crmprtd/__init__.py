@@ -181,9 +181,10 @@ def common_script_arguments(parser):  # pragma: no cover
         "--sample_size",
         type=int,
         default=50,
-        help="Number of samples to be taken from observations "
-        "when searching for duplicates "
-        "to determine how to handle bisection strategy",
+        help=(
+            "Number of samples to be taken from observations when searching for "
+            "duplicates to determine how to handle ADAPTIVE insertion strategy"
+        ),
     )
     return parser
 

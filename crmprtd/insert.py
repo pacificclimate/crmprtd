@@ -311,12 +311,12 @@ def insert(
     Insert a collection of observations.
 
     :param sesh: SQLAlchemy database session
-    :param observations: For BULK insert strategy, list of dicts containing Obs rows
-        to insert. For OTHER insert strategy, list of Obs objects to insert.
-    :param strategy: Insert strategy. BULK is currently fastest.
+    :param observations: List of Obs objects to insert.
+    :param strategy: (InsertStrategy) Insert strategy. InsertStrategy.BULK is
+        currently fastest.
     :param bulk_chunk_size: Fixed chunk size for BULK insert strategy.
     :param sample_size: Size of sample of observations to use to test for duplicates
-        for BISECTION insert strategy.
+        for ADAPTIVE insert strategy.
     :return: dict with information about insertions
     """
 
