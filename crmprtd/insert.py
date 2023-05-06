@@ -291,8 +291,12 @@ def bulk_insert_strategy(sesh, observations, chunk_size=1000):
     dbm = DBMetrics(0, 0, 0)
     for chunk in fixed_length_chunks(observations, chunk_size=chunk_size):
         chunk_dbm = insert_bulk_obs(sesh, chunk)
-        log.info(f"Bulk insert progress: {dbm.successes} inserted, {dbm.skips} skipped")
         dbm += chunk_dbm
+        log.info(
+            f"Bulk insert progress: "
+            f"{dbm.successes} inserted, {dbm.skips} skipped, {dbm.failures} failed"
+        )
+    log.info(f"Successfully inserted observations: {dbm.successes}")
     return dbm
 
 

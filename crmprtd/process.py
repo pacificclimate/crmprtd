@@ -173,7 +173,9 @@ def process(
             None,
             tap(
                 log_progress(
-                    (1, 2, 10, 100, 1000, 10000), "align progress: {count}", log.info
+                    (1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 5000),
+                    "align progress: {count}",
+                    log.info,
                 ),
                 (
                     align(sesh, row, is_diagnostic)
