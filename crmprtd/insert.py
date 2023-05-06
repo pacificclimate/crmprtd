@@ -271,13 +271,8 @@ def insert_bulk_obs(sesh, observations):
         # exception.
         log.exception("Unexpected error during bulk insertion")
         return DBMetrics(0, 0, num_to_insert)
-    else:
-        num_inserted = len(result)
-        log.info(
-            f"Successfully inserted observations: {num_inserted}",
-            extra={"num_obs": num_inserted},
-        )
     sesh.commit()
+    num_inserted = len(result)
     return DBMetrics(num_inserted, num_to_insert - num_inserted, 0)
 
 
@@ -295,7 +290,9 @@ def bulk_insert_strategy(sesh, observations, chunk_size=1000):
     log.info("Using Bulk Insert Strategy")
     dbm = DBMetrics(0, 0, 0)
     for chunk in fixed_length_chunks(observations, chunk_size=chunk_size):
-        dbm += insert_bulk_obs(sesh, chunk)
+        chunk_dbm = insert_bulk_obs(sesh, chunk)
+        log.info(f"Bulk insert progress: {dbm.successes} inserted, {dbm.skips} skipped")
+        dbm += chunk_dbm
     return dbm
 
 
