@@ -10,17 +10,13 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from crmprtd.constants import InsertStrategy
 from crmprtd.align import align
 from crmprtd.insert import insert
 from crmprtd.download_utils import verify_date
 from crmprtd.infer import infer
-from crmprtd import (
-    add_version_arg,
-    add_logging_args,
-    setup_logging,
-    NETWORKS,
-)
-
+from crmprtd import add_version_arg, add_logging_args, setup_logging, NETWORKS
+from crmprtd.more_itertools import tap, log_progress
 
 log = logging.getLogger(__name__)
 
@@ -57,14 +53,12 @@ def add_process_args(parser):  # pragma: no cover
         "--start_date",
         help="Optional start time to use for processing "
         "(interpreted with dateutil.parser.parse).",
-        default=str(datetime.min),
     )
     parser.add_argument(
         "-E",
         "--end_date",
         help="Optional end time to use for processing "
         "(interpreted with dateutil.parser.parse).",
-        default=str(datetime.max),
     )
     parser.add_argument(
         "-I",
@@ -74,6 +68,39 @@ def add_process_args(parser):  # pragma: no cover
         help="Run the 'infer' stage of the pipeline, which "
         "determines what metadata insertions could be made based"
         "on the observed data available",
+    )
+    parser.add_argument(
+        "-R",
+        "--insert_strategy",
+        choices=[s.name for s in InsertStrategy],
+        default="BULK",
+        help=(
+            "Strategy to use for inserting observations. The default BULK strategy "
+            "handles duplicate observation conflicts inside the database; it is "
+            "fastest and is the recommended strategy. The other strategies handle "
+            "duplicate observation conflicts outside the database (that is, in this "
+            "client), and are considerably slower. They are preserved mainly for "
+            "experimentation and comparison. The SINGLE strategy tries inserting the "
+            "observations one at a time. The CHUNK_BISECT strategy tries inserting the "
+            "observations in fairly large sized chunks, and seeks small sized "
+            "sub-chunks if any given chunk fails (because it contains a duplicate). "
+            "The ADAPTIVE strategy chooses between SINGLE or CHUNK_BISECT based on a "
+            "small randomly selected sample of the observations to be inserted; if all "
+            "the observations in this sample are duplicates, it uses SINGLE; "
+            "if not, it uses CHUNK_BISECT."
+        ),
+    )
+    parser.add_argument(
+        "-C",
+        "--bulk_chunk_size",
+        type=int,
+        default=1000,
+        help=(
+            "Fixed-length chunk size to use for BULK insertion strategy. Larger "
+            "groups of observations to insert are broken into groups of no greater "
+            "than this size to prevent possible problems with excessively large "
+            "queries."
+        ),
     )
     return parser
 
@@ -90,6 +117,8 @@ def process(
     end_date,
     is_diagnostic=False,
     do_infer=False,
+    insert_strategy=InsertStrategy.BULK,
+    bulk_chunk_size=1000,
 ):
     """
     Executes stages of the data processing pipeline.
@@ -115,11 +144,16 @@ def process(
     download_stream = sys.stdin.buffer
     norm_mod = get_normalization_module(network)
 
-    # The normalizer returns a generator that yields `Row`s. Convert to a set of Rows.
     log.info("Normalize: start")
-
-    rows = {row for row in norm_mod.normalize(download_stream)}
-    log.debug(f"Found {len(rows)} rows.")
+    # The normalizer returns a generator that yields `Row`s. Convert to a set of `Row`s.
+    # It is probably better to use a dict for this to preserve order.
+    # See https://stackoverflow.com/a/9792680
+    # Note: Deduplication is important. In some datasets, there is a lot of repetition
+    # (factor of 6 in the case of BCH).
+    raw_rows = tuple(norm_mod.normalize(download_stream))
+    log.info(f"Normalized {len(raw_rows)} rows")
+    rows = set(raw_rows)
+    log.info(f"Unique normalized rows: {len(rows)}")
     log.info("Normalize: done")
 
     engine = create_engine(connection_string)
@@ -137,10 +171,17 @@ def process(
         # in this case possible None values returned by align.
         filter(
             None,
-            (
-                align(sesh, row, is_diagnostic)
-                for row in rows
-                if start_date <= row.time <= end_date
+            tap(
+                log_progress(
+                    (1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 5000),
+                    "align progress: {count}",
+                    log.info,
+                ),
+                (
+                    align(sesh, row, is_diagnostic)
+                    for row in rows
+                    if start_date <= row.time <= end_date
+                ),
             ),
         )
     )
@@ -153,7 +194,13 @@ def process(
         return
 
     log.info("Insert: start")
-    results = insert(sesh, observations, sample_size)
+    results = insert(
+        sesh,
+        observations,
+        strategy=insert_strategy,
+        bulk_chunk_size=bulk_chunk_size,
+        sample_size=sample_size,
+    )
     log.info("Insert: done")
     log.info("Data insertion results", extra={"results": results, "network": network})
 
@@ -232,6 +279,8 @@ def main(args=None):
             end_date=args.end_date,
             is_diagnostic=args.diag,
             do_infer=args.infer,
+            insert_strategy=InsertStrategy[args.insert_strategy],
+            bulk_chunk_size=args.bulk_chunk_size,
         )
     except Exception:
         log.exception("Unhandled exception during 'process'")

@@ -42,9 +42,9 @@ for def_ in (
 
 
 def cached_function(attrs):
-    """A context manager that can be used to cache database results
+    """A decorator factory that can be used to cache database results
 
-        Neither database sessions (i.e. the sesh parameter of each wrapped
+    Neither database sessions (i.e. the sesh parameter of each wrapped
     function) nor SQLAlchemy mapped objects (the results of queries) are
     cachable or reusable. Therefore one cannot memoize database query
     functions using builtin things like the lrucache.
@@ -55,8 +55,8 @@ def cached_function(attrs):
     and c) accepting as a parameter a list of attributes to retrieve and
     store in the cache result.
 
-        args (except sesh) and kwargs to the wrapped function are used as
-        the cache key, and results are the parametrized object attributes.
+    args (except sesh) and kwargs to the wrapped function are used as
+    the cache key, and results are the parametrized object attributes.
     """
 
     def wrapper(f):
@@ -67,9 +67,8 @@ def cached_function(attrs):
             key = (args) + tuple(kwargs.items())
             if key not in cache:
                 obj = f(sesh, *args, **kwargs)
-                if not obj:
-                    return None
-                cache[key] = SimpleNamespace(
+                log.debug(f"Cache miss: {f.__name__} {key} -> {repr(obj)}")
+                cache[key] = obj and SimpleNamespace(
                     **{attr: getattr(obj, attr) for attr in attrs}
                 )
             return cache[key]

@@ -9,6 +9,8 @@ from pkg_resources import resource_filename
 from sqlalchemy.exc import IntegrityError
 
 from pycds import Network, History, Variable, Obs
+
+from crmprtd.constants import InsertStrategy
 from crmprtd.download_utils import verify_date
 
 # Must import the module, not objects from it, so we can mock the objects.
@@ -56,6 +58,7 @@ def num_observations_in_db(session):
     return session.query(Obs).count()
 
 
+@pytest.mark.parametrize("insert_strategy", InsertStrategy)
 @pytest.mark.parametrize(
     # There are 2510 observations in the test data file, all dated 2022-06-17.
     # Of these, 2360 are unique. Those should be inserted; the 150 duplicates should
@@ -70,7 +73,13 @@ def num_observations_in_db(session):
 )
 @pytest.mark.filterwarnings("ignore::UserWarning")
 def test_process_by_date(
-    start_date, end_date, expected_num_inserts, monkeypatch, caplog, crmp_session
+    insert_strategy,
+    start_date,
+    end_date,
+    expected_num_inserts,
+    monkeypatch,
+    caplog,
+    crmp_session,
 ):
     # align has several functions that reach out to the database and
     # subsequently cache results While this speeds up align
@@ -84,7 +93,7 @@ def test_process_by_date(
 
     # Restrict the logging to just what is important to this test.
     caplog.set_level(logging.WARNING, "sqlalchemy.engine")
-    caplog.set_level(logging.DEBUG, "crmprtd")
+    caplog.set_level(logging.INFO, "crmprtd")
 
     utc = pytz.utc
 
@@ -140,6 +149,7 @@ def test_process_by_date(
         end_date=end_date,
         is_diagnostic=False,
         do_infer=True,
+        insert_strategy=insert_strategy,
     )
 
     num_obs_in_db_after = num_observations_in_db(crmp_session)
