@@ -67,7 +67,7 @@ def cached_function(attrs):
             key = (args) + tuple(kwargs.items())
             if key not in cache:
                 obj = f(sesh, *args, **kwargs)
-                log.info(f"Cache miss: {f.__name__} {key} -> {repr(obj)}")
+                log.debug(f"Cache miss: {f.__name__} {key} -> {repr(obj)}")
                 cache[key] = obj and SimpleNamespace(
                     **{attr: getattr(obj, attr) for attr in attrs}
                 )
