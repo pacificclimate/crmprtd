@@ -1,5 +1,20 @@
 # News / Release Notes
 
+## 4.4.0
+
+_2023-May-11_
+
+Compatible with database revision 879f0efa125f (PyCDS 4.3.0).
+
+The big news is:
+- ~100x improvement in speed in process phase
+- Now using Poetry to manage dependencies etc. No more Pipenv!
+
+- [Fix download phase crash](https://github.com/pacificclimate/crmprtd/pull/170)
+- [Improve align and insert phase performance](https://github.com/pacificclimate/crmprtd/pull/168)
+- [Convert to Poetry](https://github.com/pacificclimate/crmprtd/pull/161)
+- [Catch and log all errors](https://github.com/pacificclimate/crmprtd/pull/159)
+
 ## 4.3.1
 
 _2023-Apr-19_
