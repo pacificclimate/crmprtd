@@ -50,38 +50,22 @@ pycds = { version = "4.3.0", source = "pcic-pypi" }
 pint = "*"
 pysftp = "*"
 # In Python 3.8 and/or possibly on the crmprtd server, if we use a later version of `urllib3`,
-# we end up with an incompatible version of `liburl3` and importing it fails. So we have to pin
-# `urllib3`. This should become a version-dependent constraint if we loosen the `python` constraint
-# above.
+# importing it fails because it dropped support for OpenSSL<1.1.1, which is what we have
+# currently on the crmprtd server. So we have to pin `urllib3`. This should become a
+# version-dependent constraint if we loosen the `python` constraint above. For more details,
+# see https://github.com/pacificclimate/crmprtd/issues/169.
 urllib3 = "<2"
 
-# Optional dependencies, added via the extras facility, using the `jsonlogger` extra
-# defined below.
+# Optional dependencies, added via the extras facility; see below.
 "python-json-logger" = { version = "*", optional = true }
 
 [tool.poetry.extras]
-# This allows installs with extras of the following form
-#   pip install crmprtd[jsonlogger]
-#   poetry install -E jsonlogger
-# and causes the optional package `python-json-logger` to be installed.
 jsonlogger = ["python-json-logger"]
-
-# TODO: Remove, almost certainly unnecessary and possibly wrong.
-# The following allows the user to install `crmprtd` with the `jsonlogger` extra.
-# See https://python-poetry.org/docs/pyproject#extras
-# There may be an easier way to do this. It's not even clear it does this.
-# Going to add it the apparently correct way.
-#[tool.poetry.group.jsonlogger]
-#optional = true
-#
-#[tool.poetry.group.jsonlogger.dependencies]
-#"python-json-logger" = "*"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 requests_mock = "*"
 pytest-cov = "*"
-python-json-logger = "*"
 "testing.postgresql" = "*"
 pytest-mock = "*"
 black = "*"
@@ -108,10 +92,6 @@ crmprtd_process = "crmprtd.process:main"
 #    "scripts/moti_infill_insert.py",
 #    "scripts/moti_insert_files.py",
 #
-#  Execution scripts. These are deprecated now. If we wish to include them nontheless,
-#  they will have to be added to the [tool.poetry] include key.
+#  Supplementary scripts. Add to the [tool.poetry] include key.
 #
-#    "crmprtd/execution/crmprtd_inserts.sh",
-#    "crmprtd/execution/hourly_swobml2.sh",
 #    "crmprtd/execution/update_matviews_lazy.sql",
-#    "crmprtd/execution/wamr_backpatch_20201118.sh"
