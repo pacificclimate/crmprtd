@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "crmprtd"
-version = "4.3.1.dev3"
+version = "4.3.1.dev5"
 description = "Utility to download near real time weather data and insert it into PCIC's database"
 license = "GPL-3.0-only"
 authors = [
@@ -49,6 +49,11 @@ requests = { version = "*", extras = ["security"] }
 pycds = { version = "4.3.0", source = "pcic-pypi" }
 pint = "*"
 pysftp = "*"
+# In Python 3.8 and/or possibly on the crmprtd server, if we use a later version of `urllib3`,
+# we end up with an incompatible version of `liburl3` and importing it fails. So we have to pin
+# `urllib3`. This should become a version-dependent constraint if we loosen the `python` constraint
+# above.
+urllib3 = "<2"
 
 # Optional dependencies, added via the extras facility, using the `jsonlogger` extra
 # defined below.
