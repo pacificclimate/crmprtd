@@ -25,16 +25,33 @@ def test_temp_filename():
 
 
 @pytest.mark.parametrize(
-    "start end op".split(),
+    "start end op fname".split(),
     (
-        (datetime(2020, 10, 31), datetime(2020, 11, 5), gt),
-        (datetime(2019, 1, 1), datetime(2020, 1, 1), eq),  # out of range dates
+        (
+            datetime(2020, 10, 31),
+            datetime(2020, 11, 5),
+            gt,
+            "PCIC_BCHhourly_201103.zip",
+        ),
+        (
+            datetime(2019, 1, 1),
+            datetime(2020, 1, 1),
+            eq,
+            "PCIC_BCHhourly_201103.zip",
+        ),  # out of range dates
+        # test for pattern matching; dates irrellevant
+        (datetime.min, datetime.max, gt, "PCIC_230220.zip"),
+        (datetime.min, datetime.max, gt, "PCIC_BCHhourly_200421.zip"),
+        (
+            datetime.min,
+            datetime.max,
+            gt,
+            "2021-05-18_20-31-44.177_0000.PCIC_BCHhourly_210518.zip",
+        ),
     ),
 )
-def test_download_relevant_bch_zipfiles(start, end, op, capsys):
-    download_relevant_bch_zipfiles(
-        start, end, FakeFTPConnection(), "PCIC_BCHhourly_201103.zip"
-    )
+def test_download_relevant_bch_zipfiles(start, end, op, fname, capsys):
+    download_relevant_bch_zipfiles(start, end, FakeFTPConnection(), fname)
     out, _ = capsys.readouterr()
     assert op(len(out), 0)
 
