@@ -119,6 +119,7 @@ def process(
     do_infer=False,
     insert_strategy=InsertStrategy.BULK,
     bulk_chunk_size=1000,
+    input_stream=None,  # *binary stream* if using a file use open(filname, "rb")
 ):
     """
     Executes stages of the data processing pipeline.
@@ -141,8 +142,10 @@ def process(
         raise ValueError("No network name given")
 
     # Get the normalizer for the specified network.
-    download_stream = sys.stdin.buffer
     norm_mod = get_normalization_module(network)
+
+    if input_stream is None:
+        input_stream = sys.stdin.buffer
 
     log.info("Normalize: start")
     # The normalizer returns a generator that yields `Row`s. Convert to a set of `Row`s.
@@ -150,7 +153,7 @@ def process(
     # See https://stackoverflow.com/a/9792680
     # Note: Deduplication is important. In some datasets, there is a lot of repetition
     # (factor of 6 in the case of BCH).
-    raw_rows = tuple(norm_mod.normalize(download_stream))
+    raw_rows = tuple(norm_mod.normalize(input_stream))
     log.info(f"Normalized {len(raw_rows)} rows")
     rows = set(raw_rows)
     log.info(f"Unique normalized rows: {len(rows)}")

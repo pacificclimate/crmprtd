@@ -158,3 +158,18 @@ def test_process_by_date(
 
     assert num_obs_inserted_in_db == expected_num_inserts
     assert log_num_obs_inserted == expected_num_inserts
+
+
+def test_process_with_file_arg(test_session, caplog):
+    caplog.set_level(logging.INFO, "crmprtd")
+
+    input_stream = open(resource_filename("crmprtd", "data/wmb_data.csv"), "rb")
+    crmprtd.process.process(
+        connection_string=test_session.get_bind().url,
+        sample_size=50,
+        network="wmb",
+        start_date=pytz.utc.localize(datetime.min),
+        end_date=pytz.utc.localize(datetime.max),
+        input_stream=input_stream,
+    )
+    assert get_num_obs_inserted(caplog.records) == 1
