@@ -23,9 +23,9 @@ version: 1
 disable_existing_loggers: False
 formatters:
   simple:
-    format: '%(asctime)s:%(levelname)s:%(sanitized_connection_string)s:%(name)s - %(message)s'
+    format: '%(asctime)s:%(levelname)s:%(name)s - %(message)s'
   json:
-    format: '%(asctime)s:%(levelname)s:%(sanitized_connection_string)s:%(name)s - %(message)s'
+    format: '%(asctime)s:%(levelname)s:%(name)s - %(message)s'
     class: pythonjsonlogger.jsonlogger.JsonFormatter
 handlers:
   console:
