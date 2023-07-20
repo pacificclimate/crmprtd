@@ -126,6 +126,9 @@ def add_logging_args(parser):
             "the program should report critical errors"
         ),
     )
+    parser.add_argument(
+        "-c", "--connection_string", help="PostgreSQL connection string"
+    )
     return parser
 
 
@@ -209,7 +212,9 @@ def expand_path(path):
     return os.path.expanduser(os.path.expandvars(path))
 
 
-def setup_logging(log_conf, log_filename, error_email, log_level, name):
+def setup_logging(
+    log_conf, log_filename, error_email, log_level, name, connection_string
+):
     import yaml
 
     if log_conf:
@@ -228,6 +233,17 @@ def setup_logging(log_conf, log_filename, error_email, log_level, name):
     if log_level:
         base_config["root"]["level"] = log_level
         base_config["loggers"]["crmprtd"]["level"] = log_level
+
+    if connection_string:
+
+        connection_strip = connection_string[13:]
+        start_index = connection_strip.find(":") + 1
+        end_index = connection_strip.find("@")
+        sensitive_part = connection_strip[start_index:end_index]
+        sanitized_connection_string = connection_strip.replace(sensitive_part, "****")
+        base_config["formatters"]["json"][
+            "sanitized_connection_string"
+        ] = sanitized_connection_string
 
     logging.config.dictConfig(base_config)
 
