@@ -9,10 +9,11 @@ from datetime import datetime
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.engine import URL, make_url
 
 from crmprtd.constants import InsertStrategy
 from crmprtd.align import align
-from crmprtd.insert import insert
+from crmprtd.insert import insert, sanitize_connection
 from crmprtd.download_utils import verify_date
 from crmprtd.infer import infer
 from crmprtd import add_version_arg, add_logging_args, setup_logging, NETWORKS
@@ -205,7 +206,14 @@ def process(
         sample_size=sample_size,
     )
     log.info("Insert: done")
-    log.info("Data insertion results", extra={"results": results, "network": network})
+    log.info(
+        "Data insertion results",
+        extra={
+            "results": results,
+            "network": network,
+            "datebase": sanitize_connection(sesh),
+        },
+    )
 
 
 # Note: this function was buried in crmprtd.__init__.py but is
