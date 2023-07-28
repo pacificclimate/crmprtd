@@ -10,6 +10,8 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from pycds import Obs, Network, Variable
+
 from crmprtd.constants import InsertStrategy
 from crmprtd.align import align
 from crmprtd.insert import insert
@@ -109,6 +111,26 @@ def get_normalization_module(network):
     return import_module(f"crmprtd.networks.{network}.normalize")
 
 
+def obs_by_network(observations, sesh):
+
+    obs_by_network_dict = {}
+    for obs in observations:
+        Ob_var = sesh.query(Variable).filter_by(id=obs.vars_id).first()
+        if Ob_var:
+            network_name = Ob_var.network.name
+            if network_name not in obs_by_network_dict:
+                obs_by_network_dict[network_name] = []
+            obs_by_network_dict[network_name].append(obs)
+
+    # obs_by_network_dict = {}
+    # for obs in observations:
+    #     network_name = obs.variable.network.name
+    #     if network_name not in obs_by_network_dict:
+    #         obs_by_network_dict[network_name] = []
+    #     obs_by_network_dict[network_name].append(obs)
+    return obs_by_network_dict
+
+
 def process(
     connection_string,
     sample_size,
@@ -196,16 +218,23 @@ def process(
             log.info(obs)
         return
 
+    obs_by_network_dict = obs_by_network(observations, sesh)
+
     log.info("Insert: start")
-    results = insert(
-        sesh,
-        observations,
-        strategy=insert_strategy,
-        bulk_chunk_size=bulk_chunk_size,
-        sample_size=sample_size,
-    )
-    log.info("Insert: done")
-    log.info("Data insertion results", extra={"results": results, "network": network})
+
+    for network_key in obs_by_network_dict:
+
+        results = insert(
+            sesh,
+            obs_by_network_dict[network_key],
+            strategy=insert_strategy,
+            bulk_chunk_size=bulk_chunk_size,
+            sample_size=sample_size,
+        )
+        log.info("Insert: done")
+        log.info(
+            "Data insertion results", extra={"results": results, "network": network_key}
+        )
 
 
 # Note: this function was buried in crmprtd.__init__.py but is
