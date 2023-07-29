@@ -115,7 +115,8 @@ def obs_by_network(observations, sesh):
 
     obs_by_network_dict = {}
     for obs in observations:
-        Ob_var = sesh.query(Variable).filter_by(id=obs.vars_id).first()
+        var_id = obs.vars_id
+        Ob_var = sesh.query(Variable).filter_by(id=var_id).first()
         if Ob_var:
             network_name = Ob_var.network.name
             if network_name not in obs_by_network_dict:
