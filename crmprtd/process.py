@@ -11,9 +11,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from pycds import Obs, Network, Variable
-
+import functools
 from crmprtd.constants import InsertStrategy
-from crmprtd.align import align
+from crmprtd.align import align, cached_function
 from crmprtd.insert import insert
 from crmprtd.download_utils import verify_date
 from crmprtd.infer import infer
@@ -111,24 +111,19 @@ def get_normalization_module(network):
     return import_module(f"crmprtd.networks.{network}.normalize")
 
 
-def obs_by_network(observations, sesh):
+@functools.lru_cache(maxsize=None)
+def get_network(sesh, var_id):
+    Obs_var = sesh.query(Variable).filter_by(id=var_id).first()
+    return Obs_var.network.name
 
+
+def obs_by_network(observations, sesh):
     obs_by_network_dict = {}
     for obs in observations:
-        var_id = obs.vars_id
-        Ob_var = sesh.query(Variable).filter_by(id=var_id).first()
-        if Ob_var:
-            network_name = Ob_var.network.name
-            if network_name not in obs_by_network_dict:
-                obs_by_network_dict[network_name] = []
-            obs_by_network_dict[network_name].append(obs)
-
-    # obs_by_network_dict = {}
-    # for obs in observations:
-    #     network_name = obs.variable.network.name
-    #     if network_name not in obs_by_network_dict:
-    #         obs_by_network_dict[network_name] = []
-    #     obs_by_network_dict[network_name].append(obs)
+        network_name = get_network(sesh, obs.vars_id)
+        if network_name not in obs_by_network_dict:
+            obs_by_network_dict[network_name] = []
+        obs_by_network_dict[network_name].append(obs)
     return obs_by_network_dict
 
 
@@ -224,7 +219,6 @@ def process(
     log.info("Insert: start")
 
     for network_key in obs_by_network_dict:
-
         results = insert(
             sesh,
             obs_by_network_dict[network_key],
