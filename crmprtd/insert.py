@@ -15,8 +15,6 @@ import random
 from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError, DBAPIError
-from sqlalchemy.engine import URL, make_url
-import functools
 
 from crmprtd.constants import InsertStrategy
 from crmprtd.db_exceptions import InsertionError
@@ -56,7 +54,6 @@ def max_power_of_two(num):
     return 2 ** floor(mathlog(num, 2))
 
 
-@functools.lru_cache(maxsize=None)
 def sanitize_connection(sesh):
     url_str = sesh.bind.url.render_as_string(hide_password=True)
     sanitized_connection_string = url_str.replace(sesh.bind.url.drivername + "://", "")

@@ -9,7 +9,6 @@ from datetime import datetime
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.engine import URL, make_url
 
 from crmprtd.constants import InsertStrategy
 from crmprtd.align import align
