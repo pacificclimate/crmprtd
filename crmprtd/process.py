@@ -210,7 +210,7 @@ def process(
         extra={
             "results": results,
             "network": network,
-            "datebase": sanitize_connection(sesh),
+            "database": sanitize_connection(sesh),
         },
     )
 
@@ -253,7 +253,13 @@ def run_data_pipeline(
     results = insert(sesh, observations, sample_size)
 
     log = logging.getLogger(__name__)
-    log.info("Data insertion results", extra={"results": results})
+    log.info(
+        "Data insertion results",
+        extra={
+            "results": results,
+            "database": sanitize_connection(sesh),
+        },
+    )
 
 
 def main(args=None):

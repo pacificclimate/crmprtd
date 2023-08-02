@@ -34,7 +34,7 @@ import logging
 # local
 from pycds import Network, Variable
 from crmprtd.align import get_variable, find_or_create_matching_history_and_station
-
+from crmprtd.insert import sanitize_connection
 
 log = logging.getLogger(__name__)
 
@@ -114,7 +114,8 @@ def infer(sesh, rows, diagnostic=False):
         for var in variables:
             log.info(
                 f"INSERT INTO meta_vars (network_id, net_var_name, unit) "
-                f"VALUES ({var.network.id}, '{var.name}', '{var.unit}')"
+                f"VALUES ({var.network.id}, '{var.name}', '{var.unit}')",
+                extra={"database": sanitize_connection(sesh)},
             )
 
         if diagnostic:
@@ -122,5 +123,6 @@ def infer(sesh, rows, diagnostic=False):
         elif len(variables) > 0:
             raise ValueError(
                 f"{len(variables)} Variables need to be inserted (see log). "
-                f"This is not possible without human intervention."
+                f"This is not possible without human intervention.",
+                extra={"database": sanitize_connection(sesh)},
             )

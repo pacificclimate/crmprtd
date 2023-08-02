@@ -55,9 +55,7 @@ def max_power_of_two(num):
 
 
 def sanitize_connection(sesh):
-    url_str = sesh.bind.url.render_as_string(hide_password=True)
-    sanitized_connection_string = url_str.replace(sesh.bind.url.drivername + "://", "")
-    return sanitized_connection_string
+    return sesh.bind.url.render_as_string(hide_password=True)
 
 
 def get_bisection_chunk_sizes(remainder):
@@ -132,7 +130,7 @@ def insert_single_obs(sesh, obs):
         # event of unique constraint errors
         log.debug(
             "New SAVEPOINT for single observation",
-            extra={"database:", sanitize_connection(sesh)},
+            extra={"database": sanitize_connection(sesh)},
         )
         with sesh.begin_nested():
             sesh.add(obs)
@@ -142,7 +140,7 @@ def insert_single_obs(sesh, obs):
             extra={
                 "observation": obs,
                 "exception": e,
-                "datebase": sanitize_connection(sesh),
+                "database": sanitize_connection(sesh),
             },
         )
         db_metrics = DBMetrics(0, 1, 0)
@@ -154,14 +152,14 @@ def insert_single_obs(sesh, obs):
             extra={
                 "observation": obs,
                 "exception": e,
-                "datebase": sanitize_connection(sesh),
+                "database": sanitize_connection(sesh),
             },
         )
         db_metrics = DBMetrics(0, 0, 1)
     else:
         log.info(
             "Successfully inserted observations: 1",
-            extra={"datebase": sanitize_connection(sesh)},
+            extra={"database": sanitize_connection(sesh)},
         )
         db_metrics = DBMetrics(1, 0, 0)
     sesh.commit()
@@ -170,7 +168,7 @@ def insert_single_obs(sesh, obs):
 
 def single_insert_strategy(sesh, observations):
     log.info(
-        "Using Single Insert Strategy", extra={"datebase": sanitize_connection(sesh)}
+        "Using Single Insert Strategy", extra={"database": sanitize_connection(sesh)}
     )
     dbm = DBMetrics(0, 0, 0)
     for obs in observations:
@@ -211,7 +209,7 @@ def bisect_insert_strategy(sesh, observations):
     """
     log.debug(
         "Begin mass observation insertion",
-        extra={"num_obs": len(observations), "datebase": sanitize_connection(sesh)},
+        extra={"num_obs": len(observations), "database": sanitize_connection(sesh)},
     )
 
     # Base cases
@@ -227,7 +225,7 @@ def bisect_insert_strategy(sesh, observations):
                     "New SAVEPOINT",
                     extra={
                         "num_obs": len(observations),
-                        "datebase": sanitize_connection(sesh),
+                        "database": sanitize_connection(sesh),
                     },
                 )
                 sesh.add_all(observations)
@@ -244,7 +242,7 @@ def bisect_insert_strategy(sesh, observations):
                 f"Successfully inserted observations: {len(observations)}",
                 extra={
                     "num_obs": len(observations),
-                    "datebase": sanitize_connection(sesh),
+                    "database": sanitize_connection(sesh),
                 },
             )
             db_metrics = DBMetrics(len(observations), 0, 0)
@@ -255,7 +253,7 @@ def bisect_insert_strategy(sesh, observations):
 def chunk_bisect_insert_strategy(sesh, observations):
     log.info(
         "Using Chunk + Bisection Strategy",
-        extra={"datebase": sanitize_connection(sesh)},
+        extra={"database": sanitize_connection(sesh)},
     )
     dbm = DBMetrics(0, 0, 0)
     for chunk in bisection_chunks(observations):
@@ -308,7 +306,7 @@ def insert_bulk_obs(sesh, observations):
         # exception.
         log.exception(
             "Unexpected error during bulk insertion",
-            extra={"datebase": sanitize_connection(sesh)},
+            extra={"database": sanitize_connection(sesh)},
         )
         return DBMetrics(0, 0, num_to_insert)
     sesh.commit()
@@ -328,7 +326,7 @@ def bulk_insert_strategy(sesh, observations, chunk_size=1000):
     :return: DMMetrics describing result of insertion
     """
     log.info(
-        "Using Bulk Insert Strategy", extra={"datebase": sanitize_connection(sesh)}
+        "Using Bulk Insert Strategy", extra={"database": sanitize_connection(sesh)}
     )
     dbm = DBMetrics(0, 0, 0)
     for chunk in fixed_length_chunks(observations, chunk_size=chunk_size):
@@ -337,11 +335,11 @@ def bulk_insert_strategy(sesh, observations, chunk_size=1000):
         log.info(
             f"Bulk insert progress: "
             f"{dbm.successes} inserted, {dbm.skips} skipped, {dbm.failures} failed",
-            extra={"datebase": sanitize_connection(sesh)},
+            extra={"database": sanitize_connection(sesh)},
         )
     log.info(
         f"Successfully inserted observations: {dbm.successes}",
-        extra={"datebase": sanitize_connection(sesh)},
+        extra={"database": sanitize_connection(sesh)},
     )
     return dbm
 
