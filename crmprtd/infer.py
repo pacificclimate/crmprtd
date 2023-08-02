@@ -124,5 +124,4 @@ def infer(sesh, rows, diagnostic=False):
             raise ValueError(
                 f"{len(variables)} Variables need to be inserted (see log). "
                 f"This is not possible without human intervention.",
-                extra={"database": sanitize_connection(sesh)},
             )
