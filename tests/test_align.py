@@ -2,6 +2,9 @@ import pytest
 from datetime import datetime
 from geoalchemy2.functions import ST_X, ST_Y
 
+import logging
+from tests.conftest import records_contain_db_connection
+
 from crmprtd.align import (
     get_network,
     find_or_create_matching_history_and_station,
@@ -22,7 +25,8 @@ def test_is_network(test_session, network_name, expected):
     assert bool(get_network(test_session, network_name)) == expected
 
 
-def test_get_history_with_no_matches(test_session):
+def test_get_history_with_no_matches(test_session, caplog):
+    caplog.set_level(logging.DEBUG, "crmprtd")
     # this observation will not match any in test session
     obs_tuple = Row(
         time=datetime.now(),
@@ -49,9 +53,11 @@ def test_get_history_with_no_matches(test_session):
 
     q = test_session.query(History)
     assert q.count() == 9
+    assert records_contain_db_connection(test_session, caplog) == True
 
 
-def test_get_history_with_single_match(test_session):
+def test_get_history_with_single_match(test_session, caplog):
+    caplog.set_level(logging.DEBUG, "crmprtd")
     obs_tuple = Row(
         time=datetime.now(),
         val=123,
@@ -77,9 +83,11 @@ def test_get_history_with_single_match(test_session):
 
     q = test_session.query(History)
     assert q.count() == 8
+    assert records_contain_db_connection(test_session, caplog) == True
 
 
-def test_get_history_with_multiple_matches_and_location(test_session):
+def test_get_history_with_multiple_matches_and_location(test_session, caplog):
+    caplog.set_level(logging.DEBUG, "crmprtd")
     obs_tuple = Row(
         time=datetime.now(),
         val=123,
@@ -99,9 +107,11 @@ def test_get_history_with_multiple_matches_and_location(test_session):
         obs_tuple.lon,
     )
     assert history.id == 20
+    assert records_contain_db_connection(test_session, caplog) == True
 
 
-def test_get_history_with_multiple_matches_and_no_location(test_session):
+def test_get_history_with_multiple_matches_and_no_location(test_session, caplog):
+    caplog.set_level(logging.DEBUG, "crmprtd")
     obs_tuple = Row(
         time=datetime.now(),
         val=123,
@@ -121,6 +131,7 @@ def test_get_history_with_multiple_matches_and_no_location(test_session):
         obs_tuple.lon,
     )
     assert history.id == 21
+    assert records_contain_db_connection(test_session, caplog) == True
 
 
 def test_get_variable(test_session):
@@ -237,13 +248,21 @@ def test_unit_check(test_session, network_name, variable_name, unit, val, expect
     ],
 )
 def test_align_successes(
-    test_session, obs_tuple, expected_hid, expected_time, expeceted_vid, expected_datum
+    test_session,
+    obs_tuple,
+    expected_hid,
+    expected_time,
+    expeceted_vid,
+    expected_datum,
+    caplog,
 ):
+    caplog.set_level(logging.DEBUG, "crmprtd")
     ob = align(test_session, obs_tuple)
     assert ob.history_id == expected_hid
     assert ob.time == expected_time
     assert ob.vars_id == expeceted_vid
     assert ob.datum == expected_datum
+    assert records_contain_db_connection(test_session, caplog) == True
 
 
 @pytest.mark.parametrize(
@@ -329,9 +348,11 @@ def test_align_successes(
         ),
     ],
 )
-def test_align_failures(test_session, obs_tuple):
+def test_align_failures(test_session, obs_tuple, caplog):
+    caplog.set_level(logging.DEBUG, "crmprtd")
     ob = align(test_session, obs_tuple)
     assert ob is None
+    assert records_contain_db_connection(test_session, caplog) == True
 
 
 def test_closest_stns_within_threshold(ec_session):

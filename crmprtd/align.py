@@ -415,6 +415,7 @@ def align(sesh, row, diagnostic=False):
                 "time": row.time,
                 "val": row.val,
                 "variable_name": row.variable_name,
+                "database": sanitize_connection(sesh),
             },
         )
         return None
