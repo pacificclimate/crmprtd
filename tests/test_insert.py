@@ -3,6 +3,7 @@ from math import ceil
 
 import pytest
 import pytz
+import logging
 
 from crmprtd.more_itertools import cycles
 from pycds import History, Obs
@@ -17,6 +18,7 @@ from crmprtd.insert import (
     fixed_length_chunks,
     bulk_insert_strategy,
     Timer,
+    obs_by_network,
 )
 
 
@@ -195,3 +197,28 @@ def test_single_insert_obs_not_unique(test_session):
     ]
     dbm = single_insert_strategy(test_session, ob)
     assert dbm.skips == 1
+
+
+# def test_mult_networks(crmp_session, caplog):
+#     caplog.set_level(logging.DEBUG, "crmprtd")
+#     observations = []
+
+#     obs = Obs(
+#         history_id=20,
+#         vars_id=2,
+#         time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc),
+#         datum=i,
+#     )
+#     observations.append(obs)
+#     assert networks_logged(obs, crmp_session, caplog)
+
+
+def networks_logged(observations, test_session, caplog):
+    obs_by_network_dict = obs_by_network(observations, test_session)
+
+    networks = []
+    for record in caplog.records:
+        if "network" in record.__dict__:
+            networks.append(getattr(record, "network", {}))
+
+    return obs_by_network_dict.keys() == networks

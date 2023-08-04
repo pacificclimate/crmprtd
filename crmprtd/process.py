@@ -10,10 +10,8 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from pycds import Obs, Network, Variable
-import functools
 from crmprtd.constants import InsertStrategy
-from crmprtd.align import align, cached_function
+from crmprtd.align import align
 from crmprtd.insert import insert
 from crmprtd.download_utils import verify_date
 from crmprtd.infer import infer
@@ -111,22 +109,6 @@ def get_normalization_module(network):
     return import_module(f"crmprtd.networks.{network}.normalize")
 
 
-@functools.lru_cache(maxsize=None)
-def get_network(sesh, var_id):
-    Obs_var = sesh.query(Variable).filter_by(id=var_id).first()
-    return Obs_var.network.name
-
-
-def obs_by_network(observations, sesh):
-    obs_by_network_dict = {}
-    for obs in observations:
-        network_name = get_network(sesh, obs.vars_id)
-        if network_name not in obs_by_network_dict:
-            obs_by_network_dict[network_name] = []
-        obs_by_network_dict[network_name].append(obs)
-    return obs_by_network_dict
-
-
 def process(
     connection_string,
     sample_size,
@@ -214,22 +196,16 @@ def process(
             log.info(obs)
         return
 
-    obs_by_network_dict = obs_by_network(observations, sesh)
-
     log.info("Insert: start")
-
-    for network_key in obs_by_network_dict:
-        results = insert(
-            sesh,
-            obs_by_network_dict[network_key],
-            strategy=insert_strategy,
-            bulk_chunk_size=bulk_chunk_size,
-            sample_size=sample_size,
-        )
-        log.info("Insert: done")
-        log.info(
-            "Data insertion results", extra={"results": results, "network": network_key}
-        )
+    results = insert(
+        sesh,
+        observations,
+        strategy=insert_strategy,
+        bulk_chunk_size=bulk_chunk_size,
+        sample_size=sample_size,
+    )
+    log.info("Insert: done")
+    log.info("Data insertion results", extra={"results": results, "network": network})
 
 
 # Note: this function was buried in crmprtd.__init__.py but is
