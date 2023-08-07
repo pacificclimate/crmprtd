@@ -6,8 +6,9 @@ import pytz
 import logging
 
 from crmprtd.more_itertools import cycles
-from pycds import History, Obs
+from pycds import History, Obs, Variable, Station
 from crmprtd.insert import (
+    insert,
     bisect_insert_strategy,
     split,
     bisection_chunks,
@@ -199,26 +200,49 @@ def test_single_insert_obs_not_unique(test_session):
     assert dbm.skips == 1
 
 
-# def test_mult_networks(crmp_session, caplog):
-#     caplog.set_level(logging.DEBUG, "crmprtd")
-#     observations = []
+def test_mult_networks(test_session, caplog):
+    caplog.set_level(logging.DEBUG, "crmprtd")
 
-#     obs = Obs(
-#         history_id=20,
-#         vars_id=2,
-#         time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc),
-#         datum=i,
-#     )
-#     observations.append(obs)
-#     assert networks_logged(obs, crmp_session, caplog)
+    moti = "Brandywine"
+    ec = "Sechelt"
+    wmb = "FIVE MILE"
+    stations = [moti, wmb, ec]
+    obs = []
+    with test_session:
+        for station in stations:
+            hist = (
+                test_session.query(History)
+                .filter(History.station_name == station)
+                .first()
+            )
+            var = hist.station.network.variables[0]
+            # print(hist.id)
+            # print(var.network.name)
+            # print(var.id)
+            observation = Obs(
+                history_id=hist.id,
+                datum=10,
+                vars_id=var.id,
+                time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc),
+            )
+            obs.append(observation)
+    # print(obs)
+    results = insert(test_session, obs)
+    assert networks_logged(obs, test_session, caplog)
 
 
-def networks_logged(observations, test_session, caplog):
-    obs_by_network_dict = obs_by_network(observations, test_session)
+def networks_logged(obs, test_session, caplog):
+    obs_by_network_dict = obs_by_network(obs, test_session)
 
-    networks = []
-    for record in caplog.records:
-        if "network" in record.__dict__:
-            networks.append(getattr(record, "network", {}))
+    # networks = []
+    # for record in caplog.records:
+    #     if "network" in record.__dict__:
+    #         networks.append(getattr(record, "network", {}))
 
-    return obs_by_network_dict.keys() == networks
+    networks = {
+        getattr(record, "network")
+        for record in caplog.records
+        if getattr(record, "network", None) is not None
+    }
+    assert len(networks) == len(obs_by_network_dict)
+    return obs_by_network_dict.keys() == set(networks)

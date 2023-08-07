@@ -18,7 +18,7 @@ from sqlalchemy.exc import IntegrityError, DBAPIError
 
 from crmprtd.constants import InsertStrategy
 from crmprtd.db_exceptions import InsertionError
-from pycds import Network, Obs, Variable
+from pycds import Obs, Variable
 
 
 log = logging.getLogger(__name__)
@@ -56,6 +56,7 @@ def max_power_of_two(num):
 
 def get_network_name(sesh, obs):
     Obs_var = sesh.query(Variable).filter_by(id=obs.vars_id).first()
+    # print(Obs_var.network.name)
     return Obs_var.network.name
 
 
@@ -327,9 +328,18 @@ def bulk_insert_strategy(sesh, observations, chunk_size=1000):
         dbm += chunk_dbm
         log.info(
             f"Bulk insert progress: "
-            f"{dbm.successes} inserted, {dbm.skips} skipped, {dbm.failures} failed"
+            f"{dbm.successes} inserted, {dbm.skips} skipped, {dbm.failures} failed",
+            extra={"network": get_network_name(sesh, chunk[0])},
         )
-    log.info(f"Successfully inserted observations: {dbm.successes}")
+    if len(observations) > 0:
+        log.info(
+            f"Successfully inserted observations: {dbm.successes}",
+            extra={"network": get_network_name(sesh, observations[0])},
+        )
+    else:
+        log.info(
+            f"Successfully inserted observations: {dbm.successes}",
+        )
     return dbm
 
 
