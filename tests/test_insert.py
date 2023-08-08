@@ -204,9 +204,10 @@ def test_mult_networks(test_session, caplog):
     caplog.set_level(logging.DEBUG, "crmprtd")
 
     moti = "Brandywine"
-    ec = "Sechelt"
     wmb = "FIVE MILE"
+    ec = "Sechelt"
     stations = [moti, wmb, ec]
+
     obs = []
     with test_session:
         for station in stations:
@@ -216,9 +217,6 @@ def test_mult_networks(test_session, caplog):
                 .first()
             )
             var = hist.station.network.variables[0]
-            # print(hist.id)
-            # print(var.network.name)
-            # print(var.id)
             observation = Obs(
                 history_id=hist.id,
                 datum=10,
@@ -226,18 +224,13 @@ def test_mult_networks(test_session, caplog):
                 time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc),
             )
             obs.append(observation)
-    # print(obs)
+
     results = insert(test_session, obs)
     assert networks_logged(obs, test_session, caplog)
 
 
 def networks_logged(obs, test_session, caplog):
     obs_by_network_dict = obs_by_network(obs, test_session)
-
-    # networks = []
-    # for record in caplog.records:
-    #     if "network" in record.__dict__:
-    #         networks.append(getattr(record, "network", {}))
 
     networks = {
         getattr(record, "network")

@@ -56,7 +56,6 @@ def max_power_of_two(num):
 
 def get_network_name(sesh, obs):
     Obs_var = sesh.query(Variable).filter_by(id=obs.vars_id).first()
-    # print(Obs_var.network.name)
     return Obs_var.network.name
 
 
