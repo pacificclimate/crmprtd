@@ -6,7 +6,7 @@ import pytz
 import logging
 
 from crmprtd.more_itertools import cycles
-from pycds import History, Obs, Variable, Station
+from pycds import History, Obs
 from crmprtd.insert import (
     insert,
     bisect_insert_strategy,
