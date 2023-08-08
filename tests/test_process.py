@@ -160,7 +160,7 @@ def test_process_by_date(
 
     assert num_obs_inserted_in_db == expected_num_inserts
     assert log_num_obs_inserted == expected_num_inserts
-    assert records_contain_db_connection(crmp_session, caplog) == True
+    assert records_contain_db_connection(crmp_session, caplog)
 
 
 def test_process_with_file_arg(test_session, caplog):
@@ -175,4 +175,4 @@ def test_process_with_file_arg(test_session, caplog):
         input_stream=input_stream,
     )
     assert get_num_obs_inserted(caplog.records) == 1
-    assert records_contain_db_connection(test_session, caplog) == True
+    assert records_contain_db_connection(test_session, caplog)

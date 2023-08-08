@@ -5,6 +5,7 @@ import pytest
 import pytz
 
 import logging
+
 from tests.conftest import records_contain_db_connection
 
 from crmprtd.more_itertools import cycles
@@ -80,7 +81,7 @@ def test_many_insert_strategy(test_session, method, label, days, expected, caplo
         dbm = method(test_session, obs)
     assert dbm.successes == expected
     print("insertions_per_sec", round(dbm.successes / tmr.run_time, 2))
-    assert records_contain_db_connection(test_session, caplog) == True
+    assert records_contain_db_connection(test_session, caplog)
 
 
 def test_mass_insert_obs_weird(test_session, caplog):
@@ -114,7 +115,7 @@ def test_mass_insert_obs_weird(test_session, caplog):
 
     dbm = bisect_insert_strategy(test_session, [y])
     assert dbm.successes == 0
-    assert records_contain_db_connection(test_session, caplog) == True
+    assert records_contain_db_connection(test_session, caplog)
 
 
 @pytest.mark.parametrize(
@@ -186,7 +187,7 @@ def test_single_insert_obs(test_session, caplog):
     ob = [Obs(history_id=20, vars_id=2, time=datetime.now(), datum=10)]
     dbm = single_insert_strategy(test_session, ob)
     assert dbm.successes == 1
-    assert records_contain_db_connection(test_session, caplog) == True
+    assert records_contain_db_connection(test_session, caplog)
 
     q = test_session.query(Obs)
     assert q.count() == 4
@@ -204,4 +205,4 @@ def test_single_insert_obs_not_unique(test_session, caplog):
     ]
     dbm = single_insert_strategy(test_session, ob)
     assert dbm.skips == 1
-    assert records_contain_db_connection(test_session, caplog) == True
+    assert records_contain_db_connection(test_session, caplog)

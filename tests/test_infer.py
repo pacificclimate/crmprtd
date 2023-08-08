@@ -4,6 +4,7 @@ import importlib
 import pytest
 
 import logging
+
 from tests.conftest import records_contain_db_connection
 
 import crmprtd.infer
@@ -122,4 +123,4 @@ def test_infer(crmp_session, diagnostic, stn_count, var_count, caplog):
 
     assert post_stn_count == (stn_count if commit else 0)
     assert post_var_count == (var_count if commit and not raises else 0)
-    assert records_contain_db_connection(crmp_session, caplog) == True
+    assert records_contain_db_connection(crmp_session, caplog)
