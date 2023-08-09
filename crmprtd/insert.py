@@ -20,7 +20,7 @@ from crmprtd.constants import InsertStrategy
 from crmprtd.db_exceptions import InsertionError
 from pycds import Obs, Variable
 
-from . import cached_function
+from crmprtd.log_helpers import cached_function
 
 log = logging.getLogger(__name__)
 
