@@ -4,6 +4,10 @@ from math import ceil
 import pytest
 import pytz
 
+import logging
+
+from . import records_contain_db_connection
+
 from crmprtd.more_itertools import cycles
 from pycds import History, Obs
 from crmprtd.insert import (
@@ -54,12 +58,12 @@ total_rows = 3000
         ),
     ],
 )
-def test_many_insert_strategy(test_session, method, label, days, expected):
+def test_many_insert_strategy(test_session, method, label, days, expected, caplog):
     """Test the non-single insert strategies."""
     # Just pick a random variable and history entry (doesn't matter which)
     history = test_session.query(History).first()
     variable = history.station.network.variables[0]
-
+    caplog.set_level(logging.DEBUG, "crmprtd")
     obs = [
         # Important: We are very specifically creating the Obs object here using the ids
         #  to avoid SQLAlchemy adding this object to the session as part of its
@@ -77,9 +81,11 @@ def test_many_insert_strategy(test_session, method, label, days, expected):
         dbm = method(test_session, obs)
     assert dbm.successes == expected
     print("insertions_per_sec", round(dbm.successes / tmr.run_time, 2))
+    assert records_contain_db_connection(test_session, caplog)
 
 
-def test_mass_insert_obs_weird(test_session):
+def test_mass_insert_obs_weird(test_session, caplog):
+    caplog.set_level(logging.DEBUG, "crmprtd")
     history = test_session.query(History).first()
     variable = history.station.network.variables[0]
 
@@ -109,6 +115,7 @@ def test_mass_insert_obs_weird(test_session):
 
     dbm = bisect_insert_strategy(test_session, [y])
     assert dbm.successes == 0
+    assert records_contain_db_connection(test_session, caplog)
 
 
 @pytest.mark.parametrize(
@@ -175,16 +182,19 @@ def test_contains_all_duplicates_all_dup(test_session):
     assert contains_all_duplicates(test_session, obs_list, 5)
 
 
-def test_single_insert_obs(test_session):
+def test_single_insert_obs(test_session, caplog):
+    caplog.set_level(logging.DEBUG, "crmprtd")
     ob = [Obs(history_id=20, vars_id=2, time=datetime.now(), datum=10)]
     dbm = single_insert_strategy(test_session, ob)
     assert dbm.successes == 1
+    assert records_contain_db_connection(test_session, caplog)
 
     q = test_session.query(Obs)
     assert q.count() == 4
 
 
-def test_single_insert_obs_not_unique(test_session):
+def test_single_insert_obs_not_unique(test_session, caplog):
+    caplog.set_level(logging.DEBUG, "crmprtd")
     ob = [
         Obs(
             history_id=20,
@@ -195,3 +205,4 @@ def test_single_insert_obs_not_unique(test_session):
     ]
     dbm = single_insert_strategy(test_session, ob)
     assert dbm.skips == 1
+    assert records_contain_db_connection(test_session, caplog)

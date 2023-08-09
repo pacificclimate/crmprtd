@@ -24,7 +24,7 @@ from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
 
 from pycds import Obs, History, Network, Variable, Station
 from crmprtd.db_exceptions import InsertionError
-
+from crmprtd.log_helpers import sanitize_connection
 
 log = logging.getLogger(__name__)
 ureg = UnitRegistry()
@@ -67,7 +67,10 @@ def cached_function(attrs):
             key = (args) + tuple(kwargs.items())
             if key not in cache:
                 obj = f(sesh, *args, **kwargs)
-                log.debug(f"Cache miss: {f.__name__} {key} -> {repr(obj)}")
+                log.debug(
+                    f"Cache miss: {f.__name__} {key} -> {repr(obj)}",
+                    extra={"database": sanitize_connection(sesh)},
+                )
                 cache[key] = obj and SimpleNamespace(
                     **{attr: getattr(obj, attr) for attr in attrs}
                 )
@@ -196,7 +199,11 @@ def find_nearest_history(
         for history in histories:
             if close_history.history_id == history.id:
                 log.debug(
-                    "Matched history", extra={"station_name": history.station_name}
+                    "Matched history",
+                    extra={
+                        "station_name": history.station_name,
+                        "database": sanitize_connection(sesh),
+                    },
                 )
                 return history
 
@@ -231,7 +238,11 @@ def create_station_and_history_entry(
     station = Station(native_id=native_id, network_id=network.id)
     log.info(
         f"{action} new station entry",
-        extra={"native_id": station.native_id, "network_name": network.name},
+        extra={
+            "native_id": station.native_id,
+            "network_name": network.name,
+            "database": sanitize_connection(sesh),
+        },
     )
 
     history = History(station=station, lat=lat, lon=lon)
@@ -243,13 +254,15 @@ def create_station_and_history_entry(
             "native_id": station.native_id,
             "lat": lat,
             "lon": lon,
+            "database": sanitize_connection(sesh),
         },
     )
 
     if diagnostic:
         log.info(
             f"In diagnostic mode. Skipping insertion of new history entry for: "
-            f"network_name={network_name}, native_id={native_id}, lat={lat}, lon={lon}"
+            f"network_name={network_name}, native_id={native_id}, lat={lat}, lon={lon}",
+            extra={"database": sanitize_connection(sesh)},
         )
         return None
 
@@ -260,7 +273,12 @@ def create_station_and_history_entry(
     except Exception as e:
         log.warning(
             "Unable to insert new stn/hist entries",
-            extra={"stn": station, "hist": history, "exception": e},
+            extra={
+                "stn": station,
+                "hist": history,
+                "exception": e,
+                "database": sanitize_connection(sesh),
+            },
         )
         raise InsertionError(native_id=station.id, hid=history.id, e=e)
     sesh.commit()
@@ -320,7 +338,11 @@ def find_or_create_matching_history_and_station(
     - If at least one is found within tolerance distance, return one.
     - If none are found within tolerance, this is an error condition, return None.
     """
-    log.debug("Searching for native_id = %s", native_id)
+    log.debug(
+        "Searching for native_id = %s",
+        native_id,
+        extra={"database": sanitize_connection(sesh)},
+    )
     histories = (
         sesh.query(History)
         .join(Station)
@@ -329,15 +351,25 @@ def find_or_create_matching_history_and_station(
     )
 
     if histories.count() == 0:
-        log.debug("Cound not find native_id %s", native_id)
+        log.debug(
+            "Cound not find native_id %s",
+            native_id,
+            extra={"database": sanitize_connection(sesh)},
+        )
         return create_station_and_history_entry(
             sesh, network_name, native_id, lat, lon, diagnostic=diagnostic
         )
     elif histories.count() == 1:
-        log.debug("Found exactly one matching history_id")
+        log.debug(
+            "Found exactly one matching history_id",
+            extra={"database": sanitize_connection(sesh)},
+        )
         return histories.one_or_none()
     elif histories.count() >= 2:
-        log.debug("Found multiple history entries. Searching for match.")
+        log.debug(
+            "Found multiple history entries. Searching for match.",
+            extra={"database": sanitize_connection(sesh)},
+        )
         return match_history(
             sesh, network_name, native_id, lat, lon, histories, diagnostic=diagnostic
         )
@@ -383,6 +415,7 @@ def align(sesh, row, diagnostic=False):
                 "time": row.time,
                 "val": row.val,
                 "variable_name": row.variable_name,
+                "database": sanitize_connection(sesh),
             },
         )
         return None
@@ -391,7 +424,10 @@ def align(sesh, row, diagnostic=False):
     if not get_network(sesh, row.network_name):
         log.error(
             "Network does not exist in db",
-            extra={"network_name": row.network_name},
+            extra={
+                "network_name": row.network_name,
+                "database": sanitize_connection(sesh),
+            },
         )
         return None
 
@@ -410,6 +446,7 @@ def align(sesh, row, diagnostic=False):
             extra={
                 "network_name": row.network_name,
                 "native_id": row.station_id,
+                "database": sanitize_connection(sesh),
             },
         )
         return None
@@ -421,6 +458,7 @@ def align(sesh, row, diagnostic=False):
             'Variable "%s" from network "%s" is not tracked by crmp',
             row.variable_name,
             row.network_name,
+            extra={"database": sanitize_connection(sesh)},
         )
         return None
     else:
@@ -437,6 +475,7 @@ def align(sesh, row, diagnostic=False):
                 "unit_db": var_unit,
                 "data": row.val,
                 "network_name": row.network_name,
+                "database": sanitize_connection(sesh),
             },
         )
         return None
