@@ -19,7 +19,7 @@ from sqlalchemy.exc import IntegrityError, DBAPIError
 from crmprtd.constants import InsertStrategy
 from crmprtd.db_exceptions import InsertionError
 from pycds import Obs
-
+from . import sanitize_connection
 
 log = logging.getLogger(__name__)
 
@@ -52,10 +52,6 @@ class Timer(object):
 
 def max_power_of_two(num):
     return 2 ** floor(mathlog(num, 2))
-
-
-def sanitize_connection(sesh):
-    return sesh.bind.url.render_as_string(hide_password=True)
 
 
 def get_bisection_chunk_sizes(remainder):

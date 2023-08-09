@@ -631,12 +631,3 @@ def swob_urls(requests_mock):
         text=station_listing,
         status_code=200,
     )
-
-
-def records_contain_db_connection(test_session, caplog):
-    for record in caplog.records:
-        if "database" in record.__dict__:
-            logged_db = getattr(record, "database", {})
-            if logged_db == test_session.bind.url.render_as_string(hide_password=True):
-                return True
-    return False

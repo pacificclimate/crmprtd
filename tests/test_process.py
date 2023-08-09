@@ -13,7 +13,7 @@ from pycds import Network, History, Variable, Obs
 from crmprtd.constants import InsertStrategy
 from crmprtd.download_utils import verify_date
 
-from tests.conftest import records_contain_db_connection
+from . import records_contain_db_connection
 
 # Must import the module, not objects from it, so we can mock the objects.
 import crmprtd.process

@@ -4,7 +4,7 @@ from geoalchemy2.functions import ST_X, ST_Y
 
 import logging
 
-from tests.conftest import records_contain_db_connection
+from . import records_contain_db_connection
 
 from crmprtd.align import (
     get_network,

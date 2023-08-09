@@ -5,7 +5,7 @@ import pytest
 
 import logging
 
-from tests.conftest import records_contain_db_connection
+from . import records_contain_db_connection
 
 import crmprtd.infer
 import crmprtd.align

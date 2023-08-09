@@ -234,3 +234,7 @@ def setup_logging(log_conf, log_filename, error_email, log_level, name):
 
 def subset_dict(a_dict, keys_wanted):
     return {key: a_dict[key] for key in keys_wanted if key in a_dict}
+
+
+def sanitize_connection(sesh):
+    return sesh.bind.url.render_as_string(hide_password=True)
