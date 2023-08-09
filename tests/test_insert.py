@@ -221,21 +221,20 @@ def test_mult_networks(test_session, caplog):
                 history_id=hist.id,
                 datum=10,
                 vars_id=var.id,
-                time=datetime(2012, 9, 24, 6, tzinfo=pytz.utc),
+                time=datetime(2012, 9, 25, 6, tzinfo=pytz.utc),
             )
             obs.append(observation)
 
+    expected_networks = {"MoTIe", "FLNRO-WMB", "EC_raw"}
     results = insert(test_session, obs)
-    assert networks_logged(obs, test_session, caplog)
+    assert results["successes"] == 3
+    assert networks_are_logged(expected_networks, caplog)
 
 
-def networks_logged(obs, test_session, caplog):
-    obs_by_network_dict = obs_by_network(obs, test_session)
-
-    networks = {
+def networks_are_logged(networks, caplog):
+    rec_networks = {
         getattr(record, "network")
         for record in caplog.records
         if getattr(record, "network", None) is not None
     }
-    assert len(networks) == len(obs_by_network_dict)
-    return obs_by_network_dict.keys() == set(networks)
+    return networks == rec_networks
