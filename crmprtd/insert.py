@@ -20,7 +20,7 @@ from crmprtd.constants import InsertStrategy
 from crmprtd.db_exceptions import InsertionError
 from pycds import Obs, Variable
 
-from crmprtd.align import cached_function
+from . import cached_function
 
 log = logging.getLogger(__name__)
 
@@ -55,21 +55,24 @@ def max_power_of_two(num):
     return 2 ** floor(mathlog(num, 2))
 
 
-@cached_function(["name"])
 def get_network_name(sesh, obs):
-    obs_var = sesh.query(Variable).filter_by(id=obs.vars_id).first()
-    return obs_var.network
+    @cached_function(["name"])
+    def network_query(sesh, obs):
+        obs_var = sesh.query(Variable).filter_by(id=obs.vars_id).first()
+        return obs_var.network
+
+    return network_query(sesh, obs).name
 
 
 def obs_by_network(observations, sesh):
-    obs_sorted = sorted(observations, key=lambda obs: get_network_name(sesh, obs).name)
-    obs_by_network_dict = {
+    obs_sorted = sorted(observations, key=lambda obs: get_network_name(sesh, obs))
+
+    return {
         network_name: list(obs_group)
         for network_name, obs_group in groupby(
-            obs_sorted, key=lambda obs: get_network_name(sesh, obs).name
+            obs_sorted, key=lambda obs: get_network_name(sesh, obs)
         )
     }
-    return obs_by_network_dict
 
 
 def get_bisection_chunk_sizes(remainder):
@@ -151,7 +154,7 @@ def insert_single_obs(sesh, obs):
             extra={
                 "observation": obs,
                 "exception": e,
-                "network": get_network_name(sesh, obs).name,
+                "network": get_network_name(sesh, obs),
             },
         )
         db_metrics = DBMetrics(0, 1, 0)
@@ -163,14 +166,14 @@ def insert_single_obs(sesh, obs):
             extra={
                 "observation": obs,
                 "exception": e,
-                "network": get_network_name(sesh, obs).name,
+                "network": get_network_name(sesh, obs),
             },
         )
         db_metrics = DBMetrics(0, 0, 1)
     else:
         log.info(
             "Successfully inserted observations: 1",
-            extra={"network": get_network_name(sesh, obs).name},
+            extra={"network": get_network_name(sesh, obs)},
         )
         db_metrics = DBMetrics(1, 0, 0)
     sesh.commit()
@@ -330,12 +333,12 @@ def bulk_insert_strategy(sesh, observations, chunk_size=1000):
         log.info(
             f"Bulk insert progress: "
             f"{dbm.successes} inserted, {dbm.skips} skipped, {dbm.failures} failed",
-            extra={"network": get_network_name(sesh, chunk[0]).name},
+            extra={"network": get_network_name(sesh, chunk[0])},
         )
     if len(observations) > 0:
         log.info(
             f"Successfully inserted observations: {dbm.successes}",
-            extra={"network": get_network_name(sesh, observations[0]).name},
+            extra={"network": get_network_name(sesh, observations[0])},
         )
     else:
         log.info(
