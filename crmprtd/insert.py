@@ -19,7 +19,7 @@ from sqlalchemy.exc import IntegrityError, DBAPIError
 from crmprtd.constants import InsertStrategy
 from crmprtd.db_exceptions import InsertionError
 from pycds import Obs
-from . import sanitize_connection
+from crmprtd.log_helpers import sanitize_connection
 
 log = logging.getLogger(__name__)
 

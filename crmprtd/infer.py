@@ -34,7 +34,7 @@ import logging
 # local
 from pycds import Network, Variable
 from crmprtd.align import get_variable, find_or_create_matching_history_and_station
-from . import sanitize_connection
+from crmprtd.log_helpers import sanitize_connection
 
 log = logging.getLogger(__name__)
 

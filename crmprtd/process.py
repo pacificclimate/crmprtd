@@ -13,7 +13,7 @@ from sqlalchemy.orm import sessionmaker
 from crmprtd.constants import InsertStrategy
 from crmprtd.align import align
 from crmprtd.insert import insert
-from . import sanitize_connection
+from crmprtd.log_helpers import sanitize_connection
 from crmprtd.download_utils import verify_date
 from crmprtd.infer import infer
 from crmprtd import add_version_arg, add_logging_args, setup_logging, NETWORKS
