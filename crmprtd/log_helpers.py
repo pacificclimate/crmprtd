@@ -1,3 +1,4 @@
+import logging
 from types import SimpleNamespace
 
 
@@ -19,6 +20,7 @@ def cached_function(attrs):
     args (except sesh) and kwargs to the wrapped function are used as
     the cache key, and results are the parametrized object attributes.
     """
+    log = logging.getLogger(__name__)
 
     def wrapper(f):
         cache = {}
