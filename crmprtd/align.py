@@ -24,7 +24,7 @@ from pint import UnitRegistry, UndefinedUnitError, DimensionalityError
 from pycds import Obs, History, Network, Variable, Station
 from crmprtd.db_exceptions import InsertionError
 
-from crmprtd.log_helpers import cached_function
+from crmprtd.db_helpers import cached_function
 
 log = logging.getLogger(__name__)
 ureg = UnitRegistry()

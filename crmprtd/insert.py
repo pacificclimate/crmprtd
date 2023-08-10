@@ -20,7 +20,7 @@ from crmprtd.constants import InsertStrategy
 from crmprtd.db_exceptions import InsertionError
 from pycds import Obs, Variable
 
-from crmprtd.log_helpers import cached_function
+from crmprtd.db_helpers import cached_function
 
 log = logging.getLogger(__name__)
 
@@ -391,11 +391,16 @@ def insert(
                 raise ValueError(
                     f"Insert strategy has an unrecognized value: {strategy}"
                 )
+            results = {
+                "successes": dbm.successes,
+                "skips": dbm.skips,
+                "failures": dbm.failures,
+                "insertions_per_sec": round(dbm.successes / tmr.run_time, 2),
+            }
+            log.info(
+                "Data insertion results",
+                extra={"results": results, "network": get_network_name(sesh, obs)},
+            )
 
     log.info("Data insertion complete")
-    return {
-        "successes": dbm.successes,
-        "skips": dbm.skips,
-        "failures": dbm.failures,
-        "insertions_per_sec": round(dbm.successes / tmr.run_time, 2),
-    }
+    return results
