@@ -371,11 +371,20 @@ def insert(
     # in the database.
     sesh.commit()
 
+    results_total = {
+        "successes": 0,
+        "skips": 0,
+        "failures": 0,
+        "insertions_per_sec": 0,
+    }
+    if len(observations) < 1:
+        return results_total
+
     obs_by_network_dict = obs_by_network(observations, sesh)
 
-    with Timer() as tmr:
+    for obs in obs_by_network_dict.values():
         dbm = DBMetrics(0, 0, 0)
-        for obs in obs_by_network_dict.values():
+        with Timer() as tmr:
             if strategy is InsertStrategy.BULK:
                 dbm += bulk_insert_strategy(sesh, obs, chunk_size=bulk_chunk_size)
             elif strategy is InsertStrategy.SINGLE:
@@ -391,16 +400,22 @@ def insert(
                 raise ValueError(
                     f"Insert strategy has an unrecognized value: {strategy}"
                 )
-            results = {
-                "successes": dbm.successes,
-                "skips": dbm.skips,
-                "failures": dbm.failures,
-                "insertions_per_sec": round(dbm.successes / tmr.run_time, 2),
-            }
-            log.info(
-                "Data insertion results",
-                extra={"results": results, "network": get_network_name(sesh, obs)},
+        results = {
+            "successes": dbm.successes,
+            "skips": dbm.skips,
+            "failures": dbm.failures,
+            "insertions_per_sec": round(dbm.successes / tmr.run_time, 2),
+        }
+        log.info(
+            "Insert for network: {network}: done".format(
+                network=get_network_name(sesh, obs[0])
             )
+        )
+        log.info(
+            "Data insertion results",
+            extra={"results": results, "network": get_network_name(sesh, obs[0])},
+        )
 
-    log.info("Data insertion complete")
-    return results
+        for k, v in results.items():
+            results_total[k] += v
+    return results_total
