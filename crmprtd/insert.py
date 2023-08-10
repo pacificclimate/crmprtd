@@ -407,7 +407,7 @@ def insert(
             "insertions_per_sec": round(dbm.successes / tmr.run_time, 2),
         }
         log.info(
-            "Insert for network: {network}: done".format(
+            "Insert for network {network}: done".format(
                 network=get_network_name(sesh, obs[0])
             )
         )
