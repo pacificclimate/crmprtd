@@ -3,6 +3,7 @@ This script choreographs the download and process steps (with optional data cach
 in the pipeline.
 
 TODO: More doc.
+      Factor out long lists of hard-coded network names
 """
 
 import datetime
@@ -28,6 +29,7 @@ network_aliases = {
     "hourly_swobml2": [
         "bc_env_snow",
         "bc_forestry",
+        "bc_riotinto",
         "bc_tran",
         "dfo_ccg_lighthouse",
     ],
@@ -114,6 +116,7 @@ def default_cache_filename(
     if network_name in (
         "bc_env_snow",
         "bc_forestry",
+        "bc_riotinto",
         "bc_tran",
         "dfo_ccg_lighthouse",
         "nt_forestry",
@@ -183,6 +186,7 @@ def download_args(
     if network_name in (
         "bc_env_snow",
         "bc_forestry",
+        "bc_riotinto",
         "bc_tran",
         "dfo_ccg_lighthouse",
         "nt_forestry",
@@ -252,6 +256,7 @@ def dispatch_network(
     elif network_name in (
         "bc_env_snow",
         "bc_forestry",
+        "bc_riotinto",
         "bc_tran",
         "dfo_ccg_lighthouse",
         "nt_forestry",

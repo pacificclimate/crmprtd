@@ -62,6 +62,7 @@ SWOB_PARTNERS = (
     "bc_env_aq",
     "bc_env_snow",
     "bc_forestry",
+    "bc_riotinto",
     "bc_tran",
     "nt_forestry",
     "nt_water",
