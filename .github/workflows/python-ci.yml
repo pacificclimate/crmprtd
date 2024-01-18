@@ -5,23 +5,29 @@ on: push
 jobs:
   test:
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        python-version:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Set up Python 3.8
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: ${{ matrix.python-version }}
 
     - name: Install OS dependencies
       run: |
         sudo apt update
-        sudo apt install libxml2-dev libxslt-dev python-dev
-        sudo apt purge postgresql-client-14 postgresql-server-dev-all
-        sudo apt install postgresql-12-postgis-3
+        sudo apt install libxml2-dev libxslt-dev
+        sudo apt install postgresql-14-postgis-3
 
     - name: Install Poetry
       run: |
