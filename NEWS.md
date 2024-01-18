@@ -1,5 +1,15 @@
 # News / Release Notes
 
+## 4.5.0
+
+_2024-Jan-18_
+
+Compatible with database revision 879f0efa125f (PyCDS 4.3.0).
+
+- Adds feed for RioTinto network via ECCC DataMart
+- Improves BC Hydro testing
+- Improves testing and usability of the process() function
+
 ## 4.4.0
 
 _2023-May-11_
