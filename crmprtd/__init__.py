@@ -51,7 +51,6 @@ speed and reliability. This phase is common to all networks.
 import logging
 import logging.config
 import os.path
-
 import pkg_resources
 from pkg_resources import resource_stream
 from collections import namedtuple

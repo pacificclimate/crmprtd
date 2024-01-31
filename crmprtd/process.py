@@ -204,8 +204,6 @@ def process(
         bulk_chunk_size=bulk_chunk_size,
         sample_size=sample_size,
     )
-    log.info("Insert: done")
-    log.info("Data insertion results", extra={"results": results, "network": network})
 
 
 # Note: this function was buried in crmprtd.__init__.py but is
