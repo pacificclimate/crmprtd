@@ -242,7 +242,9 @@ def dispatch_network(
             dry_run=dry_run,
         )
     elif network_name == "ec":
-        for province in ("BC", "YT"):
+        provinces = kwargs.pop("province")
+
+        for province in provinces:
             download_and_process(
                 network_name=network_name,
                 log_args=log_args(**kwargs, province=province),
@@ -450,6 +452,14 @@ def main(arglist: List[str] = None) -> None:
                 choices=["daily", "hourly"],
                 required=True,
                 help="Frequency of download (network ec only)",
+            )
+            parser.add_argument(
+                "-p",
+                "--province",
+                action="append",
+                help="2 letter province code",
+                default=[],
+                choices=("AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"),
             )
             args = parser.parse_args(arglist)
 
