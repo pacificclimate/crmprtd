@@ -121,7 +121,7 @@ def assert_match_args(*args):
     assert match_args(*args) is not None
 
 
-ec_provinces = "bc yt".split()
+ec_provinces = "BC YT".split()
 
 
 @pytest.mark.parametrize(
@@ -175,8 +175,8 @@ ec_provinces = "bc yt".split()
             "DSN",
             [
                 [
-                    rf"crmprtd_download -N ec -p {prov} -F daily",
-                    rf"tee\s+~/ec/cache/tag_daily_{prov}_.*.xml",
+                    rf"crmprtd_download -N ec -p {prov.lower()} -F daily",
+                    rf"tee\s+~/ec/cache/tag_daily_{prov.lower()}_.*.xml",
                     r"crmprtd_process -N ec -c DSN",
                 ]
                 for prov in ec_provinces
