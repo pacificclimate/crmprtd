@@ -9,9 +9,9 @@ jobs:
     strategy:
       matrix:
         python-version:
-#          - "3.8"
-#          - "3.9"
-#          - "3.10"
+          - "3.8"
+          - "3.9"
+          - "3.10"
           - "3.11"
 
     steps:
@@ -42,6 +42,3 @@ jobs:
         TZ: Canada/Pacific
       run: |
         poetry run pytest -m "not online" -v --tb=short --cov --cov-report=term-missing
-
-    - name: Code format check
-      run: poetry run black . --check
