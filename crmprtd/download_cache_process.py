@@ -453,15 +453,34 @@ def main(arglist: List[str] = None) -> None:
                 required=True,
                 help="Frequency of download (network ec only)",
             )
+            province_codes = (
+                "AB",
+                "BC",
+                "MB",
+                "NB",
+                "NL",
+                "NS",
+                "NT",
+                "NU",
+                "ON",
+                "PE",
+                "QC",
+                "SK",
+                "YT",
+            )
             parser.add_argument(
                 "-p",
                 "--province",
                 action="append",
                 help="2 letter province code",
                 default=[],
-                choices=("AB", "BC", "MB", "NB", "NL", "NS", "NT", "NU", "ON", "PE", "QC", "SK", "YT"),
+                # Province codes really ought to be upper case, but in other scripts
+                # lower case is the norm. We accept either, and normalize to lower case.
+                choices=province_codes + tuple(p.lower() for p in province_codes),
             )
             args = parser.parse_args(arglist)
+            # Normalize to lowercase.
+            args.province = [p.lower() for p in args.province]
 
         # TODO: Add network-dependent time arg here? Currently, it is hardwired in code to
         #  "now".
