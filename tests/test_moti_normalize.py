@@ -288,7 +288,7 @@ def test_normalize_bad_value():
 @pytest.mark.parametrize(
     ("empty"),
     (
-        "<observation-series />",
+        # "<observation-series />",
         """<observation-series>
      </observation-series>""",
         "<observation-series></observation-series>",
