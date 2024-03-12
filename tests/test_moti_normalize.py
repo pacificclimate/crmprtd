@@ -288,7 +288,8 @@ def test_normalize_bad_value():
 @pytest.mark.parametrize(
     ("empty"),
     (
-        # "<observation-series />",
+        "<ignore />",
+        "<observation-series />",
         """<observation-series>
      </observation-series>""",
         "<observation-series></observation-series>",
@@ -317,6 +318,8 @@ def test_normalize_empty_data(empty, caplog):
         "utf-8"
     )  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
+    if "ignore" in empty:
+        return
     assert len(rows) == 0
     for record in caplog.records:
         assert record.levelno != logging.ERROR
