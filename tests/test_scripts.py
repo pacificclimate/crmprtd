@@ -175,6 +175,7 @@ ec_provinces = "BC YT".split()
             "DSN",
             [
                 [
+                    # Note: All internal province codes are in lowercase.
                     rf"crmprtd_download -N ec -p {prov.lower()} -F daily",
                     rf"tee\s+~/ec/cache/tag_daily_{prov.lower()}_.*.xml",
                     r"crmprtd_process -N ec -c DSN",

@@ -288,6 +288,7 @@ def test_normalize_bad_value():
 @pytest.mark.parametrize(
     ("empty"),
     (
+        # See note below re. "ignore"
         "<ignore />",
         "<observation-series />",
         """<observation-series>
@@ -318,6 +319,11 @@ def test_normalize_empty_data(empty, caplog):
         "utf-8"
     )  # noqa
     rows = [row for row in normalize(BytesIO(lines))]
+    # For reasons not yet understood, the first invocation of logging in this test
+    # causes an error. The content of the `empty` argument is irrelevant to this.
+    # Instead of spending more time on debugging this, insert a fake initial test
+    # case, which is flagged by containing the string "ignore", which is ignored by this
+    # test.
     if "ignore" in empty:
         return
     assert len(rows) == 0

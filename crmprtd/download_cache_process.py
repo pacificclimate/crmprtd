@@ -453,6 +453,8 @@ def main(arglist: List[str] = None) -> None:
                 required=True,
                 help="Frequency of download (network ec only)",
             )
+
+            # See notes below re. province codes.
             province_codes = (
                 "AB",
                 "BC",
@@ -475,7 +477,8 @@ def main(arglist: List[str] = None) -> None:
                 help="2 letter province code",
                 default=[],
                 # Province codes really ought to be upper case, but in other scripts
-                # lower case is the norm. We accept either, and normalize to lower case.
+                # lower case is the norm. We accept either, and normalize to lower case
+                # for all subsequent use.
                 choices=province_codes + tuple(p.lower() for p in province_codes),
             )
             args = parser.parse_args(arglist)

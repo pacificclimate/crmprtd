@@ -22,6 +22,9 @@ jobs:
 
       - name: Install project
         run: |
+          # We only need Black, and we want to use the project-specific version.
+          # (Defaults in Black change from time to time and we want only to deal with
+          # the consequences, if any, on our own schedule.)
           poetry install --only dev
 
       - name: Run check
