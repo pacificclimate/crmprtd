@@ -68,7 +68,9 @@ requests_mock = "*"
 pytest-cov = "*"
 "testing.postgresql" = "*"
 pytest-mock = "*"
-black = "*"
+# Pin black to avoid unnecessary reformatting when its defaults change from release
+# to release.
+black = "24.2.0"
 pre-commit = "*"
 
 [tool.poetry.scripts]

@@ -42,7 +42,7 @@ def test_version_option(capsys, name):
         # Non-SWOB networks
         ("bc_hydro", "".split()),
         ("crd", "--username u --password p".split()),
-        ("ec", "-F daily".split()),
+        ("ec", "-F daily -p BC".split()),
         ("moti", "--username u --password p".split()),
         ("wamr", "".split()),
         ("wmb", "--username u --password p".split()),
@@ -121,8 +121,11 @@ def assert_match_args(*args):
     assert match_args(*args) is not None
 
 
+ec_provinces = "BC YT".split()
+
+
 @pytest.mark.parametrize(
-    "network, tag, frequency, log_filename, cache_filename, connection_string, "
+    "network, tag, frequency, provinces, log_filename, cache_filename, connection_string, "
     "seq_of_expected_cmds_patterns, expected_final_destination_pattern",
     # This covers all current networks and aliases.
     [
@@ -130,6 +133,7 @@ def assert_match_args(*args):
         (
             "bc_hydro",
             "tag",
+            None,
             None,
             None,
             None,
@@ -145,6 +149,7 @@ def assert_match_args(*args):
             (
                 network,
                 "tag",
+                None,
                 None,
                 None,
                 None,
@@ -164,16 +169,18 @@ def assert_match_args(*args):
             "ec",
             "tag",
             "daily",
+            ec_provinces,
             None,
             None,
             "DSN",
             [
                 [
-                    rf"crmprtd_download -N ec -p {prov} -F daily",
-                    rf"tee\s+~/ec/cache/tag_daily_{prov}_.*.xml",
+                    # Note: All internal province codes are in lowercase.
+                    rf"crmprtd_download -N ec -p {prov.lower()} -F daily",
+                    rf"tee\s+~/ec/cache/tag_daily_{prov.lower()}_.*.xml",
                     r"crmprtd_process -N ec -c DSN",
                 ]
-                for prov in "bc yt".split()
+                for prov in ec_provinces
             ],
             None,
         ),
@@ -181,6 +188,7 @@ def assert_match_args(*args):
             (
                 alias,
                 "tag",
+                None,
                 None,
                 None,
                 None,
@@ -202,6 +210,7 @@ def assert_match_args(*args):
             (
                 network,
                 "tag",
+                None,
                 None,
                 log_filename,
                 cache_filename,
@@ -230,6 +239,7 @@ def test_download_cache_process_main(
     network,
     tag,
     frequency,
+    provinces,
     log_filename,
     cache_filename,
     connection_string,
@@ -242,6 +252,9 @@ def test_download_cache_process_main(
         arglist += f" -T {tag}"
     if frequency is not None:
         arglist += f" -F {frequency}"
+    if provinces is not None:
+        for province in provinces:
+            arglist += f" -p {province}"
     if log_filename is not None:
         arglist += f" --log_filename {log_filename}"
     if cache_filename is not None:
