@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 4.6.0
+
+_2024-Mar-26_
+
+[Add provinces argument to download_pipeline](https://github.com/pacificclimate/crmprtd/pull/179)
+
 ## 4.5.0
 
 _2024-Jan-18_
