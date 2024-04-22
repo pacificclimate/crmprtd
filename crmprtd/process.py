@@ -2,10 +2,11 @@ import os
 import sys
 import pytz
 from importlib import import_module
-from itertools import tee
+from itertools import tee, islice
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
+import csv
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -206,6 +207,56 @@ def process(
     )
     log.info("Insert: done")
     log.info("Data insertion results", extra={"results": results, "network": network})
+
+
+def gulpy_plus_plus():
+    """A stripped down processing pipeline for users that have already
+    preprocessed their data into tuples of ("history_id", "time", "datum",
+    "vars_id"), and saved them as a CSV file"""
+
+    parser = ArgumentParser()
+    add_version_arg(parser)
+    add_process_args(parser)  # FIXME: remove start_date/end_date args
+    add_logging_args(parser)
+    (args, filenames) = parser.parse_args()
+
+    setup_logging(
+        args.log_conf,
+        args.log_filename,
+        args.error_email,
+        args.log_level,
+        "crmprtd",
+    )
+
+    engine = create_engine(args.connection_string)
+    Session = sessionmaker(engine)
+    sesh = Session()
+
+    fieldnames = ("history_id", "time", "datum", "vars_id")
+    for fname in filenames:
+        with open(fname) as csvfile:
+            reader = csv.DictReader(csvfile, fieldnames)
+            observations = [Obs(**row) for row in islice(reader, 1, None)]
+
+        log.info(f"Count of observations to process: {len(observations)}")
+        if arg.diag:
+            for obs in observations:
+                log.info(obs)
+        continue
+
+        log.info("Insert: start")
+        results = insert(
+            sesh,
+            observations,
+            strategy=insert_strategy,
+            bulk_chunk_size=bulk_chunk_size,
+            sample_size=sample_size,
+        )
+        log.info("Insert: done")
+        log.info(
+            "Data insertion results",
+            extra={"results": results, "network": args.network},
+        )
 
 
 # Note: this function was buried in crmprtd.__init__.py but is

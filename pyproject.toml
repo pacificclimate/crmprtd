@@ -77,6 +77,7 @@ pre-commit = "*"
 crmprtd_pipeline = "crmprtd.download_cache_process:main"
 crmprtd_download = "crmprtd.download:main"
 crmprtd_process = "crmprtd.process:main"
+crmprtd_gulpy = "crmprtd.process:gulpy_plus_plus"
 # Adding the scripts in scripts/ will
 # EITHER require refactoring them so that they are (a)
 # in the crmprtd package, and (b) `main()` can be invoked without arguments (i.e., put
