@@ -23,7 +23,7 @@ from pycds import Obs
 log = logging.getLogger(__name__)
 
 
-def add_process_args(parser):  # pragma: no cover
+def add_insert_args(parser):  # pragma: no cover
     parser.add_argument(
         "-c", "--connection_string", help="PostgreSQL connection string"
     )
@@ -41,35 +41,6 @@ def add_process_args(parser):  # pragma: no cover
         help="Number of samples to be taken from observations "
         "when searching for duplicates "
         "to determine which insertion strategy to use",
-    )
-    parser.add_argument(
-        "-N",
-        "--network",
-        choices=NETWORKS,
-        help="The network from which the data is coming from. "
-        "The name will be used for a dynamic import of "
-        "the module's normalization function.",
-    )
-    parser.add_argument(
-        "-S",
-        "--start_date",
-        help="Optional start time to use for processing "
-        "(interpreted with dateutil.parser.parse).",
-    )
-    parser.add_argument(
-        "-E",
-        "--end_date",
-        help="Optional end time to use for processing "
-        "(interpreted with dateutil.parser.parse).",
-    )
-    parser.add_argument(
-        "-I",
-        "--infer",
-        default=False,
-        action="store_true",
-        help="Run the 'infer' stage of the pipeline, which "
-        "determines what metadata insertions could be made based"
-        "on the observed data available",
     )
     parser.add_argument(
         "-R",
@@ -103,6 +74,39 @@ def add_process_args(parser):  # pragma: no cover
             "than this size to prevent possible problems with excessively large "
             "queries."
         ),
+    )
+    return parser
+
+
+def add_process_args(parser):  # pragma: no cover
+    parser.add_argument(
+        "-N",
+        "--network",
+        choices=NETWORKS,
+        help="The network from which the data is coming from. "
+        "The name will be used for a dynamic import of "
+        "the module's normalization function.",
+    )
+    parser.add_argument(
+        "-S",
+        "--start_date",
+        help="Optional start time to use for processing "
+        "(interpreted with dateutil.parser.parse).",
+    )
+    parser.add_argument(
+        "-E",
+        "--end_date",
+        help="Optional end time to use for processing "
+        "(interpreted with dateutil.parser.parse).",
+    )
+    parser.add_argument(
+        "-I",
+        "--infer",
+        default=False,
+        action="store_true",
+        help="Run the 'infer' stage of the pipeline, which "
+        "determines what metadata insertions could be made based"
+        "on the observed data available",
     )
     return parser
 
@@ -217,8 +221,14 @@ def gulpy_plus_plus():
 
     parser = ArgumentParser()
     add_version_arg(parser)
-    add_process_args(parser)  # FIXME: remove start_date/end_date args
+    add_insert_args(parser)
     add_logging_args(parser)
+    parser.add_argument(
+        "-N",
+        "--network",
+        help="The network from which the data is coming from. "
+        "Since gulpy input already identifies the network by way of the provided history_ids, the name will only be used for logging.",
+    )
     parser.add_argument('filenames', metavar='filename', nargs='+',
                         help='CSV files to process')
     args = parser.parse_args()
@@ -308,6 +318,7 @@ def main(args=None):
         parser = ArgumentParser()
         add_version_arg(parser)
         add_process_args(parser)
+        add_insert_args(parser)
         add_logging_args(parser)
         args = parser.parse_args(args)
 
