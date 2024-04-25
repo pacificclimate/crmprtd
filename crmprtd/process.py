@@ -18,6 +18,7 @@ from crmprtd.download_utils import verify_date
 from crmprtd.infer import infer
 from crmprtd import add_version_arg, add_logging_args, setup_logging, NETWORKS
 from crmprtd.more_itertools import tap, log_progress
+from pycds import Obs
 
 log = logging.getLogger(__name__)
 
@@ -218,7 +219,9 @@ def gulpy_plus_plus():
     add_version_arg(parser)
     add_process_args(parser)  # FIXME: remove start_date/end_date args
     add_logging_args(parser)
-    (args, filenames) = parser.parse_args()
+    parser.add_argument('filenames', metavar='filename', nargs='+',
+                        help='CSV files to process')
+    args = parser.parse_args()
 
     setup_logging(
         args.log_conf,
@@ -233,24 +236,24 @@ def gulpy_plus_plus():
     sesh = Session()
 
     fieldnames = ("history_id", "time", "datum", "vars_id")
-    for fname in filenames:
+    for fname in args.filenames:
         with open(fname) as csvfile:
             reader = csv.DictReader(csvfile, fieldnames)
             observations = [Obs(**row) for row in islice(reader, 1, None)]
 
         log.info(f"Count of observations to process: {len(observations)}")
-        if arg.diag:
+        if args.diag:
             for obs in observations:
                 log.info(obs)
-        continue
+            continue
 
         log.info("Insert: start")
         results = insert(
             sesh,
             observations,
-            strategy=insert_strategy,
-            bulk_chunk_size=bulk_chunk_size,
-            sample_size=sample_size,
+            strategy=InsertStrategy[args.insert_strategy],
+            bulk_chunk_size=args.bulk_chunk_size,
+            sample_size=args.sample_size,
         )
         log.info("Insert: done")
         log.info(
