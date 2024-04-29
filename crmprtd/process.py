@@ -2,10 +2,11 @@ import os
 import sys
 import pytz
 from importlib import import_module
-from itertools import tee
+from itertools import tee, islice
 import logging
 from argparse import ArgumentParser
 from datetime import datetime
+import csv
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -17,11 +18,12 @@ from crmprtd.download_utils import verify_date
 from crmprtd.infer import infer
 from crmprtd import add_version_arg, add_logging_args, setup_logging, NETWORKS
 from crmprtd.more_itertools import tap, log_progress
+from pycds import Obs
 
 log = logging.getLogger(__name__)
 
 
-def add_process_args(parser):  # pragma: no cover
+def add_insert_args(parser):  # pragma: no cover
     parser.add_argument(
         "-c", "--connection_string", help="PostgreSQL connection string"
     )
@@ -39,35 +41,6 @@ def add_process_args(parser):  # pragma: no cover
         help="Number of samples to be taken from observations "
         "when searching for duplicates "
         "to determine which insertion strategy to use",
-    )
-    parser.add_argument(
-        "-N",
-        "--network",
-        choices=NETWORKS,
-        help="The network from which the data is coming from. "
-        "The name will be used for a dynamic import of "
-        "the module's normalization function.",
-    )
-    parser.add_argument(
-        "-S",
-        "--start_date",
-        help="Optional start time to use for processing "
-        "(interpreted with dateutil.parser.parse).",
-    )
-    parser.add_argument(
-        "-E",
-        "--end_date",
-        help="Optional end time to use for processing "
-        "(interpreted with dateutil.parser.parse).",
-    )
-    parser.add_argument(
-        "-I",
-        "--infer",
-        default=False,
-        action="store_true",
-        help="Run the 'infer' stage of the pipeline, which "
-        "determines what metadata insertions could be made based"
-        "on the observed data available",
     )
     parser.add_argument(
         "-R",
@@ -101,6 +74,39 @@ def add_process_args(parser):  # pragma: no cover
             "than this size to prevent possible problems with excessively large "
             "queries."
         ),
+    )
+    return parser
+
+
+def add_process_args(parser):  # pragma: no cover
+    parser.add_argument(
+        "-N",
+        "--network",
+        choices=NETWORKS,
+        help="The network from which the data is coming from. "
+        "The name will be used for a dynamic import of "
+        "the module's normalization function.",
+    )
+    parser.add_argument(
+        "-S",
+        "--start_date",
+        help="Optional start time to use for processing "
+        "(interpreted with dateutil.parser.parse).",
+    )
+    parser.add_argument(
+        "-E",
+        "--end_date",
+        help="Optional end time to use for processing "
+        "(interpreted with dateutil.parser.parse).",
+    )
+    parser.add_argument(
+        "-I",
+        "--infer",
+        default=False,
+        action="store_true",
+        help="Run the 'infer' stage of the pipeline, which "
+        "determines what metadata insertions could be made based"
+        "on the observed data available",
     )
     return parser
 
@@ -208,6 +214,64 @@ def process(
     log.info("Data insertion results", extra={"results": results, "network": network})
 
 
+def gulpy_plus_plus():
+    """A stripped down processing pipeline for users that have already
+    preprocessed their data into tuples of ("history_id", "time", "datum",
+    "vars_id"), and saved them as a CSV file"""
+
+    parser = ArgumentParser()
+    add_version_arg(parser)
+    add_insert_args(parser)
+    add_logging_args(parser)
+    parser.add_argument(
+        "-N",
+        "--network",
+        help="The network from which the data is coming from. "
+        "Since gulpy input already identifies the network by way of the provided history_ids, the name will only be used for logging.",
+    )
+    parser.add_argument('filenames', metavar='filename', nargs='+',
+                        help='CSV files to process')
+    args = parser.parse_args()
+
+    setup_logging(
+        args.log_conf,
+        args.log_filename,
+        args.error_email,
+        args.log_level,
+        "crmprtd",
+    )
+
+    engine = create_engine(args.connection_string)
+    Session = sessionmaker(engine)
+    sesh = Session()
+
+    fieldnames = ("history_id", "time", "datum", "vars_id")
+    for fname in args.filenames:
+        with open(fname) as csvfile:
+            reader = csv.DictReader(csvfile, fieldnames)
+            observations = [Obs(**row) for row in islice(reader, 1, None)]
+
+        log.info(f"Count of observations to process: {len(observations)}")
+        if args.diag:
+            for obs in observations:
+                log.info(obs)
+            continue
+
+        log.info("Insert: start")
+        results = insert(
+            sesh,
+            observations,
+            strategy=InsertStrategy[args.insert_strategy],
+            bulk_chunk_size=args.bulk_chunk_size,
+            sample_size=args.sample_size,
+        )
+        log.info("Insert: done")
+        log.info(
+            "Data insertion results",
+            extra={"results": results, "network": args.network},
+        )
+
+
 # Note: this function was buried in crmprtd.__init__.py but is
 # currently (c.a. 2020-12-04) unused. It *may* have some utility at
 # some point, particularly if refactored with process(), so it is
@@ -254,6 +318,7 @@ def main(args=None):
         parser = ArgumentParser()
         add_version_arg(parser)
         add_process_args(parser)
+        add_insert_args(parser)
         add_logging_args(parser)
         args = parser.parse_args(args)
 
