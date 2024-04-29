@@ -249,7 +249,7 @@ def gulpy_plus_plus():
     for fname in args.filenames:
         with open(fname) as csvfile:
             reader = csv.DictReader(csvfile, fieldnames)
-            observations = [Obs(**row) for row in islice(reader, 1, None)]
+            observations = [Obs(**row) for row in islice(reader, 1, None) if row['datum']]
 
         log.info(f"Count of observations to process: {len(observations)}")
         if args.diag:
