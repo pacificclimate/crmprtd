@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 4.7.0
+
+_2024-Apr-29_
+
+Adds an alternate process pipeline, `crmprtd_gulpy` to the package
+
 ## 4.6.0
 
 _2024-Mar-26_
