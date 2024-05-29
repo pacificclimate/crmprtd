@@ -11,15 +11,16 @@ from math import floor, log as mathlog
 import logging
 import time
 import random
-
+from itertools import groupby
 from sqlalchemy import and_
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import IntegrityError, DBAPIError
 
 from crmprtd.constants import InsertStrategy
 from crmprtd.db_exceptions import InsertionError
-from pycds import Obs
+from pycds import Obs, Variable
 
+from crmprtd.db_helpers import cached_function
 
 log = logging.getLogger(__name__)
 
@@ -52,6 +53,26 @@ class Timer(object):
 
 def max_power_of_two(num):
     return 2 ** floor(mathlog(num, 2))
+
+
+def get_network_name(sesh, obs):
+    @cached_function(["name"])
+    def network_query(sesh, obs):
+        obs_var = sesh.query(Variable).filter_by(id=obs.vars_id).first()
+        return obs_var.network
+
+    return network_query(sesh, obs).name
+
+
+def obs_by_network(observations, sesh):
+    obs_sorted = sorted(observations, key=lambda obs: get_network_name(sesh, obs))
+
+    return {
+        network_name: list(obs_group)
+        for network_name, obs_group in groupby(
+            obs_sorted, key=lambda obs: get_network_name(sesh, obs)
+        )
+    }
 
 
 def get_bisection_chunk_sizes(remainder):
@@ -130,7 +151,11 @@ def insert_single_obs(sesh, obs):
     except IntegrityError as e:
         log.debug(
             "Failure, observation already exists",
-            extra={"observation": obs, "exception": e},
+            extra={
+                "observation": obs,
+                "exception": e,
+                "network": get_network_name(sesh, obs),
+            },
         )
         db_metrics = DBMetrics(0, 1, 0)
     except InsertionError as e:
@@ -138,11 +163,18 @@ def insert_single_obs(sesh, obs):
         #   SQLAlchemy unless something very tricky is going on. Why is this here?
         log.warning(
             "Failure occured during insertion",
-            extra={"observation": obs, "exception": e},
+            extra={
+                "observation": obs,
+                "exception": e,
+                "network": get_network_name(sesh, obs),
+            },
         )
         db_metrics = DBMetrics(0, 0, 1)
     else:
-        log.info("Successfully inserted observations: 1")
+        log.info(
+            "Successfully inserted observations: 1",
+            extra={"network": get_network_name(sesh, obs)},
+        )
         db_metrics = DBMetrics(1, 0, 0)
     sesh.commit()
     return db_metrics
@@ -187,7 +219,10 @@ def bisect_insert_strategy(sesh, observations):
     but in the optimal case it reduces the transactions to a constant
     1.
     """
-    log.debug("Begin mass observation insertion", extra={"num_obs": len(observations)})
+    log.debug(
+        "Begin mass observation insertion",
+        extra={"num_obs": len(observations)},
+    )
 
     # Base cases
     if len(observations) < 1:
@@ -198,7 +233,10 @@ def bisect_insert_strategy(sesh, observations):
     else:
         try:
             with sesh.begin_nested():
-                log.debug("New SAVEPOINT", extra={"num_obs": len(observations)})
+                log.debug(
+                    "New SAVEPOINT",
+                    extra={"num_obs": len(observations)},
+                )
                 sesh.add_all(observations)
         except IntegrityError:
             log.debug("Failed, splitting observations.")
@@ -294,9 +332,18 @@ def bulk_insert_strategy(sesh, observations, chunk_size=1000):
         dbm += chunk_dbm
         log.info(
             f"Bulk insert progress: "
-            f"{dbm.successes} inserted, {dbm.skips} skipped, {dbm.failures} failed"
+            f"{dbm.successes} inserted, {dbm.skips} skipped, {dbm.failures} failed",
+            extra={"network": get_network_name(sesh, chunk[0])},
         )
-    log.info(f"Successfully inserted observations: {dbm.successes}")
+    if len(observations) > 0:
+        log.info(
+            f"Successfully inserted observations: {dbm.successes}",
+            extra={"network": get_network_name(sesh, observations[0])},
+        )
+    else:
+        log.info(
+            f"Successfully inserted observations: {dbm.successes}",
+        )
     return dbm
 
 
@@ -324,25 +371,51 @@ def insert(
     # in the database.
     sesh.commit()
 
-    with Timer() as tmr:
-        if strategy is InsertStrategy.BULK:
-            dbm = bulk_insert_strategy(sesh, observations, chunk_size=bulk_chunk_size)
-        elif strategy is InsertStrategy.SINGLE:
-            dbm = single_insert_strategy(sesh, observations)
-        elif strategy is InsertStrategy.CHUNK_BISECT:
-            dbm = chunk_bisect_insert_strategy(sesh, observations)
-        elif strategy is InsertStrategy.ADAPTIVE:
-            if contains_all_duplicates(sesh, observations, sample_size):
-                dbm = single_insert_strategy(sesh, observations)
-            else:
-                dbm = chunk_bisect_insert_strategy(sesh, observations)
-        else:
-            raise ValueError(f"Insert strategy has an unrecognized value: {strategy}")
-
-    log.info("Data insertion complete")
-    return {
-        "successes": dbm.successes,
-        "skips": dbm.skips,
-        "failures": dbm.failures,
-        "insertions_per_sec": round(dbm.successes / tmr.run_time, 2),
+    results_total = {
+        "successes": 0,
+        "skips": 0,
+        "failures": 0,
+        "insertions_per_sec": 0,
     }
+    if len(observations) < 1:
+        return results_total
+
+    obs_by_network_dict = obs_by_network(observations, sesh)
+
+    for obs in obs_by_network_dict.values():
+        dbm = DBMetrics(0, 0, 0)
+        with Timer() as tmr:
+            if strategy is InsertStrategy.BULK:
+                dbm += bulk_insert_strategy(sesh, obs, chunk_size=bulk_chunk_size)
+            elif strategy is InsertStrategy.SINGLE:
+                dbm += single_insert_strategy(sesh, obs)
+            elif strategy is InsertStrategy.CHUNK_BISECT:
+                dbm += chunk_bisect_insert_strategy(sesh, obs)
+            elif strategy is InsertStrategy.ADAPTIVE:
+                if contains_all_duplicates(sesh, obs, sample_size):
+                    dbm += single_insert_strategy(sesh, obs)
+                else:
+                    dbm += chunk_bisect_insert_strategy(sesh, obs)
+            else:
+                raise ValueError(
+                    f"Insert strategy has an unrecognized value: {strategy}"
+                )
+        results = {
+            "successes": dbm.successes,
+            "skips": dbm.skips,
+            "failures": dbm.failures,
+            "insertions_per_sec": round(dbm.successes / tmr.run_time, 2),
+        }
+        log.info(
+            "Insert for network {network}: done".format(
+                network=get_network_name(sesh, obs[0])
+            )
+        )
+        log.info(
+            "Data insertion results",
+            extra={"results": results, "network": get_network_name(sesh, obs[0])},
+        )
+
+        for k, v in results.items():
+            results_total[k] += v
+    return results_total

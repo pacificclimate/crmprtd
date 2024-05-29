@@ -3,10 +3,12 @@ from math import ceil
 
 import pytest
 import pytz
+import logging
 
 from crmprtd.more_itertools import cycles
 from pycds import History, Obs
 from crmprtd.insert import (
+    insert,
     bisect_insert_strategy,
     split,
     bisection_chunks,
@@ -17,6 +19,7 @@ from crmprtd.insert import (
     fixed_length_chunks,
     bulk_insert_strategy,
     Timer,
+    obs_by_network,
 )
 
 
@@ -195,3 +198,43 @@ def test_single_insert_obs_not_unique(test_session):
     ]
     dbm = single_insert_strategy(test_session, ob)
     assert dbm.skips == 1
+
+
+def test_mult_networks(test_session, caplog):
+    caplog.set_level(logging.DEBUG, "crmprtd")
+
+    moti = "Brandywine"
+    wmb = "FIVE MILE"
+    ec = "Sechelt"
+    stations = [moti, wmb, ec]
+
+    obs = []
+    with test_session:
+        for station in stations:
+            hist = (
+                test_session.query(History)
+                .filter(History.station_name == station)
+                .first()
+            )
+            var = hist.station.network.variables[0]
+            observation = Obs(
+                history_id=hist.id,
+                datum=10,
+                vars_id=var.id,
+                time=datetime(2012, 9, 25, 6, tzinfo=pytz.utc),
+            )
+            obs.append(observation)
+
+    expected_networks = {"MoTIe", "FLNRO-WMB", "EC_raw"}
+    results = insert(test_session, obs)
+    assert results["successes"] == 3
+    assert networks_are_logged(expected_networks, caplog)
+
+
+def networks_are_logged(networks, caplog):
+    rec_networks = {
+        getattr(record, "network")
+        for record in caplog.records
+        if getattr(record, "network", None) is not None
+    }
+    return networks == rec_networks
