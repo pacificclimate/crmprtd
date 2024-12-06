@@ -13,6 +13,8 @@ from pycds import Network, History, Variable, Obs
 from crmprtd.constants import InsertStrategy
 from crmprtd.download_utils import verify_date
 
+from . import records_contain_db_connection
+
 # Must import the module, not objects from it, so we can mock the objects.
 import crmprtd.process
 
@@ -158,11 +160,11 @@ def test_process_by_date(
 
     assert num_obs_inserted_in_db == expected_num_inserts
     assert log_num_obs_inserted == expected_num_inserts
+    assert records_contain_db_connection(crmp_session, caplog)
 
 
 def test_process_with_file_arg(test_session, caplog):
-    caplog.set_level(logging.INFO, "crmprtd")
-
+    caplog.set_level(logging.DEBUG, "crmprtd")
     input_stream = open(resource_filename("crmprtd", "data/wmb_data.csv"), "rb")
     crmprtd.process.process(
         connection_string=test_session.get_bind().url,
@@ -173,3 +175,4 @@ def test_process_with_file_arg(test_session, caplog):
         input_stream=input_stream,
     )
     assert get_num_obs_inserted(caplog.records) == 1
+    assert records_contain_db_connection(test_session, caplog)

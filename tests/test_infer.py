@@ -3,6 +3,10 @@ import importlib
 
 import pytest
 
+import logging
+
+from . import records_contain_db_connection
+
 import crmprtd.infer
 import crmprtd.align
 from crmprtd import Row
@@ -66,7 +70,7 @@ def commit_raises(diagnostic=False, stn_count=1, var_count=1):
 @pytest.mark.parametrize("diagnostic", (False, True))
 @pytest.mark.parametrize("stn_count", (1, 2))
 @pytest.mark.parametrize("var_count", (1, 2))
-def test_infer(crmp_session, diagnostic, stn_count, var_count):
+def test_infer(crmp_session, diagnostic, stn_count, var_count, caplog):
     # align has several functions that reach out to the database and
     # subsequently cache results While this speeds up align
     # *significantly* reducing round trips to the database, an
@@ -75,6 +79,8 @@ def test_infer(crmp_session, diagnostic, stn_count, var_count):
     # function local cache gets cleared
     importlib.reload(crmprtd.infer)
     importlib.reload(crmprtd.align)
+
+    caplog.set_level(logging.INFO, "crmprtd")
 
     network_name = "MoTIe"
     stn_id_prefix = "test_stn_id"
@@ -117,3 +123,4 @@ def test_infer(crmp_session, diagnostic, stn_count, var_count):
 
     assert post_stn_count == (stn_count if commit else 0)
     assert post_var_count == (var_count if commit and not raises else 0)
+    assert records_contain_db_connection(crmp_session, caplog)

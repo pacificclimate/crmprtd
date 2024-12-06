@@ -19,7 +19,7 @@ from sqlalchemy.exc import IntegrityError, DBAPIError
 from crmprtd.constants import InsertStrategy
 from crmprtd.db_exceptions import InsertionError
 from pycds import Obs
-
+from crmprtd.log_helpers import sanitize_connection
 
 log = logging.getLogger(__name__)
 
@@ -124,13 +124,20 @@ def insert_single_obs(sesh, obs):
     try:
         # Create a nested SAVEPOINT context manager to rollback to in the
         # event of unique constraint errors
-        log.debug("New SAVEPOINT for single observation")
+        log.debug(
+            "New SAVEPOINT for single observation",
+            extra={"database": sanitize_connection(sesh)},
+        )
         with sesh.begin_nested():
             sesh.add(obs)
     except IntegrityError as e:
         log.debug(
             "Failure, observation already exists",
-            extra={"observation": obs, "exception": e},
+            extra={
+                "observation": obs,
+                "exception": e,
+                "database": sanitize_connection(sesh),
+            },
         )
         db_metrics = DBMetrics(0, 1, 0)
     except InsertionError as e:
@@ -138,18 +145,27 @@ def insert_single_obs(sesh, obs):
         #   SQLAlchemy unless something very tricky is going on. Why is this here?
         log.warning(
             "Failure occured during insertion",
-            extra={"observation": obs, "exception": e},
+            extra={
+                "observation": obs,
+                "exception": e,
+                "database": sanitize_connection(sesh),
+            },
         )
         db_metrics = DBMetrics(0, 0, 1)
     else:
-        log.info("Successfully inserted observations: 1")
+        log.info(
+            "Successfully inserted observations: 1",
+            extra={"database": sanitize_connection(sesh)},
+        )
         db_metrics = DBMetrics(1, 0, 0)
     sesh.commit()
     return db_metrics
 
 
 def single_insert_strategy(sesh, observations):
-    log.info("Using Single Insert Strategy")
+    log.info(
+        "Using Single Insert Strategy", extra={"database": sanitize_connection(sesh)}
+    )
     dbm = DBMetrics(0, 0, 0)
     for obs in observations:
         dbm += insert_single_obs(sesh, obs)
@@ -187,7 +203,10 @@ def bisect_insert_strategy(sesh, observations):
     but in the optimal case it reduces the transactions to a constant
     1.
     """
-    log.debug("Begin mass observation insertion", extra={"num_obs": len(observations)})
+    log.debug(
+        "Begin mass observation insertion",
+        extra={"num_obs": len(observations), "database": sanitize_connection(sesh)},
+    )
 
     # Base cases
     if len(observations) < 1:
@@ -198,7 +217,13 @@ def bisect_insert_strategy(sesh, observations):
     else:
         try:
             with sesh.begin_nested():
-                log.debug("New SAVEPOINT", extra={"num_obs": len(observations)})
+                log.debug(
+                    "New SAVEPOINT",
+                    extra={
+                        "num_obs": len(observations),
+                        "database": sanitize_connection(sesh),
+                    },
+                )
                 sesh.add_all(observations)
         except IntegrityError:
             log.debug("Failed, splitting observations.")
@@ -211,7 +236,10 @@ def bisect_insert_strategy(sesh, observations):
         else:
             log.info(
                 f"Successfully inserted observations: {len(observations)}",
-                extra={"num_obs": len(observations)},
+                extra={
+                    "num_obs": len(observations),
+                    "database": sanitize_connection(sesh),
+                },
             )
             db_metrics = DBMetrics(len(observations), 0, 0)
         sesh.commit()
@@ -219,7 +247,10 @@ def bisect_insert_strategy(sesh, observations):
 
 
 def chunk_bisect_insert_strategy(sesh, observations):
-    log.info("Using Chunk + Bisection Strategy")
+    log.info(
+        "Using Chunk + Bisection Strategy",
+        extra={"database": sanitize_connection(sesh)},
+    )
     dbm = DBMetrics(0, 0, 0)
     for chunk in bisection_chunks(observations):
         dbm += bisect_insert_strategy(sesh, chunk)
@@ -269,7 +300,10 @@ def insert_bulk_obs(sesh, observations):
     except DBAPIError as e:
         # Something really unanticipated happened. Duplicate rows do not trigger an
         # exception.
-        log.exception("Unexpected error during bulk insertion")
+        log.exception(
+            "Unexpected error during bulk insertion",
+            extra={"database": sanitize_connection(sesh)},
+        )
         return DBMetrics(0, 0, num_to_insert)
     sesh.commit()
     num_inserted = len(result)
@@ -287,16 +321,22 @@ def bulk_insert_strategy(sesh, observations, chunk_size=1000):
     :param chunk_size: Size of chunks.
     :return: DMMetrics describing result of insertion
     """
-    log.info("Using Bulk Insert Strategy")
+    log.info(
+        "Using Bulk Insert Strategy", extra={"database": sanitize_connection(sesh)}
+    )
     dbm = DBMetrics(0, 0, 0)
     for chunk in fixed_length_chunks(observations, chunk_size=chunk_size):
         chunk_dbm = insert_bulk_obs(sesh, chunk)
         dbm += chunk_dbm
         log.info(
             f"Bulk insert progress: "
-            f"{dbm.successes} inserted, {dbm.skips} skipped, {dbm.failures} failed"
+            f"{dbm.successes} inserted, {dbm.skips} skipped, {dbm.failures} failed",
+            extra={"database": sanitize_connection(sesh)},
         )
-    log.info(f"Successfully inserted observations: {dbm.successes}")
+    log.info(
+        f"Successfully inserted observations: {dbm.successes}",
+        extra={"database": sanitize_connection(sesh)},
+    )
     return dbm
 
 
