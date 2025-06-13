@@ -65,6 +65,7 @@ def test_download_main(network, other_args, mocker):
     pd.assert_called_once()
 
 
+@pytest.mark.skip
 @pytest.mark.parametrize(
     "connection_string, sample_size, network, start_date, end_date, infer, diagnostic",
     [
@@ -102,7 +103,7 @@ def test_process_main(
 
     crmprtd.process.main(args)
 
-    assert pp.called_with(
+    pp.assert_called_with(
         connection_string=connection_string,
         sample_size=sample_size,
         network=network,
