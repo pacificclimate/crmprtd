@@ -149,8 +149,10 @@ def main(
     else:
         dl_date = verify_date(args.date, datetime.datetime.now(), "date")
 
+    day = dl_date.strftime("%Y%m%d")
+
     download(
-        "https://dd.weather.gc.ca/observations/swob-ml/partners/{}/".format(partner),
+        f"https://hpfx.collab.science.gc.ca/{day}/WXO-DD/observations/swob-ml/partners/{partner}/{day}/",
         dl_date,
     )
 
