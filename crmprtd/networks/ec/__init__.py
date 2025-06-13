@@ -39,10 +39,11 @@ def makeurl(
     """
     if time is None:
         time = now()
+    day = time.strftime("%Y%m%d")
     fmt = "%Y%m%d%H" if freq == "hourly" else "%Y%m%d"
     freq = "yesterday" if freq == "daily" else freq
     fname = f"{freq}_{province.lower()}_{time.strftime(fmt)}_{language}.xml"
-    return f"{baseurl}/observations/xml/{province.upper()}/{freq}/{fname}"
+    return f"{baseurl}/{day}/WXO-DD/observations/xml/{province.upper()}/{freq}/{fname}"
 
 
 class OmMember(object):
