@@ -13,7 +13,7 @@ authors = [
   { name = "Nik Rados" }
 ]
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9,<3.14"
 keywords = ["sql", "database", "data", "science", "climate", "oceanography", "meteorology"]
 classifiers = [
   "Programming Language :: Python :: 3.9",
@@ -51,18 +51,19 @@ url = "https://pypi.pacificclimate.org/simple/"
 priority = "supplemental"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = ">=3.9,<3.14"
 lxml = "*"
 psycopg2 = "*"
 pyyaml = "*"
 python-dateutil = "*"
 pytz = "*"
 requests = { version = "*", extras = ["security"] }
-pycds = { version = "4.3.0", source = "pcic-pypi" }
+pycds = "5.0.0rc1"
 pint = "*"
 pysftp = "*"
 urllib3 = "<2"
 python-json-logger = { version = "*", optional = true }
+black = "25.1.0"
 
 [tool.poetry.extras]
 jsonlogger = ["python-json-logger"]
@@ -73,5 +74,5 @@ requests_mock = "*"
 pytest-cov = "*"
 testing-postgresql = "*"
 pytest-mock = "*"
-black = "24.2.0"
+black = "25.1.0"
 pre-commit = "*"
