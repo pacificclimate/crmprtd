@@ -25,7 +25,7 @@ def pytest_runtest_setup():
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def postgis_session():
     """
     Yields a blank PostGIS session with no tables or data
@@ -46,7 +46,7 @@ def postgis_session():
         yield sesh
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def crmp_session(postgis_session):
     """
     Yields a PostGIS enabled session with CRMP schema but no data
@@ -62,7 +62,7 @@ def crmp_session(postgis_session):
     yield postgis_session
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def test_session(crmp_session, caplog):
     """
     Yields a PostGIS enabled session with CRMP schema and test data
@@ -204,7 +204,7 @@ def test_data():
     return data
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def ec_session(crmp_session, caplog):
     """
     Yields a PostGIS enabled session with CRMP schema and test data
