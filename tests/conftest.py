@@ -19,7 +19,7 @@ import requests
 import pycds
 from pycds import Network, Station, Contact, History, Variable, Obs
 from .swob_data import network_listing, day_listing, station_listing
-from .test_helpers import resource_filename
+from tests.test_helpers import resource_filename
 
 
 def pytest_runtest_setup():
