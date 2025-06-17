@@ -1,4 +1,5 @@
-from pkg_resources import resource_filename
+from importlib import import_module
+from importlib.resources import files
 from datetime import datetime, timedelta
 import logging
 
@@ -8,7 +9,7 @@ from lxml.etree import parse, XSLT
 
 log = logging.getLogger(__name__)
 
-xsl = resource_filename("crmprtd", "data/moti.xsl")
+xsl = str(files(import_module("crmprtd")) / "data/moti.xsl")
 transform = XSLT(parse(xsl))
 
 ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}

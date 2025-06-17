@@ -1,8 +1,8 @@
 import os
 from shutil import copyfile
-from pkg_resources import resource_filename
 from datetime import datetime
 from operator import gt, eq
+from tests.test_helpers import resource_filename
 
 import pytest
 

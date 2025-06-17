@@ -1,4 +1,3 @@
-from pkg_resources import resource_filename
 from datetime import datetime
 from io import StringIO
 import sys
@@ -19,7 +18,7 @@ import requests
 import pycds
 from pycds import Network, Station, Contact, History, Variable, Obs
 from .swob_data import network_listing, day_listing, station_listing
-
+from .test_helpers import resource_filename
 
 def pytest_runtest_setup():
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)

@@ -52,8 +52,8 @@ import logging
 import logging.config
 import os.path
 
-import pkg_resources
-from pkg_resources import resource_stream
+from importlib.metadata import version
+from importlib.resources import files
 from collections import namedtuple
 
 from crmprtd.argparse_helpers import OneAndDoneAction
@@ -95,7 +95,7 @@ def add_version_arg(parser):
 
 
 def get_version():
-    return pkg_resources.require("crmprtd")[0].version
+    return version("crmprtd")
 
 
 def add_logging_args(parser):
@@ -217,7 +217,7 @@ def setup_logging(log_conf, log_filename, error_email, log_level, name):
         with open(expand_path(log_conf), "rb") as f:
             base_config = yaml.safe_load(f)
     else:
-        with resource_stream("crmprtd", "data/logging.yaml") as f:
+        with (files("crmprtd") / "data/logging.yaml").open('rb') as f:
             base_config = yaml.safe_load(f)
 
     if log_filename:
