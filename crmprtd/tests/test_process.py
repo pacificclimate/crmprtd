@@ -4,7 +4,7 @@ import pytest
 import logging
 import importlib
 from datetime import datetime
-from tests.test_helpers import resource_filename
+from .test_helpers import resource_filename
 
 from sqlalchemy.exc import IntegrityError
 

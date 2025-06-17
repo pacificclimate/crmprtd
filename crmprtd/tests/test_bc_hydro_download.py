@@ -2,7 +2,7 @@ import os
 from shutil import copyfile
 from datetime import datetime
 from operator import gt, eq
-from tests.test_helpers import resource_filename
+from .test_helpers import resource_filename
 
 import pytest
 
