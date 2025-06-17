@@ -18,7 +18,7 @@ result in data loss.
 from typing import List
 import sys
 import logging.config
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from argparse import ArgumentParser
 
 # Local
@@ -37,11 +37,11 @@ def download(time, frequency, province, language, baseurl):
         deltat = timedelta(1 / 24.0) if frequency == "hourly" else timedelta(1)
 
         if time:
-            time = verify_date(time, datetime.utcnow() - deltat, "time")
+            time = verify_date(time, datetime.now(UTC) - deltat, "time")
             log.info("Starting manual run " f"using timestamp {time}")
         else:
             # go back a day
-            time = datetime.utcnow() - deltat
+            time = datetime.now(UTC) - deltat
             log.info("Starting automatic run " f"using timestamp {time}")
 
         # Construct and download the xml
