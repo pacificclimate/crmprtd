@@ -7,8 +7,9 @@ import logging.config
 
 import pytest
 import sqlalchemy
+from sqlalchemy import text
 from sqlalchemy.schema import CreateSchema
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from lxml.etree import parse, fromstring, XSLT
 import testing.postgresql
 import pytz
@@ -20,42 +21,53 @@ from pycds import Network, Station, Contact, History, Variable, Obs
 from .swob_data import network_listing, day_listing, station_listing
 from .test_helpers import resource_filename
 
+
 def pytest_runtest_setup():
     logging.basicConfig(level=logging.DEBUG, stream=sys.stdout)
 
 
 @pytest.fixture(scope="function")
-def postgis_session():
+def postgis_engine():
     """
-    Yields a blank PostGIS session with no tables or data
+    Yields a blank PostGIS-enabled engine with a fresh db
     """
-    logging.getLogger("sqlalchemy.engine").setLevel(
-        logging.ERROR
-    )  # Let's not log all the db setup stuff...
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.ERROR)
 
     with testing.postgresql.Postgresql() as pg:
-        engine = sqlalchemy.create_engine(pg.url())
-        engine.execute("create extension postgis")
-        engine.execute("CREATE EXTENSION IF NOT EXISTS citext")
-        engine.execute(CreateSchema("crmp"))
-        sesh = sessionmaker(bind=engine)()
+        engine = sqlalchemy.create_engine(pg.url(), future=True)
+
+        with engine.begin() as conn:
+            conn.execute(text("CREATE EXTENSION postgis"))
+            conn.execute(text("CREATE EXTENSION IF NOT EXISTS citext"))
+            conn.execute(CreateSchema("crmp"))
+            conn.execute(text("SET search_path TO crmp,public"))
 
         logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
-        sesh.execute("SET search_path TO crmp,public")
-        yield sesh
+        yield engine
 
 
 @pytest.fixture(scope="function")
-def crmp_session(postgis_session):
+def postgis_session(postgis_engine):
     """
-    Yields a PostGIS enabled session with CRMP schema but no data
+    Yields a clean SQLAlchemy 2.x Session bound to a PostGIS engine
     """
-    logging.getLogger("sqlalchemy.engine").setLevel(
-        logging.ERROR
-    )  # Let's not log all the db setup stuff...
+    SessionLocal = sessionmaker(
+        bind=postgis_engine, class_=Session, expire_on_commit=False, future=True
+    )
 
-    engine = postgis_session.get_bind()
-    pycds.Base.metadata.create_all(bind=engine)
+    with SessionLocal() as session:
+        session.execute(text("SET search_path TO crmp,public"))
+        yield session
+
+
+@pytest.fixture(scope="function")
+def crmp_session(postgis_engine, postgis_session):
+    """
+    Yields a Session with CRMP schema set up but no data
+    """
+    logging.getLogger("sqlalchemy.engine").setLevel(logging.ERROR)
+
+    pycds.Base.metadata.create_all(bind=postgis_engine)
 
     logging.getLogger("sqlalchemy.engine").setLevel(logging.INFO)
     yield postgis_session

@@ -1,3 +1,5 @@
+from sqlalchemy import text
+
 from pycds import Contact, Network
 
 
@@ -16,14 +18,19 @@ def test_db_has_data(test_session):
 
 def test_db_has_geo(postgis_session):
     res = postgis_session.execute(
-        ("SELECT ST_AsText(ST_GeomFromText('POLYGON((0 0,0 1,1 1,1 0,0 0))'" ",4326))")
+        text(
+            (
+                "SELECT ST_AsText(ST_GeomFromText('POLYGON((0 0,0 1,1 1,1 0,0 0))'"
+                ",4326))"
+            )
+        )
     )
     assert res.fetchall()[0][0] == "POLYGON((0 0,0 1,1 1,1 0,0 0))"
 
 
 def test_db_has_binary(postgis_session):
     res = postgis_session.execute(
-        (
+        text(
             "SELECT ST_AsBinary(ST_GeomFromText('POLYGON((0 0,0 1,1 1,1 0,0 0))',"
             "4326))"
         )
