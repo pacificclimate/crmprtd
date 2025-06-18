@@ -29,7 +29,7 @@ def normalize(file_stream):
 
     variable_substitutions_path = "networks/bc_hydro/variable_substitutions.yaml"
     try:
-        with (files("crmprtd") / variable_substitutions_path).open('rb') as f:
+        with (files("crmprtd") / variable_substitutions_path).open("rb") as f:
             variable_substitutions = yaml.safe_load(f)
     except FileNotFoundError:
         log.warning(

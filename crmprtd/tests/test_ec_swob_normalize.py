@@ -29,8 +29,9 @@ def test_normalize_missing_values(caplog):
     iterator = norm_tran(BytesIO(MSNG_values_xml))
     assert isinstance(iterator, Iterable)
     assert next(iterator)
-    with pytest.raises(StopIteration), caplog.at_level(
-        logging.DEBUG, logger="crmprtd.swob_ml"
+    with (
+        pytest.raises(StopIteration),
+        caplog.at_level(logging.DEBUG, logger="crmprtd.swob_ml"),
     ):
         next(iterator)
         # There should be 3 DEBUG log messages about skipping a MSNG value

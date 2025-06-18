@@ -217,7 +217,7 @@ def setup_logging(log_conf, log_filename, error_email, log_level, name):
         with open(expand_path(log_conf), "rb") as f:
             base_config = yaml.safe_load(f)
     else:
-        with (files("crmprtd") / "data/logging.yaml").open('rb') as f:
+        with (files("crmprtd") / "data/logging.yaml").open("rb") as f:
             base_config = yaml.safe_load(f)
 
     if log_filename:

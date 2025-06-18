@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 def parse_xml(stream):
-    with (files("crmprtd") / "data/ec_xform.xsl").open('rb') as xsl:
+    with (files("crmprtd") / "data/ec_xform.xsl").open("rb") as xsl:
         xsl = parse(xsl)
 
     # Parse and transform the xml

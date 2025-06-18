@@ -20,10 +20,13 @@ import crmprtd.download_cache_process
 
 if sys.version_info >= (3, 10):
     from importlib.metadata import entry_points
+
     def get_entry_points(group):
         return entry_points().select(group=group)
+
 else:
     from importlib.metadata import entry_points
+
     def get_entry_points(group):
         return entry_points().get(group, [])
 
