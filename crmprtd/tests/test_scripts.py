@@ -1,4 +1,5 @@
 import re
+import sys
 from itertools import product
 from datetime import datetime
 from typing import List
@@ -17,6 +18,16 @@ import crmprtd.download
 import crmprtd.download_cache_process
 
 
+if sys.version_info >= (3, 10):
+    from importlib.metadata import entry_points
+    def get_entry_points(group):
+        return entry_points().select(group=group)
+else:
+    from importlib.metadata import entry_points
+    def get_entry_points(group):
+        return entry_points().get(group, [])
+
+
 @pytest.mark.parametrize(
     "name",
     [
@@ -28,7 +39,7 @@ import crmprtd.download_cache_process
 )
 def test_version_option(capsys, name):
     """Test that CLI scripts accept --version arg and return the expected value."""
-    eps = entry_points(group="console_scripts")
+    eps = get_entry_points(group="console_scripts")
     ep = next(ep for ep in eps if ep.name == name and ep.value.startswith("crmprtd."))
     entry_point = ep.load()
     with pytest.raises(SystemExit):
