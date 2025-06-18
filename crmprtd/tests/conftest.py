@@ -270,7 +270,7 @@ def ec_session(crmp_session, caplog):
         cell_method="placeholder",
         network=ec,
     )
-    ec_precip = Variable(
+    ec_temp = Variable(
         id=101,
         name="air_temperature",
         standard_name="air_temperature",
@@ -279,7 +279,7 @@ def ec_session(crmp_session, caplog):
         cell_method="placeholder",
         network=ec,
     )
-    crmp_session.add(ec_precip)
+    crmp_session.add_all((ec_precip, ec_temp))
 
     obs = [
         Obs(
