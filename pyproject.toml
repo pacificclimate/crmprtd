@@ -58,7 +58,7 @@ pyyaml = "*"
 python-dateutil = "*"
 pytz = "*"
 requests = { version = "*", extras = ["security"] }
-pycds = "5.0.0rc1"
+pycds = "5.0.0"
 pint = "*"
 pysftp = "*"
 urllib3 = "<2"
