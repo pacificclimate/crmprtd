@@ -83,6 +83,8 @@ def test_mass_insert_obs_weird(test_session):
     history = test_session.query(History).first()
     variable = history.station.network.variables[0]
 
+    test_session.add_all((history, variable))
+
     x = Obs(
         history=history,
         datum=2.5,
