@@ -278,12 +278,13 @@ def get_variable(sesh, network_name, variable_name):
     :param variable_name: Name of Variable
     :return: Variable or None
     """
-    variable = (
-        sesh.query(Variable)
-        .join(Network)
-        .filter(and_(Network.name == network_name, Variable.name == variable_name))
-        .first()
-    )
+    with sesh.no_autoflush:
+        variable = (
+            sesh.query(Variable)
+            .join(Network)
+            .filter(and_(Network.name == network_name, Variable.name == variable_name))
+            .first()
+        )
     return variable
 
 

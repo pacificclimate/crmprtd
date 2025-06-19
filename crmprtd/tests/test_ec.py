@@ -1,4 +1,4 @@
-from pkg_resources import resource_filename
+from .test_helpers import resource_filename
 from datetime import datetime
 from lxml.etree import LxmlError
 

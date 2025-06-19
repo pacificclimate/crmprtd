@@ -3,9 +3,10 @@
 # Standard module
 import pytz
 import logging
+from importlib import import_module
+from importlib.resources import files
 
 # Installed libraries
-from pkg_resources import resource_filename
 from lxml.etree import XSLT, parse as xmlparse
 from dateutil.parser import parse as dateparse
 
@@ -13,7 +14,7 @@ from dateutil.parser import parse as dateparse
 from crmprtd import Row
 
 
-xsl = resource_filename("crmprtd", "data/moti.xsl")
+xsl = str(files(import_module("crmprtd")) / "data/moti.xsl")
 transform = XSLT(xmlparse(xsl))
 ns = {"xsi": "http://www.w3.org/2001/XMLSchema-instance"}
 log = logging.getLogger(__name__)

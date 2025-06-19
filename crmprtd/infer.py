@@ -48,7 +48,8 @@ def create_variable(
     display_name=None,
     cell_method=None,
 ):
-    network = sesh.query(Network).filter(Network.name == network_name).one()
+    with sesh.no_autoflush:
+        network = sesh.query(Network).filter(Network.name == network_name).one()
 
     return Variable(
         network=network,

@@ -83,6 +83,8 @@ def test_mass_insert_obs_weird(test_session):
     history = test_session.query(History).first()
     variable = history.station.network.variables[0]
 
+    test_session.add_all((history, variable))
+
     x = Obs(
         history=history,
         datum=2.5,
@@ -95,11 +97,6 @@ def test_mass_insert_obs_weird(test_session):
         variable=variable,
         time=datetime(2017, 8, 6, 1, tzinfo=pytz.utc),
     )
-
-    # For some reason, without expunging the objects, *both* INSERT statements
-    # seem to get issued. Are we misusing the ORM?
-    test_session.expunge(x)
-    test_session.expunge(y)
 
     dbm = bisect_insert_strategy(test_session, [])
     assert dbm.successes == 0

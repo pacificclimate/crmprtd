@@ -4,7 +4,7 @@ import logging
 from itertools import islice
 from time import perf_counter
 from contextlib import contextmanager
-from pkg_resources import resource_stream
+from importlib.resources import files
 import yaml
 
 from dateutil import parser as date_parse
@@ -29,7 +29,7 @@ def normalize(file_stream):
 
     variable_substitutions_path = "networks/bc_hydro/variable_substitutions.yaml"
     try:
-        with resource_stream("crmprtd", variable_substitutions_path) as f:
+        with (files("crmprtd") / variable_substitutions_path).open("rb") as f:
             variable_substitutions = yaml.safe_load(f)
     except FileNotFoundError:
         log.warning(

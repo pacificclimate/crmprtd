@@ -20,7 +20,7 @@ little risk of missing data.
 import logging.config
 import sys
 from argparse import ArgumentParser
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 # Standard module
 from typing import List
@@ -36,7 +36,7 @@ log = logging.getLogger(__name__)
 
 
 def utcnow():
-    return datetime.utcnow()
+    return datetime.now(timezone.utc)
 
 
 def download(

@@ -1,5 +1,5 @@
 from lxml.etree import LxmlError
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 
 
@@ -14,7 +14,7 @@ ns = {
 
 
 def now():  # Dumb to be its own function, but this makes it mockable
-    return datetime.utcnow()
+    return datetime.now(timezone.utc)
 
 
 def no_ns_element(name):

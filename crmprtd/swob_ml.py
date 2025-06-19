@@ -1,13 +1,13 @@
 # Standard module
 import pytz
 import logging
+from importlib.resources import files
 
 # Installed libraries
 from lxml.etree import parse, XSLT
 from dateutil.parser import parse as dateparse
 
 # Local
-from pkg_resources import resource_stream
 from crmprtd import Row
 from crmprtd.networks.ec import ns, OmMember, no_ns_element
 from crmprtd.networks.ec_swob.download import split_multi_xml_stream
@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 def parse_xml(stream):
-    with resource_stream("crmprtd", "data/ec_xform.xsl") as xsl:
+    with (files("crmprtd") / "data/ec_xform.xsl").open("rb") as xsl:
         xsl = parse(xsl)
 
     # Parse and transform the xml

@@ -3,7 +3,7 @@ import io
 import logging
 import re
 import csv
-from pkg_resources import resource_stream
+from importlib.resources import files
 
 # Installed libraries
 import pytz
@@ -38,7 +38,7 @@ def normalize(file_stream):
 
     station_substitutions_fp = "networks/wamr/station_substitutions.yaml"
     try:
-        with resource_stream("crmprtd", station_substitutions_fp) as f:
+        with (files("crmprtd") / station_substitutions_fp).open("rb") as f:
             station_substitutions = yaml.safe_load(f)
     except FileNotFoundError:
         log.error(
