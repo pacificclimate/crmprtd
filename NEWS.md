@@ -1,5 +1,16 @@
 # News / Release Notes
 
+## 5.0.0
+
+_2025-Jun-19_
+
+Maintenance updates:
+
+- Upgrade pyproject.toml to be PEP 621-compliant
+- Change supported python versions to 3.9-3.12 and address all
+  deprecations
+- Upgrade to SQLAlchemy 2.x
+
 ## 4.7.0
 
 _2024-Apr-29_
