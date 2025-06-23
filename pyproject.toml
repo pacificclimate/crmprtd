@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "crmprtd"
-version = "5.0.0"
+version = "5.0.1rc2"
 description = "Utility to download near real time weather data and insert it into PCIC's database"
 license = { text = "GPL-3.0-only" }
 authors = [
