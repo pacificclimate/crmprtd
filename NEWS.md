@@ -1,5 +1,12 @@
 # News / Release Notes
 
+## 5.0.1
+
+_2025-Jun-23_
+
+Fixed the PyPI publishing workflow to use a supported version of
+Python and to match release candidate versions
+
 ## 5.0.0
 
 _2025-Jun-19_
