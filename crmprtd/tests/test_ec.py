@@ -69,8 +69,8 @@ def test_makeurl_no_time_hourly(mocker):
     t = datetime(2016, 1, 15, 21)
     fmt = "%Y%m%d%H"
 
-    with mocker.patch("crmprtd.networks.ec.now", return_value=t):
-        url = makeurl(freq="hourly")
+    mocker.patch("crmprtd.networks.ec.now", return_value=t)
+    url = makeurl(freq="hourly")
 
     assert url == (
         f"{baseurl}/20160115/WXO-DD/observations/xml/BC/hourly/hourly_bc_{t.strftime(fmt)}_e.xml"
@@ -81,8 +81,8 @@ def test_makeurl_no_time_daily(mocker):
     t = datetime(2016, 1, 15, 21)
     fmt = "%Y%m%d"
 
-    with mocker.patch("crmprtd.networks.ec.now", return_value=t):
-        url = makeurl()
+    mocker.patch("crmprtd.networks.ec.now", return_value=t)
+    url = makeurl()
 
     assert url == (
         f"{baseurl}/20160115/WXO-DD/observations/xml/BC/"
