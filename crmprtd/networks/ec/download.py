@@ -4,14 +4,16 @@ Environment and Climate Change Canada (ECCC) post two sets of XML
 files containing weather observations, one for daily variables
 (e.g. daily high temperature) and one for hourly variables. They post
 a new file every hour or day, depending on the temporal resolution.
-Each new file containing only the data for that time range. Only the
-previous month's worth of data is available.
+Each new file containing only the data for that time range. Data is
+retained on dd.weather.gc.ca for 30 days and on
+hpfx.collab.science.gc.ca for 90 days.
 
 It is recommended to run this script once per hour with the "-F
 hourly" flag or once per day with the "-F daily" flag. There is
 sufficient overlap between the time resolution and the historical data
-available that only the most severe outtages (over a month) would
+available that only the significant outtages (over a quarter) would
 result in data loss.
+
 """
 
 # Standard module
@@ -104,7 +106,7 @@ def main(arglist: List[str] = None, parent_parser: ArgumentParser = None) -> Non
     parser.add_argument(
         "-b",
         "--baseurl",
-        default="https://dd.weather.gc.ca",
+        default="https://hpfx.collab.science.gc.ca",
         help=(
             "Base URL (scheme and hostname components) for"
             "the meteorological observations service"

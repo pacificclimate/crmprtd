@@ -23,8 +23,7 @@ baseurl = "https://dd.weather.gc.ca"
                 "time": datetime(2016, 1, 15, 21),
             },
             (
-                f"{baseurl}/observations/xml/BC/yesterday/"
-                f"yesterday_bc_20160115_e.xml"
+                f"{baseurl}/20160115/WXO-DD/observations/xml/BC/yesterday/yesterday_bc_20160115_e.xml"
             ),
         ),
         (
@@ -35,25 +34,30 @@ baseurl = "https://dd.weather.gc.ca"
                 "language": "e",
                 "time": datetime(2016, 1, 15, 21),
             },
-            (f"{baseurl}/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml"),
+            (
+                f"{baseurl}/20160115/WXO-DD/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml"
+            ),
         ),
         (
             "nofreq-BC-EN",
             {"province": "BC", "language": "e", "time": datetime(2016, 1, 15, 21)},
             (
-                f"{baseurl}/observations/xml/BC/yesterday/"
-                f"yesterday_bc_20160115_e.xml"
+                f"{baseurl}/20160115/WXO-DD/observations/xml/BC/yesterday/yesterday_bc_20160115_e.xml"
             ),
         ),
         (
             "hourly-noprov-EN",
             {"freq": "hourly", "language": "e", "time": datetime(2016, 1, 15, 21)},
-            (f"{baseurl}/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml"),
+            (
+                f"{baseurl}/20160115/WXO-DD/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml"
+            ),
         ),
         (
             "hourly-BC-nolang",
             {"freq": "hourly", "province": "BC", "time": datetime(2016, 1, 15, 21)},
-            (f"{baseurl}/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml"),
+            (
+                f"{baseurl}/20160115/WXO-DD/observations/xml/BC/hourly/hourly_bc_2016011521_e.xml"
+            ),
         ),
     ],
 )
@@ -65,11 +69,11 @@ def test_makeurl_no_time_hourly(mocker):
     t = datetime(2016, 1, 15, 21)
     fmt = "%Y%m%d%H"
 
-    with mocker.patch("crmprtd.networks.ec.now", return_value=t):
-        url = makeurl(freq="hourly")
+    mocker.patch("crmprtd.networks.ec.now", return_value=t)
+    url = makeurl(freq="hourly")
 
     assert url == (
-        f"{baseurl}/observations/xml/BC/hourly/hourly_bc_{t.strftime(fmt)}_e.xml"
+        f"{baseurl}/20160115/WXO-DD/observations/xml/BC/hourly/hourly_bc_{t.strftime(fmt)}_e.xml"
     )
 
 
@@ -77,11 +81,11 @@ def test_makeurl_no_time_daily(mocker):
     t = datetime(2016, 1, 15, 21)
     fmt = "%Y%m%d"
 
-    with mocker.patch("crmprtd.networks.ec.now", return_value=t):
-        url = makeurl()
+    mocker.patch("crmprtd.networks.ec.now", return_value=t)
+    url = makeurl()
 
     assert url == (
-        f"{baseurl}/observations/xml/BC/"
+        f"{baseurl}/20160115/WXO-DD/observations/xml/BC/"
         f"yesterday/yesterday_bc_{t.strftime(fmt)}_e.xml"
     )
 
