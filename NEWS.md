@@ -1,5 +1,14 @@
 # News / Release Notes
 
+## 5.0.2
+
+_2025-Jun-26_
+
+ECCC added a new server with longer data retention (90 vs 30 days),
+and subtly changed the directory structure on their legacy server
+dd.weather.gc.ca. This short patch fixes that for both ECCC native
+data as well as the partner SWOB-ML data that comes through ECCC.
+
 ## 5.0.1
 
 _2025-Jun-23_
