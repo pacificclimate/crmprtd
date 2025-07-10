@@ -7194,5 +7194,6 @@ hourly_bc_2016061115 = fromstring(
             </om:result>
         </om:Observation>
     </om:member>
-</om:ObservationCollection>"""
-)"""
+</om:ObservationCollection>
+"""
+)

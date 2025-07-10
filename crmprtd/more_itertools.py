@@ -1,6 +1,7 @@
 """
 Some additional iteration tools
 """
+
 from itertools import islice, cycle
 
 

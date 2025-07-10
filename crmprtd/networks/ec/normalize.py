@@ -7,8 +7,9 @@ from crmprtd.swob_ml import normalize as swob_ml_normalize
 
 log = logging.getLogger(__name__)
 
-def normalize(file_stream): 
-    
+
+def normalize(file_stream):
+
     variable_substitutions_path = "networks/ec/variable_substitutions.yaml"
     try:
         with (files("crmprtd") / variable_substitutions_path).open("rb") as f:
@@ -19,7 +20,7 @@ def normalize(file_stream):
             f"Proceeding with normalization, but there's a risk that variable names will not be recognized."
         )
         return
-    
+
     rows = swob_ml_normalize(
         file_stream, "EC_raw", station_id_attr="climate_station_number"
     )

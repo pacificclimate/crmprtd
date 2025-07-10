@@ -454,9 +454,7 @@ partial_daily = b"""<?xml version="1.0" encoding="UTF-8" standalone="no"?>
         </om:Observation>
     </om:member>
 </om:ObservationCollection>
-"""  # noqa 
-
-
+"""  # noqa
 
 
 def test_normalize_good_data():
@@ -470,13 +468,15 @@ def test_normalize_good_data():
         assert row.val is not None
         assert row.network_name is not None
 
+
 variable_names = [
-    'air_temperature_yesterday_high',
-    'air_temperature_yesterday_low',
+    "air_temperature_yesterday_high",
+    "air_temperature_yesterday_low",
     # 'total_precipitation', # this is present in the configuration but doesn't currently change the value
-    'wind_direction',
-    'wind_gust_speed',
+    "wind_direction",
+    "wind_gust_speed",
 ]
+
 
 def test_variable_replace():
     lines = partial_daily
