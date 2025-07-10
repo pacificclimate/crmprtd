@@ -1,0 +1,10 @@
+# Defines a mapping between variable names given to us by EC
+# c.a. 2022 and what the variables were named in the PCDS (a.k.a. their
+# "historic" name)
+# Values should be of the form: "name_in_near_real_time_feed": "net_var_name-in-pcds"
+
+'air_temperature_yesterday_high': 'air_temperature'
+'air_temperature_yesterday_low': 'air_temperature'
+'total_precipitation': 'total_precipitation'
+'wind_direction': 'wind_from_direction'
+'wind_gust_speed': 'wind_speed'
