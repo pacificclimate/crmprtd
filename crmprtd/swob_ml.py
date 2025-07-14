@@ -1,6 +1,8 @@
 # Standard module
+from typing import Generator, Optional
 import pytz
 import logging
+import yaml
 from importlib.resources import files
 
 # Installed libraries
@@ -127,3 +129,35 @@ def normalize_xml(
                 lat=lat,
                 lon=lon,
             )
+
+def get_substitutions(variable_substitutions_path) -> Optional[dict[str, str]]:
+    try:
+        with (files("crmprtd") / variable_substitutions_path).open("rb") as f:
+            return yaml.safe_load(f)
+    except FileNotFoundError:
+        log.warning(
+            f"Cannot open resource file '{variable_substitutions_path}'. "
+            f"Proceeding with normalization, but there's a risk that variable names will not be recognized."
+        )
+        return
+    
+def apply_substitutions(variable_substitutions: Optional[dict[str, str]], rows: Generator[Row]):
+    match variable_substitutions:
+        case None:
+            log.warning("No variable substitutions provided. Skipping substitution step.")
+            return
+        case _:
+            for row in rows:
+                if row.variable_name in variable_substitutions:
+                    yield Row(
+                        time=row.time,
+                        val=row.val,
+                        variable_name=variable_substitutions[row.variable_name],
+                        unit=row.unit,
+                        network_name=row.network_name,
+                        station_id=row.station_id,
+                        lat=row.lat,
+                        lon=row.lon,
+                    )
+                else:
+                    yield row
