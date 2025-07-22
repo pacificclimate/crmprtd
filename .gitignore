@@ -63,3 +63,8 @@ docs/_build/
 
 # PyBuilder
 target/
+
+#temp data directories
+infill*/
+.pgpass
+

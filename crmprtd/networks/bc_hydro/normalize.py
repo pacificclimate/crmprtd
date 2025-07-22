@@ -12,6 +12,7 @@ import pytz
 
 from crmprtd import Row
 from crmprtd import setup_logging
+from crmprtd.swob_ml import get_substitutions
 
 log = logging.getLogger(__name__)
 
@@ -28,15 +29,7 @@ def normalize(file_stream):
     num_pattern = re.compile(r"-?\d+(\.\d+)?$")
 
     variable_substitutions_path = "networks/bc_hydro/variable_substitutions.yaml"
-    try:
-        with (files("crmprtd") / variable_substitutions_path).open("rb") as f:
-            variable_substitutions = yaml.safe_load(f)
-    except FileNotFoundError:
-        log.warning(
-            f"Cannot open resource file '{variable_substitutions_path}'. "
-            f"Proceeding with normalization, but there's a risk that variable names will not be recognized."
-        )
-        return
+    variable_substitutions = get_substitutions(variable_substitutions_path)
 
     for line in file_stream:
         line = line.decode("utf-8")
@@ -79,7 +72,10 @@ def normalize(file_stream):
                 elif num_pattern.match(value):
                     value = float(value)
 
-                    if varname in variable_substitutions:
+                    if (
+                        variable_substitutions is not None
+                        and varname in variable_substitutions
+                    ):
                         varname = variable_substitutions[varname]
 
                     yield Row(

@@ -1,6 +1,7 @@
 """
 A test downloader that does nothing.
 """
+
 import logging
 import os
 from argparse import ArgumentParser

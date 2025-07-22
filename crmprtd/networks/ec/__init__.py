@@ -24,8 +24,8 @@ def no_ns_element(name):
 
 
 def makeurl(
-    freq="daily",
-    province="BC",
+    freq = "daily",
+    province = "BC",
     language="e",
     time=None,
     baseurl="https://dd.weather.gc.ca",
