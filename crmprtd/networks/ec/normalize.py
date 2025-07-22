@@ -2,7 +2,11 @@ import logging
 
 from importlib.resources import files
 from crmprtd import Row
-from crmprtd.swob_ml import normalize as swob_ml_normalize, get_substitutions, apply_substitutions
+from crmprtd.swob_ml import (
+    normalize as swob_ml_normalize,
+    get_substitutions,
+    apply_substitutions,
+)
 
 log = logging.getLogger(__name__)
 

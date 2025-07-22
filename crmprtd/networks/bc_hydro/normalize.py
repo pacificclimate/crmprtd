@@ -72,7 +72,10 @@ def normalize(file_stream):
                 elif num_pattern.match(value):
                     value = float(value)
 
-                    if variable_substitutions is not None and varname in variable_substitutions:
+                    if (
+                        variable_substitutions is not None
+                        and varname in variable_substitutions
+                    ):
                         varname = variable_substitutions[varname]
 
                     yield Row(

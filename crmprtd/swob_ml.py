@@ -130,6 +130,7 @@ def normalize_xml(
                 lon=lon,
             )
 
+
 def get_substitutions(variable_substitutions_path) -> Optional[dict[str, str]]:
     try:
         with (files("crmprtd") / variable_substitutions_path).open("rb") as f:
@@ -140,11 +141,16 @@ def get_substitutions(variable_substitutions_path) -> Optional[dict[str, str]]:
             f"Proceeding with normalization, but there's a risk that variable names will not be recognized."
         )
         return
-    
-def apply_substitutions(variable_substitutions: Optional[dict[str, str]], rows: Generator[Row]):
+
+
+def apply_substitutions(
+    variable_substitutions: Optional[dict[str, str]], rows: Generator[Row, None, None]
+):
     match variable_substitutions:
         case None:
-            log.warning("No variable substitutions provided. Skipping substitution step.")
+            log.warning(
+                "No variable substitutions provided. Skipping substitution step."
+            )
             return
         case _:
             for row in rows:
