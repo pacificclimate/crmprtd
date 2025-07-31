@@ -7,15 +7,13 @@ import logging
 import pytz
 from datetime import datetime, timedelta
 from argparse import ArgumentParser
-from importlib.resources import files
 from time import sleep
+from importlib.resources import files
 
 # Import from crmprtd
 from crmprtd import add_logging_args, setup_logging, NETWORKS
 from crmprtd.download_cache_process import (
-    dispatch,
-    network_aliases,
-    network_alias_names,
+    main as download_cache_process_main,
     describe_network,
 )
 from scripts import add_bulk_args, add_time_range_args
@@ -84,28 +82,42 @@ def main(opts, args):
                         opts.tag,
                     )
 
-                # Call dispatch directly with arguments
-                if opts.network == "ec" and opts.province:
-                    dispatch(
-                        network=opts.network,
-                        connection_string=opts.connection_string,
-                        dry_run=opts.dry_run,
-                        frequency=opts.frequency,
-                        tag=opts.tag,
-                        time=current_time,
-                        cache_filename=cache_filename,
-                        province=opts.province,
-                    )
-                else:
-                    dispatch(
-                        network=opts.network,
-                        connection_string=opts.connection_string,
-                        dry_run=opts.dry_run,
-                        frequency=opts.frequency,
-                        tag=opts.tag,
-                        time=current_time,
-                        cache_filename=cache_filename,
-                    )
+                # Build argument list for download_cache_process main function
+                # Start with base arguments from the original args list
+                base_args = args.copy()
+                
+                # Construct the full argument list with all required parameters
+                fun_args = [
+                    *base_args,
+                    "--network", 
+                    opts.network, 
+                    # "--log_conf",
+                    # opts.log_conf,
+                    "--log_filename",
+                    opts.log_filename,
+                    # "--log_level",
+                    # opts.log_level,
+                    # "--error_email",
+                    # opts.error_email,
+                ]
+                
+                # Add frequency if provided (only for EC network, as other networks don't use it)
+                if opts.network == "ec" and opts.frequency:
+                    fun_args.extend(["--frequency", opts.frequency])
+                
+                # Add tag if provided
+                if opts.tag:
+                    fun_args.extend(["--tag", opts.tag])
+                
+                # Add cache filename if specified
+                if cache_filename:
+                    fun_args.extend(["--cache_filename", cache_filename])
+
+                # Add time parameter (now supported by download_cache_process.main())
+                fun_args.extend(["--time", current_time.strftime("%Y-%m-%d %H:%M:%S")])
+
+                # Call download_cache_process main function with constructed arguments
+                download_cache_process_main(fun_args)
                 successful_runs += 1
                 log.info(f"Successfully processed: {iter_time_str}")
 
@@ -178,32 +190,10 @@ if __name__ == "__main__":
         help="Directory to store cache files (if not specified, uses download_cache_process defaults)",
     )
     parser.add_argument(
-        "-c",
-        "--connection_string",
-        dest="connection_string",
-        help="Database connection string for processing step",
-    )
-    parser.add_argument(
-        "--dry-run",
-        dest="dry_run",
-        action="store_true",
-        help="Print commands without executing them",
-    )
-    parser.add_argument(
         "--tag",
         dest="tag",
         help="Tag to include in cache and log filenames",
     )
-
-    # EC-specific options
-    parser.add_argument(
-        "-p",
-        "--province",
-        dest="province",
-        action="append",
-        help="Province code(s) for EC network (can be used multiple times)",
-    )
-
     # Control options
     parser.add_argument(
         "--force",
@@ -218,14 +208,14 @@ if __name__ == "__main__":
         default=3,
         help="Delay in seconds between operations (default: 3)",
     )
-
-    # Set defaults
+    
     try:
         with (files("crmprtd") / "data/logging.yaml").open("r") as f:
             default_log_conf = f.name
     except:
         default_log_conf = None
 
+    # Set defaults
     parser.set_defaults(
         log_conf=default_log_conf,
         log_filename="/tmp/crmp/bulk_pipeline.log",
@@ -239,19 +229,8 @@ if __name__ == "__main__":
 
     opts, args = parser.parse_known_args(sysargs)
 
-    # Handle list networks option
-    if opts.list_networks:
-        print("Available networks:")
-        for network in sorted(NETWORKS):
-            print(f"  {network}")
-        print("\nAvailable network aliases:")
-        for alias in sorted(network_alias_names):
-            networks = network_aliases[alias]
-            print(f"  {alias}: {', '.join(networks)}")
-        sys.exit(0)
-
     # Validate arguments
-    if not opts.network and not opts.list_networks:
+    if not opts.network:
         parser.error("Network (-N/--network) is required")
 
     print(f"Parsed opts: {opts}")

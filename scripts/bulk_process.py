@@ -6,14 +6,10 @@ import glob
 import logging
 from argparse import ArgumentParser
 from importlib.resources import files
-from datetime import datetime
 import sys
-import pytz
 
 # Import the process function directly instead of main
 from crmprtd.process import main as process
-from crmprtd.constants import InsertStrategy
-from crmprtd.download_utils import verify_date
 from crmprtd import add_logging_args, setup_logging
 from scripts import add_bulk_args
 
