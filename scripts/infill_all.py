@@ -13,6 +13,7 @@ details (for MoTI and WMB) and a database connection. Optionally you
 can configure the loggging, and select a subset of available networks
 to infill.
 """
+
 import logging
 from argparse import ArgumentParser
 import datetime

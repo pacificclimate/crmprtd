@@ -19,7 +19,8 @@ function, or a main-like wrapper for it. Pros and cons:
 - Cons: Significant changes to existing code. Greater complexity. Significant changes
 to scripts that use it.
 """
-from typing import List
+
+from typing import List, Optional
 from importlib import import_module
 from argparse import ArgumentParser
 import logging
@@ -38,7 +39,7 @@ def get_download_module(network):
     return import_module(f"crmprtd.networks.{network}.download")
 
 
-def main(arglist: List[str] = None):
+def main(arglist: Optional[List[str]] = None):
     try:
         parser = ArgumentParser(add_help=False)
 

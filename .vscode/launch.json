@@ -1,0 +1,40 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: crmprtd_process",
+            "type": "debugpy",
+            "module": "crmprtd.process:main",
+            "request": "launch",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false,
+            "env": {},
+            "args": [
+                "-N", "ec",
+                "-c", "postgresql://crmp@dbtest01.pcic.uvic.ca:5432/crmp?passfile=/workspaces/crmprtd/.pgpass",
+                "-L", "logging.yaml",
+                "-l", "infill-cache/manual-infill.log",
+                "-o", "DEBUG",
+                "-D",
+                "<", "infill-cache/crmprtd_download_2025-05-12.xml"
+            ]
+        },
+        {
+            "name": "Pytest: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}",
+            "justMyCode": false,
+            "env": {},
+            "args": [
+                "${file}"
+            ]
+        }
+    ],
+}
