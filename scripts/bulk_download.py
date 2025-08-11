@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Standard module
+# Standard modules
 import pytz
 import sys
 from datetime import datetime, timedelta
@@ -31,7 +31,7 @@ def main(opts, args):
         elif opts.frequency == "daily":
             timestep = timedelta(days=1)
         else:
-            raise Exception("Frequency must be 'hourly' or 'daily'")
+            raise ValueError("Frequency must be 'hourly' or 'daily'")
 
         base_args = args.copy()
         while stime <= etime:
@@ -94,5 +94,5 @@ if __name__ == "__main__":
     )
 
     opts, args = parser.parse_known_args(sysargs)
-    print(f"Parsed opts: {opts}")
+    logging.debug(f"Parsed opts: {opts}")
     main(opts, args)

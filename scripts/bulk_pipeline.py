@@ -233,5 +233,5 @@ if __name__ == "__main__":
     if not opts.network:
         parser.error("Network (-N/--network) is required")
 
-    print(f"Parsed opts: {opts}")
+    logging.info(f"Parsed opts: {opts}")
     main(opts, args)
