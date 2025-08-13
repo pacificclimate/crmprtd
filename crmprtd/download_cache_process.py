@@ -133,6 +133,7 @@ def default_cache_filename(
 def the_cache_filename(cache_filename: Optional[str] = None, **kwargs) -> str:
     return cache_filename or default_cache_filename(**kwargs)
 
+
 # TODO: This is inconsistent with how all the other functions pull the log config
 # They use crmprtd/data/logging.yaml, but this uses a default of the home directory
 def log_args(**kwargs) -> List[str]:
@@ -246,16 +247,19 @@ def dispatch_network(
             log_args=log_args(**kwargs),
             download_args=download_args(time=time, **kwargs),
             cache_filename=the_cache_filename(
-                cache_filename=cache_filename, 
-                timestamp=time if time else datetime.datetime.now(), 
-                **kwargs
+                cache_filename=cache_filename,
+                timestamp=time if time else datetime.datetime.now(),
+                **kwargs,
             ),
             connection_string=connection_string,
             dry_run=dry_run,
         )
     elif network_name == "ec":
         provinces = kwargs.pop("province")
-        
+
+        if not provinces or len(provinces) == 0:
+            raise ValueError("EC network requires at least one province code")
+
         # Use custom time if provided, otherwise let EC network use its defaults
         for province in provinces:
             download_and_process(
@@ -263,10 +267,10 @@ def dispatch_network(
                 log_args=log_args(**kwargs, province=province),
                 download_args=download_args(time=time, province=province, **kwargs),
                 cache_filename=the_cache_filename(
-                    cache_filename=cache_filename, 
-                    province=province, 
+                    cache_filename=cache_filename,
+                    province=province,
                     timestamp=time if time else datetime.datetime.now(),
-                    **kwargs
+                    **kwargs,
                 ),
                 connection_string=connection_string,
                 dry_run=dry_run,
@@ -285,7 +289,9 @@ def dispatch_network(
         "yt_firewx",
     ):
         # Use custom time if provided, otherwise default to "an hour ago"
-        use_time = time if time else (datetime.datetime.now() - datetime.timedelta(hours=1))
+        use_time = (
+            time if time else (datetime.datetime.now() - datetime.timedelta(hours=1))
+        )
         download_and_process(
             network_name=network_name,
             log_args=log_args(**kwargs),
@@ -367,6 +373,7 @@ def main(arglist: Optional[List[str]] = None) -> None:
         if None then sys.argv is used.
     :return: None.
     """
+
     try:
         parser = ArgumentParser(
             description="""
@@ -464,7 +471,7 @@ def main(arglist: Optional[List[str]] = None) -> None:
         # Time parameter
         parser.add_argument(
             "-t",
-            "--time", 
+            "--time",
             help=(
                 "Custom time to use for downloading (format: YYYY-MM-DD HH:MM:SS). "
                 "If not specified, networks will use their default time logic "
@@ -510,6 +517,8 @@ def main(arglist: Optional[List[str]] = None) -> None:
                 # lower case is the norm. We accept either, and normalize to lower case
                 # for all subsequent use.
                 choices=province_codes + tuple(p.lower() for p in province_codes),
+                # Ensure at least one province is selected
+                required=True,
             )
             args = parser.parse_args(arglist)
             # Normalize to lowercase.
@@ -518,12 +527,14 @@ def main(arglist: Optional[List[str]] = None) -> None:
             args = parser.parse_args(arglist)
 
         # Parse time parameter if provided
-        if hasattr(args, 'time') and args.time:
+        if hasattr(args, "time") and args.time:
             try:
                 # Parse the time string into a datetime object
                 args.time = datetime.datetime.strptime(args.time, "%Y-%m-%d %H:%M:%S")
             except ValueError as e:
-                raise ValueError(f"Invalid time format. Expected 'YYYY-MM-DD HH:MM:SS', got '{args.time}': {e}")
+                raise ValueError(
+                    f"Invalid time format. Expected 'YYYY-MM-DD HH:MM:SS', got '{args.time}': {e}"
+                )
         else:
             args.time = None
 

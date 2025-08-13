@@ -85,12 +85,12 @@ def main(opts, args):
                 # Build argument list for download_cache_process main function
                 # Start with base arguments from the original args list
                 base_args = args.copy()
-                
+
                 # Construct the full argument list with all required parameters
                 fun_args = [
                     *base_args,
-                    "--network", 
-                    opts.network, 
+                    "--network",
+                    opts.network,
                     # "--log_conf",
                     # opts.log_conf,
                     "--log_filename",
@@ -100,15 +100,15 @@ def main(opts, args):
                     # "--error_email",
                     # opts.error_email,
                 ]
-                
+
                 # Add frequency if provided (only for EC network, as other networks don't use it)
                 if opts.network == "ec" and opts.frequency:
                     fun_args.extend(["--frequency", opts.frequency])
-                
+
                 # Add tag if provided
                 if opts.tag:
                     fun_args.extend(["--tag", opts.tag])
-                
+
                 # Add cache filename if specified
                 if cache_filename:
                     fun_args.extend(["--cache_filename", cache_filename])
@@ -208,7 +208,7 @@ if __name__ == "__main__":
         default=3,
         help="Delay in seconds between operations (default: 3)",
     )
-    
+
     try:
         with (files("crmprtd") / "data/logging.yaml").open("r") as f:
             default_log_conf = f.name

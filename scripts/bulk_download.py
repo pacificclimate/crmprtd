@@ -15,8 +15,8 @@ from crmprtd.download_cache_process import default_cache_filename
 from contextlib import redirect_stdout
 
 
-def main(opts, args):# Create log directory if it doesn't exist
-    
+def main(opts, args):  # Create log directory if it doesn't exist
+
     if opts.log_filename:
         log_dir = os.path.dirname(opts.log_filename)
         if log_dir and not os.path.exists(log_dir):
@@ -69,15 +69,15 @@ def main(opts, args):# Create log directory if it doesn't exist
                 opts.log_level,
                 "--error_email",
                 opts.error_email,
-            ]  
+            ]
             # Add frequency if provided (only for EC network, as other networks don't use it)
             if opts.network == "ec" and opts.frequency:
                 fun_args.extend(["--frequency", opts.frequency])
-            
+
             # Add tag if provided
             if opts.tag:
                 fun_args.extend(["--tag", opts.tag])
-            
+
             # Add province if provided
             if opts.province:
                 fun_args.extend(["--province", opts.province])
@@ -88,11 +88,13 @@ def main(opts, args):# Create log directory if it doesn't exist
                 network_name=opts.network,
                 frequency=opts.frequency if opts.network == "ec" else None,
                 province=opts.province if opts.network == "ec" else None,
-                tag=opts.tag
+                tag=opts.tag,
             )
             # Replace the default cache directory with the user-specified directory
-            cache_filename = cache_filename.replace(f"~/{opts.network}/cache/", f"{opts.directory}/")
-            
+            cache_filename = cache_filename.replace(
+                f"~/{opts.network}/cache/", f"{opts.directory}/"
+            )
+
             with open(cache_filename, "w") as f:
                 with redirect_stdout(f):
                     download_main(fun_args)
@@ -107,14 +109,14 @@ if __name__ == "__main__":
     add_logging_args(parser)
     add_bulk_args(parser)
     add_time_range_args(parser, start_required=False, frequency_required=True)
-    
+
     # Add tag argument for filename generation
     parser.add_argument(
         "-T",
         "--tag",
         help="Tag for forming default names for cache files",
     )
-    
+
     parser.add_argument(
         "-p",
         "--province",
