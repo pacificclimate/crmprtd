@@ -9,6 +9,7 @@ collect all available data (plus, presumably some duplicate data from
 the last run). If the script is run less than once per month, you will
 miss data.
 """
+
 from typing import List
 import ftplib
 import logging

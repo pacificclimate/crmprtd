@@ -17,7 +17,7 @@ result in data loss.
 """
 
 # Standard module
-from typing import List
+from typing import List, Optional
 import sys
 import logging.config
 from datetime import datetime, timedelta, timezone
@@ -57,7 +57,9 @@ def download(time, frequency, province, language, baseurl):
         sys.exit(1)
 
 
-def main(arglist: List[str] = None, parent_parser: ArgumentParser = None) -> None:
+def main(
+    arglist: Optional[List[str]] = None, parent_parser: ArgumentParser = None
+) -> None:
     """Download CLI function for Environment Canada
 
     Side effect: Sends downloaded XML files to STDOUT.

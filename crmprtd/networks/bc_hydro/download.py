@@ -1,4 +1,4 @@
-""" Downloads data from BC hyrdo
+"""Downloads data from BC hyrdo
 
 BC Hydro posts a rolling window (3 months) observing hourly data
 once a week. Data is in txt files.
@@ -8,6 +8,7 @@ updated available data, supplemented with monitoring and alerting
 for errors. If the script is run less than once every 3 months
 you will miss data.
 """
+
 from typing import List
 import pysftp
 import logging

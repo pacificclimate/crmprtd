@@ -229,8 +229,9 @@ def gulpy_plus_plus():
         help="The network from which the data is coming from. "
         "Since gulpy input already identifies the network by way of the provided history_ids, the name will only be used for logging.",
     )
-    parser.add_argument('filenames', metavar='filename', nargs='+',
-                        help='CSV files to process')
+    parser.add_argument(
+        "filenames", metavar="filename", nargs="+", help="CSV files to process"
+    )
     args = parser.parse_args()
 
     setup_logging(
