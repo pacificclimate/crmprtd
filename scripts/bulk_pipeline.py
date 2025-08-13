@@ -75,12 +75,18 @@ def main(opts, args):
                 # Generate cache filename if directory specified
                 cache_filename = None
                 if opts.cache_directory:
+                    
                     cache_filename = default_cache_filename(
                         timestamp=current_time,
                         network_name=opts.network,
                         tag=opts.tag,
                         frequency=opts.frequency if opts.network == "ec" else None,
                         province=opts.province if opts.network == "ec" else None,
+                    )
+
+                    # Replace the default cache directory with the user-specified directory
+                    cache_filename = cache_filename.replace(
+                        f"~/{opts.network}/cache/", f"{opts.directory}/"
                     )
 
                 # Build argument list for download_cache_process main function
@@ -111,7 +117,7 @@ def main(opts, args):
                     fun_args.extend(["--tag", opts.tag])
 
                 # Add cache filename if specified
-                if cache_filename:
+                if opts.cache_directory:
                     fun_args.extend(["--cache_filename", cache_filename])
 
                 # Add time parameter (now supported by download_cache_process.main())
