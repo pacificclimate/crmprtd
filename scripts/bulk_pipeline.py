@@ -15,6 +15,7 @@ from crmprtd import add_logging_args, setup_logging, NETWORKS
 from crmprtd.download_cache_process import (
     main as download_cache_process_main,
     describe_network,
+    default_cache_filename,
 )
 from scripts import add_bulk_args, add_time_range_args
 
@@ -74,12 +75,12 @@ def main(opts, args):
                 # Generate cache filename if directory specified
                 cache_filename = None
                 if opts.cache_directory:
-                    cache_filename = generate_cache_filename(
-                        opts.cache_directory,
-                        opts.network,
-                        current_time,
-                        opts.frequency,
-                        opts.tag,
+                    cache_filename = default_cache_filename(
+                        timestamp=current_time,
+                        network_name=opts.network,
+                        tag=opts.tag,
+                        frequency=opts.frequency if opts.network == "ec" else None,
+                        province=opts.province if opts.network == "ec" else None,
                     )
 
                 # Build argument list for download_cache_process main function
@@ -142,37 +143,6 @@ def main(opts, args):
         raise
 
 
-def generate_cache_filename(cache_dir, network, timestamp, frequency=None, tag=None):
-    """Generate cache filename based on parameters"""
-    os.makedirs(cache_dir, exist_ok=True)
-
-    ts = timestamp.strftime("%Y-%m-%dT%H:%M:%S")
-    tag_prefix = f"{tag}_" if tag else ""
-    freq_suffix = f"_{frequency}" if frequency else ""
-
-    if network in ("ec",):
-        extension = ".xml"
-    elif network in (
-        "bc_env_snow",
-        "bc_forestry",
-        "bc_riotinto",
-        "bc_tran",
-        "dfo_ccg_lighthouse",
-        "nt_forestry",
-        "nt_water",
-        "yt_gov",
-        "yt_water",
-        "yt_avalanche",
-        "yt_firewx",
-    ):
-        extension = ".xml"
-    else:
-        extension = ".txt"
-
-    filename = f"{tag_prefix}{network}_{ts}{freq_suffix}{extension}"
-    return os.path.join(cache_dir, filename)
-
-
 if __name__ == "__main__":
     sysargs = sys.argv[1:]
     parser = ArgumentParser(
@@ -185,7 +155,7 @@ if __name__ == "__main__":
 
     # Cache and processing options
     parser.add_argument(
-        "--cache-directory",
+        "--cache_directory",
         dest="cache_directory",
         help="Directory to store cache files (if not specified, uses download_cache_process defaults)",
     )

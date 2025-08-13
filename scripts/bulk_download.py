@@ -48,7 +48,6 @@ def main(opts, args):  # Create log directory if it doesn't exist
             timestep = timedelta(days=1)
         else:
             raise ValueError("Frequency must be 'hourly' or 'daily'")
-            raise ValueError("Frequency must be 'hourly' or 'daily'")
 
         base_args = args.copy()
         while stime <= etime:

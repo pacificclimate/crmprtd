@@ -6,9 +6,9 @@ This document covers the three bulk operation scripts available in the CRMPRTD p
 
 The bulk operation scripts provide different approaches to handle large-scale data operations:
 
-1. **`bulk_download.py`** - Downloads data files for specified time ranges
-2. **`bulk_process.py`** - Processes previously downloaded files 
-3. **`bulk_pipeline.py`** - Complete download-and-process pipeline for single networks
+1. **`bulk_download.py`** - Downloads data files for specified time ranges, extends crmprtd_download
+2. **`bulk_process.py`** - Processes previously downloaded files , extends crmprtd_process
+3. **`bulk_pipeline.py`** - Complete download-and-process pipeline for single networks, extends crmprtd_pipeline
 
 ## Quick Start
 
@@ -70,7 +70,7 @@ python scripts/bulk_download.py \
 - `-d, --directory`: Directory to save downloaded files (default: `~/bulk_download`)
 - `-S, --start_date`: Start time in "YYYY-MM-DD HH:MM:SS" format (required)
 - `-E, --end_date`: End time in "YYYY-MM-DD HH:MM:SS" format (defaults to current time)
-- `-F, --frequency`: Download frequency - "hourly" or "daily" (required)
+- `-F, --frequency`: Download frequency - "hourly" or "daily" (required). 
 
 ### Logging Options
 
@@ -134,15 +134,15 @@ python scripts/bulk_process.py \
 - `-S, --start_date`: Start time in "YYYY-MM-DD HH:MM:SS" format (required)
 - `-E, --end_date`: End time in "YYYY-MM-DD HH:MM:SS" format (optional)
 
-### File Selection (choose one)
+### File Selection
 
 - `-d, --directory`: Directory containing files to process
 - `-p, --pattern`: File pattern to match (e.g., `"crmprtd_download_2025-01-*.xml"`)
 
 ### Processing Options
 
-- `--continue-on-error`: Continue processing if one file fails
-- `--move-processed`: Move successfully processed files to 'processed' subdirectory
+- `--force`: Continue processing if one file fails
+- `--move_processed`: Move successfully processed files to 'processed' subdirectory
 
 ### Database Options
 
@@ -218,13 +218,13 @@ python scripts/bulk_pipeline.py \
 
 ### Cache and Processing Options
 
-- `--cache-directory`: Directory to store cache files
-- `--dry-run`: Print commands without executing them
+- `--cache_directory`: Directory to store cache files
+- `--dry_run`: Print commands without executing them
 - `--tag`: Tag to include in cache and log filenames
 
 ### EC Network Specific
 
-- `-p, --province`: Province code(s) for EC network (can be used multiple times)
+- `-p, --province`: Province code(s) for EC network (can be used multiple times) (Required for ec)
 
 ### Control Options
 
@@ -233,7 +233,7 @@ python scripts/bulk_pipeline.py \
 
 ### Information
 
-- `--list-networks`: List available networks and aliases, then exit
+- `--list_networks`: List available networks and aliases, then exit
 
 ### Examples
 
@@ -447,8 +447,8 @@ python scripts/bulk_pipeline.py \
 
 ### Getting Help
 
-- Use `--list-networks` to see available networks
-- Use `--dry-run` to preview operations without execution
+- Use `--list_networks` to see available networks
+- Use `--dry_run` to preview operations without execution
 - Use `-D` diagnostic mode to test without database commits
 - Check log files for detailed error information
 

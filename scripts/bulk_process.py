@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "-p",
-        "--file-pattern",
+        "--file_pattern",
         default="*.xml",
         help="File pattern to match in directory (default: *.xml)",
     )
@@ -180,7 +180,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "-M",
-        "--move-processed",
+        "--move_processed",
         action="store_true",
         help="Move successfully processed files to a 'processed' subdirectory",
     )
