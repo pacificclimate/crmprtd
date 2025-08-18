@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Standard modules
+import copy
 import os
 import sys
 import logging
@@ -11,13 +12,77 @@ from time import sleep
 from importlib.resources import files
 
 # Import from crmprtd
-from crmprtd import add_logging_args, setup_logging, NETWORKS
+from crmprtd import add_logging_args, add_province_args, setup_logging, NETWORKS
 from crmprtd.download_cache_process import (
     main as download_cache_process_main,
     describe_network,
     default_cache_filename,
 )
-from scripts import add_bulk_args, add_time_range_args
+from scripts import add_bulk_args, add_time_range_args, ensure_log_directory
+
+def process(current_time, opts, args):
+        # Generate cache filename if directory specified
+        cache_filename = None
+        if opts.directory:
+            
+            cache_filename = default_cache_filename(
+                timestamp=current_time,
+                network_name=opts.network,
+                tag=opts.tag,
+                frequency=opts.frequency if opts.network == "ec" else None,
+                province=opts.province if opts.network == "ec" else None,
+            )
+
+            # Replace the default cache directory with the user-specified directory
+            cache_filename = cache_filename.replace(
+                f"~/{opts.network}/cache/", f"{opts.directory}/{opts.network}/cache/"
+            )
+
+            # ensure directory exists
+            cache_dir = os.path.dirname(cache_filename)
+            if not os.path.exists(cache_dir):
+                os.makedirs(cache_dir, exist_ok=True)
+
+        # Build argument list for download_cache_process main function
+        # Start with base arguments from the original args list
+        base_args = args.copy()
+
+        # Construct the full argument list with all required parameters
+        fun_args = [
+            *base_args,
+            "--network",
+            opts.network,
+            # "--log_conf",
+            # opts.log_conf,
+            "--log_filename",
+            opts.log_filename,
+            # "--log_level",
+            # opts.log_level,
+            # "--error_email",
+            # opts.error_email,
+        ]
+
+        # Add frequency if provided (only for EC network, as other networks don't use it)
+        if opts.network == "ec" and opts.frequency:
+            fun_args.extend(["--frequency", opts.frequency])
+        
+        # Add province if provided
+        if opts.network == "ec" and opts.province:
+            fun_args.extend(["--province", opts.province])
+
+        # Add tag if provided
+        if opts.tag:
+            fun_args.extend(["--tag", opts.tag])
+
+        # Add cache filename if specified
+        if opts.directory:
+            fun_args.extend(["--cache_filename", cache_filename])
+
+        # Add time parameter (now supported by download_cache_process.main())
+        fun_args.extend(["--time", current_time.strftime("%Y-%m-%d %H:%M:%S")])
+
+        # Call download_cache_process main function with constructed arguments
+        download_cache_process_main(fun_args)
 
 
 def main(opts, args):
@@ -27,9 +92,7 @@ def main(opts, args):
     """
     # Create log directory if it doesn't exist
     if opts.log_filename:
-        log_dir = os.path.dirname(opts.log_filename)
-        if log_dir and not os.path.exists(log_dir):
-            os.makedirs(log_dir, exist_ok=True)
+        ensure_log_directory(opts.log_filename)
 
     # Setup logging first
     setup_logging(
@@ -42,6 +105,7 @@ def main(opts, args):
 
     log = logging.getLogger("crmprtd")
 
+    log.info(f"Parsed opts: {opts}")
     log.info(f"Network description: {describe_network(opts.network)}")
 
     try:
@@ -72,61 +136,26 @@ def main(opts, args):
             log.info(f"Processing time: {iter_time_str}")
 
             try:
-                # Generate cache filename if directory specified
-                cache_filename = None
-                if opts.cache_directory:
+                if opts.network == "ec" and not opts.province:
+                    log.error(
+                        "For network 'ec', province must be specified using --province option"
+                    )
+                    raise ValueError("Province must be specified for EC network")
+                # Process each province if specified
+                if opts.network == "ec":
+                    for p in opts.province:
+                        log.info(f"Processing province: {p}")
+                        copts = copy.copy(opts)
+                        copts.province = p.lower()  # Normalize to lowercase
+                        process(current_time, copts, args)
+                        successful_runs += 1
+                        log.info(f"Successfully processed: {iter_time_str} for province {p}")
+                else:
+                    # For other networks, process without province
+                    process(current_time, opts, args)
+                    successful_runs += 1
+                    log.info(f"Successfully processed: {iter_time_str}")
                     
-                    cache_filename = default_cache_filename(
-                        timestamp=current_time,
-                        network_name=opts.network,
-                        tag=opts.tag,
-                        frequency=opts.frequency if opts.network == "ec" else None,
-                        province=opts.province if opts.network == "ec" else None,
-                    )
-
-                    # Replace the default cache directory with the user-specified directory
-                    cache_filename = cache_filename.replace(
-                        f"~/{opts.network}/cache/", f"{opts.directory}/"
-                    )
-
-                # Build argument list for download_cache_process main function
-                # Start with base arguments from the original args list
-                base_args = args.copy()
-
-                # Construct the full argument list with all required parameters
-                fun_args = [
-                    *base_args,
-                    "--network",
-                    opts.network,
-                    # "--log_conf",
-                    # opts.log_conf,
-                    "--log_filename",
-                    opts.log_filename,
-                    # "--log_level",
-                    # opts.log_level,
-                    # "--error_email",
-                    # opts.error_email,
-                ]
-
-                # Add frequency if provided (only for EC network, as other networks don't use it)
-                if opts.network == "ec" and opts.frequency:
-                    fun_args.extend(["--frequency", opts.frequency])
-
-                # Add tag if provided
-                if opts.tag:
-                    fun_args.extend(["--tag", opts.tag])
-
-                # Add cache filename if specified
-                if opts.cache_directory:
-                    fun_args.extend(["--cache_filename", cache_filename])
-
-                # Add time parameter (now supported by download_cache_process.main())
-                fun_args.extend(["--time", current_time.strftime("%Y-%m-%d %H:%M:%S")])
-
-                # Call download_cache_process main function with constructed arguments
-                download_cache_process_main(fun_args)
-                successful_runs += 1
-                log.info(f"Successfully processed: {iter_time_str}")
 
             except Exception as e:
                 failed_runs += 1
@@ -152,19 +181,14 @@ def main(opts, args):
 if __name__ == "__main__":
     sysargs = sys.argv[1:]
     parser = ArgumentParser(
-        description="Bulk pipeline operations using download_cache_process functions for time ranges"
+        description="Bulk pipeline operations using download_cache_process functions for time ranges. If only" \
+        "downloads are desired, omit inclusion of connection string arguments."
     )
 
     add_logging_args(parser)
     add_bulk_args(parser)
-    add_time_range_args(parser, start_required=True, frequency_required=True)
+    add_time_range_args(parser)
 
-    # Cache and processing options
-    parser.add_argument(
-        "--cache_directory",
-        dest="cache_directory",
-        help="Directory to store cache files (if not specified, uses download_cache_process defaults)",
-    )
     parser.add_argument(
         "--tag",
         dest="tag",
@@ -205,9 +229,14 @@ if __name__ == "__main__":
 
     opts, args = parser.parse_known_args(sysargs)
 
+    if opts.network == "ec":
+        add_province_args(parser)
+        opts, args = parser.parse_known_args(sysargs)
+        # Normalize to lowercase.
+        opts.province = [p.lower() for p in opts.province]
+
     # Validate arguments
     if not opts.network:
         parser.error("Network (-N/--network) is required")
 
-    logging.info(f"Parsed opts: {opts}")
     main(opts, args)

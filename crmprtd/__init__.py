@@ -235,3 +235,34 @@ def setup_logging(log_conf, log_filename, error_email, log_level, name):
 
 def subset_dict(a_dict, keys_wanted):
     return {key: a_dict[key] for key in keys_wanted if key in a_dict}
+
+def add_province_args(parser):
+    # See notes below re. province codes.
+    province_codes = (
+        "AB",
+        "BC",
+        "MB",
+        "NB",
+        "NL",
+        "NS",
+        "NT",
+        "NU",
+        "ON",
+        "PE",
+        "QC",
+        "SK",
+        "YT",
+    )
+    parser.add_argument(
+        "-p",
+        "--province",
+        action="append",
+        help="2 letter province code",
+        default=[],
+        # Province codes really ought to be upper case, but in other scripts
+        # lower case is the norm. We accept either, and normalize to lower case
+        # for all subsequent use.
+        choices=province_codes + tuple(p.lower() for p in province_codes),
+        # Ensure at least one province is selected
+        required=True,
+    )

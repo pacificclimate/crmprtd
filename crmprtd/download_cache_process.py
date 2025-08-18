@@ -13,7 +13,7 @@ import logging
 
 import pytz
 
-from crmprtd import NETWORKS, add_version_arg
+from crmprtd import NETWORKS, add_province_args, add_version_arg
 from crmprtd.argparse_helpers import OneAndDoneAction
 from crmprtd.infill import download_and_process
 
@@ -490,36 +490,7 @@ def main(arglist: Optional[List[str]] = None) -> None:
                 required=True,
                 help="Frequency of download (network ec only)",
             )
-
-            # See notes below re. province codes.
-            province_codes = (
-                "AB",
-                "BC",
-                "MB",
-                "NB",
-                "NL",
-                "NS",
-                "NT",
-                "NU",
-                "ON",
-                "PE",
-                "QC",
-                "SK",
-                "YT",
-            )
-            parser.add_argument(
-                "-p",
-                "--province",
-                action="append",
-                help="2 letter province code",
-                default=[],
-                # Province codes really ought to be upper case, but in other scripts
-                # lower case is the norm. We accept either, and normalize to lower case
-                # for all subsequent use.
-                choices=province_codes + tuple(p.lower() for p in province_codes),
-                # Ensure at least one province is selected
-                required=True,
-            )
+            add_province_args(parser)
             args = parser.parse_args(arglist)
             # Normalize to lowercase.
             args.province = [p.lower() for p in args.province]
