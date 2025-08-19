@@ -56,7 +56,7 @@ def download_and_process(
     download_args: List[str],
     cache_filename: Optional[str] = None,
     connection_string: Optional[str] = None,
-    dry_run: bool = True,
+    dry_run: bool = False,
 ):
     """
     Start subprocesses as necessary to perform download-and-process pipeline.
