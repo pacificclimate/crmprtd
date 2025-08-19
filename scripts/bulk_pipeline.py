@@ -233,7 +233,7 @@ if __name__ == "__main__":
         add_province_args(parser)
         opts, args = parser.parse_known_args(sysargs)
         # Normalize to lowercase.
-        opts.province = [p.lower() for p in opts.province]
+        opts.province = {p.lower() for p in opts.province}
 
     # Validate arguments
     if not opts.network:
