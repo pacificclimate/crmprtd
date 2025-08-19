@@ -1,0 +1,72 @@
+# This is the default log file retrieved from /home/crmprtd on 2025-08-19
+# Importantly over the default log file it redirects the output to stderr
+# which prevents pollution of the downloaded files with log information. 
+
+# When executing crmprtd_pipeline, the log file default location is set to
+# ~/logging.yaml . Make sure to copy this file to that location before 
+# executing the pipeline to replicate that behavior.
+
+# Log level standard usage
+#   -- debug --
+#       Used to relay detailed information during testing. For the purposes
+#       of this application any postgresql UniquenessError should be logged
+#       using this level.
+#
+#   -- info --
+#       Used to output information that is useful while running application.
+#
+#   --warning --
+#       Used when handling exceptions.
+#
+#   -- error --
+#       Used for unhandled exceptions.
+#
+#   -- exception --
+#       Used like the error level, but will also output a stack trace.
+#
+#   -- critical --
+#       Used for outlying cases where program may be unable to continue.
+
+version: 1
+disable_existing_loggers: False
+formatters:
+  simple:
+    format: '%(asctime)s:%(levelname)s:%(name)s - %(message)s'
+  json:
+    format: '%(asctime)s:%(levelname)s:%(name)s - %(message)s'
+    class: pythonjsonlogger.jsonlogger.JsonFormatter
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: json
+    stream: ext://sys.stderr
+  error:
+    class: logging.StreamHandler
+    level: ERROR
+    formatter: json
+    stream: ext://sys.stderr
+  mail:
+    class: logging.handlers.SMTPHandler
+    level: CRITICAL
+    formatter: json
+    mailhost: smtp.uvic.ca
+    fromaddr: noreply@pcic.uvic.ca
+    toaddrs:
+      - tkunkel@uvic.ca
+    subject: 'Errors with crmprtd daemon'
+  file:
+    class: logging.handlers.RotatingFileHandler
+    level: INFO
+    formatter: json
+    backupCount: 10
+    maxBytes: 10000000
+    filename: 'crmprtd_log.txt'
+loggers:
+  crmprtd:
+    level: INFO
+    handlers: [console,mail]
+    propagate: yes
+root:
+  level: DEBUG
+  handlers: [file]

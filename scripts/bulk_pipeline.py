@@ -17,6 +17,8 @@ from crmprtd.download_cache_process import (
     main as download_cache_process_main,
     describe_network,
     default_cache_filename,
+    network_alias_names,
+    network_aliases,
 )
 from scripts import add_bulk_args, add_time_range_args, ensure_log_directory
 
@@ -190,6 +192,7 @@ if __name__ == "__main__":
     add_time_range_args(parser)
 
     parser.add_argument(
+        "-T",
         "--tag",
         dest="tag",
         help="Tag to include in cache and log filenames",
@@ -239,4 +242,10 @@ if __name__ == "__main__":
     if not opts.network:
         parser.error("Network (-N/--network) is required")
 
-    main(opts, args)
+    if opts.network in network_alias_names:
+        for alias in network_aliases[opts.network]:
+            copts = copy.copy(opts)
+            copts.network = alias
+            main(copts, args)
+    else:
+        main(opts, args)

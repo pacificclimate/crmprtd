@@ -2,6 +2,9 @@
 from datetime import datetime, timedelta, timezone
 import os
 
+from crmprtd import NETWORKS
+from crmprtd.download_cache_process import network_alias_names
+
 
 def add_bulk_args(parser):
     """
@@ -18,11 +21,16 @@ def add_bulk_args(parser):
         ),
     )
     parser.add_argument(
-        "-N",
-        "--network",
-        dest="network",
-        help="The network from which the data is coming from",
-    )
+            "-N",
+            "--network",
+            choices=NETWORKS + network_alias_names,
+            required=True,
+            help=(
+                "Network identifier (a network name or network alias) from which to "
+                "download observations. A network alias can stand for one or more "
+                "individual networks (e.g., 'ytnt' stands for many networks)."
+            ),
+        )
 
 
 def add_time_range_args(parser):
