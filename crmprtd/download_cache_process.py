@@ -8,12 +8,12 @@ TODO: More doc.
 
 import datetime
 from argparse import ArgumentParser
-from typing import List
+from typing import List, Optional
 import logging
 
 import pytz
 
-from crmprtd import NETWORKS, add_version_arg
+from crmprtd import NETWORKS, add_province_args, add_version_arg
 from crmprtd.argparse_helpers import OneAndDoneAction
 from crmprtd.infill import download_and_process
 
@@ -52,10 +52,10 @@ def check_network_name(network_name):
 
 
 def default_log_filename(
-    network_name: str = None,
-    tag: str = None,
-    frequency: str = None,
-    province: str = None,
+    network_name: Optional[str] = None,
+    tag: Optional[str] = None,
+    frequency: Optional[str] = None,
+    province: Optional[str] = None,
     **_,
 ):
     """Return log filename (filepath). It depends on several parameters, starting
@@ -79,17 +79,17 @@ def default_log_filename(
     return f"{filepath}/{tag_prefix}{network_name}_json.log"
 
 
-def the_log_filename(log_filename: str = None, **kwargs):
+def the_log_filename(log_filename: Optional[str] = None, **kwargs):
     return log_filename or default_log_filename(**kwargs)
 
 
 def default_cache_filename(
     timestamp: datetime.datetime = datetime.datetime.now(),
     timestamp_format: str = "%Y-%m-%dT%H:%M:%S",
-    network_name: str = None,
-    tag: str = None,
-    frequency: str = None,
-    province: str = None,
+    network_name: Optional[str] = None,
+    tag: Optional[str] = None,
+    frequency: Optional[str] = None,
+    province: Optional[str] = None,
     **_,
 ) -> str:
     """Return cache filename (filepath). It depends on several parameters, starting
@@ -130,10 +130,12 @@ def default_cache_filename(
     return f"{filepath}/{tag_prefix}{network_name}_{ts}.txt"
 
 
-def the_cache_filename(cache_filename: str = None, **kwargs) -> str:
+def the_cache_filename(cache_filename: Optional[str] = None, **kwargs) -> str:
     return cache_filename or default_cache_filename(**kwargs)
 
 
+# TODO: This is inconsistent with how all the other functions pull the log config
+# They use crmprtd/data/logging.yaml, but this uses a default of the home directory
 def log_args(**kwargs) -> List[str]:
     """Return logging args. Only the log filename depends on the arguments."""
     return [
@@ -153,11 +155,11 @@ def to_utc(d: datetime.datetime, tz_string: str = "Canada/Pacific"):
 
 
 def download_args(
-    network_name: str = None,
-    frequency: str = None,
-    province: str = None,
-    time: datetime.datetime = None,  # TODO: use now()?
-    start_time: datetime.datetime = None,
+    network_name: Optional[str] = None,
+    frequency: Optional[str] = None,
+    province: Optional[str] = None,
+    time: Optional[datetime.datetime] = None,  # TODO: use now()?
+    start_time: Optional[datetime.datetime] = None,
     **_,
 ) -> List[str]:
     """Return command-line args for download phase. They depend on the network and
@@ -182,6 +184,8 @@ def download_args(
     if network_name == "crd":
         net_args = f"--auth_fname ~/.rtd_auth.yaml --auth_key={network_name}".split()
     if network_name == "ec":
+        if province is None or frequency is None:
+            raise ValueError("EC network requires both province and frequency")
         net_args = f"-p {province.lower()} -F {frequency}".split()
     if network_name in (
         "bc_env_snow",
@@ -196,6 +200,8 @@ def download_args(
         "yt_avalanche",
         "yt_firewx",
     ):
+        if time is None:
+            raise ValueError(f"Network {network_name} requires a time parameter")
         ts = to_utc(time).strftime("%Y/%m/%d %H:00:00")
         net_args = ["-d", f'"{ts}"']
     if network_name == "moti":
@@ -214,9 +220,10 @@ def alias_to_networks(network_alias: str):
 
 
 def dispatch_network(
-    cache_filename: str = None,
-    connection_string: str = None,
-    dry_run: bool = None,
+    cache_filename: Optional[str] = None,
+    connection_string: Optional[str] = None,
+    dry_run: Optional[bool] = None,
+    time: Optional[datetime.datetime] = None,
     **kwargs,
 ) -> None:
     """
@@ -224,6 +231,7 @@ def dispatch_network(
 
     :param cache_filename: Custom cache filename.
     :param connection_string: Database connection string for "process" step.
+    :param time: Custom time to use for downloading. If None, use network defaults.
     :param kwargs: Remaining args, passed through to various subfunctions. Note that
         network name is one of these args.
     :param dry_run: If true, print commands but don't run them.
@@ -233,24 +241,36 @@ def dispatch_network(
     check_network_name(network_name)
 
     if network_name == "_test":
+        # Use custom time if provided, otherwise no time parameter
         download_and_process(
             network_name=network_name,
             log_args=log_args(**kwargs),
-            download_args=download_args(**kwargs),
-            cache_filename=the_cache_filename(cache_filename=cache_filename, **kwargs),
+            download_args=download_args(time=time, **kwargs),
+            cache_filename=the_cache_filename(
+                cache_filename=cache_filename,
+                timestamp=time if time else datetime.datetime.now(),
+                **kwargs,
+            ),
             connection_string=connection_string,
             dry_run=dry_run,
         )
     elif network_name == "ec":
         provinces = kwargs.pop("province")
 
+        if not provinces or len(provinces) == 0:
+            raise ValueError("EC network requires at least one province code")
+
+        # Use custom time if provided, otherwise let EC network use its defaults
         for province in provinces:
             download_and_process(
                 network_name=network_name,
                 log_args=log_args(**kwargs, province=province),
-                download_args=download_args(**kwargs, province=province),
+                download_args=download_args(time=time, province=province, **kwargs),
                 cache_filename=the_cache_filename(
-                    cache_filename=cache_filename, province=province, **kwargs
+                    cache_filename=cache_filename,
+                    province=province,
+                    timestamp=time if time else datetime.datetime.now(),
+                    **kwargs,
                 ),
                 connection_string=connection_string,
                 dry_run=dry_run,
@@ -268,32 +288,36 @@ def dispatch_network(
         "yt_avalanche",
         "yt_firewx",
     ):
-        an_hour_ago = datetime.datetime.now() - datetime.timedelta(hours=1)
+        # Use custom time if provided, otherwise default to "an hour ago"
+        use_time = (
+            time if time else (datetime.datetime.now() - datetime.timedelta(hours=1))
+        )
         download_and_process(
             network_name=network_name,
             log_args=log_args(**kwargs),
-            download_args=download_args(**kwargs, time=an_hour_ago),
+            download_args=download_args(**kwargs, time=use_time),
             cache_filename=the_cache_filename(
-                cache_filename=cache_filename, timestamp=an_hour_ago, **kwargs
+                cache_filename=cache_filename, timestamp=use_time, **kwargs
             ),
             connection_string=connection_string,
             dry_run=dry_run,
         )
     else:
-        now = datetime.datetime.now()
+        # Use custom time if provided, otherwise default to "now"
+        use_time = time if time else datetime.datetime.now()
         download_and_process(
             network_name=network_name,
             log_args=log_args(**kwargs),
-            download_args=download_args(**kwargs, time=now),
+            download_args=download_args(**kwargs, time=use_time),
             cache_filename=the_cache_filename(
-                cache_filename=cache_filename, timestamp=now, **kwargs
+                cache_filename=cache_filename, timestamp=use_time, **kwargs
             ),
             connection_string=connection_string,
             dry_run=dry_run,
         )
 
 
-def dispatch_network_alias(network_alias: str = None, **kwargs) -> None:
+def dispatch_network_alias(network_alias: Optional[str] = None, **kwargs) -> None:
     """
     Dispatch each network defined by an alias.
 
@@ -306,7 +330,7 @@ def dispatch_network_alias(network_alias: str = None, **kwargs) -> None:
         dispatch_network(network_name=network_name, **kwargs)
 
 
-def dispatch(network: str = None, **kwargs) -> None:
+def dispatch(network: Optional[str] = None, **kwargs) -> None:
     """
     Dispatch a network or a network alias.
 
@@ -337,7 +361,7 @@ def describe_network(network):
     return f"'{network}' is not a known network name or alias"
 
 
-def main(arglist: List[str] = None) -> None:
+def main(arglist: Optional[List[str]] = None) -> None:
     """
     Mainline for script.
 
@@ -349,6 +373,7 @@ def main(arglist: List[str] = None) -> None:
         if None then sys.argv is used.
     :return: None.
     """
+
     try:
         parser = ArgumentParser(
             description="""
@@ -378,6 +403,7 @@ def main(arglist: List[str] = None) -> None:
 
         add_version_arg(parser)
 
+        # TODO: Overloaded argument, -D is for try run in other crmprtd utilities
         parser.add_argument(
             "-D",
             "--describe",
@@ -442,6 +468,17 @@ def main(arglist: List[str] = None) -> None:
             ),
         )
 
+        # Time parameter
+        parser.add_argument(
+            "-t",
+            "--time",
+            help=(
+                "Custom time to use for downloading (format: YYYY-MM-DD HH:MM:SS). "
+                "If not specified, networks will use their default time logic "
+                "(e.g., 'now', 'previous hour', etc.)."
+            ),
+        )
+
         args, _ = parser.parse_known_args(arglist)
 
         # Network-dependent args
@@ -453,40 +490,24 @@ def main(arglist: List[str] = None) -> None:
                 required=True,
                 help="Frequency of download (network ec only)",
             )
-
-            # See notes below re. province codes.
-            province_codes = (
-                "AB",
-                "BC",
-                "MB",
-                "NB",
-                "NL",
-                "NS",
-                "NT",
-                "NU",
-                "ON",
-                "PE",
-                "QC",
-                "SK",
-                "YT",
-            )
-            parser.add_argument(
-                "-p",
-                "--province",
-                action="append",
-                help="2 letter province code",
-                default=[],
-                # Province codes really ought to be upper case, but in other scripts
-                # lower case is the norm. We accept either, and normalize to lower case
-                # for all subsequent use.
-                choices=province_codes + tuple(p.lower() for p in province_codes),
-            )
+            add_province_args(parser)
             args = parser.parse_args(arglist)
             # Normalize to lowercase.
             args.province = [p.lower() for p in args.province]
+        else:
+            args = parser.parse_args(arglist)
 
-        # TODO: Add network-dependent time arg here? Currently, it is hardwired in code to
-        #  "now".
+        # Parse time parameter if provided
+        if hasattr(args, "time") and args.time:
+            try:
+                # Parse the time string into a datetime object
+                args.time = datetime.datetime.strptime(args.time, "%Y-%m-%d %H:%M:%S")
+            except ValueError as e:
+                raise ValueError(
+                    f"Invalid time format. Expected 'YYYY-MM-DD HH:MM:SS', got '{args.time}': {e}"
+                )
+        else:
+            args.time = None
 
         dispatch(**vars(args))
     except Exception:

@@ -15,6 +15,7 @@ CRD's data has a unique and pseudo-secret client ID. This client id
 can be supplied as the username in the authentication file or via the
 --username paramenter. No password is necessary.
 """
+
 import logging
 import sys
 from argparse import ArgumentParser

@@ -54,9 +54,9 @@ def download_and_process(
     network_name: str,
     log_args: List[str],
     download_args: List[str],
-    cache_filename: str = None,
-    connection_string: str = None,
-    dry_run: bool = None,
+    cache_filename: Optional[str] = None,
+    connection_string: Optional[str] = None,
+    dry_run: bool = False,
 ):
     """
     Start subprocesses as necessary to perform download-and-process pipeline.
@@ -86,6 +86,11 @@ def download_and_process(
         logger.warning(
             f"Network {network_name}: Data is to be neither cached nor processed. "
             f"Nothing to do."
+        )
+    
+    if not do_process:
+        logger.info(
+            f"Network {network_name}: Data is to be downloaded but not processed."
         )
 
     # Build up commands to be chained in this list

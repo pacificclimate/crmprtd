@@ -13,6 +13,7 @@ PCDS-type databases (e.g., CRMP, Metnorth).
   - [For production](docs/installation/production.md)
   - [For development](docs/installation/development.md)
 - [Usage (CLI)](docs/usage.md)
+- [Usage (Bulk CLI)](docs/bulk_operations.md)
 - Development
   - [Caveats](docs/development/caveats.md)
   - [Unit tests](docs/development/unit-tests.md)
