@@ -157,7 +157,7 @@ def main(opts, args):
             log.error(f"  {file_path}: {error}")
 
 
-if __name__ == "__main__":
+def run():
     sysargs = sys.argv[1:]
     parser = ArgumentParser(
         description="Bulk process files using crmprtd.process, for arguments that can be passed to crmprtd.process call crmprtd_process --help"
@@ -204,3 +204,6 @@ if __name__ == "__main__":
 
     opts, args = parser.parse_known_args(sysargs)
     main(opts, args)
+
+if __name__ == "__main__":
+    run()
