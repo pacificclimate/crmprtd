@@ -22,69 +22,70 @@ from crmprtd.download_cache_process import (
 )
 from scripts import add_bulk_args, add_time_range_args, ensure_log_directory
 
+
 def process(current_time, opts, args):
-        # Generate cache filename if directory specified
-        cache_filename = None
-        if opts.directory:
-            
-            cache_filename = default_cache_filename(
-                timestamp=current_time,
-                network_name=opts.network,
-                tag=opts.tag,
-                frequency=opts.frequency if opts.network == "ec" else None,
-                province=opts.province if opts.network == "ec" else None,
-            )
+    # Generate cache filename if directory specified
+    cache_filename = None
+    if opts.directory:
 
-            # Replace the default cache directory with the user-specified directory
-            cache_filename = cache_filename.replace(
-                f"~/{opts.network}/cache/", f"{opts.directory}/{opts.network}/cache/"
-            )
+        cache_filename = default_cache_filename(
+            timestamp=current_time,
+            network_name=opts.network,
+            tag=opts.tag,
+            frequency=opts.frequency if opts.network == "ec" else None,
+            province=opts.province if opts.network == "ec" else None,
+        )
 
-            # ensure directory exists
-            cache_dir = os.path.dirname(cache_filename)
-            if not os.path.exists(cache_dir):
-                os.makedirs(cache_dir, exist_ok=True)
+        # Replace the default cache directory with the user-specified directory
+        cache_filename = cache_filename.replace(
+            f"~/{opts.network}/cache/", f"{opts.directory}/{opts.network}/cache/"
+        )
 
-        # Build argument list for download_cache_process main function
-        # Start with base arguments from the original args list
-        base_args = args.copy()
+        # ensure directory exists
+        cache_dir = os.path.dirname(cache_filename)
+        if not os.path.exists(cache_dir):
+            os.makedirs(cache_dir, exist_ok=True)
 
-        # Construct the full argument list with all required parameters
-        fun_args = [
-            *base_args,
-            "--network",
-            opts.network,
-            # "--log_conf",
-            # opts.log_conf,
-            "--log_filename",
-            opts.log_filename,
-            # "--log_level",
-            # opts.log_level,
-            # "--error_email",
-            # opts.error_email,
-        ]
+    # Build argument list for download_cache_process main function
+    # Start with base arguments from the original args list
+    base_args = args.copy()
 
-        # Add frequency if provided (only for EC network, as other networks don't use it)
-        if opts.network == "ec" and opts.frequency:
-            fun_args.extend(["--frequency", opts.frequency])
-        
-        # Add province if provided
-        if opts.network == "ec" and opts.province:
-            fun_args.extend(["--province", opts.province])
+    # Construct the full argument list with all required parameters
+    fun_args = [
+        *base_args,
+        "--network",
+        opts.network,
+        # "--log_conf",
+        # opts.log_conf,
+        "--log_filename",
+        opts.log_filename,
+        # "--log_level",
+        # opts.log_level,
+        # "--error_email",
+        # opts.error_email,
+    ]
 
-        # Add tag if provided
-        if opts.tag:
-            fun_args.extend(["--tag", opts.tag])
+    # Add frequency if provided (only for EC network, as other networks don't use it)
+    if opts.network == "ec" and opts.frequency:
+        fun_args.extend(["--frequency", opts.frequency])
 
-        # Add cache filename if specified
-        if opts.directory:
-            fun_args.extend(["--cache_filename", cache_filename])
+    # Add province if provided
+    if opts.network == "ec" and opts.province:
+        fun_args.extend(["--province", opts.province])
 
-        # Add time parameter (now supported by download_cache_process.main())
-        fun_args.extend(["--time", current_time.strftime("%Y-%m-%d %H:%M:%S")])
+    # Add tag if provided
+    if opts.tag:
+        fun_args.extend(["--tag", opts.tag])
 
-        # Call download_cache_process main function with constructed arguments
-        download_cache_process_main(fun_args)
+    # Add cache filename if specified
+    if opts.directory:
+        fun_args.extend(["--cache_filename", cache_filename])
+
+    # Add time parameter (now supported by download_cache_process.main())
+    fun_args.extend(["--time", current_time.strftime("%Y-%m-%d %H:%M:%S")])
+
+    # Call download_cache_process main function with constructed arguments
+    download_cache_process_main(fun_args)
 
 
 def run(opts, args):
@@ -151,13 +152,14 @@ def run(opts, args):
                         copts.province = p.lower()  # Normalize to lowercase
                         process(current_time, copts, args)
                         successful_runs += 1
-                        log.info(f"Successfully processed: {iter_time_str} for province {p}")
+                        log.info(
+                            f"Successfully processed: {iter_time_str} for province {p}"
+                        )
                 else:
                     # For other networks, process without province
                     process(current_time, opts, args)
                     successful_runs += 1
                     log.info(f"Successfully processed: {iter_time_str}")
-                    
 
             except Exception as e:
                 failed_runs += 1
@@ -183,7 +185,7 @@ def run(opts, args):
 def main():
     sysargs = sys.argv[1:]
     parser = ArgumentParser(
-        description="Bulk pipeline operations using download_cache_process functions for time ranges. If only" \
+        description="Bulk pipeline operations using download_cache_process functions for time ranges. If only"
         "downloads are desired, omit inclusion of connection string arguments."
     )
 
@@ -249,6 +251,7 @@ def main():
             run(copts, args)
     else:
         run(opts, args)
+
 
 if __name__ == "__main__":
     main()
