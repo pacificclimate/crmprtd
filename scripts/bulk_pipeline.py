@@ -180,7 +180,7 @@ def main(opts, args):
         raise
 
 
-if __name__ == "__main__":
+def run():
     sysargs = sys.argv[1:]
     parser = ArgumentParser(
         description="Bulk pipeline operations using download_cache_process functions for time ranges. If only" \
@@ -249,3 +249,6 @@ if __name__ == "__main__":
             main(copts, args)
     else:
         main(opts, args)
+
+if __name__ == "__main__":
+    run()
