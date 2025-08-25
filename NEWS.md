@@ -1,5 +1,12 @@
 # News / Release Notes
 
+## 5.0.3
+
+_2025-Aug-25_
+
+Additions of some command line utility "BULK" scripts to help back
+fill data.
+
 ## 5.0.2
 
 _2025-Jun-26_
