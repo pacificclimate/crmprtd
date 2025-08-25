@@ -14,7 +14,7 @@ from crmprtd import add_logging_args, setup_logging
 from scripts import add_bulk_args
 
 
-def main(opts, args):
+def run(opts, args):
     """
     Main function to process multiple files in a directory using crmprtd.process with
     optional pattern matching
@@ -157,7 +157,7 @@ def main(opts, args):
             log.error(f"  {file_path}: {error}")
 
 
-def run():
+def main():
     sysargs = sys.argv[1:]
     parser = ArgumentParser(
         description="Bulk process files using crmprtd.process, for arguments that can be passed to crmprtd.process call crmprtd_process --help"
@@ -203,7 +203,7 @@ def run():
     )
 
     opts, args = parser.parse_known_args(sysargs)
-    main(opts, args)
+    run(opts, args)
 
 if __name__ == "__main__":
-    run()
+    main()

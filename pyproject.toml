@@ -32,8 +32,8 @@ crmprtd_pipeline = "crmprtd.download_cache_process:main"
 crmprtd_download = "crmprtd.download:main"
 crmprtd_process = "crmprtd.process:main"
 crmprtd_gulpy = "crmprtd.process:gulpy_plus_plus"
-bulk_pipeline = "scripts.bulk_pipeline:run"
-bulk_process = "scripts.bulk_process:run"
+bulk_pipeline = "scripts.bulk_pipeline:main"
+bulk_process = "scripts.bulk_process:main"
 
 [tool.poetry]
 packages = [

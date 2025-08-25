@@ -87,7 +87,7 @@ def process(current_time, opts, args):
         download_cache_process_main(fun_args)
 
 
-def main(opts, args):
+def run(opts, args):
     """
     Main function to run bulk pipeline operations using download_cache_process
     for time ranges with specified frequency
@@ -180,7 +180,7 @@ def main(opts, args):
         raise
 
 
-def run():
+def main():
     sysargs = sys.argv[1:]
     parser = ArgumentParser(
         description="Bulk pipeline operations using download_cache_process functions for time ranges. If only" \
@@ -246,9 +246,9 @@ def run():
         for alias in network_aliases[opts.network]:
             copts = copy.copy(opts)
             copts.network = alias
-            main(copts, args)
+            run(copts, args)
     else:
-        main(opts, args)
+        run(opts, args)
 
 if __name__ == "__main__":
-    run()
+    main()
