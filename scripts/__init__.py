@@ -1,4 +1,3 @@
-
 from datetime import datetime, timedelta, timezone
 import os
 
@@ -21,16 +20,16 @@ def add_bulk_args(parser):
         ),
     )
     parser.add_argument(
-            "-N",
-            "--network",
-            choices=NETWORKS + network_alias_names,
-            required=True,
-            help=(
-                "Network identifier (a network name or network alias) from which to "
-                "download observations. A network alias can stand for one or more "
-                "individual networks (e.g., 'ytnt' stands for many networks)."
-            ),
-        )
+        "-N",
+        "--network",
+        choices=NETWORKS + network_alias_names,
+        required=True,
+        help=(
+            "Network identifier (a network name or network alias) from which to "
+            "download observations. A network alias can stand for one or more "
+            "individual networks (e.g., 'ytnt' stands for many networks)."
+        ),
+    )
 
 
 def add_time_range_args(parser):
@@ -70,10 +69,11 @@ def add_time_range_args(parser):
         help="Frequency for bulk operations (daily or hourly), determines the timestep while looping through the time range",
     )
 
+
 def ensure_log_directory(log_filename):
     """
     Ensure the log directory exists.
-    
+
     Args:
         log_filename: The path to the log file.
     """

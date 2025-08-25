@@ -87,7 +87,7 @@ def download_and_process(
             f"Network {network_name}: Data is to be neither cached nor processed. "
             f"Nothing to do."
         )
-    
+
     if not do_process:
         logger.info(
             f"Network {network_name}: Data is to be downloaded but not processed."
