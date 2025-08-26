@@ -12,15 +12,21 @@ from time import sleep
 from importlib.resources import files
 
 # Import from crmprtd
-from crmprtd import add_logging_args, add_province_args, setup_logging, NETWORKS
+from crmprtd import (
+    add_logging_args,
+    add_province_args,
+    setup_logging,
+    add_bulk_args,
+    add_time_range_args,
+    ensure_log_directory,
+    network_alias_names,
+    network_aliases,
+)
 from crmprtd.download_cache_process import (
     main as download_cache_process_main,
     describe_network,
     default_cache_filename,
-    network_alias_names,
-    network_aliases,
 )
-from scripts import add_bulk_args, add_time_range_args, ensure_log_directory
 
 
 def process(current_time, opts, args):

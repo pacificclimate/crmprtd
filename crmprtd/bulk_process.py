@@ -10,8 +10,7 @@ import sys
 
 # Import the process function directly instead of main
 from crmprtd.process import main as process
-from crmprtd import add_logging_args, setup_logging
-from scripts import add_bulk_args
+from crmprtd import add_logging_args, setup_logging, add_bulk_args
 
 
 def run(opts, args):
