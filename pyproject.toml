@@ -32,8 +32,8 @@ crmprtd_pipeline = "crmprtd.download_cache_process:main"
 crmprtd_download = "crmprtd.download:main"
 crmprtd_process = "crmprtd.process:main"
 crmprtd_gulpy = "crmprtd.process:gulpy_plus_plus"
-bulk_pipeline = "scripts.bulk_pipeline:main"
-bulk_process = "scripts.bulk_process:main"
+bulk_pipeline = "crmprtd.bulk_pipeline:main"
+bulk_process = "crmprtd.bulk_process:main"
 
 [tool.poetry]
 packages = [
@@ -45,8 +45,6 @@ include = [
   "tests/data/*",
   "networks/wamr/station_substitutions.yaml",
   "networks/bc_hydro/variable_substitutions.yaml",
-  "scripts/bulk_pipeline.py",
-  "scripts/bulk_process.py",
 ]
 
 [[tool.poetry.source]]

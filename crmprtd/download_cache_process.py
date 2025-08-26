@@ -13,37 +13,18 @@ import logging
 
 import pytz
 
-from crmprtd import NETWORKS, add_province_args, add_version_arg
+from crmprtd import (
+    NETWORKS,
+    network_alias_names,
+    network_aliases,
+    add_province_args,
+    add_version_arg,
+)
 from crmprtd.argparse_helpers import OneAndDoneAction
 from crmprtd.infill import download_and_process
 
 
 log = logging.getLogger(__name__)
-
-
-# Maps a network alias to a *list* of networks (names). This allows for both groups
-# and single-network aliases.
-# TODO: This should probably be in a config file.
-network_aliases = {
-    "bch": ["bc_hydro"],
-    "hourly_swobml2": [
-        "bc_env_snow",
-        "bc_forestry",
-        "bc_riotinto",
-        "bc_tran",
-        "dfo_ccg_lighthouse",
-    ],
-    "ytnt": [
-        "nt_forestry",
-        "nt_water",
-        "yt_gov",
-        "yt_water",
-        "yt_avalanche",
-        "yt_firewx",
-    ],
-}
-
-network_alias_names = tuple(network_aliases.keys())
 
 
 def check_network_name(network_name):
