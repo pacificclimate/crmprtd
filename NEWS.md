@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 5.0.5
+
+_2025-Aug-27_
+
+Packaging changes to include new scripts
+
 ## 5.0.4
 
 _2025-Aug-25_
