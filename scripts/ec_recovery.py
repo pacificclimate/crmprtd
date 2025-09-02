@@ -44,7 +44,7 @@ if __name__ == "__main__":
         help="PostgreSQL connection string",
     )
     parser.add_option(
-        "-y",
+        "-L",
         "--log_conf",
         dest="log_conf",
         help=("YAML file to use to override the default logging " " configuration"),
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         "-p", "--province", dest="province", help="2 letter province code"
     )
     parser.add_option(
-        "-L", "--language", dest="language", help="'e' (english) | 'f' (french)"
+        "--language", dest="language", help="'e' (english) | 'f' (french)"
     )
     parser.add_option("-F", "--frequency", dest="frequency", help="daily|hourly")
     parser.add_option(

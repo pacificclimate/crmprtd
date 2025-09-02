@@ -9,8 +9,9 @@ from importlib.resources import files
 import sys
 
 # Import the process function directly instead of main
+from crmprtd.download_cache_process import default_log_filename
 from crmprtd.process import main as process
-from crmprtd import add_logging_args, setup_logging, add_bulk_args
+from crmprtd import add_logging_args, ensure_directory, setup_logging, add_bulk_args
 
 
 def run(opts, args):
@@ -18,11 +19,16 @@ def run(opts, args):
     Main function to process multiple files in a directory using crmprtd.process with
     optional pattern matching
     """
-    # Create log directory if it doesn't exist
-    if opts.log_filename:
-        log_dir = os.path.dirname(opts.log_filename)
-        if log_dir and not os.path.exists(log_dir):
-            os.makedirs(log_dir, exist_ok=True)
+
+    if not opts.log_filename:
+        opts.log_filename = default_log_filename(
+            network_name=opts.network,
+            tag=opts.tag,
+            frequency=opts.frequency,
+            province=opts.province,
+        )
+
+    ensure_directory(opts.log_filename)
 
     # Setup logging first
     setup_logging(
@@ -172,7 +178,6 @@ def main():
     )
     # Processing options
     parser.add_argument(
-        "-f",
         "--force",
         action="store_true",
         help="Continue processing remaining files if one fails",
@@ -194,7 +199,7 @@ def main():
     parser.set_defaults(
         connection_string="dbname=crmprtd user=crmp",
         log_conf=default_log_conf,
-        log_filename="/tmp/crmp/bulk_process.log",
+        log_filename=None,
         log_level="INFO",
         error_email="pcic.devops@uvic.ca",
         force=False,

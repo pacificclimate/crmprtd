@@ -18,18 +18,18 @@ from crmprtd import (
     setup_logging,
     add_bulk_args,
     add_time_range_args,
-    ensure_log_directory,
+    ensure_directory,
     network_alias_names,
     network_aliases,
 )
 from crmprtd.download_cache_process import (
     main as download_cache_process_main,
     describe_network,
-    default_cache_filename,
 )
 
 
 def process(current_time, opts, args):
+
     # Generate cache filename if directory specified
     cache_filename = None
     if opts.directory:
@@ -48,9 +48,7 @@ def process(current_time, opts, args):
         )
 
         # ensure directory exists
-        cache_dir = os.path.dirname(cache_filename)
-        if not os.path.exists(cache_dir):
-            os.makedirs(cache_dir, exist_ok=True)
+        ensure_directory(os.path.dirname(cache_filename))
 
     # Build argument list for download_cache_process main function
     # Start with base arguments from the original args list
@@ -99,9 +97,16 @@ def run(opts, args):
     Main function to run bulk pipeline operations using download_cache_process
     for time ranges with specified frequency
     """
-    # Create log directory if it doesn't exist
-    if opts.log_filename:
-        ensure_log_directory(opts.log_filename)
+
+    if not opts.log_filename:
+        opts.log_filename = default_log_filename(
+            network_name=opts.network,
+            tag=opts.tag,
+            frequency=opts.frequency,
+            province=opts.province if opts.network == "ec" else None,
+        )
+
+    ensure_directory(opts.log_filename)
 
     # Setup logging first
     setup_logging(
@@ -229,7 +234,7 @@ def main():
     # Set defaults
     parser.set_defaults(
         log_conf=default_log_conf,
-        log_filename="/tmp/crmp/bulk_pipeline.log",
+        log_filename=None,
         log_level="INFO",
         error_email="pcic.devops@uvic.ca",
         etime=datetime.now(pytz.timezone("UTC")).strftime("%Y-%m-%d %H:%M:%S"),

@@ -361,14 +361,14 @@ def add_time_range_args(parser):
     )
 
 
-def ensure_log_directory(log_filename):
+def ensure_directory(filename):
     """
     Ensure the log directory exists.
 
     Args:
         log_filename: The path to the log file.
     """
-    if log_filename:
-        log_dir = os.path.dirname(log_filename)
-        if log_dir and not os.path.exists(log_dir):
-            os.makedirs(log_dir, exist_ok=True)
+    if filename:
+        dir_path = os.path.dirname(filename)
+        if dir_path and not os.path.exists(dir_path):
+            os.makedirs(dir_path, exist_ok=True)
