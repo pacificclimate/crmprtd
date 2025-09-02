@@ -146,81 +146,81 @@ ec_provinces = "BC YT".split()
     # This covers all current networks and aliases.
     [
         # Tests of all networks, with default log/cache filenames
-        # (
-        #     "bc_hydro",
-        #     "tag",
-        #     None,
-        #     None,
-        #     None,
-        #     None,
-        #     None,
-        #     [
-        #         [
-        #             r"crmprtd_download -N bc_hydro",
-        #         ],
-        #     ],
-        #     r".*/bc_hydro/cache/tag_bc_hydro_.*\.txt",
-        # ),
-        # *(
-        #     (
-        #         network,
-        #         "tag",
-        #         None,
-        #         None,
-        #         None,
-        #         None,
-        #         "DSN",
-        #         [
-        #             [
-        #                 rf"crmprtd_download -N {network}",
-        #                 rf"tee\s+~/{network}/cache/tag_{network}_.*.txt",
-        #                 rf"crmprtd_process -N {network} -c DSN",
-        #             ],
-        #         ],
-        #         None,
-        #     )
-        #     for network in "crd moti wamr wmb".split()
-        # ),
-        # (
-        #     "ec",
-        #     "tag",
-        #     "daily",
-        #     ec_provinces,
-        #     None,
-        #     None,
-        #     "DSN",
-        #     [
-        #         [
-        #             # Note: All internal province codes are in lowercase.
-        #             rf"crmprtd_download -N ec -p {prov.lower()} -F daily",
-        #             rf"tee\s+~/ec/cache/tag_daily_{prov.lower()}_.*.xml",
-        #             r"crmprtd_process -N ec -c DSN",
-        #         ]
-        #         for prov in ec_provinces
-        #     ],
-        #     None,
-        # ),
-        # *(
-        #     (
-        #         alias,
-        #         "tag",
-        #         None,
-        #         None,
-        #         None,
-        #         None,
-        #         "DSN",
-        #         [
-        #             [
-        #                 rf"crmprtd_download -N {network}",
-        #                 rf"tee\s+~/{network}/cache/tag_{network}_.*.xml",
-        #                 rf"crmprtd_process -N {network} -c DSN",
-        #             ]
-        #             for network in crmprtd.download_cache_process.network_aliases[alias]
-        #         ],
-        #         None,
-        #     )
-        #     for alias in "hourly_swobml2 ytnt".split()
-        # ),
+        (
+            "bc_hydro",
+            "tag",
+            None,
+            None,
+            None,
+            None,
+            None,
+            [
+                [
+                    r"crmprtd_download -N bc_hydro",
+                ],
+            ],
+            r".*/bc_hydro/cache/tag_bc_hydro_.*\.txt",
+        ),
+        *(
+            (
+                network,
+                "tag",
+                None,
+                None,
+                None,
+                None,
+                "DSN",
+                [
+                    [
+                        rf"crmprtd_download -N {network}",
+                        rf"tee\s+~/{network}/cache/tag_{network}_.*.txt",
+                        rf"crmprtd_process -N {network} -c DSN",
+                    ],
+                ],
+                None,
+            )
+            for network in "crd moti wamr wmb".split()
+        ),
+        (
+            "ec",
+            "tag",
+            "daily",
+            ec_provinces,
+            None,
+            None,
+            "DSN",
+            [
+                [
+                    # Note: All internal province codes are in lowercase.
+                    rf"crmprtd_download -N ec -p {prov.lower()} -F daily",
+                    rf"tee\s+~/ec/cache/tag_daily_{prov.lower()}_.*.xml",
+                    r"crmprtd_process -N ec -c DSN",
+                ]
+                for prov in ec_provinces
+            ],
+            None,
+        ),
+        *(
+            (
+                alias,
+                "tag",
+                None,
+                None,
+                None,
+                None,
+                "DSN",
+                [
+                    [
+                        rf"crmprtd_download -N {network}",
+                        rf"tee\s+~/{network}/cache/tag_{network}_.*.xml",
+                        rf"crmprtd_process -N {network} -c DSN",
+                    ]
+                    for network in crmprtd.download_cache_process.network_aliases[alias]
+                ],
+                None,
+            )
+            for alias in "hourly_swobml2 ytnt".split()
+        ),
         # Tests of output filename handling
         *(
             (
