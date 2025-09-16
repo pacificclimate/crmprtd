@@ -55,9 +55,12 @@ import os
 
 from datetime import datetime, timezone
 
+from importlib import import_module
 from importlib.metadata import version
 from importlib.resources import files
 from collections import namedtuple
+
+import dateutil
 
 from crmprtd.argparse_helpers import OneAndDoneAction
 
@@ -295,6 +298,21 @@ def add_province_args(parser):
         required=True,
     )
 
+def add_network_arg(parser):
+    """ Network is fundamental to how we process, so we always require it. """
+    parser.add_argument(
+        "-N",
+        "--network",
+        dest="network_name",
+        choices=NETWORKS + network_alias_names,
+        required=True,
+        help=(
+            "Network identifier (a network name or network alias) from which to "
+            "download observations. A network alias can stand for one or more "
+            "individual networks (e.g., 'ytnt' stands for many networks)."
+        ),
+    )    
+
 
 def add_bulk_args(parser):
     """
@@ -311,15 +329,10 @@ def add_bulk_args(parser):
         ),
     )
     parser.add_argument(
-        "-N",
-        "--network",
-        choices=NETWORKS + network_alias_names,
-        required=True,
-        help=(
-            "Network identifier (a network name or network alias) from which to "
-            "download observations. A network alias can stand for one or more "
-            "individual networks (e.g., 'ytnt' stands for many networks)."
-        ),
+        "--force",
+        dest="force",
+        action="store_true",
+        help="Continue processing if individual operations fail",
     )
 
 
@@ -335,6 +348,7 @@ def add_time_range_args(parser):
         "-S",
         "--start_date",
         dest="stime",
+        type=dateutil.parser.parse,
         required=True,
         help=(
             "Start time (UTC) of range to process (format: '%%Y-%%m-%%d %%H:%%M:%%S'). "
@@ -345,10 +359,11 @@ def add_time_range_args(parser):
         "-E",
         "--end_date",
         dest="etime",
-        default=datetime.now(timezone.utc),
+        type=dateutil.parser.parse,
         help=(
             "End time (UTC) of range to process (format: '%%Y-%%m-%%d %%H:%%M:%%S'). "
-            "Interpreted with strptime and rounded to the nearest hour. Defaults to the current UTC time."
+            "Interpreted with strptime and rounded to the nearest hour. "
+            "Defaults to start time if not provided."
         ),
     )
     parser.add_argument(
@@ -361,7 +376,7 @@ def add_time_range_args(parser):
     )
 
 
-def ensure_directory(filename):
+def ensure_directory(filename: str):
     """
     Ensure the log directory exists.
 
@@ -372,3 +387,6 @@ def ensure_directory(filename):
         dir_path = os.path.dirname(filename)
         if dir_path and not os.path.exists(dir_path):
             os.makedirs(dir_path, exist_ok=True)
+
+def get_defaults_module(network: str):
+    return import_module(f"crmprtd.networks.{network}.defaults")

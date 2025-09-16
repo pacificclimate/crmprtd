@@ -176,12 +176,6 @@ def main():
         default="*.xml",
         help="File pattern to match in directory (default: *.xml)",
     )
-    # Processing options
-    parser.add_argument(
-        "--force",
-        action="store_true",
-        help="Continue processing remaining files if one fails",
-    )
     parser.add_argument(
         "-M",
         "--move_processed",

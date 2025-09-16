@@ -1,21 +1,35 @@
 import datetime
-import pytz
 from typing import Optional
+from zoneinfo import ZoneInfo
+
+"""Common Default functions for networks. Many do not need bespoke versions, so
+they can be defined here and reused.
+
+The interface for network_defaults should be a module with functions:
+
+- default_log_filename(**args) -> str
+- default_cache_filename(**args) -> str
+- default_time(**args) -> datetime.datetime
+- default_end_time(**args) -> datetime.datetime
+- default_download_args(**args) -> list[str]
+"""
+
+default_timestamp_format = "%Y-%m-%dT%H:%M:%S"
 
 
-def to_utc(d: datetime.datetime, tz_string: str = "Canada/Pacific"):
-    if d.tzinfo is not None and d.tzinfo.utcoffset(d) is not None:
+# TODO: is tz_string a safe assumption to be our locality? shouldn't this really be based on OS locale?
+def to_utc(d: datetime.datetime):
+    if d.tzinfo is None:
         # d is not localized. Make it so.
-        tz = pytz.timezone(tz_string)
-        d = tz.localize(d)
-    return d.astimezone(pytz.utc)
+        d = d.astimezone()
+    return d.astimezone(ZoneInfo("UTC"))
 
 
 def default_cache_filename(
-    time: datetime.datetime = datetime.datetime.now(),
-    timestamp_format: str = "%Y-%m-%dT%H:%M:%S",
-    network_name: Optional[str] = None,
+    network_name: str,
     tag: Optional[str] = None,
+    timestamp: datetime.datetime = datetime.datetime.now(),
+    timestamp_format: str = default_timestamp_format,
     **_,
 ) -> str:
     """Return cache filename (filepath). It depends on several parameters, starting
@@ -29,7 +43,7 @@ def default_cache_filename(
     :param _: Ignored additional kw args.
     :return: Filename.
     """
-    ts = time.strftime(timestamp_format)
+    ts = timestamp.strftime(timestamp_format)
     filepath = f"~/{network_name}/cache"
     tag_prefix = f"{tag}_" if tag is not None else ""
     return f"{filepath}/{tag_prefix}{network_name}_{ts}.txt"
@@ -37,7 +51,7 @@ def default_cache_filename(
 
 def default_swob_cache_filename(
     timestamp: datetime.datetime = datetime.datetime.now(),
-    timestamp_format: str = "%Y-%m-%dT%H:%M:%S",
+    timestamp_format: str = default_timestamp_format,
     network_name: Optional[str] = None,
     tag: Optional[str] = None,
     **_,
@@ -60,7 +74,7 @@ def default_swob_cache_filename(
 
 
 def default_log_filename(
-    network_name: Optional[str] = None,
+    network_name: str,
     tag: Optional[str] = None,
     **_,
 ):
@@ -78,10 +92,14 @@ def default_log_filename(
 
 
 def empty_default_download_args(**_):
+    """Some networks do not require any special download arguments."""
     return []
 
 
 def gen_default_swob_download_args(network_name: str):
+    """SWOB networks follow a similar pattern, we can use a generator function to
+    create a default function for each network."""
+
     def swob_default_download_args(time: Optional[datetime.datetime], **_):
         if time is None:
             raise ValueError(f"Network {network_name} requires a time parameter")
@@ -89,3 +107,13 @@ def gen_default_swob_download_args(network_name: str):
         return ["-d", f'"{ts}"']
 
     return swob_default_download_args
+
+def default_time(**_):
+    return datetime.datetime.now().astimezone()
+
+def default_end_time(**_):
+    return datetime.datetime.now().astimezone()
+
+def default_swob_time(**_):
+    # SWOB data is always for the previous hour
+    return datetime.datetime.now(ZoneInfo("UTC")) - datetime.timedelta(hours=1)
