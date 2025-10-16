@@ -1,5 +1,6 @@
 # import pycds
 from crmprtd import Row
+import logging
 import os
 import pickle
 import pandas as pd
@@ -11,6 +12,15 @@ from pprint import pprint
 import re
 
 from rapidfuzz import fuzz
+
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 def names_match(a, b, threshold=50):
     """Return True if two names are similar above a threshold."""
@@ -119,6 +129,7 @@ for station_i, csv_file in enumerate(csv_files):
     # if normalize_name(station_name) == normalize_name(station_file_name):
 
     if names_match(station_name, station_file_name):
+        logger.info(f"Processing station: {station_name} with file: {station_file_name}")
         rows, native_id = create_rows_from_dataframe(df_station, df_data, station_i)
         
         # Save as pickle
