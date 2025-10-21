@@ -12,6 +12,7 @@ from pprint import pprint
 import re
 
 from rapidfuzz import fuzz
+from crmprtd import infer
 
 
 # Configure logging
@@ -22,7 +23,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-def names_match(a, b, threshold=50):
+def names_match(a, b, threshold=40):
     """Return True if two names are similar above a threshold."""
     score = fuzz.ratio(normalize_name(a), normalize_name(b))
     return score >= threshold
@@ -36,7 +37,7 @@ def normalize_name(name):
     return name
 
 
-def create_rows_from_dataframe(df_station, df_data, station_i, network_name='FERN'):
+def create_rows_from_dataframe(df_station, df_data, station_i, network_name='FLNRO-FERN'):
     """
     Convert a dataframe of station data into a list of Row objects for multiple variables.
     
@@ -68,7 +69,7 @@ def create_rows_from_dataframe(df_station, df_data, station_i, network_name='FER
     df_data[time_col] = pd.to_datetime(df_data[time_col], errors='coerce')
     variable_columns = [c for c in df_data.columns[1:] if ',' in c]
 
-    print(len(variable_columns))
+    # print(len(variable_columns))
 
     # --- Ensure numeric values ---
     for col in variable_columns:
@@ -153,5 +154,6 @@ file_path = os.path.join(output_folder, file_name)
 with open(file_path, 'rb') as f:
     rows = pickle.load(f)
 
+''
 
 # pprint(rows[:50])

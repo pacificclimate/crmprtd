@@ -4,6 +4,7 @@
     "name": "Python3 & Poetry & Postgres",
     "build": {
         "dockerfile": "Dockerfile",
+        // "postStartCommand": "cd '/Users/tongli1997/OneDrive - University of Victoria/Codes_run_on_local' && bash read_storage.sh",
         "args": {
             // Update 'VARIANT' to pick a Python version: 3, 3.10, 3.9, 3.8, 3.7, 3.6
             // Append -bullseye or -buster to pin to an OS version.
@@ -11,6 +12,7 @@
             "VARIANT": "ubuntu-24.04"
         }
     },
+
     // Configure tool-specific properties.
     "customizations": {
         // Configure properties specific to VS Code.
@@ -63,5 +65,10 @@
         // give a nicer name to the container
         "--name",
         "${localEnv:USER}_crmprtd_devcontainer"
-    ]
+    ],
+
+    "mounts":[
+        "source=/Users/tongli1997/pcic-storage/data/projects/crmp/data/fern/,target=/fern_data,type=bind,consistency=cached"
+]
+
 }

@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python: crmprtd_process",
             "type": "debugpy",
             "module": "crmprtd.process:main",
@@ -14,13 +21,19 @@
             "justMyCode": false,
             "env": {},
             "args": [
-                "-N", "ec",
-                "-c", "postgresql://crmp@dbtest01.pcic.uvic.ca:5432/crmp?passfile=/workspaces/crmprtd/.pgpass",
-                "-L", "logging.yaml",
-                "-l", "infill-cache/manual-infill.log",
-                "-o", "DEBUG",
+                "-N",
+                "ec",
+                "-c",
+                "postgresql://crmp@dbtest01.pcic.uvic.ca:5432/crmp?passfile=/workspaces/crmprtd/.pgpass",
+                "-L",
+                "logging.yaml",
+                "-l",
+                "infill-cache/manual-infill.log",
+                "-o",
+                "DEBUG",
                 "-D",
-                "<", "infill-cache/crmprtd_download_2025-05-12.xml"
+                "<",
+                "infill-cache/crmprtd_download_2025-05-12.xml"
             ]
         },
         {

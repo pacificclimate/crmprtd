@@ -66,3 +66,5 @@ target/
 
 .pgpass
 infill-*/
+rows_output/*.pickle
+.idea
