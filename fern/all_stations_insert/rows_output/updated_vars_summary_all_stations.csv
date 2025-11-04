@@ -1,31 +1,31 @@
 station_name,updated_row,updated_rows_count,updated_vars,num_updated_vars,unchanged_vars,num_unchanged_vars
-Atlin School,109,0,,0,"Gd Temp 25 cm, Gust Speed, Air Temp 2, Solar Radiation, Sfc Temp, Wind Direction, Wind Speed, Air Temp, Gd Temp 50 cm, Gd Temp 75 cm, Rain",11
-BarrenWx,139,99,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Soil Temp, Rain, Temp, Pressure",10,"WC_cal, Water Content",2
-BlackhawkWx,89,89,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-BoulderWx,90,90,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-BowronPit,30,0,,0,"DewPt 2, Temp 2, RH 2",3
-BulkleyWx,90,90,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-CPFWx,90,90,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-Canoe Mountain Stn,89,89,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-Caribou Pass,119,89,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,"DewPt 2, Temp 2, RH 2",3
-ChapmanWx,139,99,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Soil Temp, Rain, Temp, Pressure",10,"WC_cal, Water Content",2
-ChiefLakeWx,119,0,,0,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Water Content, Rain, Temp, WC_cal, Wetness, Pressure",12
-CoalmineWx,30,0,,0,"DewPt 2, Temp 2, RH 2",3
-CrystalWx,71,100,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Wetness, Pressure",10,,0
-Dennis,100,99,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Soil Temp, Rain, Temp, Pressure",10,Water Content,1
-DunsterWx,129,0,,0,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9
-EndakoWx,89,100,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Wetness, Pressure",10,,0
-GeorgeWx,100,100,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Wetness, Pressure",10,,0
-GunnelWx,100,89,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-HourglassWx,89,89,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-Hudson Bay Mtn2,89,89,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-Kluskus,89,89,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-MacJxnWx,119,100,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Wetness, Pressure",10,,0
-MiddleforkWx,119,89,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-NondaWx,69,90,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-PinkWx,89,90,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,Rain raw,1
-SaxtonWx,100,90,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
-Sunbeam,89,79,"RH, Gust Speed, Solar Radiation, Wind Direction, Wind Speed, Rain, Temp, Pressure",8,,0
+Atlin School,109,0,,0,"Wind Direction, Gd Temp 25 cm, Air Temp 2, Gust Speed, Gd Temp 50 cm, Sfc Temp, Rain, Solar Radiation, Air Temp, Gd Temp 75 cm, Wind Speed",11
+BarrenWx,139,99,"DewPt, Wind Direction, Soil Temp, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",10,"WC_cal, Water Content",2
+BlackhawkWx,89,89,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+BoulderWx,90,90,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+BowronPit,30,0,,0,"Temp 2, RH 2, DewPt 2",3
+BulkleyWx,90,90,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+CPFWx,90,90,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+Canoe Mountain Stn,89,89,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+Caribou Pass,119,89,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,"Temp 2, RH 2, DewPt 2",3
+ChapmanWx,139,99,"DewPt, Wind Direction, Soil Temp, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",10,"WC_cal, Water Content",2
+ChiefLakeWx,119,0,,0,"DewPt, Wind Direction, Pressure, Gust Speed, WC_cal, Wetness, Temp, RH, Water Content, Rain, Solar Radiation, Wind Speed",12
+CoalmineWx,30,0,,0,"Temp 2, RH 2, DewPt 2",3
+CrystalWx,71,100,"DewPt, Wind Direction, Pressure, Gust Speed, Wetness, Temp, RH, Rain, Solar Radiation, Wind Speed",10,,0
+Dennis,100,99,"DewPt, Wind Direction, Soil Temp, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",10,Water Content,1
+DunsterWx,129,0,,0,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9
+EndakoWx,89,100,"DewPt, Wind Direction, Pressure, Gust Speed, Wetness, Temp, RH, Rain, Solar Radiation, Wind Speed",10,,0
+GeorgeWx,100,100,"DewPt, Wind Direction, Pressure, Gust Speed, Wetness, Temp, RH, Rain, Solar Radiation, Wind Speed",10,,0
+GunnelWx,100,89,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+HourglassWx,89,89,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+Hudson Bay Mtn2,89,89,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+Kluskus,89,89,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+MacJxnWx,119,100,"DewPt, Wind Direction, Pressure, Gust Speed, Wetness, Temp, RH, Rain, Solar Radiation, Wind Speed",10,,0
+MiddleforkWx,119,89,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+NondaWx,69,90,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+PinkWx,89,90,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,Rain raw,1
+SaxtonWx,100,90,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
+Sunbeam,89,79,"Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",8,,0
 Tamarac,90,0,,0,"WC_cal, Water Content, Soil Temp",3
-ThompsonWx,100,100,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Wetness, Pressure",10,,0
-Willow-BowronWx,90,90,"RH, Gust Speed, Solar Radiation, DewPt, Wind Direction, Wind Speed, Rain, Temp, Pressure",9,,0
+ThompsonWx,100,100,"DewPt, Wind Direction, Pressure, Gust Speed, Wetness, Temp, RH, Rain, Solar Radiation, Wind Speed",10,,0
+Willow-BowronWx,90,90,"DewPt, Wind Direction, Pressure, Gust Speed, Temp, RH, Rain, Solar Radiation, Wind Speed",9,,0
