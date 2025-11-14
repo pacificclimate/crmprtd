@@ -1,0 +1,340 @@
+station_name,matched_name,lat,lon,net_var_name,unit,earliest_time,latest_time
+BarrenWx,BarrenWx,54.51044,-126.6143,DewPtC,celsius,2021-07-09 12:00:00,2024-10-03 11:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,GustSpeedms,m s-1,2021-07-09 12:00:00,2024-10-03 11:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,Pressurembar,millibar,2021-07-09 12:00:00,2024-10-03 11:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,Rainmm,mm,2021-07-09 13:00:00,2024-10-03 11:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,RH,%,2021-07-09 12:00:00,2024-10-03 11:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,Soil_Temp,celsius,2021-07-09 12:00:00,2024-10-03 11:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,SolarRadiationWm,W m-2,2021-07-09 12:00:00,2024-10-03 11:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,TempC,celsius,2021-07-09 12:00:00,2024-10-03 11:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,Water_Content_m3_m3_15_cm,m3/m3,2021-07-09 12:00:00,2023-09-18 12:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,Water_Content_m3_m3_30_cm,m3/m3,2021-07-09 12:00:00,2023-09-18 12:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,Water_Content_m3_m3_5_cm,m3/m3,2021-07-09 12:00:00,2023-09-18 12:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,WindDirection,degree,2021-07-09 12:00:00,2024-10-03 11:00:00
+BarrenWx,BarrenWx,54.51044,-126.6143,WindSpeedms,m s-1,2021-07-09 12:00:00,2024-10-03 11:00:00
+BlackhawkWx,Blackhawk,55.0789,-120.352,DewPtC,celsius,2012-05-24 13:00:00,2025-01-07 10:00:00
+BlackhawkWx,Blackhawk,55.0789,-120.352,GustSpeedms,m s-1,2012-05-24 13:00:00,2025-01-07 10:00:00
+BlackhawkWx,Blackhawk,55.0789,-120.352,Pressurembar,millibar,2012-05-24 13:00:00,2025-01-07 10:00:00
+BlackhawkWx,Blackhawk,55.0789,-120.352,Rainmm,mm,2012-05-24 14:00:00,2025-01-07 10:00:00
+BlackhawkWx,Blackhawk,55.0789,-120.352,RH,%,2012-05-24 13:00:00,2025-01-07 10:00:00
+BlackhawkWx,Blackhawk,55.0789,-120.352,Snow_Depth,cm,2016-10-26 14:00:00,2025-01-07 10:00:00
+BlackhawkWx,Blackhawk,55.0789,-120.352,SolarRadiationWm,W m-2,2012-05-24 13:00:00,2025-01-07 10:00:00
+BlackhawkWx,Blackhawk,55.0789,-120.352,TempC,celsius,2012-05-24 13:00:00,2025-01-07 10:00:00
+BlackhawkWx,Blackhawk,55.0789,-120.352,Water_Content_m3_m3_15_cm,m3/m3,2017-07-27 12:00:00,2024-01-05 08:00:00
+BlackhawkWx,Blackhawk,55.0789,-120.352,WindDirection,degree,2012-05-24 13:00:00,2025-01-07 10:00:00
+BlackhawkWx,Blackhawk,55.0789,-120.352,WindSpeedms,m s-1,2012-05-24 13:00:00,2025-01-07 10:00:00
+BoulderWx,Boulder Creek,55.1082,-127.375,DewPtC,celsius,2010-06-07 13:00:00,2023-09-21 14:00:00
+BoulderWx,Boulder Creek,55.1082,-127.375,GustSpeedms,m s-1,2010-06-07 13:00:00,2023-09-21 14:00:00
+BoulderWx,Boulder Creek,55.1082,-127.375,Pressurembar,millibar,2010-06-07 13:00:00,2023-09-21 14:00:00
+BoulderWx,Boulder Creek,55.1082,-127.375,Rainmm,mm,2010-06-07 13:00:00,2023-09-21 14:00:00
+BoulderWx,Boulder Creek,55.1082,-127.375,RH,%,2010-06-07 13:00:00,2023-09-21 14:00:00
+BoulderWx,Boulder Creek,55.1082,-127.375,SolarRadiationWm,W m-2,2010-06-07 13:00:00,2023-09-21 14:00:00
+BoulderWx,Boulder Creek,55.1082,-127.375,TempC,celsius,2010-06-07 13:00:00,2023-09-21 14:00:00
+BoulderWx,Boulder Creek,55.1082,-127.375,Water_Content_m3_m3_15_cm,m3/m3,2017-05-25 17:00:00,2023-09-21 14:00:00
+BoulderWx,Boulder Creek,55.1082,-127.375,Wetness,%,2011-07-13 11:00:00,2023-09-21 14:00:00
+BoulderWx,Boulder Creek,55.1082,-127.375,WindDirection,degree,2010-06-07 13:00:00,2023-09-21 14:00:00
+BoulderWx,Boulder Creek,55.1082,-127.375,WindSpeedms,m s-1,2010-06-07 13:00:00,2023-09-21 14:00:00
+BowronPit,Bowron Pit,53.902111,-122.015389,DewPtC,celsius,2018-09-13 12:00:00,2025-01-07 11:00:00
+BowronPit,Bowron Pit,53.902111,-122.015389,GustSpeedms,m s-1,2018-09-13 12:00:00,2025-01-07 11:00:00
+BowronPit,Bowron Pit,53.902111,-122.015389,Pressurembar,millibar,2018-09-13 12:00:00,2025-01-07 11:00:00
+BowronPit,Bowron Pit,53.902111,-122.015389,Rainmm,mm,2018-09-13 13:00:00,2025-01-07 11:00:00
+BowronPit,Bowron Pit,53.902111,-122.015389,RH,%,2018-08-29 15:00:00,2025-01-07 11:00:00
+BowronPit,Bowron Pit,53.902111,-122.015389,Snow_Depth,cm,2019-11-01 12:00:00,2025-01-07 11:00:00
+BowronPit,Bowron Pit,53.902111,-122.015389,SolarRadiationWm,W m-2,2018-09-13 12:00:00,2025-01-07 11:00:00
+BowronPit,Bowron Pit,53.902111,-122.015389,TempC,celsius,2018-08-29 15:00:00,2025-01-07 11:00:00
+BowronPit,Bowron Pit,53.902111,-122.015389,Water_Content_m3_m3_15_cm,m3/m3,2018-09-13 12:00:00,2024-01-05 08:00:00
+BowronPit,Bowron Pit,53.902111,-122.015389,WindDirection,degree,2018-09-13 12:00:00,2025-01-07 11:00:00
+BowronPit,Bowron Pit,53.902111,-122.015389,WindSpeedms,m s-1,2018-09-13 12:00:00,2025-01-07 11:00:00
+BulkleyWx,BulkleyWx,53.771956,-122.720939,DewPtC,celsius,2007-07-31 12:00:03,2023-10-17 10:00:00
+BulkleyWx,BulkleyWx,53.771956,-122.720939,GustSpeedms,m s-1,2007-07-31 12:00:03,2023-10-17 10:00:00
+BulkleyWx,BulkleyWx,53.771956,-122.720939,Pressurembar,millibar,2007-07-31 12:00:03,2023-10-17 10:00:00
+BulkleyWx,BulkleyWx,53.771956,-122.720939,Rainmm,mm,2007-07-31 12:00:03,2023-10-17 10:00:00
+BulkleyWx,BulkleyWx,53.771956,-122.720939,RH,%,2007-07-31 12:00:03,2023-10-17 10:00:00
+BulkleyWx,BulkleyWx,53.771956,-122.720939,SolarRadiationWm,W m-2,2007-07-31 12:00:03,2023-10-17 10:00:00
+BulkleyWx,BulkleyWx,53.771956,-122.720939,TempC,celsius,2007-07-31 12:00:03,2023-10-17 10:00:00
+BulkleyWx,BulkleyWx,53.771956,-122.720939,Wetness,%,2007-07-31 12:00:03,2023-10-17 10:00:00
+BulkleyWx,BulkleyWx,53.771956,-122.720939,WindDirection,degree,2007-07-31 12:00:03,2023-10-17 10:00:00
+BulkleyWx,BulkleyWx,53.771956,-122.720939,WindSpeedms,m s-1,2007-07-31 12:00:03,2023-10-17 10:00:00
+CPFWx,CPFWx,53.753756,-122.718803,DewPtC,celsius,2007-08-09 13:00:00,2023-10-17 08:00:00
+CPFWx,CPFWx,53.753756,-122.718803,GustSpeedms,m s-1,2007-08-09 13:00:00,2023-10-17 08:00:00
+CPFWx,CPFWx,53.753756,-122.718803,Pressurembar,millibar,2007-08-09 13:00:00,2023-10-17 08:00:00
+CPFWx,CPFWx,53.753756,-122.718803,Rainmm,mm,2007-08-09 13:00:00,2023-10-17 08:00:00
+CPFWx,CPFWx,53.753756,-122.718803,RH,%,2007-08-09 13:00:00,2023-10-17 08:00:00
+CPFWx,CPFWx,53.753756,-122.718803,SolarRadiationWm,W m-2,2007-08-09 13:00:00,2023-10-17 08:00:00
+CPFWx,CPFWx,53.753756,-122.718803,TempC,celsius,2007-08-09 13:00:00,2023-10-17 08:00:00
+CPFWx,CPFWx,53.753756,-122.718803,Wetness,%,2007-08-09 13:00:00,2023-10-17 08:00:00
+CPFWx,CPFWx,53.753756,-122.718803,WindDirection,degree,2007-08-09 13:00:00,2023-10-17 08:00:00
+CPFWx,CPFWx,53.753756,-122.718803,WindSpeedms,m s-1,2007-08-09 13:00:00,2023-10-17 08:00:00
+Canoe Mountain Stn,Canoe Mountain Stn,52.7098,-119.191,DewPtC,celsius,2012-03-22 11:00:00,2024-01-05 10:00:00
+Canoe Mountain Stn,Canoe Mountain Stn,52.7098,-119.191,GustSpeedms,m s-1,2012-03-22 11:00:00,2024-01-05 10:00:00
+Canoe Mountain Stn,Canoe Mountain Stn,52.7098,-119.191,Pressurembar,millibar,2012-03-22 11:00:00,2024-01-05 10:00:00
+Canoe Mountain Stn,Canoe Mountain Stn,52.7098,-119.191,Rainmm,mm,2012-03-22 12:00:00,2024-01-05 10:00:00
+Canoe Mountain Stn,Canoe Mountain Stn,52.7098,-119.191,RH,%,2012-03-22 11:00:00,2024-01-05 10:00:00
+Canoe Mountain Stn,Canoe Mountain Stn,52.7098,-119.191,SolarRadiationWm,W m-2,2012-03-22 11:00:00,2024-01-05 10:00:00
+Canoe Mountain Stn,Canoe Mountain Stn,52.7098,-119.191,TempC,celsius,2012-03-22 11:00:00,2024-01-05 10:00:00
+Canoe Mountain Stn,Canoe Mountain Stn,52.7098,-119.191,WindDirection,degree,2012-03-22 11:00:00,2024-01-05 10:00:00
+Canoe Mountain Stn,Canoe Mountain Stn,52.7098,-119.191,WindSpeedms,m s-1,2012-03-22 11:00:00,2024-01-05 10:00:00
+Caribou Pass,Caribou Pass,58.35718,-129.54637,DewPtC,celsius,2023-08-04 11:00:00,2023-12-14 06:00:00
+Caribou Pass,Caribou Pass,58.35718,-129.54637,GustSpeedms,m s-1,2023-08-04 11:00:00,2024-01-05 11:00:00
+Caribou Pass,Caribou Pass,58.35718,-129.54637,Pressurembar,millibar,2023-08-04 11:00:00,2024-01-05 11:00:00
+Caribou Pass,Caribou Pass,58.35718,-129.54637,Rainmm,mm,2023-08-04 12:00:00,2024-01-05 11:00:00
+Caribou Pass,Caribou Pass,58.35718,-129.54637,RH,%,2023-08-04 11:00:00,2023-12-14 06:00:00
+Caribou Pass,Caribou Pass,58.35718,-129.54637,SolarRadiationWm,W m-2,2023-08-04 11:00:00,2024-01-05 11:00:00
+Caribou Pass,Caribou Pass,58.35718,-129.54637,TempC,celsius,2023-08-04 11:00:00,2023-12-14 06:00:00
+Caribou Pass,Caribou Pass,58.35718,-129.54637,WindDirection,degree,2023-08-04 11:00:00,2024-01-05 11:00:00
+Caribou Pass,Caribou Pass,58.35718,-129.54637,WindSpeedms,m s-1,2023-08-04 11:00:00,2024-01-05 11:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,DewPtC,celsius,2021-07-08 12:00:00,2024-10-03 14:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,GustSpeedms,m s-1,2021-07-08 12:00:00,2024-10-03 14:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,Pressurembar,millibar,2021-07-08 12:00:00,2024-10-03 14:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,Rainmm,mm,2021-07-08 13:00:00,2024-10-03 14:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,RH,%,2021-07-08 12:00:00,2024-10-03 14:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,Soil_Temp,celsius,2021-07-08 12:00:00,2024-10-03 14:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,SolarRadiationWm,W m-2,2021-07-08 12:00:00,2024-10-03 14:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,TempC,celsius,2021-07-08 12:00:00,2024-10-03 14:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,Water_Content_m3_m3_15_cm,m3/m3,2021-07-08 12:00:00,2022-10-27 08:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,Water_Content_m3_m3_30_cm,m3/m3,2021-07-08 12:00:00,2022-10-27 08:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,Water_Content_m3_m3_5_cm,m3/m3,2021-07-08 12:00:00,2022-10-27 08:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,WindDirection,degree,2021-07-08 12:00:00,2024-10-03 14:00:00
+ChapmanWx,ChapmanWx,54.8839,-126.6235,WindSpeedms,m s-1,2021-07-08 12:00:00,2024-10-03 14:00:00
+ChiefLakeWx,Chief Lake,54.23821,-122.8775,DewPtC,celsius,2019-07-05 13:00:00,2023-09-29 08:00:00
+ChiefLakeWx,Chief Lake,54.23821,-122.8775,GustSpeedms,m s-1,2019-07-05 13:00:00,2023-09-29 08:00:00
+ChiefLakeWx,Chief Lake,54.23821,-122.8775,Pressurembar,millibar,2019-07-05 13:00:00,2023-09-29 08:00:00
+ChiefLakeWx,Chief Lake,54.23821,-122.8775,Rainmm,mm,2019-07-05 14:00:00,2023-09-29 08:00:00
+ChiefLakeWx,Chief Lake,54.23821,-122.8775,RH,%,2019-07-05 13:00:00,2023-09-29 08:00:00
+ChiefLakeWx,Chief Lake,54.23821,-122.8775,SolarRadiationWm,W m-2,2019-07-05 13:00:00,2023-09-29 08:00:00
+ChiefLakeWx,Chief Lake,54.23821,-122.8775,TempC,celsius,2019-07-05 13:00:00,2023-09-29 08:00:00
+ChiefLakeWx,Chief Lake,54.23821,-122.8775,Water_Content_m3_m3_15_cm,m3/m3,2019-07-05 13:00:00,2023-09-29 08:00:00
+ChiefLakeWx,Chief Lake,54.23821,-122.8775,Wetness,%,2019-07-05 13:00:00,2023-09-29 08:00:00
+ChiefLakeWx,Chief Lake,54.23821,-122.8775,WindDirection,degree,2019-07-05 13:00:00,2023-09-29 08:00:00
+ChiefLakeWx,Chief Lake,54.23821,-122.8775,WindSpeedms,m s-1,2019-07-05 13:00:00,2023-09-29 08:00:00
+CoalmineWx,Coalmine Wx,53.741139,-121.784639,DewPtC,celsius,2018-09-14 14:00:00,2024-09-12 12:00:00
+CoalmineWx,Coalmine Wx,53.741139,-121.784639,GustSpeedms,m s-1,2018-09-14 14:00:00,2024-09-12 12:00:00
+CoalmineWx,Coalmine Wx,53.741139,-121.784639,Pressurembar,millibar,2018-09-14 14:00:00,2024-09-12 12:00:00
+CoalmineWx,Coalmine Wx,53.741139,-121.784639,Rainmm,mm,2018-09-14 15:00:00,2024-09-12 12:00:00
+CoalmineWx,Coalmine Wx,53.741139,-121.784639,RH,%,2018-08-29 14:00:00,2024-09-12 12:00:00
+CoalmineWx,Coalmine Wx,53.741139,-121.784639,SolarRadiationWm,W m-2,2018-09-14 14:00:00,2024-09-12 12:00:00
+CoalmineWx,Coalmine Wx,53.741139,-121.784639,TempC,celsius,2018-08-29 14:00:00,2024-09-12 12:00:00
+CoalmineWx,Coalmine Wx,53.741139,-121.784639,Water_Content_m3_m3_15_cm,m3/m3,2019-06-26 10:00:00,2023-09-26 09:00:00
+CoalmineWx,Coalmine Wx,53.741139,-121.784639,WindDirection,degree,2018-09-14 14:00:00,2024-09-12 12:00:00
+CoalmineWx,Coalmine Wx,53.741139,-121.784639,WindSpeedms,m s-1,2018-09-14 14:00:00,2024-09-12 12:00:00
+CrystalWx,Crystal Lake,54.4235,-122.628,DewPtC,celsius,2010-04-29 13:00:00,2023-10-11 11:00:00
+CrystalWx,Crystal Lake,54.4235,-122.628,GustSpeedms,m s-1,2010-04-29 13:00:00,2023-10-11 11:00:00
+CrystalWx,Crystal Lake,54.4235,-122.628,Pressurembar,millibar,2010-04-29 13:00:00,2023-10-11 11:00:00
+CrystalWx,Crystal Lake,54.4235,-122.628,Rainmm,mm,2010-04-29 13:00:00,2023-10-11 11:00:00
+CrystalWx,Crystal Lake,54.4235,-122.628,RH,%,2010-04-29 13:00:00,2023-10-11 11:00:00
+CrystalWx,Crystal Lake,54.4235,-122.628,SolarRadiationWm,W m-2,2010-04-29 13:00:00,2023-10-11 11:00:00
+CrystalWx,Crystal Lake,54.4235,-122.628,TempC,celsius,2010-04-29 13:00:00,2023-10-11 11:00:00
+CrystalWx,Crystal Lake,54.4235,-122.628,Water_Content_m3_m3_15_cm,m3/m3,2017-09-14 11:00:00,2023-10-11 11:00:00
+CrystalWx,Crystal Lake,54.4235,-122.628,Wetness,%,2010-04-29 13:00:00,2023-10-11 11:00:00
+CrystalWx,Crystal Lake,54.4235,-122.628,WindDirection,degree,2010-04-29 13:00:00,2023-10-11 11:00:00
+CrystalWx,Crystal Lake,54.4235,-122.628,WindSpeedms,m s-1,2010-04-29 13:00:00,2023-10-11 11:00:00
+Dennis,Dennis,,,DewPtC,celsius,2021-07-07 17:00:00,2023-09-19 13:00:00
+Dennis,Dennis,,,GustSpeedms,m s-1,2021-07-07 17:00:00,2023-09-19 13:00:00
+Dennis,Dennis,,,Pressurembar,millibar,2021-07-07 17:00:00,2023-09-19 13:00:00
+Dennis,Dennis,,,Rainmm,mm,2021-07-07 18:00:00,2023-09-19 13:00:00
+Dennis,Dennis,,,RH,%,2021-07-07 17:00:00,2023-09-19 13:00:00
+Dennis,Dennis,,,Soil_Temp,celsius,2021-07-07 17:00:00,2023-09-19 13:00:00
+Dennis,Dennis,,,SolarRadiationWm,W m-2,2021-07-07 17:00:00,2023-09-19 13:00:00
+Dennis,Dennis,,,TempC,celsius,2021-07-07 17:00:00,2023-09-19 13:00:00
+Dennis,Dennis,,,Water_Content_m3_m3_15_cm,m3/m3,2021-07-07 17:00:00,2023-09-19 13:00:00
+Dennis,Dennis,,,Water_Content_m3_m3_30_cm,m3/m3,2021-07-07 17:00:00,2023-09-19 13:00:00
+Dennis,Dennis,,,Water_Content_m3_m3_5_cm,m3/m3,2021-07-07 17:00:00,2023-02-28 00:00:00
+Dennis,Dennis,,,WindDirection,degree,2021-07-07 17:00:00,2023-09-19 13:00:00
+Dennis,Dennis,,,WindSpeedms,m s-1,2021-07-07 17:00:00,2023-09-19 13:00:00
+DunsterWx,Dunster,53.1149,-119.835,DewPtC,celsius,2013-09-05 14:00:00,2025-01-07 14:00:00
+DunsterWx,Dunster,53.1149,-119.835,GustSpeedms,m s-1,2013-09-05 14:00:00,2025-01-07 14:00:00
+DunsterWx,Dunster,53.133333,-119.85,MAX_TEMP,celsius,1975-05-02 00:00:00,1995-04-30 00:00:00
+DunsterWx,Dunster,53.133333,-119.85,MIN_TEMP,celsius,1975-05-03 00:00:00,1995-04-30 00:00:00
+DunsterWx,Dunster,53.166667,-119.833333,ONE_DAY_PRECIPITATION,mm,1994-08-10 00:00:00,1997-08-31 00:00:00
+DunsterWx,Dunster,53.133333,-119.85,ONE_DAY_PRECIPITATION,mm,1974-05-05 00:00:00,1995-04-30 00:00:00
+DunsterWx,Dunster,53.166667,-119.833333,ONE_DAY_RAIN,mm,1994-08-10 00:00:00,1997-08-31 00:00:00
+DunsterWx,Dunster,53.133333,-119.85,ONE_DAY_RAIN,mm,1974-05-05 00:00:00,1995-04-30 00:00:00
+DunsterWx,Dunster,53.166667,-119.833333,ONE_DAY_SNOW,cm,1994-08-01 00:00:00,1997-08-31 00:00:00
+DunsterWx,Dunster,53.133333,-119.85,ONE_DAY_SNOW,cm,1974-05-05 00:00:00,1995-04-30 00:00:00
+DunsterWx,Dunster,53.166667,-119.833333,Precip_Climatology,mm,2000-01-31 23:59:59,2000-12-31 23:59:59
+DunsterWx,Dunster,53.133333,-119.85,Precip_Climatology,mm,2000-01-31 23:59:59,2000-12-31 23:59:59
+DunsterWx,Dunster,53.1149,-119.835,Pressurembar,millibar,2013-09-05 14:00:00,2025-01-07 14:00:00
+DunsterWx,Dunster,53.1149,-119.835,Rainmm,mm,2013-09-05 14:00:00,2025-01-07 14:00:00
+DunsterWx,Dunster,53.1149,-119.835,RH,%,2013-09-05 14:00:00,2025-01-07 14:00:00
+DunsterWx,Dunster,53.1149,-119.835,Snow_Depth,cm,2023-07-14 11:00:00,2025-01-07 14:00:00
+DunsterWx,Dunster,53.133333,-119.85,SNOW_ON_THE_GROUND,cm,1980-08-01 00:00:00,1995-04-30 00:00:00
+DunsterWx,Dunster,53.166667,-119.833333,SNOW_ON_THE_GROUND,cm,1994-08-01 00:00:00,1997-08-31 00:00:00
+DunsterWx,Dunster,53.1149,-119.835,SolarRadiationWm,W m-2,2013-09-05 14:00:00,2025-01-07 14:00:00
+DunsterWx,Dunster,53.1149,-119.835,TempC,celsius,2013-09-05 14:00:00,2025-01-07 14:00:00
+DunsterWx,Dunster,53.133333,-119.85,T_mean_Climatology,celsius,2000-01-31 23:59:59,2000-12-31 23:59:59
+DunsterWx,Dunster,53.133333,-119.85,Tn_Climatology,celsius,2000-01-31 23:59:59,2000-12-31 23:59:59
+DunsterWx,Dunster,53.133333,-119.85,Tx_Climatology,celsius,2000-01-31 23:59:59,2000-12-31 23:59:59
+DunsterWx,Dunster,53.1149,-119.835,Water_Content_m3_m3_15_cm,m3/m3,2016-07-27 07:00:00,2024-01-05 12:00:00
+DunsterWx,Dunster,53.1149,-119.835,WindDirection,degree,2013-09-05 14:00:00,2025-01-07 14:00:00
+DunsterWx,Dunster,53.1149,-119.835,WindSpeedms,m s-1,2013-09-05 14:00:00,2025-01-07 14:00:00
+EndakoWx,EndakoWx,54.422278,-125.991497,DewPtC,celsius,2007-09-13 12:00:00,2023-09-15 11:00:00
+EndakoWx,EndakoWx,54.422278,-125.991497,GustSpeedms,m s-1,2007-09-13 12:00:00,2023-09-15 11:00:00
+EndakoWx,EndakoWx,54.422278,-125.991497,Pressurembar,millibar,2007-09-13 12:00:00,2023-09-15 11:00:00
+EndakoWx,EndakoWx,54.422278,-125.991497,Rainmm,mm,2007-09-13 12:00:00,2023-09-15 11:00:00
+EndakoWx,EndakoWx,54.422278,-125.991497,RH,%,2007-09-13 12:00:00,2023-09-15 11:00:00
+EndakoWx,EndakoWx,54.422278,-125.991497,SolarRadiationWm,W m-2,2007-09-13 12:00:00,2023-09-15 11:00:00
+EndakoWx,EndakoWx,54.422278,-125.991497,TempC,celsius,2007-09-13 12:00:00,2023-09-15 11:00:00
+EndakoWx,EndakoWx,54.422278,-125.991497,Water_Content_m3_m3_15_cm,m3/m3,2017-05-26 10:00:00,2022-08-13 07:00:00
+EndakoWx,EndakoWx,54.422278,-125.991497,Wetness,%,2007-09-13 12:00:00,2023-09-15 11:00:00
+EndakoWx,EndakoWx,54.422278,-125.991497,WindDirection,degree,2007-09-13 12:00:00,2023-09-15 11:00:00
+EndakoWx,EndakoWx,54.422278,-125.991497,WindSpeedms,m s-1,2007-09-13 12:00:00,2023-09-15 11:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,DewPtC,celsius,2007-09-14 11:00:00,2023-10-30 11:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,GustSpeedms,m s-1,2007-09-14 11:00:00,2023-10-30 11:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,Pressurembar,millibar,2007-09-14 11:00:00,2023-10-30 11:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,Rainmm,mm,2007-09-14 11:00:00,2023-10-30 10:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,RH,%,2007-09-14 11:00:00,2023-10-30 11:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,Soil_Temp,celsius,2023-08-22 12:00:00,2023-10-30 11:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,SolarRadiationWm,W m-2,2007-09-14 11:00:00,2023-10-30 11:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,TempC,celsius,2007-09-14 11:00:00,2023-10-30 11:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,Water_Content_m3_m3_15_cm,m3/m3,2016-09-28 14:00:00,2022-08-17 13:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,Wetness,%,2007-09-14 11:00:00,2023-10-30 11:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,WindDirection,degree,2007-09-14 11:00:00,2023-10-30 11:00:00
+GeorgeWx,GeorgeWx,53.963903,-124.663289,WindSpeedms,m s-1,2007-09-14 11:00:00,2023-10-30 11:00:00
+GunnelWx,GunnelWx,58.75475,-123.977683,DewPtC,celsius,2008-09-04 15:00:00,2015-08-06 10:00:00
+GunnelWx,GunnelWx,58.75475,-123.977683,GustSpeedms,m s-1,2008-09-04 15:00:00,2015-08-06 10:00:00
+GunnelWx,GunnelWx,58.75475,-123.977683,Pressurembar,millibar,2008-09-04 15:00:00,2015-08-06 10:00:00
+GunnelWx,GunnelWx,58.75475,-123.977683,Rainmm,mm,2008-09-04 15:00:00,2015-08-06 10:00:00
+GunnelWx,GunnelWx,58.75475,-123.977683,RH,%,2008-09-04 15:00:00,2015-08-06 10:00:00
+GunnelWx,GunnelWx,58.75475,-123.977683,SolarRadiationWm,W m-2,2008-09-04 15:00:00,2009-08-26 07:00:00
+GunnelWx,GunnelWx,58.75475,-123.977683,TempC,celsius,2008-09-04 15:00:00,2015-08-06 10:00:00
+GunnelWx,GunnelWx,58.75475,-123.977683,Tn,celsius,2014-07-15 12:00:00,2015-08-06 10:00:00
+GunnelWx,GunnelWx,58.75475,-123.977683,Tx,celsius,2014-07-15 12:00:00,2015-08-06 10:00:00
+GunnelWx,GunnelWx,58.75475,-123.977683,WindDirection,degree,2008-09-04 15:00:00,2015-08-06 10:00:00
+GunnelWx,GunnelWx,58.75475,-123.977683,WindSpeedms,m s-1,2008-09-04 15:00:00,2015-08-06 10:00:00
+HourglassWx,Hourglass,55.3575,-120.85,ACCPPT1,mm,1976-08-04 00:00:00,1980-08-19 00:00:00
+HourglassWx,Hourglass,55.3575,-120.85,ACCPPT2,mm,1976-08-04 00:00:00,1977-09-21 00:00:00
+HourglassWx,Hourglass,55.2127,-120.772,DewPtC,celsius,2012-05-23 17:00:00,2024-01-05 16:00:00
+HourglassWx,Hourglass,55.2127,-120.772,GustSpeedms,m s-1,2012-05-23 17:00:00,2024-01-05 16:00:00
+HourglassWx,Hourglass,55.2127,-120.772,Pressurembar,millibar,2012-05-23 17:00:00,2024-01-05 16:00:00
+HourglassWx,Hourglass,55.2127,-120.772,Rainmm,mm,2012-05-23 18:00:00,2024-01-05 16:00:00
+HourglassWx,Hourglass,55.2127,-120.772,RH,%,2012-05-23 17:00:00,2024-01-05 16:00:00
+HourglassWx,Hourglass,55.2127,-120.772,Snow_Depth,cm,2016-10-27 12:00:00,2024-01-05 16:00:00
+HourglassWx,Hourglass,55.3575,-120.85,SNOWDEPTH,cm,1976-12-08 00:00:00,1980-09-16 00:00:00
+HourglassWx,Hourglass,55.2127,-120.772,SolarRadiationWm,W m-2,2012-05-23 17:00:00,2024-01-05 16:00:00
+HourglassWx,Hourglass,55.2127,-120.772,TempC,celsius,2012-05-23 17:00:00,2024-01-05 16:00:00
+HourglassWx,Hourglass,55.2127,-120.772,Water_Content_m3_m3_15_cm,m3/m3,2019-07-16 16:00:00,2024-01-05 16:00:00
+HourglassWx,Hourglass,55.2127,-120.772,WindDirection,degree,2012-05-23 17:00:00,2024-01-05 16:00:00
+HourglassWx,Hourglass,55.2127,-120.772,WindSpeedms,m s-1,2012-05-23 17:00:00,2024-01-05 16:00:00
+Hudson Bay Mtn2,Hudson Bay Mtn2,54.7734,-127.2424,DewPtC,celsius,2017-08-25 13:00:00,2025-01-09 06:00:00
+Hudson Bay Mtn2,Hudson Bay Mtn2,54.7734,-127.2424,GustSpeedms,m s-1,2017-08-25 13:00:00,2025-01-09 06:00:00
+Hudson Bay Mtn2,Hudson Bay Mtn2,54.7734,-127.2424,Pressurembar,millibar,2017-08-25 13:00:00,2025-01-09 06:00:00
+Hudson Bay Mtn2,Hudson Bay Mtn2,54.7734,-127.2424,Rainmm,mm,2017-08-25 14:00:00,2025-01-09 06:00:00
+Hudson Bay Mtn2,Hudson Bay Mtn2,54.7734,-127.2424,RH,%,2017-08-25 13:00:00,2025-01-09 06:00:00
+Hudson Bay Mtn2,Hudson Bay Mtn2,54.7734,-127.2424,SolarRadiationWm,W m-2,2017-08-25 13:00:00,2025-01-09 06:00:00
+Hudson Bay Mtn2,Hudson Bay Mtn2,54.7734,-127.2424,TempC,celsius,2017-08-25 13:00:00,2025-01-09 06:00:00
+Hudson Bay Mtn2,Hudson Bay Mtn2,54.7734,-127.2424,WindDirection,degree,2017-08-25 13:00:00,2025-01-09 06:00:00
+Hudson Bay Mtn2,Hudson Bay Mtn2,54.7734,-127.2424,WindSpeedms,m s-1,2017-08-25 13:00:00,2025-01-09 06:00:00
+Kluskus,Kluskus,53.3831,-124.5121,air_temp,celsius,2020-01-23 19:00:00,2025-10-23 19:00:00
+Kluskus,Kluskus,53.3831,-124.5121,avg_wnd_dir_10m_pst10mts,degrees,2020-01-23 19:00:00,2025-10-23 19:00:00
+Kluskus,Kluskus,53.3831,-124.5121,avg_wnd_spd_10m_pst10mts,km/h,2020-01-23 19:00:00,2025-10-23 19:00:00
+Kluskus,Kluskus,53.3979,-124.513,DewPtC,celsius,2010-07-15 17:00:00,2023-10-12 10:00:00
+Kluskus,Kluskus,53.3831,-124.5121,dwpt_temp,celsius,2020-01-23 19:00:00,2025-10-23 19:00:00
+Kluskus,Kluskus,53.3979,-124.513,GustSpeedms,m s-1,2010-07-15 17:00:00,2023-10-12 10:00:00
+Kluskus,Kluskus,53.3831,-124.5121,Precip_Climatology,mm,2000-03-31 23:59:59,2000-11-30 23:59:59
+Kluskus,Kluskus,53.3831,-124.5121,precipitation,mm,1991-08-04 17:00:00,2025-10-23 00:00:00
+Kluskus,Kluskus,53.3979,-124.513,Pressurembar,millibar,2010-07-15 17:00:00,2023-10-12 10:00:00
+Kluskus,Kluskus,53.3979,-124.513,Rainmm,mm,2010-07-15 18:00:00,2023-10-12 10:00:00
+Kluskus,Kluskus,53.3831,-124.5121,relative_humidity,%,1991-08-04 17:00:00,2025-10-23 00:00:00
+Kluskus,Kluskus,53.3831,-124.5121,rel_hum,%,2020-01-23 19:00:00,2025-10-23 19:00:00
+Kluskus,Kluskus,53.3979,-124.513,RH,%,2010-07-15 17:00:00,2023-10-12 10:00:00
+Kluskus,Kluskus,53.3831,-124.5121,rnfl_amt_pst1hr,mm,2020-01-23 19:00:00,2025-10-23 19:00:00
+Kluskus,Kluskus,53.3831,-124.5121,rnfl_amt_pst24hrs,mm,2020-01-23 19:00:00,2025-10-23 19:00:00
+Kluskus,Kluskus,53.3979,-124.513,SolarRadiationWm,W m-2,2010-07-15 17:00:00,2023-10-12 10:00:00
+Kluskus,Kluskus,53.3979,-124.513,TempC,celsius,2010-07-15 17:00:00,2023-10-12 10:00:00
+Kluskus,Kluskus,53.3831,-124.5121,temperature,celsius,1991-08-04 17:00:00,2025-10-23 00:00:00
+Kluskus,Kluskus,53.3979,-124.513,Water_Content_m3_m3_15_cm,m3/m3,2016-07-13 13:00:00,2023-10-12 10:00:00
+Kluskus,Kluskus,53.3831,-124.5121,wind_direction,degree,1991-08-04 17:00:00,2025-10-23 00:00:00
+Kluskus,Kluskus,53.3979,-124.513,WindDirection,degree,2010-07-15 17:00:00,2023-10-12 10:00:00
+Kluskus,Kluskus,53.3831,-124.5121,wind_speed,km/h,1991-08-04 17:00:00,2025-10-23 00:00:00
+Kluskus,Kluskus,53.3979,-124.513,WindSpeedms,m s-1,2010-07-15 17:00:00,2023-10-12 10:00:00
+MacJxnWx,Mackenzie Jxn,55.1379,-122.977,DewPtC,celsius,2010-04-28 14:00:00,2023-10-11 09:00:00
+MacJxnWx,Mackenzie Jxn,55.1379,-122.977,GustSpeedms,m s-1,2010-04-28 14:00:00,2023-10-11 09:00:00
+MacJxnWx,Mackenzie Jxn,55.1379,-122.977,Pressurembar,millibar,2010-04-28 14:00:00,2023-10-11 09:00:00
+MacJxnWx,Mackenzie Jxn,55.1379,-122.977,Rainmm,mm,2010-04-28 14:00:00,2023-10-11 09:00:00
+MacJxnWx,Mackenzie Jxn,55.1379,-122.977,RH,%,2010-04-28 14:00:00,2023-10-11 09:00:00
+MacJxnWx,Mackenzie Jxn,55.1379,-122.977,SolarRadiationWm,W m-2,2010-04-28 14:00:00,2023-10-11 09:00:00
+MacJxnWx,Mackenzie Jxn,55.1379,-122.977,TempC,celsius,2010-04-28 14:00:00,2023-10-11 09:00:00
+MacJxnWx,Mackenzie Jxn,55.1379,-122.977,Water_Content_m3_m3_15_cm,m3/m3,2017-06-22 11:00:00,2023-10-11 09:00:00
+MacJxnWx,Mackenzie Jxn,55.1379,-122.977,Wetness,%,2010-04-28 14:00:00,2023-10-11 09:00:00
+MacJxnWx,Mackenzie Jxn,55.1379,-122.977,WindDirection,degree,2010-04-28 14:00:00,2023-10-11 09:00:00
+MacJxnWx,Mackenzie Jxn,55.1379,-122.977,WindSpeedms,m s-1,2010-04-28 14:00:00,2023-10-11 09:00:00
+MiddleforkWx,MiddleforkWx,57.550917,-122.7963,DewPtC,celsius,2007-07-11 20:00:00,2023-11-01 12:00:00
+MiddleforkWx,MiddleforkWx,57.550917,-122.7963,GustSpeedms,m s-1,2007-07-11 20:00:00,2023-11-01 12:00:00
+MiddleforkWx,MiddleforkWx,57.550917,-122.7963,Pressurembar,millibar,2007-07-11 20:00:00,2023-11-01 12:00:00
+MiddleforkWx,MiddleforkWx,57.550917,-122.7963,Rainmm,mm,2007-07-11 21:00:00,2023-11-01 12:00:00
+MiddleforkWx,MiddleforkWx,57.550917,-122.7963,RH,%,2007-07-11 20:00:00,2023-11-01 12:00:00
+MiddleforkWx,MiddleforkWx,57.550917,-122.7963,SolarRadiationWm,W m-2,2007-07-11 20:00:00,2023-11-01 12:00:00
+MiddleforkWx,MiddleforkWx,57.550917,-122.7963,TempC,celsius,2007-07-11 20:00:00,2023-11-01 12:00:00
+MiddleforkWx,MiddleforkWx,57.550917,-122.7963,Water_Content_m3_m3_15_cm,m3/m3,2019-08-11 11:00:00,2023-11-01 12:00:00
+MiddleforkWx,MiddleforkWx,57.550917,-122.7963,WindDirection,degree,2007-07-11 20:00:00,2023-11-01 12:00:00
+MiddleforkWx,MiddleforkWx,57.550917,-122.7963,WindSpeedms,m s-1,2007-07-11 20:00:00,2023-11-01 12:00:00
+NondaWx,NondaWx,59.002111,-125.509361,DewPtC,celsius,2007-07-12 16:00:00,2024-01-08 10:00:00
+NondaWx,NondaWx,59.002111,-125.509361,GustSpeedms,m s-1,2007-07-12 16:00:00,2024-01-08 10:00:00
+NondaWx,NondaWx,59.002111,-125.509361,Pressurembar,millibar,2007-07-12 16:00:00,2024-01-08 10:00:00
+NondaWx,NondaWx,59.002111,-125.509361,Rainmm,mm,2007-07-12 16:00:00,2024-01-08 10:00:00
+NondaWx,NondaWx,59.002111,-125.509361,RH,%,2007-07-12 16:00:00,2024-01-08 10:00:00
+NondaWx,NondaWx,59.002111,-125.509361,SolarRadiationWm,W m-2,2007-07-12 16:00:00,2024-01-08 10:00:00
+NondaWx,NondaWx,59.002111,-125.509361,TempC,celsius,2007-07-12 16:00:00,2024-01-08 10:00:00
+NondaWx,NondaWx,59.002111,-125.509361,WindDirection,degree,2007-07-12 16:00:00,2024-01-08 10:00:00
+NondaWx,NondaWx,59.002111,-125.509361,WindSpeedms,m s-1,2007-07-12 16:00:00,2024-01-08 10:00:00
+PinkWx,PinkWx,57.062067,-122.8651,DewPtC,celsius,2008-09-08 16:00:00,2024-01-08 10:00:00
+PinkWx,PinkWx,57.062067,-122.8651,GustSpeedms,m s-1,2008-09-08 16:00:00,2024-01-08 10:00:00
+PinkWx,PinkWx,57.062067,-122.8651,Pressurembar,millibar,2008-09-08 16:00:00,2024-01-08 10:00:00
+PinkWx,PinkWx,57.062067,-122.8651,Rainmm,mm,2008-09-08 16:00:00,2024-01-08 10:00:00
+PinkWx,PinkWx,57.062067,-122.8651,RH,%,2008-09-08 16:00:00,2024-01-08 10:00:00
+PinkWx,PinkWx,57.062067,-122.8651,SolarRadiationWm,W m-2,2008-09-08 16:00:00,2024-01-08 10:00:00
+PinkWx,PinkWx,57.062067,-122.8651,TempC,celsius,2008-09-08 16:00:00,2024-01-08 10:00:00
+PinkWx,PinkWx,57.062067,-122.8651,WindDirection,degree,2008-09-08 16:00:00,2024-01-08 10:00:00
+PinkWx,PinkWx,57.062067,-122.8651,WindSpeedms,m s-1,2008-09-08 16:00:00,2024-01-08 10:00:00
+SaxtonWx,SaxtonWx,54.027527,-123.030078,DewPtC,celsius,2007-07-04 10:00:00,2023-10-05 11:00:00
+SaxtonWx,SaxtonWx,54.027527,-123.030078,GustSpeedms,m s-1,2007-07-04 10:00:00,2023-10-05 11:00:00
+SaxtonWx,SaxtonWx,54.027527,-123.030078,Pressurembar,millibar,2007-07-04 10:00:00,2023-10-05 11:00:00
+SaxtonWx,SaxtonWx,54.027527,-123.030078,Rainmm,mm,2007-07-04 10:00:00,2023-10-05 11:00:00
+SaxtonWx,SaxtonWx,54.027527,-123.030078,RH,%,2007-07-04 10:00:00,2023-10-05 11:00:00
+SaxtonWx,SaxtonWx,54.027527,-123.030078,SolarRadiationWm,W m-2,2007-07-04 10:00:00,2023-10-05 11:00:00
+SaxtonWx,SaxtonWx,54.027527,-123.030078,TempC,celsius,2007-07-04 10:00:00,2023-10-05 11:00:00
+SaxtonWx,SaxtonWx,54.027527,-123.030078,Water_Content_m3_m3_15_cm,m3/m3,2017-06-16 11:00:00,2023-10-05 11:00:00
+SaxtonWx,SaxtonWx,54.027527,-123.030078,Water_Content_m3_m3_5_cm,m3/m3,2017-06-16 11:00:00,2023-10-05 11:00:00
+SaxtonWx,SaxtonWx,54.027527,-123.030078,WindDirection,degree,2007-07-04 10:00:00,2023-10-05 11:00:00
+SaxtonWx,SaxtonWx,54.027527,-123.030078,WindSpeedms,m s-1,2007-07-04 10:00:00,2023-10-05 11:00:00
+Sunbeam,Sunbeam,53.33869,-120.12108,DewPtC,celsius,2012-08-17 12:00:00,2024-01-08 12:00:00
+Sunbeam,Sunbeam,53.33869,-120.12108,GustSpeedms,m s-1,2009-09-09 16:00:00,2024-01-08 12:00:00
+Sunbeam,Sunbeam,53.33869,-120.12108,Pressurembar,millibar,2009-09-09 16:00:00,2024-01-08 12:00:00
+Sunbeam,Sunbeam,53.33869,-120.12108,Rainmm,mm,2009-09-09 17:00:00,2024-01-08 12:00:00
+Sunbeam,Sunbeam,53.33869,-120.12108,RH,%,2009-09-09 16:00:00,2024-01-08 12:00:00
+Sunbeam,Sunbeam,53.33869,-120.12108,SolarRadiationWm,W m-2,2009-09-09 16:00:00,2024-01-08 12:00:00
+Sunbeam,Sunbeam,53.33869,-120.12108,TempC,celsius,2009-09-09 16:00:00,2024-01-08 12:00:00
+Sunbeam,Sunbeam,53.33869,-120.12108,WindDirection,degree,2009-09-09 16:00:00,2024-01-08 12:00:00
+Sunbeam,Sunbeam,53.33869,-120.12108,WindSpeedms,m s-1,2009-09-09 16:00:00,2024-01-08 12:00:00
+Tamarac,BednestiWx,53.87133,-123.3704,DewPtC,celsius,2021-07-29 13:00:00,2023-10-04 11:00:00
+Tamarac,BednestiWx,53.87133,-123.3704,GustSpeedms,m s-1,2021-07-29 13:00:00,2023-10-04 12:00:00
+Tamarac,BednestiWx,53.87133,-123.3704,Rainmm,mm,2021-07-29 14:00:00,2023-10-04 11:00:00
+Tamarac,BednestiWx,53.87133,-123.3704,RH,%,2021-07-29 13:00:00,2023-10-04 11:00:00
+Tamarac,BednestiWx,53.87133,-123.3704,Soil_Temp,celsius,2021-07-21 15:00:00,2023-10-04 11:00:00
+Tamarac,BednestiWx,53.87133,-123.3704,TempC,celsius,2021-07-29 13:00:00,2023-10-04 11:00:00
+Tamarac,BednestiWx,53.87133,-123.3704,Water_Content_m3_m3_15_cm,m3/m3,2021-07-21 15:00:00,2023-10-04 12:00:00
+Tamarac,BednestiWx,53.87133,-123.3704,Water_Content_m3_m3_30_cm,m3/m3,2021-07-21 15:00:00,2023-10-04 12:00:00
+Tamarac,BednestiWx,53.87133,-123.3704,Water_Content_m3_m3_5_cm,m3/m3,2021-07-21 15:00:00,2023-10-04 12:00:00
+Tamarac,BednestiWx,53.87133,-123.3704,WindSpeedms,m s-1,2021-07-29 13:00:00,2023-10-04 11:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,DewPtC,celsius,2007-09-12 16:00:00,2023-09-13 11:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,GustSpeedms,m s-1,2007-09-12 16:00:00,2023-09-13 11:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,Pressurembar,millibar,2007-09-12 16:00:00,2023-09-13 11:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,Rainmm,mm,2007-09-12 16:00:00,2023-09-13 11:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,RH,%,2007-09-12 16:00:00,2023-09-13 11:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,Soil_Temp,celsius,2023-06-23 13:00:00,2023-09-13 11:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,SolarRadiationWm,W m-2,2007-09-12 16:00:00,2023-09-13 11:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,TempC,celsius,2007-09-12 16:00:00,2023-09-13 11:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,Water_Content_m3_m3_15_cm,m3/m3,2016-09-29 12:00:00,2022-10-26 10:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,Wetness,%,2007-09-12 16:00:00,2023-09-13 11:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,WindDirection,degree,2007-09-12 16:00:00,2023-09-13 11:00:00
+ThompsonWx,ThompsonWx,54.336006,-126.101008,WindSpeedms,m s-1,2007-09-12 16:00:00,2023-09-13 11:00:00
+Willow-BowronWx,Willow-BowronWx,53.772461,-122.724517,DewPtC,celsius,2007-07-31 15:00:00,2023-10-17 09:00:00
+Willow-BowronWx,Willow-BowronWx,53.772461,-122.724517,GustSpeedms,m s-1,2007-07-31 15:00:00,2023-10-17 09:00:00
+Willow-BowronWx,Willow-BowronWx,53.772461,-122.724517,Pressurembar,millibar,2007-07-31 15:00:00,2023-10-17 09:00:00
+Willow-BowronWx,Willow-BowronWx,53.772461,-122.724517,Rainmm,mm,2007-07-31 15:00:00,2023-10-17 09:00:00
+Willow-BowronWx,Willow-BowronWx,53.772461,-122.724517,RH,%,2007-07-31 15:00:00,2023-10-17 09:00:00
+Willow-BowronWx,Willow-BowronWx,53.772461,-122.724517,SolarRadiationWm,W m-2,2007-07-31 15:00:00,2023-10-17 09:00:00
+Willow-BowronWx,Willow-BowronWx,53.772461,-122.724517,TempC,celsius,2007-07-31 15:00:00,2023-10-17 09:00:00
+Willow-BowronWx,Willow-BowronWx,53.772461,-122.724517,Wetness,%,2008-06-12 13:00:00,2023-10-17 09:00:00
+Willow-BowronWx,Willow-BowronWx,53.772461,-122.724517,WindDirection,degree,2007-07-31 15:00:00,2023-10-17 09:00:00
+Willow-BowronWx,Willow-BowronWx,53.772461,-122.724517,WindSpeedms,m s-1,2007-07-31 15:00:00,2023-10-17 09:00:00

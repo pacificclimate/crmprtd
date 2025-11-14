@@ -1,0 +1,15 @@
+variable,station_name,notes
+Air Temp,Atlin School,
+Air Temp 2,Atlin School,
+DewPt 2,"BowronPit, Caribou Pass, CoalmineWx, Kluskus, NondaWx, PinkWx, SaxtonWx, Sunbeam",Has corresponding variable without '2' in raw data
+Gd Temp 25 cm,Atlin School,
+Gd Temp 50 cm,Atlin School,
+Gd Temp 75 cm,Atlin School,
+RH 2,"BowronPit, Caribou Pass, CoalmineWx, Kluskus, NondaWx, PinkWx, SaxtonWx, Sunbeam",Has corresponding variable without '2' in raw data
+Rain raw,PinkWx,Has 'Rain' in raw data
+Rain2,DunsterWx,Has 'Rain' in raw data
+Sfc Temp,Atlin School,
+Snow depth raw,"BlackhawkWx, BowronPit, DunsterWx, HourglassWx, Sunbeam",Has 'Snow depth' in raw data
+Snow sensor Temp,BowronPit,
+Temp 2,"BowronPit, Caribou Pass, CoalmineWx, Kluskus, NondaWx, PinkWx, SaxtonWx, Sunbeam",Has corresponding variable without '2' in raw data
+WC_cal,"BarrenWx, BlackhawkWx, BoulderWx, BowronPit, ChapmanWx, ChiefLakeWx, CoalmineWx, CrystalWx, Dennis, DunsterWx, EndakoWx, GeorgeWx, HourglassWx, Kluskus, MacJxnWx, MiddleforkWx, SaxtonWx, Tamarac, ThompsonWx",

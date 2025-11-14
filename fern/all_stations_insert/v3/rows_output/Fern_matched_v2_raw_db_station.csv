@@ -1,0 +1,156 @@
+station_name,native_id,station_file_name,lat,lon,elev,variable,unit_raw,earliest_time_raw,latest_time_raw,db_var_match,unit_db,matched_name,earliest_time_db,latest_time_db,earliest_diff_days,latest_diff_days,Has_inserted,score
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,Rain,mm,2010-08-20 19:00:00,2024-08-10 19:00:00,Rainmm,mm,,,,,,Yes,80.0
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,Air Temp,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,,,,,,,,No,61.53846153846154
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,RH,%,2010-08-20 19:00:00,2024-08-10 19:00:00,RH,%,,,,,,Yes,100.0
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,DewPt,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,DewPtC,celsius,,,,,,Yes,90.9090909090909
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,Wind Speed,m/s,2010-08-20 19:00:00,2024-08-10 19:00:00,WindSpeedms,m s-1,,,,,,Yes,85.71428571428572
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,Gust Speed,m/s,2010-08-20 19:00:00,2024-08-10 19:00:00,GustSpeedms,m s-1,,,,,,Yes,85.71428571428572
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,Wind Direction,ø,2010-08-20 19:00:00,2024-08-10 19:00:00,WindDirection,degree,,,,,,Yes,96.2962962962963
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,Solar Radiation,W/m²,2010-08-20 19:00:00,2024-08-10 19:00:00,SolarRadiationWm,W m-2,,,,,,Yes,90.32258064516128
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,Gd Temp 75 cm,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,,,,,,,,No,44.44444444444444
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,Gd Temp 50 cm,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,,,,,,,,No,44.44444444444444
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,Gd Temp 25 cm,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,,,,,,,,No,44.44444444444444
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,Sfc Temp,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,,,,,,,,No,61.53846153846154
+Atlin School,AtlSch,Atlin school,59.574,-133.687,705,Air Temp 2,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,,,,,,,,No,53.333333333333336
+BarrenWx,Barren,Barren,54.510444,-126.614341,1051,Water Content,m³/m³ 15 cm,2021-07-09 12:00:00,2024-10-03 11:00:00,,,,,,,,No,40.0
+BarrenWx,Barren,Barren,54.510444,-126.614341,1051,WC_cal,m³/m³,2021-07-09 12:00:00,2024-10-03 11:00:00,,,,,,,,No,21.052631578947366
+BarrenWx,Barren,Barren,54.510444,-126.614341,1051,Water Content,m³/m³ 5 cm,2021-07-09 12:00:00,2024-10-03 11:00:00,,,,,,,,No,40.0
+BarrenWx,Barren,Barren,54.510444,-126.614341,1051,Water Content,m³/m³ 30 cm,2021-07-09 12:00:00,2024-10-03 11:00:00,,,,,,,,No,40.0
+BlackhawkWx,Blackhawk,Blackhawk,55.078885,-120.352171,962,Snow depth raw,cm,2012-05-24 13:00:00,2025-01-07 10:00:00,,,,,,,,No,66.66666666666667
+BlackhawkWx,Blackhawk,Blackhawk,55.078885,-120.352171,962,Water Content,m?/m? 15 cm,2012-05-24 13:00:00,2025-01-07 10:00:00,,,,,,,,No,40.0
+BlackhawkWx,Blackhawk,Blackhawk,55.078885,-120.352171,962,WC_cal,m?/m?,2012-05-24 13:00:00,2025-01-07 10:00:00,,,,,,,,No,21.052631578947366
+BlackhawkWx,Blackhawk,Blackhawk,55.078885,-120.352171,962,Soil Temp,?C,2012-05-24 13:00:00,2025-01-07 10:00:00,Soil_Temp,celsius,,,,,,No,88.88888888888889
+BoulderWx,Boulder Creek,BoulderCr,55.108173,-127.37474,385,Water Content,m³/m³ 15 cm,2010-06-07 13:00:00,2024-08-07 08:00:00,,,,,,,,No,40.0
+BoulderWx,Boulder Creek,BoulderCr,55.108173,-127.37474,385,WC_cal,m³/m³,2010-06-07 13:00:00,2024-08-07 08:00:00,,,,,,,,No,21.052631578947366
+BoulderWx,Boulder Creek,BoulderCr,55.108173,-127.37474,385,Soil Temp,°C,2010-06-07 13:00:00,2024-08-07 08:00:00,Soil_Temp,celsius,,,,,,No,88.88888888888889
+BowronPit,BowronPit,Bowron Pit,53.902111,-122.015389,722,Snow depth raw,cm,2018-08-29 15:00:00,2025-01-07 11:00:00,,,,,,,,No,66.66666666666667
+BowronPit,BowronPit,Bowron Pit,53.902111,-122.015389,722,Water Content,m³/m³ 15 cm,2018-08-29 15:00:00,2025-01-07 11:00:00,,,,,,,,No,40.0
+BowronPit,BowronPit,Bowron Pit,53.902111,-122.015389,722,WC_cal,m³/m³,2018-08-29 15:00:00,2025-01-07 11:00:00,,,,,,,,No,21.052631578947366
+BowronPit,BowronPit,Bowron Pit,53.902111,-122.015389,722,Soil Temp,°C,2018-08-29 15:00:00,2025-01-07 11:00:00,Soil_Temp,celsius,,,,,,No,88.88888888888889
+BowronPit,BowronPit,Bowron Pit,53.902111,-122.015389,722,Temp 2,°C,2018-08-29 15:00:00,2025-01-07 11:00:00,,,,,,,,No,72.72727272727273
+BowronPit,BowronPit,Bowron Pit,53.902111,-122.015389,722,RH 2,%,2018-08-29 15:00:00,2025-01-07 11:00:00,,,,,,,,No,66.66666666666667
+BowronPit,BowronPit,Bowron Pit,53.902111,-122.015389,722,DewPt 2,°C,2018-08-29 15:00:00,2025-01-07 11:00:00,,,,,,,,No,76.92307692307692
+BowronPit,BowronPit,Bowron Pit,53.902111,-122.015389,722,Snow sensor Temp,°C,2018-08-29 15:00:00,2025-01-07 11:00:00,,,,,,,,No,48.0
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,Temp 2,?C,2023-08-04 11:00:00,2025-01-07 14:00:00,,,,,,,,No,72.72727272727273
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,RH 2,%,2023-08-04 11:00:00,2025-01-07 14:00:00,,,,,,,,No,66.66666666666667
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,DewPt 2,?C,2023-08-04 11:00:00,2025-01-07 14:00:00,,,,,,,,No,76.92307692307692
+ChapmanWx,Chapman,Chapman,54.883903,-126.623533,848,Water Content,m?/m? 15 cm,2021-07-08 12:00:00,2024-10-03 14:00:00,,,,,,,,No,40.0
+ChapmanWx,Chapman,Chapman,54.883903,-126.623533,848,WC_cal,m?/m?,2021-07-08 12:00:00,2024-10-03 14:00:00,,,,,,,,No,21.052631578947366
+ChapmanWx,Chapman,Chapman,54.883903,-126.623533,848,Water Content,m?/m? 5 cm,2021-07-08 12:00:00,2024-10-03 14:00:00,,,,,,,,No,40.0
+ChapmanWx,Chapman,Chapman,54.883903,-126.623533,848,Water Content,m?/m? 30 cm,2021-07-08 12:00:00,2024-10-03 14:00:00,,,,,,,,No,40.0
+ChiefLakeWx,ChiefWx,ChiefLk,54.238028,-122.877306,720,Water Content,m?/m? 15 cm,2019-07-05 13:00:00,2024-10-09 10:00:00,,,,,,,,No,40.0
+ChiefLakeWx,ChiefWx,ChiefLk,54.238028,-122.877306,720,WC_cal,m?/m?,2019-07-05 13:00:00,2024-10-09 10:00:00,,,,,,,,No,21.052631578947366
+ChiefLakeWx,ChiefWx,ChiefLk,54.238028,-122.877306,720,Soil Temp,?C,2019-07-05 13:00:00,2024-10-09 10:00:00,Soil_Temp,celsius,,,,,,No,88.88888888888889
+CoalmineWx,CoalmineWx,Coalmine,53.741139,-121.784639,840,Water Content,m³/m³ 15 cm,2018-08-29 14:00:00,2024-09-12 12:00:00,,,,,,,,No,40.0
+CoalmineWx,CoalmineWx,Coalmine,53.741139,-121.784639,840,WC_cal,m³/m³,2018-08-29 14:00:00,2024-09-12 12:00:00,,,,,,,,No,21.052631578947366
+CoalmineWx,CoalmineWx,Coalmine,53.741139,-121.784639,840,Temp 2,°C,2018-08-29 14:00:00,2024-09-12 12:00:00,,,,,,,,No,72.72727272727273
+CoalmineWx,CoalmineWx,Coalmine,53.741139,-121.784639,840,RH 2,%,2018-08-29 14:00:00,2024-09-12 12:00:00,,,,,,,,No,66.66666666666667
+CoalmineWx,CoalmineWx,Coalmine,53.741139,-121.784639,840,DewPt 2,°C,2018-08-29 14:00:00,2024-09-12 12:00:00,,,,,,,,No,76.92307692307692
+CrookedLk,CrookedLk,Crooked Lake,59.88626,-126.42886,669,Rain,mm,2023-08-08 14:00:00,2024-10-28 10:00:00,Rainmm,mm,,,,,,Yes,80.0
+CrookedLk,CrookedLk,Crooked Lake,59.88626,-126.42886,669,Pressure,mbar,2023-08-08 14:00:00,2024-10-28 10:00:00,Pressurembar,millibar,,,,,,Yes,80.0
+CrookedLk,CrookedLk,Crooked Lake,59.88626,-126.42886,669,Temp,?C,2023-08-08 14:00:00,2024-10-28 10:00:00,TempC,celsius,,,,,,Yes,88.88888888888889
+CrookedLk,CrookedLk,Crooked Lake,59.88626,-126.42886,669,RH,%,2023-08-08 14:00:00,2024-10-28 10:00:00,RH,%,,,,,,Yes,100.0
+CrookedLk,CrookedLk,Crooked Lake,59.88626,-126.42886,669,DewPt,?C,2023-08-08 14:00:00,2024-10-28 10:00:00,DewPtC,celsius,,,,,,Yes,90.9090909090909
+CrookedLk,CrookedLk,Crooked Lake,59.88626,-126.42886,669,Wind Speed,m/s,2023-08-08 14:00:00,2024-10-28 10:00:00,WindSpeedms,m s-1,,,,,,Yes,85.71428571428572
+CrookedLk,CrookedLk,Crooked Lake,59.88626,-126.42886,669,Gust Speed,m/s,2023-08-08 14:00:00,2024-10-28 10:00:00,GustSpeedms,m s-1,,,,,,Yes,85.71428571428572
+CrookedLk,CrookedLk,Crooked Lake,59.88626,-126.42886,669,Wind Direction,°,2023-08-08 14:00:00,2024-10-28 10:00:00,WindDirection,degree,,,,,,Yes,96.2962962962963
+CrookedLk,CrookedLk,Crooked Lake,59.88626,-126.42886,669,Solar Radiation,W/m?,2023-08-08 14:00:00,2024-10-28 10:00:00,SolarRadiationWm,W m-2,,,,,,Yes,90.32258064516128
+CrystalWx,Crystal Lake,CrystalLk,54.423494,-122.627844,744,Water Content,m³/m³ 15 cm,2010-04-29 13:00:00,2024-10-18 13:00:00,,,,,,,,No,40.0
+CrystalWx,Crystal Lake,CrystalLk,54.423494,-122.627844,744,WC_cal,m³/m³,2010-04-29 13:00:00,2024-10-18 13:00:00,,,,,,,,No,21.052631578947366
+CrystalWx,Crystal Lake,CrystalLk,54.423494,-122.627844,744,Soil Temp,°C,2010-04-29 13:00:00,2024-10-18 13:00:00,Soil_Temp,celsius,,,,,,No,88.88888888888889
+Dennis,McDonn,Dennis,54.78217,-127.514341,980,Water Content,m³/m³ 15 cm,2021-07-07 17:00:00,2024-10-04 09:00:00,,,,,,,,No,40.0
+Dennis,McDonn,Dennis,54.78217,-127.514341,980,WC_cal,m³/m³,2021-07-07 17:00:00,2024-10-04 09:00:00,,,,,,,,No,21.052631578947366
+Dennis,McDonn,Dennis,54.78217,-127.514341,980,Water Content,m³/m³ 5 cm,2021-07-07 17:00:00,2024-10-04 09:00:00,,,,,,,,No,40.0
+Dennis,McDonn,Dennis,54.78217,-127.514341,980,Water Content,m³/m³ 30 cm,2021-07-07 17:00:00,2024-10-04 09:00:00,,,,,,,,No,40.0
+DunsterWx,Dunster,Dunster,53.114909,-119.835293,890,Snow depth raw,cm,2013-09-05 14:00:00,2025-01-07 14:00:00,,,,,,,,No,66.66666666666667
+DunsterWx,Dunster,Dunster,53.114909,-119.835293,890,Water Content,m³/m³ 15 cm,2013-09-05 14:00:00,2025-01-07 14:00:00,,,,,,,,No,40.0
+DunsterWx,Dunster,Dunster,53.114909,-119.835293,890,WC_cal,m³/m³,2013-09-05 14:00:00,2025-01-07 14:00:00,,,,,,,,No,21.052631578947366
+DunsterWx,Dunster,Dunster,53.114909,-119.835293,890,Rain2,mm,2013-09-05 14:00:00,2025-01-07 14:00:00,,,,,,,,No,72.72727272727273
+EndakoWx,Endako,Endako,54.422392,-125.991293,851,Water Content,m?/m? 15 cm,2007-09-13 13:00:00,2024-09-24 12:00:00,,,,,,,,No,40.0
+EndakoWx,Endako,Endako,54.422392,-125.991293,851,WC_cal,m?/m?,2007-09-13 13:00:00,2024-09-24 12:00:00,,,,,,,,No,21.052631578947366
+EndakoWx,Endako,Endako,54.422392,-125.991293,851,Soil Temp,?C,2007-09-13 13:00:00,2024-09-24 12:00:00,Soil_Temp,celsius,,,,,,No,88.88888888888889
+GeorgeWx,George,George,53.883555,-124.710668,859,Water Content,m?/m? 15 cm,2007-09-14 12:00:00,2024-09-18 11:00:00,,,,,,,,No,40.0
+GeorgeWx,George,George,53.883555,-124.710668,859,WC_cal,m?/m?,2007-09-14 12:00:00,2024-09-18 11:00:00,,,,,,,,No,21.052631578947366
+HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Snow depth raw,cm,2012-05-23 17:00:00,2025-01-07 15:00:00,,,,,,,,No,66.66666666666667
+HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Water Content,m³/m³ 15 cm,2012-05-23 17:00:00,2025-01-07 15:00:00,,,,,,,,No,40.0
+HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,WC_cal,m³/m³,2012-05-23 17:00:00,2025-01-07 15:00:00,,,,,,,,No,21.052631578947366
+HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Soil Temp,°C,2012-05-23 17:00:00,2025-01-07 15:00:00,Soil_Temp,celsius,,,,,,No,88.88888888888889
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,Rain,mm,2024-07-25 13:00:00,2024-09-16 14:00:00,Rainmm,mm,,,,,,Yes,80.0
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,Pressure,mbar,2024-07-25 13:00:00,2024-09-16 14:00:00,Pressurembar,millibar,,,,,,Yes,80.0
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,Temp,°C,2024-07-25 13:00:00,2024-09-16 14:00:00,TempC,celsius,,,,,,Yes,88.88888888888889
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,RH,%,2024-07-25 13:00:00,2024-09-16 14:00:00,RH,%,,,,,,Yes,100.0
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,DewPt,°C,2024-07-25 13:00:00,2024-09-16 14:00:00,DewPtC,celsius,,,,,,Yes,90.9090909090909
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,Wind Speed,m/s,2024-07-25 13:00:00,2024-09-16 14:00:00,WindSpeedms,m s-1,,,,,,Yes,85.71428571428572
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,Gust Speed,m/s,2024-07-25 13:00:00,2024-09-16 14:00:00,GustSpeedms,m s-1,,,,,,Yes,85.71428571428572
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,Wind Direction,ø,2024-07-25 13:00:00,2024-09-16 14:00:00,WindDirection,degree,,,,,,Yes,96.2962962962963
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,Solar Radiation,W/m²,2024-07-25 13:00:00,2024-09-16 14:00:00,SolarRadiationWm,W m-2,,,,,,Yes,90.32258064516128
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,Wetness,%,2024-07-25 13:00:00,2024-09-16 14:00:00,Wetness,%,,,,,,Yes,100.0
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,Water Content,m³/m³ 15 cm,2024-07-25 13:00:00,2024-09-16 14:00:00,,,,,,,,No,40.0
+IBB2Wx,IBB2,IBB2 Ganokwa Canyon,54.81127,-126.92067,967,Soil Temp,°C,2024-07-25 13:00:00,2024-09-16 14:00:00,Soil_Temp,celsius,,,,,,Yes,88.88888888888889
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,Rain,mm,2023-09-20 14:00:00,2024-09-16 11:00:00,Rainmm,mm,,,,,,Yes,80.0
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,Pressure,mbar,2023-09-20 14:00:00,2024-09-16 11:00:00,Pressurembar,millibar,,,,,,Yes,80.0
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,Temp,°C,2023-09-20 14:00:00,2024-09-16 11:00:00,TempC,celsius,,,,,,Yes,88.88888888888889
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,RH,%,2023-09-20 14:00:00,2024-09-16 11:00:00,RH,%,,,,,,Yes,100.0
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,DewPt,°C,2023-09-20 14:00:00,2024-09-16 11:00:00,DewPtC,celsius,,,,,,Yes,90.9090909090909
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,Wind Speed,m/s,2023-09-20 14:00:00,2024-09-16 11:00:00,WindSpeedms,m s-1,,,,,,Yes,85.71428571428572
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,Gust Speed,m/s,2023-09-20 14:00:00,2024-09-16 11:00:00,GustSpeedms,m s-1,,,,,,Yes,85.71428571428572
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,Wind Direction,ø,2023-09-20 14:00:00,2024-09-16 11:00:00,WindDirection,degree,,,,,,Yes,96.2962962962963
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,Solar Radiation,W/m²,2023-09-20 14:00:00,2024-09-16 11:00:00,SolarRadiationWm,W m-2,,,,,,Yes,90.32258064516128
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,Wetness,%,2023-09-20 14:00:00,2024-09-16 11:00:00,Wetness,%,,,,,,Yes,100.0
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,Water Content,m³/m³ 15 cm,2023-09-20 14:00:00,2024-09-16 11:00:00,,,,,,,,No,40.0
+IBB3Wx,IBB3,IBB3 Pine Creek,54.71172,-127.30577,960,Soil Temp,°C,2023-09-20 14:00:00,2024-09-16 11:00:00,Soil_Temp,celsius,,,,,,Yes,88.88888888888889
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Rain,mm,2023-06-15 16:00:00,2024-08-10 14:00:00,Rainmm,mm,,,,,,Yes,80.0
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Pressure,mbar,2023-06-15 16:00:00,2024-08-10 14:00:00,Pressurembar,millibar,,,,,,Yes,80.0
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Temp,?C,2023-06-15 16:00:00,2024-08-10 14:00:00,TempC,celsius,,,,,,Yes,88.88888888888889
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,RH,%,2023-06-15 16:00:00,2024-08-10 14:00:00,RH,%,,,,,,Yes,100.0
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,DewPt,?C,2023-06-15 16:00:00,2024-08-10 14:00:00,DewPtC,celsius,,,,,,Yes,90.9090909090909
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Wind Speed,m/s,2023-06-15 16:00:00,2024-08-10 14:00:00,WindSpeedms,m s-1,,,,,,Yes,85.71428571428572
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Gust Speed,m/s,2023-06-15 16:00:00,2024-08-10 14:00:00,GustSpeedms,m s-1,,,,,,Yes,85.71428571428572
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Wind Direction,°,2023-06-15 16:00:00,2024-08-10 14:00:00,WindDirection,degree,,,,,,Yes,96.2962962962963
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Solar Radiation,W/m?,2023-06-15 16:00:00,2024-08-10 14:00:00,SolarRadiationWm,W m-2,,,,,,Yes,90.32258064516128
+Kluskus,SBSmc3Wx,Kluskus,53.397852,-124.513069,1110,Water Content,m³/m³ 15 cm,2010-07-15 17:00:00,2024-09-16 11:00:00,,,,,,,,No,40.0
+Kluskus,SBSmc3Wx,Kluskus,53.397852,-124.513069,1110,WC_cal,m³/m³,2010-07-15 17:00:00,2024-09-16 11:00:00,,,,,,,,No,21.052631578947366
+Kluskus,SBSmc3Wx,Kluskus,53.397852,-124.513069,1110,Soil Temp,°C,2010-07-15 17:00:00,2024-09-16 11:00:00,Soil_Temp,celsius,,,,,,No,88.88888888888889
+Kluskus,SBSmc3Wx,Kluskus,53.397852,-124.513069,1110,Temp 2,°C,2010-07-15 17:00:00,2024-09-16 11:00:00,,,,,,,,No,72.72727272727273
+Kluskus,SBSmc3Wx,Kluskus,53.397852,-124.513069,1110,RH 2,%,2010-07-15 17:00:00,2024-09-16 11:00:00,,,,,,,,No,66.66666666666667
+Kluskus,SBSmc3Wx,Kluskus,53.397852,-124.513069,1110,DewPt 2,°C,2010-07-15 17:00:00,2024-09-16 11:00:00,,,,,,,,No,76.92307692307692
+MacJxnWx,Mackenzie Jxn,MacJxn,55.137858,-122.977243,719,Water Content,m³/m³ 15 cm,2010-04-28 14:00:00,2024-08-28 09:00:00,,,,,,,,No,40.0
+MacJxnWx,Mackenzie Jxn,MacJxn,55.137858,-122.977243,719,WC_cal,m³/m³,2010-04-28 14:00:00,2024-08-28 09:00:00,,,,,,,,No,21.052631578947366
+MiddleforkWx,MF1,Middlefork,57.550917,-122.7963,972,Water Content,m³/m³ 15 cm,2007-07-11 20:00:00,2024-08-14 12:00:00,,,,,,,,No,40.0
+MiddleforkWx,MF1,Middlefork,57.550917,-122.7963,972,WC_cal,m³/m³,2007-07-11 20:00:00,2024-08-14 12:00:00,,,,,,,,No,21.052631578947366
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,Temp 2,°C,2007-07-12 16:00:00,2025-01-09 08:00:00,,,,,,,,No,72.72727272727273
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,RH 2,%,2007-07-12 16:00:00,2025-01-09 08:00:00,,,,,,,,No,66.66666666666667
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,DewPt 2,°C,2007-07-12 16:00:00,2025-01-09 08:00:00,,,,,,,,No,76.92307692307692
+PinkWx,Pink1,PinkMtnWx,57.06163,-122.86491,1756,Temp 2,°C,2008-09-08 16:00:00,2025-01-09 08:00:00,,,,,,,,No,72.72727272727273
+PinkWx,Pink1,PinkMtnWx,57.06163,-122.86491,1756,RH 2,%,2008-09-08 16:00:00,2025-01-09 08:00:00,,,,,,,,No,66.66666666666667
+PinkWx,Pink1,PinkMtnWx,57.06163,-122.86491,1756,DewPt 2,°C,2008-09-08 16:00:00,2025-01-09 08:00:00,,,,,,,,No,76.92307692307692
+PinkWx,Pink1,PinkMtnWx,57.06163,-122.86491,1756,Rain raw,mm,2008-09-08 16:00:00,2025-01-09 08:00:00,,,,,,,,No,57.14285714285714
+SaxtonWx,Saxton,SaxtonLakeWx,54.027523,-123.300774,718,Water Content,m?/m? 15 cm,2007-07-04 10:00:00,2024-10-09 08:00:00,,,,,,,,No,40.0
+SaxtonWx,Saxton,SaxtonLakeWx,54.027523,-123.300774,718,WC_cal,m?/m?,2007-07-04 10:00:00,2024-10-09 08:00:00,,,,,,,,No,21.052631578947366
+SaxtonWx,Saxton,SaxtonLakeWx,54.027523,-123.300774,718,Water Content,m?/m? 5 cm,2007-07-04 10:00:00,2024-10-09 08:00:00,,,,,,,,No,40.0
+SaxtonWx,Saxton,SaxtonLakeWx,54.027523,-123.300774,718,Temp 2,?C,2007-07-04 10:00:00,2024-10-09 08:00:00,,,,,,,,No,72.72727272727273
+SaxtonWx,Saxton,SaxtonLakeWx,54.027523,-123.300774,718,RH 2,%,2007-07-04 10:00:00,2024-10-09 08:00:00,,,,,,,,No,66.66666666666667
+SaxtonWx,Saxton,SaxtonLakeWx,54.027523,-123.300774,718,DewPt 2,?C,2007-07-04 10:00:00,2024-10-09 08:00:00,,,,,,,,No,76.92307692307692
+SeebachWx,Seebach,Seebach,54.355,122.058,780,Rain,mm,2023-07-13 12:00:00,2024-09-26 10:11:00,Rainmm,mm,,,,,,Yes,80.0
+SeebachWx,Seebach,Seebach,54.355,122.058,780,Pressure,mbar,2023-07-13 12:00:00,2024-09-26 10:11:00,Pressurembar,millibar,,,,,,Yes,80.0
+SeebachWx,Seebach,Seebach,54.355,122.058,780,Temp,°C,2023-07-13 12:00:00,2024-09-26 10:11:00,TempC,celsius,,,,,,Yes,88.88888888888889
+SeebachWx,Seebach,Seebach,54.355,122.058,780,RH,%,2023-07-13 12:00:00,2024-09-26 10:11:00,RH,%,,,,,,Yes,100.0
+SeebachWx,Seebach,Seebach,54.355,122.058,780,DewPt,°C,2023-07-13 12:00:00,2024-09-26 10:11:00,DewPtC,celsius,,,,,,Yes,90.9090909090909
+SeebachWx,Seebach,Seebach,54.355,122.058,780,Wind Speed,m/s,2023-07-13 12:00:00,2024-09-26 10:11:00,WindSpeedms,m s-1,,,,,,Yes,85.71428571428572
+SeebachWx,Seebach,Seebach,54.355,122.058,780,Gust Speed,m/s,2023-07-13 12:00:00,2024-09-26 10:11:00,GustSpeedms,m s-1,,,,,,Yes,85.71428571428572
+SeebachWx,Seebach,Seebach,54.355,122.058,780,Wind Direction,ø,2023-07-13 12:00:00,2024-09-26 10:11:00,WindDirection,degree,,,,,,Yes,96.2962962962963
+SeebachWx,Seebach,Seebach,54.355,122.058,780,Solar Radiation,W/m²,2023-07-13 12:00:00,2024-09-26 10:11:00,SolarRadiationWm,W m-2,,,,,,Yes,90.32258064516128
+SeebachWx,Seebach,Seebach,54.355,122.058,780,Wetness,%,2023-07-13 12:00:00,2024-09-26 10:11:00,Wetness,%,,,,,,Yes,100.0
+SeebachWx,Seebach,Seebach,54.355,122.058,780,Water Content,m³/m³ 15 cm,2023-07-13 12:00:00,2024-09-26 10:11:00,,,,,,,,No,40.0
+SeebachWx,Seebach,Seebach,54.355,122.058,780,Soil Temp,°C,2023-07-13 12:00:00,2024-09-26 10:11:00,Soil_Temp,celsius,,,,,,Yes,88.88888888888889
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Snow depth raw,cm,2009-09-09 16:00:00,2025-01-09 08:00:00,,,,,,,,No,66.66666666666667
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Snow depth,cm,2009-09-09 16:00:00,2025-01-09 08:00:00,Snow_Depth,cm,,,,,,No,80.0
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Temp 2,°C,2009-09-09 16:00:00,2025-01-09 08:00:00,,,,,,,,No,72.72727272727273
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,RH 2,%,2009-09-09 16:00:00,2025-01-09 08:00:00,,,,,,,,No,66.66666666666667
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,DewPt 2,°C,2009-09-09 16:00:00,2025-01-09 08:00:00,,,,,,,,No,76.92307692307692
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Water Content,m³/m³ 15 cm,2021-07-21 15:00:00,2024-10-10 12:00:00,,,,,,,,No,40.0
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,WC_cal,m³/m³,2021-07-21 15:00:00,2024-10-10 12:00:00,,,,,,,,No,21.052631578947366
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Water Content,m³/m³ 5 cm,2021-07-21 15:00:00,2024-10-10 12:00:00,,,,,,,,No,40.0
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Water Content,m³/m³ 30 cm,2021-07-21 15:00:00,2024-10-10 12:00:00,,,,,,,,No,40.0
+ThompsonWx,Thompson,Thompson,54.333115,-126.099445,869,Water Content,m?/m? 15 cm,2007-09-12 17:00:00,2024-09-24 10:00:00,,,,,,,,No,40.0
+ThompsonWx,Thompson,Thompson,54.333115,-126.099445,869,WC_cal,m?/m?,2007-09-12 17:00:00,2024-09-24 10:00:00,,,,,,,,No,21.052631578947366
