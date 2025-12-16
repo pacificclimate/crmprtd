@@ -124,9 +124,17 @@ def summarize_raw_station(csv_file, station_row, data_path):
 
         # Loop over variables and append only non-all-NaN
         for col_name, var_name, var_unit in zip(variable_columns, variable, unit):
-            if df_data[col_name].isna().all():
+
+            # Find non-NaN rows for this variable
+            valid_rows = df_data[df_data[col_name].notna()]
+
+            if valid_rows.empty:
                 print(f"⚠️ Variable '{var_name}' is all NaN, skipping")
-                continue  # skip this variable
+                continue
+
+            # Earliest & latest NON-NaN timestamps
+            earliest_time = valid_rows[time_col].min()
+            latest_time = valid_rows[time_col].max()
 
             # Append record for this variable
             records.append({

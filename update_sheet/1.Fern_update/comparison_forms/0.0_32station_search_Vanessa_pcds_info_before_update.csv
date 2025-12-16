@@ -1,0 +1,33 @@
+station_id,station_name,lat,lon,elev,native_id,mod_user
+13182,BarrenWx,54.51044,-126.6143,1051,Barren,crmp
+12055,Blackhawk,55.0789,-120.352,962.492,Blackhawk,crmp
+12056,Boulder Creek,55.1082,-127.375,385.101,BoulderCr,crmp
+12438,Bowron Pit,53.902111,-122.015389,722,BowronPit,crmp
+1604,BulkleyWx,53.771956,-122.720939,599,1113694,crmp
+12057,Canoe Mountain Stn,52.7098,-119.191,2210,Canoe,crmp
+13220,Caribou Pass,58.35718,-129.54637,1744,Caribou Pass,crmp
+13184,ChapmanWx,54.8839,-126.6235,848,Chapman,crmp
+13070,Chief Lake,54.23821,-122.8775,726,Chief Lake,crmp
+12439,Coalmine Wx,53.741139,-121.784639,840,CoalmineWx,crmp
+1606,CPFWx,53.753756,-122.718803,595,1113682,crmp
+12058,Crystal Lake,54.4235,-122.628,744.027,CrystalLk,crmp
+13256,Dennis,,,,Dennis,crmp
+12059,Dunster,53.1149,-119.835,890.205,Dunster,crmp
+1600,EndakoWx,54.422278,-125.991497,856,1159701,crmp
+1602,GeorgeWx,53.963903,-124.663289,878,1177893,crmp
+12433,Gnat Pass,58.18275,-129.89044,1656,Gnat Pass Stn,crmp
+12435,Gunnel3,58.745694,-123.977778,1486,GunnelReal,crmp
+1595,GunnelWx,58.75475,-123.977683,1768,1113693,crmp
+12060,Hourglass,55.2127,-120.772,1131.2,Hourglass,crmp
+12434,Hudson Bay Mtn2,54.7734,-127.2424,1675,HBMtn2,crmp
+12061,Kluskus,53.3979,-124.513,1110.35,Kluskus,crmp
+12062,Mackenzie Jxn,55.1379,-122.977,718.723,MacJxn,crmp
+1596,MiddleforkWx,57.550917,-122.7963,972,1095443,crmp
+1594,NondaWx,59.002111,-125.509361,1683,1113695,crmp
+12436,Perkins Peak Stn,51.81296,-125.03981,2092,Perkins Peak Stn,crmp
+1597,PinkWx,57.062067,-122.8651,1748,1113696,crmp
+1598,SaxtonWx,54.027527,-123.030078,743,1113683,crmp
+1599,SmithersCmpd,54.773403,-127.139994,484,1113697,crmp
+13069,Sunbeam,53.338690,-120.121080,2000,Sunbeam,crmp
+1601,ThompsonWx,54.336006,-126.101008,866,1163628,crmp
+1605,Willow-BowronWx,53.772461,-122.724517,602,1095439,crmp

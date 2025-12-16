@@ -238,20 +238,20 @@ GunnelWx,Gunnel1,Gunnel,58.75475,-123.977683,1460,Wind Speed,m/s,2018-08-15 13:0
 GunnelWx,Gunnel1,Gunnel,58.75475,-123.977683,1460,Gust Speed,m/s,2018-08-15 13:00:00,2022-09-27 13:00:00
 GunnelWx,Gunnel1,Gunnel,58.75475,-123.977683,1460,Wind Direction,ø,2018-08-15 13:00:00,2022-09-27 13:00:00
 GunnelWx,Gunnel1,Gunnel,58.75475,-123.977683,1460,Solar Radiation,W/m²,2018-08-15 13:00:00,2022-09-27 13:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Rain,mm,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Pressure,mbar,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Temp,°C,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,RH,%,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,DewPt,°C,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Wind Speed,m/s,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Gust Speed,m/s,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Wind Direction,ø,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Solar Radiation,W/m²,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Snow depth raw,cm,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Snow depth,cm,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Water Content,m³/m³ 15 cm,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,WC_cal,m³/m³,2012-05-23 17:00:00,2025-01-07 15:00:00
-HourglassWx,Hourglass ,Hourglass,55.21275,-120.771635,1131,Soil Temp,°C,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,Rain,mm,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,Pressure,mbar,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,Temp,°C,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,RH,%,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,DewPt,°C,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,Wind Speed,m/s,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,Gust Speed,m/s,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,Wind Direction,ø,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,Solar Radiation,W/m²,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,Snow depth raw,cm,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,Snow depth,cm,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,Water Content,m³/m³ 15 cm,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,WC_cal,m³/m³,2012-05-23 17:00:00,2025-01-07 15:00:00
+HourglassWx,"Hourglass ",Hourglass,55.21275,-120.771635,1131,Soil Temp,°C,2012-05-23 17:00:00,2025-01-07 15:00:00
 Hudson Bay Mtn2,HBMtn2,HudsonBayMtn2,54.77375,-127.27216,1670,Rain,mm,2017-08-25 13:00:00,2025-01-09 06:00:00
 Hudson Bay Mtn2,HBMtn2,HudsonBayMtn2,54.77375,-127.27216,1670,Pressure,mbar,2017-08-25 13:00:00,2025-01-09 06:00:00
 Hudson Bay Mtn2,HBMtn2,HudsonBayMtn2,54.77375,-127.27216,1670,Temp,?C,2017-08-25 13:00:00,2025-01-09 06:00:00

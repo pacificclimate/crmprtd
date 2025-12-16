@@ -1,0 +1,33 @@
+db_station_id,db_station_name,db_native_id,updated_station_name,updated_native_id,updated_lat,updated_lon,updated_elev
+13182,BarrenWx,Barren,BarrenWx,Barren,54.510444,-126.614341,1051
+12055,Blackhawk,Blackhawk,BlackhawkWx,Blackhawk,55.078885,-120.352171,962
+12056,Boulder Creek,BoulderCr,BoulderWx,Boulder Creek,55.108173,-127.37474,385
+12438,Bowron Pit,BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722
+1604,BulkleyWx,1113694,BulkleyWx,PGTIS1,53.772183,-122.720729,594
+12057,Canoe Mountain Stn,Canoe,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210
+13220,Caribou Pass,Caribou Pass,Caribou Pass,CaribouPass,58.35718,-129.54637,1744
+13184,ChapmanWx,Chapman,ChapmanWx,Chapman,54.883903,-126.623533,848
+13070,Chief Lake,Chief Lake,ChiefLakeWx,ChiefWx,54.238028,-122.877306,720
+12439,Coalmine Wx,CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840
+1606,CPFWx,1113682,CPFWx,PGTIS3,53.753775,-122.718864,593
+12058,Crystal Lake,CrystalLk,CrystalWx,Crystal Lake,54.423494,-122.627844,744
+13256,Dennis,Dennis,Dennis,McDonn,54.76159,-127.46765,895
+12059,Dunster,Dunster,DunsterWx,Dunster,53.114909,-119.835293,890
+1600,EndakoWx,1159701,EndakoWx,Endako,54.422392,-125.991293,851
+1602,GeorgeWx,1177893,GeorgeWx,George,53.883555,-124.710668,859
+12433,Gnat Pass,Gnat Pass Stn,Gnat Pass Stn,Gnat Pass Stn,58.18275,-129.89044,1656
+12435,Gunnel3,GunnelReal,Gunnel3,GunnelReal,58.745694,-123.977778,1486
+1595,GunnelWx,1113693,GunnelWx,Gunnel1,58.75475,-123.977683,1460
+12060,Hourglass,Hourglass,HourglassWx,Hourglass ,55.21275,-120.771635,1131
+12434,Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,HBMtn2,54.77375,-127.27216,1670
+12061,Kluskus,Kluskus,Kluskus,BednestiWx,53.397852,-124.513069,1110
+12062,Mackenzie Jxn,MacJxn,MacJxnWx,Mackenzie Jxn,55.137858,-122.977243,719
+1596,MiddleforkWx,'-> MF1,MiddleforkWx,MF1,57.550917,-122.7963,972
+1594,NondaWx,'-> Nonda1,NondaWx,Nonda1,59.002111,-125.509361,1683
+12436,Perkins Peak Stn,Perkins Peak Stn,Perkins Peak Stn,Perkins Peak Stn,51.81296,-125.03981,2092
+1597,PinkWx,1113696,PinkWx,Pink1,57.06163,-122.86491,1756
+1598,SaxtonWx,1113683,SaxtonWx,Saxton,54.027523,-123.300774,718
+1599,SmithersCmpd,1113697,SmithersCmpd,SmithersCmpd,54.773403,-127.139994,484
+13069,Sunbeam,Sunbeam,Sunbeam,Mcbride Mountain Stn,53.33869,-120.12108,2000
+1601,ThompsonWx,1163628,ThompsonWx,Thompson,54.333115,-126.099445,869
+1605,Willow-BowronWx,1095439,Willow-BowronWx,PGTIS2,53.772577,-122.724634,596
