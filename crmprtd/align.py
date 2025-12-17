@@ -37,8 +37,6 @@ for def_ in (
     "degreeF = 5 / 9 * kelvin; offset: 255.372222",
     "degreeK = degK; offset: 0",
     "degree = π / 180 * radian = deg = Deg = arcdeg = arcdegree = angular_degree",
-    "square_meter = meter ** 2 = m2 = sqm",
-    "watt_per_square_metre = watt / square_meter = W/m2 = W/m^2"
 ):
     ureg.define(def_)
 
