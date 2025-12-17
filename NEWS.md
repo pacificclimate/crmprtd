@@ -1,5 +1,12 @@
 # News / Release Notes
 
+## 5.0.6
+
+_2025-Dec-17_
+
+Better handling of sun intensity measurement unit (W/m2) reducing
+logged errors 
+
 ## 5.0.5
 
 _2025-Aug-27_
