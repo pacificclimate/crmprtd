@@ -58,7 +58,6 @@ lxml = "*"
 psycopg2 = "*"
 pyyaml = "*"
 python-dateutil = "*"
-pytz = "*"
 requests = { version = "*", extras = ["security"] }
 pycds = "5.0.0"
 pint = "*"

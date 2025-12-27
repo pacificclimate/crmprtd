@@ -2,11 +2,7 @@ import datetime
 
 import pytest
 
-from crmprtd.download_cache_process import (
-    default_log_filename,
-    default_cache_filename,
-    download_args,
-)
+from crmprtd.download_cache_process import download_args, get_defaults_module
 
 
 @pytest.mark.parametrize(
@@ -39,8 +35,9 @@ from crmprtd.download_cache_process import (
     ],
 )
 def test_default_log_filename(network_name, tag, frequency, province, expected):
+    network_defaults = get_defaults_module(network_name)  # Just to cover that function
     assert (
-        default_log_filename(
+        network_defaults.default_log_filename(
             network_name=network_name,
             tag=tag,
             frequency=frequency,
@@ -91,8 +88,9 @@ def test_default_log_filename(network_name, tag, frequency, province, expected):
     ],
 )
 def test_default_cache_filename(network_name, tag, frequency, province, expected):
+    network_defaults = get_defaults_module(network_name)
     assert (
-        default_cache_filename(
+        network_defaults.default_cache_filename(
             timestamp=datetime.datetime(2020, 1, 2, 3, 4, 5),
             network_name=network_name,
             tag=tag,
@@ -136,7 +134,7 @@ def test_default_cache_filename(network_name, tag, frequency, province, expected
             None,
             None,
             datetime.datetime(2020, 1, 2, 3, 4, 5),
-            ["-N", "bc_env_snow", "-d", '"2020/01/02 11:00:00"'],
+            ["-N", "bc_env_snow", "-d", '"2020/01/02 03:00:00"'],
         ),
         (
             "moti",
@@ -166,7 +164,7 @@ def test_default_cache_filename(network_name, tag, frequency, province, expected
             None,
             None,
             datetime.datetime(2020, 1, 2, 3, 4, 5),
-            ["-N", "nt_forestry", "-d", '"2020/01/02 11:00:00"'],
+            ["-N", "nt_forestry", "-d", '"2020/01/02 03:00:00"'],
         ),
     ],
 )

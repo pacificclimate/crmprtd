@@ -70,7 +70,7 @@ def download(client_id, start_date, end_date):  # pragma: no cover
 
 
 def main(
-    arglist: List[str] = None, parent_parser: ArgumentParser = None
+    arglist: List[str] | None = None, parent_parser: ArgumentParser = None
 ) -> None:  # pragma: no cover
     """Download CLI function for CRD
 
