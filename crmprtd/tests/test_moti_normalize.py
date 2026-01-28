@@ -51,7 +51,7 @@ def test_normalize_good_data():
     assert len(rows) == 4
     for row in rows:
         assert row.station_id == "11091"
-        assert row.network_name == "MoTIe"
+        assert row.network_key == "motie"
 
 
 def test_normalize_missing_stn_indexerror():

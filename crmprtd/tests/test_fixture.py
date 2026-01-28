@@ -10,9 +10,9 @@ def test_can_instantiate(test_session):
 def test_db_has_data(test_session):
     q = test_session.query(Contact.name)
     assert set([rv[0] for rv in q.all()]) == set(["Simon", "Pat", "Eric"])
-    q = test_session.query(Network.name)
+    q = test_session.query(Network.key)
     assert set([rv[0] for rv in q.all()]) == set(
-        ["MoTIe", "EC_raw", "FLNRO-WMB", "ENV-AQN"]
+        ["motie", "ec_raw", "flnro_wmb", "env_aqn"]
     )
 
 

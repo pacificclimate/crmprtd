@@ -1161,10 +1161,8 @@ description = "An ORM representation of the PCDS and CRMP database"
 optional = false
 python-versions = ">=3.9,<3.14"
 groups = ["main"]
-files = [
-    {file = "pycds-5.0.0-py3-none-any.whl", hash = "sha256:b9e6c1aacde84fcaf78b5c21acbf7dbf618e8c6fc543a5a7dcc2f9835a64c5f4"},
-    {file = "pycds-5.0.0.tar.gz", hash = "sha256:439540ebfaedd4f9091bd2e4e41d44ebf2cf1b71ced28319f3c5f706b440d172"},
-]
+files = []
+develop = false
 
 [package.dependencies]
 alembic = ">=1.16"
@@ -1178,9 +1176,10 @@ SQLAlchemy = ">=2.0.0,<3.0"
 dev = ["alembic-verify (>=0.1.4,<0.2.0)", "black (>=24.3.0)", "pytest (>=8.4.0)", "pytest-describe (>=2.1.0)", "pytest-mock (>=3.11.1)", "setuptools (>=72.2.0)", "sqlalchemy-diff (>=0.1.5)", "testing-postgresql (>=1.3.0)"]
 
 [package.source]
-type = "legacy"
-url = "https://pypi.pacificclimate.org/simple"
-reference = "pcic-pypi"
+type = "git"
+url = "https://github.com/pacificclimate/pycds"
+reference = "network_keys"
+resolved_reference = "8043590c7abd1e4d0b98405d0804896f900a1551"
 
 [[package]]
 name = "pycparser"
@@ -1735,4 +1734,4 @@ jsonlogger = ["python-json-logger"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<3.14"
-content-hash = "2af8d31f9e6f619583c5be4ed808d498a62526ebc3c41c800c26ff227e81fc81"
+content-hash = "f39365238e019b9275eee972daf77b17f6acf2abcf94f97aac7dffef33d39ad4"

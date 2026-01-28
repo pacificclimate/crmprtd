@@ -17,7 +17,7 @@ def test_normalize_good_data():
         assert row.time == tz.localize(datetime.strptime("2018052710", "%Y%m%d%H"))
         assert row.variable_name is not None
         assert row.val is not None
-        assert row.network_name is not None
+        assert row.network_key is not None
 
 
 def test_normalize_bad_date():
@@ -40,4 +40,4 @@ def test_normalize_bad_value():
         assert row.time == tz.localize(datetime.strptime("2018052710", "%Y%m%d%H"))
         assert row.variable_name is not None
         assert row.val is not None
-        assert row.network_name is not None
+        assert row.network_key is not None

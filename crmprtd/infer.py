@@ -41,7 +41,7 @@ log = logging.getLogger(__name__)
 
 def create_variable(
     sesh,
-    network_name,
+    network_key,
     variable_name,
     unit,
     standard_name=None,
@@ -49,7 +49,7 @@ def create_variable(
     cell_method=None,
 ):
     with sesh.no_autoflush:
-        network = sesh.query(Network).filter(Network.name == network_name).one()
+        network = sesh.query(Network).filter(Network.key == network_key).one()
 
     return Variable(
         network=network,
@@ -80,7 +80,7 @@ def infer(sesh, rows, diagnostic=False):
     # Reduce observations to unique set of tuples describing required histories
     # and stations.
     hists_to_create = {
-        (row.network_name, row.station_id, row.lat, row.lon) for row in rows
+        (row.network_key, row.station_id, row.lat, row.lon) for row in rows
     }
 
     # Find or create matching histories and stations.
@@ -94,22 +94,22 @@ def infer(sesh, rows, diagnostic=False):
     ]
 
     # Reduce observations to unique set of tuples describing required variables
-    vars_to_create = {(row.network_name, row.variable_name, row.unit) for row in rows}
+    vars_to_create = {(row.network_key, row.variable_name, row.unit) for row in rows}
 
     # Construct required variables. They are never committed to the database.
     with sesh.begin_nested() as nested:
         variables = [
             create_variable(
                 sesh,
-                network_name,
+                network_key,
                 var_name,
                 unit,
                 standard_name="requires_human_intervention",
                 display_name="requires_human_intervention",
                 cell_method="requires_human_intervention",
             )
-            for network_name, var_name, unit in vars_to_create
-            if not get_variable(sesh, network_name, var_name)
+            for network_key, var_name, unit in vars_to_create
+            if not get_variable(sesh, network_key, var_name)
         ]
 
         for var in variables:

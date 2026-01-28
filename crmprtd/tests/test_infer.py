@@ -44,11 +44,11 @@ def make_test_rows(
     All items are associated to the same network.
     """
 
-    session.add(Network(name=network_name))
+    session.add(Network(name=network_name, key=Network.gen_key_from_name(network_name)))
     station_ids = tuple(f"{stn_id_prefix}_{i}" for i in range(stn_count))
     variable_names = tuple(f"{var_name_prefix}_{i}" for i in range(var_count))
     return tuple(
-        Row(time, val, variable_name, unit, network_name, station_id, 40, -120)
+        Row(time, val, variable_name, unit, Network.gen_key_from_name(network_name), station_id, 40, -120)
         for station_id in station_ids
         for variable_name in variable_names
     )

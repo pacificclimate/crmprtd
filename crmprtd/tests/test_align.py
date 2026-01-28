@@ -16,11 +16,10 @@ from pycds import Station, History
 
 
 @pytest.mark.parametrize(
-    ("network_name", "expected"), [("FLNRO-WMB", True), ("WMB", False)]
+    ("network_key", "expected"), [("flnro_wmb", True), ("wmb", False)]
 )
-def test_is_network(test_session, network_name, expected):
-    assert bool(get_network(test_session, network_name)) == expected
-
+def test_is_network(test_session, network_key, expected):
+    assert bool(get_network(test_session, network_key)) == expected
 
 def test_get_history_with_no_matches(test_session):
     # this observation will not match any in test session
@@ -29,7 +28,7 @@ def test_get_history_with_no_matches(test_session):
         val=123,
         variable_name="relative_humidity",
         unit="percent",
-        network_name="FLNRO-WMB",
+        network_key="flnro_wmb",
         station_id="666",
         lat=None,
         lon=None,
@@ -37,7 +36,7 @@ def test_get_history_with_no_matches(test_session):
 
     history = find_or_create_matching_history_and_station(
         test_session,
-        obs_tuple.network_name,
+        obs_tuple.network_key,
         obs_tuple.station_id,
         obs_tuple.lat,
         obs_tuple.lon,
@@ -57,7 +56,7 @@ def test_get_history_with_single_match(test_session):
         val=123,
         variable_name="relative_humidity",
         unit="percent",
-        network_name="MoTIe",
+        network_key="motie",
         station_id="11091",
         lat=None,
         lon=None,
@@ -65,7 +64,7 @@ def test_get_history_with_single_match(test_session):
 
     history = find_or_create_matching_history_and_station(
         test_session,
-        obs_tuple.network_name,
+        obs_tuple.network_key,
         obs_tuple.station_id,
         obs_tuple.lat,
         obs_tuple.lon,
@@ -85,7 +84,7 @@ def test_get_history_with_multiple_matches_and_location(test_session):
         val=123,
         variable_name="relative_humidity",
         unit="percent",
-        network_name="EC_raw",
+        network_key="ec_raw",
         station_id="1047172",
         lat=49.45,
         lon=-123.7,
@@ -93,7 +92,7 @@ def test_get_history_with_multiple_matches_and_location(test_session):
 
     history = find_or_create_matching_history_and_station(
         test_session,
-        obs_tuple.network_name,
+        obs_tuple.network_key,
         obs_tuple.station_id,
         obs_tuple.lat,
         obs_tuple.lon,
@@ -107,7 +106,7 @@ def test_get_history_with_multiple_matches_and_no_location(test_session):
         val=123,
         variable_name="relative_humidity",
         unit="percent",
-        network_name="EC_raw",
+        network_key="ec_raw",
         station_id="1047172",
         lat=None,
         lon=None,
@@ -115,7 +114,7 @@ def test_get_history_with_multiple_matches_and_no_location(test_session):
 
     history = find_or_create_matching_history_and_station(
         test_session,
-        obs_tuple.network_name,
+        obs_tuple.network_key,
         obs_tuple.station_id,
         obs_tuple.lat,
         obs_tuple.lon,
@@ -124,24 +123,24 @@ def test_get_history_with_multiple_matches_and_no_location(test_session):
 
 
 def test_get_variable(test_session):
-    variable = get_variable(test_session, "FLNRO-WMB", "relative_humidity")
+    variable = get_variable(test_session, "flnro_wmb", "relative_humidity")
     assert variable.id == 3
 
 
 def test_get_variable_no_match(test_session):
-    variable = get_variable(test_session, "FLNRO-WMB", "humidity")
+    variable = get_variable(test_session, "flnro_wmb", "humidity")
     assert variable is None
 
 
 @pytest.mark.parametrize(
-    ("network_name", "variable_name", "unit", "val", "expected"),
+    ("network_key", "variable_name", "unit", "val", "expected"),
     [
-        ("FLNRO-WMB", "relative_humidity", "percent", 10, 10),
-        ("EC_raw", "precipitation", "cm", 10, 100),
+        ("flnro_wmb", "relative_humidity", "percent", 10, 10),
+        ("ec_raw", "precipitation", "cm", 10, 100),
     ],
 )
-def test_unit_check(test_session, network_name, variable_name, unit, val, expected):
-    variable = get_variable(test_session, network_name, variable_name)
+def test_unit_check(test_session, network_key, variable_name, unit, val, expected):
+    variable = get_variable(test_session, network_key, variable_name)
     check_val = convert_obs_value_to_db_units(val, unit, variable.unit)
     assert check_val == expected
 
@@ -156,7 +155,7 @@ def test_unit_check(test_session, network_name, variable_name, unit, val, expect
                 val=123,
                 variable_name="precipitation",
                 unit="mm",
-                network_name="EC_raw",
+                network_key="ec_raw",
                 station_id="1047172",
                 lat=None,
                 lon=None,
@@ -173,7 +172,7 @@ def test_unit_check(test_session, network_name, variable_name, unit, val, expect
                 val=10,
                 variable_name="precipitation",
                 unit="cm",
-                network_name="EC_raw",
+                network_key="ec_raw",
                 station_id="1047172",
                 lat=49.45,
                 lon=-123.7,
@@ -190,7 +189,7 @@ def test_unit_check(test_session, network_name, variable_name, unit, val, expect
                 val=10,
                 variable_name="CURRENT_AIR_TEMPERATURE1",
                 unit="celsius",
-                network_name="MoTIe",
+                network_key="motie",
                 station_id="11091",
                 lat=None,
                 lon=None,
@@ -207,7 +206,7 @@ def test_unit_check(test_session, network_name, variable_name, unit, val, expect
                 val=10,
                 variable_name="CURRENT_AIR_TEMPERATURE1",
                 unit="celsius",
-                network_name="MoTIe",
+                network_key="motie",
                 station_id="666",
                 lat=49,
                 lon=-121,
@@ -224,7 +223,7 @@ def test_unit_check(test_session, network_name, variable_name, unit, val, expect
                 val=123,
                 variable_name="precipitation",
                 unit="mm",
-                network_name="EC_raw",
+                network_key="ec_raw",
                 station_id="1047172",
                 lat=51,
                 lon=-128,
@@ -256,7 +255,7 @@ def test_align_successes(
                 val=10,
                 variable_name="CURRENT_AIR_TEMPERATURE1",
                 unit="not_a_unit",
-                network_name="MoTIe",
+                network_key="motie",
                 station_id="11091",
                 lat=None,
                 lon=None,
@@ -269,7 +268,7 @@ def test_align_successes(
                 val=10,
                 variable_name="no_unit",
                 unit=None,
-                network_name="ENV-AQN",
+                network_key="env_aqn",
                 station_id="0260011",
                 lat=None,
                 lon=None,
@@ -282,7 +281,7 @@ def test_align_successes(
                 val=10,
                 variable_name="not_a_var",
                 unit="celsius",
-                network_name="MoTIe",
+                network_key="motie",
                 station_id="11091",
                 lat=None,
                 lon=None,
@@ -295,7 +294,7 @@ def test_align_successes(
                 val=10,
                 variable_name="CURRENT_AIR_TEMPERATURE1",
                 unit="celsius",
-                network_name="not_a_network",
+                network_key="not_a_network",
                 station_id="11091",
                 lat=None,
                 lon=None,
@@ -308,7 +307,7 @@ def test_align_successes(
                 val=None,
                 variable_name=None,
                 unit="celsius",
-                network_name="MoTIe",
+                network_key="motie",
                 station_id="11091",
                 lat=None,
                 lon=None,
@@ -321,7 +320,7 @@ def test_align_successes(
                 val=15,
                 variable_name="relative_humidity",
                 unit="percent",
-                network_name="FLNRO-WMB",
+                network_key="flnro_wmb",
                 station_id="1029",
                 lat=None,
                 lon=None,
@@ -335,7 +334,7 @@ def test_align_failures(test_session, obs_tuple):
 
 
 def test_closest_stns_within_threshold(ec_session):
-    x = histories_within_threshold(ec_session, "EC_raw", -123.7, 49.45, 1000)
+    x = histories_within_threshold(ec_session, "ec_raw", -123.7, 49.45, 1000)
     assert len(x) > 0
 
 
@@ -356,7 +355,7 @@ def test_closest_stns_within_threshold_bad_data(ec_session):
     ec_session.commit()
 
     # Just search for the good station and ensure there are not errors
-    x = histories_within_threshold(ec_session, "EC_raw", x, y, 1)
+    x = histories_within_threshold(ec_session, "ec_raw", x, y, 1)
     assert len(x) > 0
 
 

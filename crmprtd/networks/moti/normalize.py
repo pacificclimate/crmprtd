@@ -93,7 +93,7 @@ def normalize(file_stream):
                     val=value,
                     variable_name=variable_name,
                     unit=value_element.get("units"),
-                    network_name="MoTIe",
+                    network_key="motie",
                     station_id=stn_id,
                     lat=None,
                     lon=None,

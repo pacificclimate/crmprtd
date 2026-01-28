@@ -27,13 +27,13 @@ from crmprtd.infill import download_and_process
 log = logging.getLogger(__name__)
 
 
-def check_network_name(network_name):
-    if network_name not in NETWORKS:
-        raise ValueError(f"Network name '{network_name}' is not recognized.")
+def check_network_key(network_key):
+    if network_key not in NETWORKS:
+        raise ValueError(f"Network key '{network_key}' is not recognized.")
 
 
 def default_log_filename(
-    network_name: Optional[str] = None,
+    network_key: Optional[str] = None,
     tag: Optional[str] = None,
     frequency: Optional[str] = None,
     province: Optional[str] = None,
@@ -43,21 +43,21 @@ def default_log_filename(
     with the network. Its pattern is similar, but not identical, to that of the cache
     filename.
 
-    :param network_name: Network name to include in filename.
+    :param network_key: Network key to include in filename.
     :param tag: Tag to include in filename.
     :param frequency: Download frequency to include in filename (network ec only).
     :param province: Province code (2 letters) to include in filename (network ec only).
     :param _: Ignored additional kw args.
     :return: Filename.
     """
-    check_network_name(network_name)
-    filepath = f"~/{network_name}/logs"
+    check_network_key(network_key)
+    filepath = f"~/{network_key}/logs"
     tag_prefix = f"{tag}_" if tag is not None else ""
-    if network_name in ("ec",):
+    if network_key in ("ec",):
         assert frequency is not None
         assert province is not None
         return f"{filepath}/{tag_prefix}{province.lower()}_{frequency}_json.log"
-    return f"{filepath}/{tag_prefix}{network_name}_json.log"
+    return f"{filepath}/{tag_prefix}{network_key}_json.log"
 
 
 def the_log_filename(log_filename: Optional[str] = None, **kwargs):
@@ -67,7 +67,7 @@ def the_log_filename(log_filename: Optional[str] = None, **kwargs):
 def default_cache_filename(
     timestamp: datetime.datetime = datetime.datetime.now(),
     timestamp_format: str = "%Y-%m-%dT%H:%M:%S",
-    network_name: Optional[str] = None,
+    network_key: Optional[str] = None,
     tag: Optional[str] = None,
     frequency: Optional[str] = None,
     province: Optional[str] = None,
@@ -79,22 +79,22 @@ def default_cache_filename(
 
     :param timestamp: Timestamp to include in filename.
     :param timestamp_format: Format for converting timestamp to string.
-    :param network_name: Network name to include in filename.
+    :param network_key: Network key to include in filename.
     :param tag: Tag to include in filename.
     :param frequency: Download frequency to include in filename (network ec only).
     :param province: Province code (2 letters) to include in filename (network ec only).
     :param _: Ignored additional kw args.
     :return: Filename.
     """
-    check_network_name(network_name)
+    check_network_key(network_key)
     ts = timestamp.strftime(timestamp_format)
-    filepath = f"~/{network_name}/cache"
+    filepath = f"~/{network_key}/cache"
     tag_prefix = f"{tag}_" if tag is not None else ""
-    if network_name in ("ec",):
+    if network_key in ("ec",):
         assert frequency is not None
         assert province is not None
         return f"{filepath}/{tag_prefix}{frequency}_{province.lower()}_{ts}.xml"
-    if network_name in (
+    if network_key in (
         "bc_env_snow",
         "bc_forestry",
         "bc_riotinto",
@@ -107,8 +107,8 @@ def default_cache_filename(
         "yt_avalanche",
         "yt_firewx",
     ):
-        return f"{filepath}/{tag_prefix}{network_name}_{ts}.xml"
-    return f"{filepath}/{tag_prefix}{network_name}_{ts}.txt"
+        return f"{filepath}/{tag_prefix}{network_key}_{ts}.xml"
+    return f"{filepath}/{tag_prefix}{network_key}_{ts}.txt"
 
 
 def the_cache_filename(cache_filename: Optional[str] = None, **kwargs) -> str:
@@ -136,7 +136,7 @@ def to_utc(d: datetime.datetime, tz_string: str = "Canada/Pacific"):
 
 
 def download_args(
-    network_name: Optional[str] = None,
+    network_key: Optional[str] = None,
     frequency: Optional[str] = None,
     province: Optional[str] = None,
     time: Optional[datetime.datetime] = None,  # TODO: use now()?
@@ -148,27 +148,26 @@ def download_args(
 
     :param time:
     :param start_time:
-    :param network_name: Network name.
+    :param network_key: Network key.
     :param _: Remainder args. Passed through.
     :return: List of download args.
     """
-    check_network_name(network_name)
-
-    common_args = f"-N {network_name} ".split()
+    check_network_key(network_key)
+    common_args = f"-N {network_key} ".split()
     net_args = None
 
     # Set net_args per network.
-    if network_name == "_test":
+    if network_key == "_test":
         net_args = []
-    if network_name == "bc_hydro":
+    if network_key == "bc_hydro":
         net_args = "-f sftp2.bchydro.com -F pcic -S ~/.ssh/id_rsa".split()
-    if network_name == "crd":
-        net_args = f"--auth_fname ~/.rtd_auth.yaml --auth_key={network_name}".split()
-    if network_name == "ec":
+    if network_key == "crd":
+        net_args = f"--auth_fname ~/.rtd_auth.yaml --auth_key={network_key}".split()
+    if network_key == "ec":
         if province is None or frequency is None:
             raise ValueError("EC network requires both province and frequency")
         net_args = f"-p {province.lower()} -F {frequency}".split()
-    if network_name in (
+    if network_key in (
         "bc_env_snow",
         "bc_forestry",
         "bc_riotinto",
@@ -182,15 +181,15 @@ def download_args(
         "yt_firewx",
     ):
         if time is None:
-            raise ValueError(f"Network {network_name} requires a time parameter")
+            raise ValueError(f"Network {network_key} requires a time parameter")
         ts = to_utc(time).strftime("%Y/%m/%d %H:00:00")
         net_args = ["-d", f'"{ts}"']
-    if network_name == "moti":
-        net_args = f"-u https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110 --auth_fname ~/.rtd_auth.yaml --auth_key={network_name}".split()
-    if network_name == "wamr":
+    if network_key == "moti":
+        net_args = f"-u https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110 --auth_fname ~/.rtd_auth.yaml --auth_key={network_key}".split()
+    if network_key == "wamr":
         net_args = []
-    if network_name == "wmb":
-        net_args = f"--auth_fname ~/.rtd_auth.yaml --auth_key={network_name}".split()
+    if network_key == "wmb":
+        net_args = f"--auth_fname ~/.rtd_auth.yaml --auth_key={network_key}".split()
 
     assert net_args is not None
     return common_args + net_args
@@ -218,13 +217,13 @@ def dispatch_network(
     :param dry_run: If true, print commands but don't run them.
     :return: None. Side effect: Download and process network specified in args.
     """
-    network_name = kwargs["network_name"]
-    check_network_name(network_name)
+    network_key = kwargs["network_key"]
+    check_network_key(network_key)
 
-    if network_name == "_test":
+    if network_key == "_test":
         # Use custom time if provided, otherwise no time parameter
         download_and_process(
-            network_name=network_name,
+            network_key=network_key,
             log_args=log_args(**kwargs),
             download_args=download_args(time=time, **kwargs),
             cache_filename=the_cache_filename(
@@ -235,7 +234,7 @@ def dispatch_network(
             connection_string=connection_string,
             dry_run=dry_run,
         )
-    elif network_name == "ec":
+    elif network_key == "ec":
         provinces = kwargs.pop("province")
 
         if not provinces or len(provinces) == 0:
@@ -244,7 +243,7 @@ def dispatch_network(
         # Use custom time if provided, otherwise let EC network use its defaults
         for province in provinces:
             download_and_process(
-                network_name=network_name,
+                network_key=network_key,
                 log_args=log_args(**kwargs, province=province),
                 download_args=download_args(time=time, province=province, **kwargs),
                 cache_filename=the_cache_filename(
@@ -256,7 +255,7 @@ def dispatch_network(
                 connection_string=connection_string,
                 dry_run=dry_run,
             )
-    elif network_name in (
+    elif network_key in (
         "bc_env_snow",
         "bc_forestry",
         "bc_riotinto",
@@ -274,7 +273,7 @@ def dispatch_network(
             time if time else (datetime.datetime.now() - datetime.timedelta(hours=1))
         )
         download_and_process(
-            network_name=network_name,
+            network_key=network_key,
             log_args=log_args(**kwargs),
             download_args=download_args(**kwargs, time=use_time),
             cache_filename=the_cache_filename(
@@ -287,7 +286,7 @@ def dispatch_network(
         # Use custom time if provided, otherwise default to "now"
         use_time = time if time else datetime.datetime.now()
         download_and_process(
-            network_name=network_name,
+            network_key=network_key,
             log_args=log_args(**kwargs),
             download_args=download_args(**kwargs, time=use_time),
             cache_filename=the_cache_filename(
@@ -307,8 +306,8 @@ def dispatch_network_alias(network_alias: Optional[str] = None, **kwargs) -> Non
     :return: None.
     """
     assert network_alias in network_alias_names
-    for network_name in alias_to_networks(network_alias):
-        dispatch_network(network_name=network_name, **kwargs)
+    for network_key in alias_to_networks(network_alias):
+        dispatch_network(network_key=network_key, **kwargs)
 
 
 def dispatch(network: Optional[str] = None, **kwargs) -> None:
@@ -323,7 +322,7 @@ def dispatch(network: Optional[str] = None, **kwargs) -> None:
     if network in network_alias_names:
         dispatch_network_alias(network_alias=network, **kwargs)
     elif network in NETWORKS:
-        dispatch_network(network_name=network, **kwargs)
+        dispatch_network(network_key=network, **kwargs)
     else:
         raise ValueError(
             f"Network argument '{network}' is not a valid network name or alias"

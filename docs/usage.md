@@ -79,7 +79,7 @@ $ crmprtd_pipeline -N ytnt -T metnorth -c postgresql://user:password@db.uvic.ca/
 
 ### Downloading data
 
-Script `crmprtd_download -N [network_name]` downloads data for the named network.  
+Script `crmprtd_download -N [network_key]` downloads data for the named network.  
 The standard output stream of this script can be redirected into a file or piped
 into `crmprtd_process`.  Script `crmprtd_process` read data from the standard input
 stream runs it through a series of formatting changes and checks before inserting
@@ -105,7 +105,7 @@ optional arguments:
                         Number of samples to be taken from observations when searching for
                         duplicates to determine which insertion strategy to use
   -N {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,_test}, --network {bc_env_aq,bc_env_snow,bc_forestry,bc_tran,nt_forestry,nt_water,yt_gov,yt_water,yt_firewx,yt_avalanche,dfo_ccg_lighthouse,bc_hydro,crd,ec,moti,wamr,wmb,_test}
-                        The network from which the data is coming from. The name will be used
+                        The network from which the data is coming from. The key will be used
                         for a dynamic import of the module's normalization function.
   -S START_DATE, --start_date START_DATE
                         Optional start time to use for processing (interpreted with
@@ -138,12 +138,12 @@ Notes:
 3. Command `crmprtd_pipeline` wraps this pattern and supplies required arguments.
 
 ```bash
-crmprtd_download -N [network_name] > cache_filename
-crmprtd_process -N [network_name] < cache_filename
+crmprtd_download -N [network_key] > cache_filename
+crmprtd_process -N [network_key] < cache_filename
 # Or
-crmprtd_download -N [network_name] | crmprtd_process -N [network_name]
+crmprtd_download -N [network_key] | crmprtd_process -N [network_key]
 # Or
-crmprtd_download -N [network_name] | tee cache_filename | crmprtd_process -N [network_name]
+crmprtd_download -N [network_key] | tee cache_filename | crmprtd_process -N [network_key]
 ```
 
 ### Cron usage

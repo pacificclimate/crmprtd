@@ -101,7 +101,7 @@ def test_process_by_date(
     end_date = utc.localize(verify_date(end_date, datetime.max, "end date"))
 
     # Insert the network required in the test data
-    network = Network(name="FLNRO-WMB")
+    network = Network(name="FLNRO-WMB", key=Network.gen_key_from_name("FLNRO-WMB"))
     crmp_session.add(network)
 
     # Insert the variables required in the test data.

@@ -104,7 +104,7 @@ network_alias_names = tuple(network_aliases.keys())
 
 Row = namedtuple(
     "Row",
-    "time val variable_name unit network_name station_id lat lon",
+    "time val variable_name unit network_key station_id lat lon",
 )
 
 

@@ -10,7 +10,7 @@ from crmprtd.download_cache_process import (
 
 
 @pytest.mark.parametrize(
-    "network_name, tag, frequency, province, expected",
+    "network_key, tag, frequency, province, expected",
     [
         # A representative sample, copied from all present execution scripts.
         # Some changes due to simplification of filename pattern.
@@ -38,10 +38,10 @@ from crmprtd.download_cache_process import (
         ("nt_forestry", None, None, None, "~/nt_forestry/logs/nt_forestry_json.log"),
     ],
 )
-def test_default_log_filename(network_name, tag, frequency, province, expected):
+def test_default_log_filename(network_key, tag, frequency, province, expected):
     assert (
         default_log_filename(
-            network_name=network_name,
+            network_key=network_key,
             tag=tag,
             frequency=frequency,
             province=province,
@@ -51,7 +51,7 @@ def test_default_log_filename(network_name, tag, frequency, province, expected):
 
 
 @pytest.mark.parametrize(
-    "network_name, tag, frequency, province, expected",
+    "network_key, tag, frequency, province, expected",
     [
         # A representative sample, copied from all present execution scripts.
         # Some changes due to simplification of filename pattern.
@@ -90,11 +90,11 @@ def test_default_log_filename(network_name, tag, frequency, province, expected):
         ),
     ],
 )
-def test_default_cache_filename(network_name, tag, frequency, province, expected):
+def test_default_cache_filename(network_key, tag, frequency, province, expected):
     assert (
         default_cache_filename(
             timestamp=datetime.datetime(2020, 1, 2, 3, 4, 5),
-            network_name=network_name,
+            network_key=network_key,
             tag=tag,
             frequency=frequency,
             province=province,
@@ -104,7 +104,7 @@ def test_default_cache_filename(network_name, tag, frequency, province, expected
 
 
 @pytest.mark.parametrize(
-    "network_name, frequency, province, time, expected",
+    "network_key, frequency, province, time, expected",
     [
         # A representative sample, covering all present execution scripts.
         (
@@ -170,11 +170,11 @@ def test_default_cache_filename(network_name, tag, frequency, province, expected
         ),
     ],
 )
-def test_download_args(network_name, frequency, province, time, expected):
+def test_download_args(network_key, frequency, province, time, expected):
     assert (
         download_args(
             time=time,
-            network_name=network_name,
+            network_key=network_key,
             tag="tag",
             frequency=frequency,
             province=province,
