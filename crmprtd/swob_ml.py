@@ -32,26 +32,26 @@ def identity(x):
 
 def normalize(
     file_stream,
-    network_name,
+    network_key,
     station_id_attr="climate_station_number",
     station_id_xform=identity,
 ):
     for xml_file in split_multi_xml_stream(file_stream):
         yield from normalize_xml(
-            xml_file, network_name, station_id_attr, station_id_xform
+            xml_file, network_key, station_id_attr, station_id_xform
         )
 
 
 def normalize_xml(
     file_stream,
-    network_name,
+    network_key,
     station_id_attr="climate_station_number",
     station_id_xform=identity,
 ):
     et = parse_xml(file_stream)
 
     members = et.xpath("//om:member", namespaces=ns)
-    log.info("Starting %s data normalization", network_name)
+    log.info("Starting %s data normalization", network_key)
 
     for member in members:
         om = OmMember(member)
@@ -122,7 +122,7 @@ def normalize_xml(
                 val=val,
                 variable_name=var,
                 unit=om.member_unit(var),
-                network_name=network_name,
+                network_key=network_key,
                 station_id=station_id,
                 lat=lat,
                 lon=lon,

@@ -70,4 +70,4 @@ def test_substitutions():
 2021-05-25 15:15:00,M110514,Does not matter,HUMIDITY,HUMIDITY,HUMIDITY,11.68,% RH,1,n/a,Data Ok,11.7
 """  # noq
     row = next(normalize(BytesIO(lines)))
-    assert row.network_name == "MVan"
+    assert row.network_key == "MVan"

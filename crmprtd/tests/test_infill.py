@@ -56,7 +56,7 @@ def test_chain_subprocesses(commands, final_destination, mocker):
 
 
 @pytest.mark.parametrize(
-    "network_name, cache_filename, connection_string, expected_commands",
+    "network_key, cache_filename, connection_string, expected_commands",
     [
         # Do nothing
         ("netwerk", None, None, []),
@@ -69,11 +69,11 @@ def test_chain_subprocesses(commands, final_destination, mocker):
     ],
 )
 def test_download_and_process_choreography(
-    network_name, cache_filename, connection_string, expected_commands, mocker
+    network_key, cache_filename, connection_string, expected_commands, mocker
 ):
     mocker.patch("crmprtd.infill.chain_subprocesses", return_value=True)
     download_and_process(
-        network_name=network_name,
+        network_key=network_key,
         log_args=["--log_args"],
         download_args=["--download_args"],
         cache_filename=cache_filename,

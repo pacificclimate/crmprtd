@@ -60,7 +60,7 @@ pyyaml = "*"
 python-dateutil = "*"
 pytz = "*"
 requests = { version = "*", extras = ["security"] }
-pycds = "5.0.0"
+pycds = { git = "https://github.com/pacificclimate/pycds", branch= "network_keys" }
 pint = "*"
 pysftp = "*"
 urllib3 = "<2"

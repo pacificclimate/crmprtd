@@ -36,7 +36,7 @@ def process(current_time, opts, args):
 
         cache_filename = default_cache_filename(
             timestamp=current_time,
-            network_name=opts.network,
+            network_key=opts.network,
             tag=opts.tag,
             frequency=opts.frequency if opts.network == "ec" else None,
             province=opts.province if opts.network == "ec" else None,

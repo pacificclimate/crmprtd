@@ -118,17 +118,17 @@ def normalize(file_stream):
 
         if reported_station_id in station_substitutions:
             station_id = station_substitutions[reported_station_id]
-            network_name = "MVan"
+            network_key = "MVan"
         else:
             station_id = reported_station_id
-            network_name = "ENV-AQN"
+            network_key = "ENV-AQN"
 
         yield Row(
             time=dt,
             val=value,
             variable_name=variable_name,
             unit=unit,
-            network_name=network_name,
+            network_key=network_key,
             station_id=station_id,
             lat=lat,
             lon=lon,

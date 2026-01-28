@@ -86,7 +86,7 @@ def normalize(file_stream):
                         time=obs_time,
                         val=value,
                         variable_name=varname,
-                        network_name="BCH",
+                        network_key="bch",
                         station_id=stn_id,
                         unit=None,
                         lat=None,
@@ -105,7 +105,7 @@ if __name__ == "__main__":  # noqa
         stream = open(sys.argv[1], "rb")
 
     setup_logging(
-        "/home/james/code/git/crmprtd/logging.yaml",
+        "/home/james/code/git/crmprtd/logging.yaml", # TODO: remove references to specific installs
         "./bch_normalize.log",
         "nobody@example.com",
         logging.INFO,

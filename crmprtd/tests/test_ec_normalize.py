@@ -77,7 +77,7 @@ def test_normalize_good_data():
         assert row.time is not None
         assert row.variable_name is not None
         assert row.val is not None
-        assert row.network_name is not None
+        assert row.network_key is not None
 
 
 def test_normalize_no_station_id():

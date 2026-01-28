@@ -44,7 +44,7 @@ def normalize(stream):
                 val=val,
                 variable_name=var_name,
                 unit=units[f"{var_name}Unit"],
-                network_name="CRD",
+                network_key="crd",
                 station_id=record["StationName"],
                 lat=None,
                 lon=None,

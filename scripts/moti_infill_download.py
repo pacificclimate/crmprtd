@@ -98,7 +98,7 @@ def main(args):
     else:
         engine = create_engine(args.connection_string)
         sesh = sessionmaker(bind=engine)()
-        q = sesh.query(CNG.native_id).filter(CNG.network_name == "MoTIe")
+        q = sesh.query(CNG.native_id).filter(CNG.network_key == "motie")
         for (station_id,) in q.all():
             for url in url_generator(station_id, start_time, end_time):
                 to, _from = url_to_from(url)

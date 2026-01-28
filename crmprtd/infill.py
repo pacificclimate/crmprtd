@@ -51,7 +51,7 @@ def chain_subprocesses(
 
 
 def download_and_process(
-    network_name: str,
+    network_key: str,
     log_args: List[str],
     download_args: List[str],
     cache_filename: Optional[str] = None,
@@ -65,7 +65,7 @@ def download_and_process(
         processed if the process step is requested).
     The process step is optionally performed (using script `crmprtd_process`).
 
-    :param network_name: Name of network to download.
+    :param network_key: Key of network to download.
     :param log_args: Configuration for application logging.
     :param download_args: Args to be passed to crmprtd_download.
     :param cache_filename: Name of file in which to cache downloaded data. If this
@@ -84,13 +84,13 @@ def download_and_process(
 
     if not do_download:
         logger.warning(
-            f"Network {network_name}: Data is to be neither cached nor processed. "
+            f"Network {network_key}: Data is to be neither cached nor processed. "
             f"Nothing to do."
         )
 
     if not do_process:
         logger.info(
-            f"Network {network_name}: Data is to be downloaded but not processed."
+            f"Network {network_key}: Data is to be downloaded but not processed."
         )
 
     # Build up commands to be chained in this list
@@ -114,7 +114,7 @@ def download_and_process(
             [
                 "crmprtd_process",
                 "-N",
-                network_name,
+                network_key,
                 "-c",
                 connection_string,
             ]
@@ -183,7 +183,7 @@ def infill(
                 "crd",
             ]
             download_and_process(
-                network_name="crd",
+                network_key="crd",
                 log_args=log_args,
                 download_args=dl_args,
                 connection_string=connection_string,
@@ -207,7 +207,7 @@ def infill(
                         time.strftime(time_fmt),
                     ]
                     download_and_process(
-                        network_name="ec",
+                        network_key="ec",
                         log_args=log_args,
                         download_args=dl_args,
                         connection_string=connection_string,
@@ -245,7 +245,7 @@ def infill(
                         station,
                     ]
                     download_and_process(
-                        network_name="moti",
+                        network_key="moti",
                         log_args=log_args,
                         download_args=dl_args,
                         connection_string=connection_string,
@@ -273,7 +273,7 @@ def infill(
                 logger.warning(warning_msg["not_contained"].format("WAMR", "one_month"))
             dl_args = []
             download_and_process(
-                network_name="wamr",
+                network_key="wamr",
                 log_args=log_args,
                 download_args=dl_args,
                 connection_string=connection_string,
@@ -293,7 +293,7 @@ def infill(
             # Run it
             dl_args = ["--auth_fname", auth_fname, "--auth_key", "wmb"]
             download_and_process(
-                network_name="wmb",
+                network_key="wmb",
                 log_args=log_args,
                 download_args=dl_args,
                 connection_string=connection_string,
@@ -307,7 +307,7 @@ def infill(
                 hour = hour.astimezone(pytz.utc)  # EC files are named in UTC
                 dl_args = ["-d", hour.strftime(time_fmt)]
                 download_and_process(
-                    network_name=partner,
+                    network_key=partner,
                     log_args=log_args,
                     download_args=dl_args,
                     connection_string=connection_string,

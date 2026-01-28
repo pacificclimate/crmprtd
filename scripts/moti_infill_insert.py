@@ -55,7 +55,7 @@ def copy_stations_to_sqlite(src_dsn, dest_dsn):
     src_sesh = sessionmaker(bind=create_engine(src_dsn))()
     dest_sesh = sessionmaker(bind=create_engine(dest_dsn))()
 
-    net = Network(name="MoTIe")
+    net = Network(name="MoTIe", key=Network.gen_key_from_name("MoTIe"))
     dest_sesh.add(net)
     dest_sesh.flush()
 

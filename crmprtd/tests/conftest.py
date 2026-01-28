@@ -80,10 +80,10 @@ def test_session(crmp_session, caplog):
     """
     caplog.set_level(logging.ERROR, logger="sqlalchemy.engine")
 
-    moti = Network(name="MoTIe")
-    ec = Network(name="EC_raw")
-    wmb = Network(name="FLNRO-WMB")
-    wamr = Network(name="ENV-AQN")
+    moti = Network(name="MoTIe", key=Network.gen_key_from_name("MoTIe"))
+    ec = Network(name="EC_raw", key=Network.gen_key_from_name("EC_raw"))
+    wmb = Network(name="FLNRO-WMB", key=Network.gen_key_from_name("FLNRO-WMB"))
+    wamr = Network(name="ENV-AQN", key=Network.gen_key_from_name("ENV-AQN"))
     crmp_session.add_all([moti, ec, wmb, wamr])
 
     simon = Contact(name="Simon", networks=[moti])
@@ -222,7 +222,7 @@ def ec_session(crmp_session, caplog):
     """
     caplog.set_level(logging.ERROR, logger="sqlalchemy.engine")
 
-    ec = Network(name="EC_raw")
+    ec = Network(name="EC_raw", key=Network.gen_key_from_name("EC_raw"))
     crmp_session.add(ec)
 
     pat = Contact(name="Pat", networks=[ec])
