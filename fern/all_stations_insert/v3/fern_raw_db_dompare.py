@@ -6,56 +6,6 @@ from rapidfuzz import fuzz
 import sqlalchemy as sa
 from sqlalchemy.orm import Session
 
-###### Compare of the station
-def same_station(lat1, lon1, lat2, lon2, threshold_km=10):
-    """Return (is_same, distance_km) safely, handling NaNs."""
-    # Check for missing or invalid coordinates
-    if any(pd.isna(x) for x in [lat1, lon1, lat2, lon2]):
-        return False, np.nan
-
-    try:
-        dist = geodesic((lat1, lon1), (lat2, lon2)).km
-        return dist <= threshold_km, dist
-    except ValueError:
-        # Handles invalid coordinate tuples (e.g. non-finite)
-        return False, np.nan
-
-
-def find_nearby_stations(engine, lat, lon, radius_km=10):
-    """
-    Search stations in meta_history within radius_km of (lat, lon).
-    Returns a DataFrame of nearby stations.
-    """
-    query = sa.text("""
-        SELECT 
-            m.station_name, 
-            m.lat, 
-            m.lon,
-            ST_Distance(
-                m.the_geom::geography, 
-                ST_MakePoint(:lon, :lat)::geography
-            ) AS distance_m
-        FROM meta_history AS m
-        JOIN meta_station AS s ON m.station_id = s.station_id
-        WHERE s.network_id = 11
-        AND ST_DWithin(
-            m.the_geom::geography,
-            ST_MakePoint(:lon, :lat)::geography,
-            :radius_m
-        )
-        ORDER BY distance_m ASC;
-    """)
-    
-    params = {
-        "lat": lat,
-        "lon": lon,
-        "radius_m": radius_km * 1000
-    }
-
-    with engine.connect() as conn:
-        df = pd.read_sql(query, conn, params=params)
-    return df
-
 
 ###### Compare of the variables
 

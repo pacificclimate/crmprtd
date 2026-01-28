@@ -1,0 +1,45 @@
+Network ID,Station_name_pcds,native_id_pcds,lat_pcds,lon_pcds,Elevation_pcds,Station_name_ted,native_id_ted,lat_ted,lon_ted,Elevation_ted,Station_name_match,lat_match,lon_match,elev_match,id_match,all_match
+10.0,South ErickSon,AGCRESSEKN,49.0803,-116.4931,650.0,South Erickson,AGCRESSEKN,49.0803,-116.4931,650,False,True,True,True,True,False
+2.0,Johnson Hill,14093,49.20528,-122.80202,93.0,Port Mann Bridge Johnson Hill,14093,49.20528,-122.80202,93,False,True,True,True,True,False
+12.0,LITTLE CHOPAKA,3730,49.0251,-119.6909,461.0,LITTLE CHOPEKA,3810,49.0251,-119.6909,416,False,True,True,False,False,False
+12.0,WILLIS,3873,49.3394,-120.4071,1455.0,,,,,,False,False,False,False,False,False
+12.0,BURNS LAKE,3991,54.2591,-125.7599,830.0,,,,,,False,False,False,False,False,False
+12.0,WILDHORSE WX,4250,51.2333,-122.15,577.0,,,,,,False,False,False,False,False,False
+12.0,CHETWYND FB,4270,55.6907,-121.6137,616.0,CHETWYND,4270,55.6907,-121.6137,616,False,True,True,True,True,False
+12.0,MESACHIE 3,4513,48.8199,-124.131,197.0,,,,,,False,False,False,False,False,False
+12.0,MASHITER,4552,49.752,-123.0983,262.0,,,,,,False,False,False,False,False,False
+12.0,BAKER CREEK,4973,52.9639,-122.8311,826.0,,,,,,False,False,False,False,False,False
+12.0,Begbie DL,509,51.4733,-121.36,1276.0,BEGBIE SF,509,51.4733333,-121.36,1276,False,False,True,True,True,False
+137.0,Agassiz - Centential Park,T051,49.2384,-121.7748,23.0,Agassiz - Centential Park,T051,49.23836,-121.77478,AQ,True,False,False,False,True,False
+5.0,Gold River Below Ucona River 2,GLD 2,49.7032,-126.109406,10.0,,,,,,False,False,False,False,False,False
+5.0,Rees Creek,REC,49.6053611,-125.288167,280.0,Rees Creek,REC,-125.2881667,49.60536111,,True,False,False,False,True,False
+14.0,July Mountain,1C45P,49.70764,-121.08547,1860.0,July Mountain,1C45P,-121.08547,49.70764,,True,False,False,False,True,False
+14.0,Paradise Lake,AC44P,49.948639,-120.28227,1640.0,Paradise Lake,1C44P,-120.28227,49.948639,,True,False,False,False,False,False
+14.0,Deadman River,1C32P,51.09851,-120.60969,1430.0,Deadman River,1C32P,-120.60969,51.09851,,True,False,False,False,True,False
+14.0,Penfold Creek,1C23P,52.74882,-120.56057,1740.0,Penfold Creek,1C23P,-120.56057,52.74882,,True,False,False,False,True,False
+14.0,Puntzi,1C22AP,52.109,-124.15273,920.0,Puntzi,1C22AP,-124.15273,52.109,,True,False,False,False,True,False
+14.0,Mount Timothy,1C17P,51.90453,-121.25604,1630.0,Mount Timothy,1C17P,-121.25604,51.90453,,True,False,False,False,True,False
+14.0,Longworth Upper,1A05P,53.95083,-121.443056,1693.0,Longworth Upper,1A05P,-121.443056,53.95083,,True,False,False,False,True,False
+14.0,Trophy Mountain,1E03AP,51.808369,-119.940639,1880.0,Trophy Mountain,1E03AP,-119.940639,51.808369,,True,False,False,False,True,False
+14.0,Farron,2B02AP,49.27017,-118.13016,1230.0,Farron,2B02AP,-118.13016,49.27017,,True,False,False,False,True,False
+14.0,Gray Creek Lower,2D05P,49.61142,-116.6788,1650.0,Gray Creek Lower,2D05P,-116.6788,49.61142,,True,False,False,False,True,False
+14.0,Gray Creek Upper,2D10P,49.61656,-116.6584,1930.0,Gray Creek Upper,2D10P,-116.6584,49.61656,,True,False,False,False,True,False
+14.0,McCulloch,2F03AP,49.76731,-119.12403,1245.0,McCulloch,2F03AP,-119.12403,49.76731,,True,False,False,False,True,False
+14.0,Oyama Lake,2F19P,50.11633,-119.279,1360.0,Oyama Lake,2F19P,-119.279,50.11633,,True,False,False,False,True,False
+14.0,Whiterocks Mountain,2F09P,50.01691,-119.7461,1795.0,Whiterocks Mountain,2F09P,-119.7461,50.01691,,True,False,False,False,True,False
+14.0,Hamilton Hill,2G06P,49.49914,-120.79439,1480.0,Hamilton Hill,2G06P,-120.79439,49.49914,,True,False,False,False,True,False
+14.0,Mount Arrowsmith,3B26p,49.207376,-124.567776,1460.0,Mount Arrowsmith,3B26P,-124.567776,49.207376,,True,False,False,False,False,False
+14.0,Tetrahedron,3A28P,49.597854,-123.604999,1423.0,Tetrahedron,3A28P,-123.604999,49.597854,,True,False,False,False,True,False
+14.0,Granduc,4B12P,56.24674,-130.0661,790.0,Granduc,4B12P,-130.0661,56.24674,,True,False,False,False,True,False
+137.0,Lower Capilano Fire Weather,01FW02,49.38667,-123.11944,250.0,Lower Capilano Fire Weather,01FW02,49.38666667,-123.1194444,250,True,False,False,True,True,False
+137.0,Capilano Lake Raft,01WQ01,49.36617,-123.11361,145.0,Capilano Lake Raft,01WQ01,49.36611,-123.11361,145,True,False,True,True,True,False
+137.0,Capilano River above Lakehead,08GA010,49.39637,-123.14583,183.0,Capilano River above Lakehead,08GA010,49.39638889,-123.1458333,183,True,False,False,True,True,False
+137.0,Capilano River at Mid Valley,08GA026,49.45389,-123.10972,305.0,Capilano River at Mid Valley,08GA026,49.45388889,-123.1097222,305,True,False,False,True,True,False
+10.0,Blue Springs,BLUSPRNG,50.248,-118.869,580.0,Blue Springs,BLUSPRNG,50.248,-118.87,580,True,True,False,True,True,False
+10.0,Creton Flats,AGCRESFLAT,49.0418,-116.5674,536.0,Creston Flats,AGCRESFLAT,49.0418,-116.5674,536,False,True,True,True,True,False
+10.0,Westwold,WESTWOLD,50.4788,-119.765,654.0,Westwold,WESTWOLD,50.4788,-119.77,654,True,True,False,True,True,False
+10.0,Silver Creek,OKNGSVCK,50.6304,-119.3839,361.0,Silver Creek,OKNGSVCK,50.6304,-119.38,361,True,True,False,True,True,False
+2.0,Trout Lake,12092,49.5073,-123.87978,164.0,Trout Lake,12092,49.50725,-123.87978,164,True,False,True,True,True,False
+2.0,Highline,26521,50.62331,-122.44316,742.0,Highline,26521,50.62331,-122.4432,742,True,True,False,True,True,False
+5.0,Alouette Dam East Embankment,ALM,49.285665,-122.485421,129.0,Alouette Dam East Embankment,ALM,-122.485421,49.285665,,True,False,False,False,True,False
+137.0,Tsawwassen,T039,49.0099,-123.082,52.0,,,,,,False,False,False,False,False,False

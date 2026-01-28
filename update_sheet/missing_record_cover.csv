@@ -1,0 +1,28 @@
+ISSUE,Station ID,Network ID,Network Name,Unique Names,Unique Location (String),old_native_id,new_native_id,n_obs,oldest_obs_time,newest_obs_time
+"Attribution, ID, Location, Missing Data",2628,9,BC-Air -> MVRD-AIR,Annacis Island,"122.9422222 W, 49.15972222 N, Elev. 160 m -> 133.9607 W, 49.1657 N, Elev. 6 m",M110514,T038,0,,
+"Attribution, ID, Location, Missing Data (Differs from 12562)",12220,9,BC-Air -> MVRD-AIR,Pitt Meadows Meadowlands School,"122.7089 W, 49.2453 N, Elev. 20 m -> 122.7089 W, 49.2453 N, Elev. 4 m ",E232244,T020,0,,
+"Attribution, ID, Missing Data",12092,9,BC-Air -> MVRD-AIR,Burnaby South,"122.9856 W, 49.2153 N, Elev. 122 m",E207418,T018,0,,
+"Attribution, ID, Missing Data",2634,9,BC-Air -> MVRD-AIR,Horseshoe Bay Met,"123.2797222 W, 49.37277778 N, Elev. 60 m -> 123.2767 W, 49.3686 N, Elev. 65 m",M104271,T035,28055,1985-05-30 18:00:00,1987-02-17 11:00:00
+"Attribution, ID, Missing Data",12269,9,BC-Air -> MVRD-AIR,Richmond South,"123.1083 W, 49.1414 N, Elev. 15 m",E207417,T17,0,,
+"Attribution, ID, Name, Location, missing data",12530,9,BC-Air -> MVRD-AIR,NA -> Agassiz Municiple Hall,"121.762334 W, 49.238032 N, Elev. null m -> 121.762264 W, 49.238008 N, Elev. 23 m",Agassiz Municipal Hall,T044,5654,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12589,9,BC-Air -> MVRD-AIR,NA -> Abbotsford-Mill Lake,"122.3097 W, 49.0428 N, Elev. null m -> 122.3089 W, 49.0426 N, Elev. 58 m",Abbotsford Central,T033,2826,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12532,9,BC-Air -> MVRD-AIR,NA -> Burnaby Mountain,"122.9222 W, 49.2797 N, Elev. null m -> 122.9223 W, 49.2798 N, Elev. 360 m",Burnaby Mountain,T014,5620,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12593,9,BC-Air -> MVRD-AIR,NA -> Burnaby North,"123.0078 W, 49.2875 N, Elev. null m -> 123.008 W, 49.2875 N, Elev. 70 m",Burnaby North Eton,T024,2338,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12533,9,BC-Air -> MVRD-AIR,NA -> Burnaby South,"122.9856 W, 49.2153 N, Elev. null m -> 122.9857 WW, 49.2152 N, Elev. 20 m",Burnaby South,T018,5646,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12601,9,BC-Air -> MVRD-AIR,NA -> Burnaby-Capitol Hill,"122.9856 W, 49.2878 N, Elev. null m -> 122.9856 W, 49.2879 N, Elev. 200 m",North Burnaby Capitol Hill,T023,2825,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12591,9,BC-Air -> MVRD-AIR,NA -> Burnbay-Burmount,"122.9356 W, 49.2667 N, Elev. null m -> 122.9355 W, 49.2667 N, Elev. 101 m",Burnaby Burmount,T022,2822,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12536,9,BC-Air -> MVRD-AIR,NA -> Chilliwak Airport,"121.9406 W, 49.1561 N, Elev. null m -> 121.9403 W, 49.1558 N, Elev. 12 m",Chilliwack Airport,T012,160146,1987-03-26 12:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12549,9,BC-Air -> MVRD-AIR,NA -> Hope,"121.4994 W, 49.3697 N, Elev. null m -> 121.4991 W, 49.3698 N, Elev. 40 m",Hope Airport,T029,5558,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12556,9,BC-Air -> MVRD-AIR,NA -> Langley,"122.5669 W, 49.0956 N, Elev. null m -> 122.5671 W, 49.0956 N, Elev. 88 m",Langley Central,T027,5622,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12603,9,BC-Air -> MVRD-AIR,NA -> Mahon Park ,"123.0836 W, 49.3239 N, Elev. null m -> 123.0835 W, 49.3239 N, Elev. 71 m",North Vancouver Mahon Park,T026,2827,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12600,9,BC-Air -> MVRD-AIR,NA -> Maple Ridge,"122.5819 W, 49.215 N, Elev. null m -> 122.5821 W, 49.2149 N, Elev. 50 m ",Maple Ridge Golden Ears School,T028,2822,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data",12558,9,BC-Air -> MVRD-AIR,NA -> Mission,"122.311078 W, 49.14149 N, Elev. null m -> 122.31078 W, 49.14149 N, Elev. 74 m",Mission School Works Yard,T043,5654,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Location, Missing Data (differs from 12220)",12562,9,BC-Air -> MVRD-AIR,NA -> Pitt Meadows Airport,"122.7089 W, 49.2453 N, Elev. null m -> 122.7089 W, 49.2452 N, Elev. 10 m",Pitt Meadows Meadowlands School,T020,5620,2020-07-27 00:00:00,2020-11-21 23:00:00
+"Attribution, ID, Name, Missing Data",12311,9,BC-Air -> MVRD-AIR,Vancouver International Airport #2 -> Richmond Airport,"123.1522 W, 49.1864 N, Elev. 10 m",E232246,T031,0,,
+"Attribution, Missing Data",12291,9,BC-Air -> MVRD-AIR,Surrey East,"122.6942 W, 49.1328 N, Elev. 79 m",E206271,T015,0,,
+"Attribution,ID, Missing Data",12074,9,BC-Air -> MVRD-AIR,Abbotsford A Columbia Street ,"122.3266 W, 49.0215 N, Elev. 65 m",E289309,T045,0,,
+"ID, Missing Data",2615,9,BC-Air,Castlegar Met,"117.6577778 W, 49.31388889 N, Elev. 451 m",M114217,350,119245,1985-10-20 09:00:00,1993-04-19 11:00:00
+Missing data,12626,36,CRD-WS,Judge Creek,"123.673611 W, 48.585278 N, Elev. 200 m",HY002,,0,,
+Missing data,12625,36,CRD-WS,Rithet Creek,"123.714167 W, 48.5675 N, Elev. 223 m",FW002,,0,,
+Missing Data,12203,9,BC-Air -> MVRD-AIR,New Westminster Sapperton Park -> Sapperton Park,"122.894487 W, 49.227045 N, Elev. 45 m -> 122.8944487W, 49.227045 N, Elev. 45 m",E308566,T046,0,,
+Missing Data,12205,9,BC-Air -> MVRD-AIR,North Delta,"122.9017 W, 49.1583 N, Elev. 111 m",E207723,T013,0,,

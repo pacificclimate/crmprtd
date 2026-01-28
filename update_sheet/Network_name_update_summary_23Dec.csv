@@ -1,0 +1,32 @@
+network_id,network_name,description,Current,Suggested Network name,status
+10,AGRI,BC Ministry of Agriculture and Foods,AGRI,BC AGRIWeather,Rename
+22,ARD,Agricultural Resource Development office - Alberta,,,Not referenced
+17,ARDA,Agricultural and Rural Development Act Network,ARDA,ARDA,unchanged
+5,BCH,BC Hydro,BCH,BCH-GSO-HMP,Rename
+36,CRD,Capital Regional District Water Supply Area ,CRD,CRD-WS,Rename
+39,DFO_CCG_lighthouse,Department of Fisheries and Oceans - Lighthouses,,,Not referenced
+1,EC,Environment and Climate Change Canada (Canadian Daily Climate Data 2007),EC,EC,unchanged
+20,EC_AHCCD,Environment and Climate Change Canada (Adjusted and Homogenized Canadian Climate Data),,,Not referenced
+21,EC_Buoy,Environment and Climate Change Canada (Marine Buoys),,,Not referenced
+19,EC_raw,"Environment and Climate Change Canada (raw observations from ""Climate Data Online"")",EC_raw,EC_Raw,Rename
+9,ENV-AQN,BC Ministry of Environment and Climate Change Strategy - Air Quality Network,ENV-AQN,BC-Air,Rename
+14,ENV-ASP,BC Ministry of Environment and Climate Change Strategy - Automated Snow Weather Network,ENV-ASP,BC-Snow,Rename
+11,FLNRO-FERN,BC Ministry of Forests - Forest Ecosystems Research Network,FLNRO-FERN,BC-FERN,Rename
+12,FLNRO-WMB,BC Ministry of Forests - Wildfire Service Network,FLNRO-WMB,BC-TS,Rename
+16,FRBC,Forest Renewal British Columbia,FRBC,FRBC,unchanged
+40,HAK,Hakai Institute,HAK,HAK,unchanged
+137,MVRD,,,,delete
+15,MVan,Metro Vancouver and Climate Change Strategy - Air Quality Network,,MVRD,Rename
+23,MoAg_GS,BC Ministry of Agriculture Growers Supply,,,Not referenced
+13,MoTI,,,,Not referenced
+2,MoTIe,Ministry of Transportation and Infrastructure - Automated stations ,MoTIe,BC-TRAN,Rename
+3,MoTIm,Ministry of Transportation and Infrastructure - Manual stations,MoTIm,BC-TRAN,Rename
+,,,NAVCAN,NAVCAN,new
+,,,PC-Aval,PC-Aval,new
+,,,PC-FWx,PC-FWx,new
+34,PCIC Climate Variables,Synthetic network for climate variables computed by PCIC,,,Not referenced
+,,,PRPA,PRPA,new
+6,RT,Rio Tinto ,RT,RT,unchanged
+35,UNBC_CAM,UNBC Cariboo Alpine Mesonet,UNBC_CAM,UNBC_CAM,unchanged
+38,YAA,Yukon Avalanche Association,,,Not referenced
+37,YT_WFM,Yukon Wildland Fire Management Branch,,,Not referenced
