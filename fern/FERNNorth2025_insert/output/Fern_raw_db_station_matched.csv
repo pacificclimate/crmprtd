@@ -1,0 +1,534 @@
+station_name,native_id_raw,station_file_name,lat,lon,elev,variable,unit_raw,earliest_time_raw,latest_time_raw,unit_origin,db_var_match,unit_db,earliest_time_db,latest_time_db,earliest_diff_days,latest_diff_days,batch
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,DewPt,°C,2011-07-28 09:00:00,2024-08-10 19:00:00,°C,DewPtC,celsius,2011-07-28 09:00:00,2024-08-10 19:00:00,0.0,0.0,batch1
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,Gust Speed,m/s,2010-08-20 19:00:00,2024-08-10 19:00:00,m/s,GustSpeedms,m s-1,2010-08-20 19:00:00,2024-08-10 19:00:00,0.0,0.0,batch1
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,RH,%,2011-07-28 09:00:00,2024-08-10 19:00:00,%,RH,%,2011-07-28 09:00:00,2024-08-10 19:00:00,0.0,0.0,batch1
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,Rain,mm,2010-08-20 20:00:00,2024-08-10 19:00:00,mm,Rainmm,mm,2010-08-20 20:00:00,2024-08-10 19:00:00,0.0,0.0,batch1
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,Sfc Temp,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,°C,Surface_Temp,celsius,,,,,batch4
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,Soil Temp,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,°C,Soil_Temp,celsius,2010-08-20 19:00:00,2024-08-10 19:00:00,0.0,0.0,batch1
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,Soil Temp 50 cm,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,°C,Soil_Temp_50cm,celsius,2010-08-20 19:00:00,2024-08-10 19:00:00,0.0,0.0,batch1
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,Soil Temp 75 cm,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,°C,Soil_Temp_75cm,celsius,2010-08-20 19:00:00,2024-08-10 19:00:00,0.0,0.0,batch1
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,Solar Radiation,W/m²,2010-08-20 19:00:00,2024-08-10 19:00:00,W/m²,SolarRadiationWm,W m-2,2010-08-20 19:00:00,2024-08-10 19:00:00,0.0,0.0,batch1
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,Temp,°C,2010-08-20 19:00:00,2024-08-10 19:00:00,°C,TempC,celsius,2010-08-20 19:00:00,2024-08-10 19:00:00,0.0,0.0,batch1
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,Temp 2,°C,2011-07-28 09:00:00,2024-08-10 19:00:00,°C,,,,,,,batch5
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,Wind Direction,ø,2010-08-20 19:00:00,2024-08-10 19:00:00,ø,WindDirection,degree,2010-08-20 19:00:00,2024-08-10 19:00:00,0.0,0.0,batch1
+Atlin School,AtlSch,Atlin School,59.574,-133.687,705,Wind Speed,m/s,2010-08-20 19:00:00,2024-08-10 19:00:00,m/s,WindSpeedms,m s-1,2010-08-20 19:00:00,2024-08-10 19:00:00,0.0,0.0,batch1
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,DewPt,°C,2021-07-09 12:00:00,2025-09-24 12:00:00,°C,DewPtC,celsius,2021-07-09 12:00:00,2024-10-03 11:00:00,0.0,356.0,batch1
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,DewPt 30 cm,°C,2021-07-09 12:00:00,2025-09-24 12:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Gust Speed,m/s,2021-07-09 12:00:00,2025-09-24 12:00:00,m/s,GustSpeedms,m s-1,2021-07-09 12:00:00,2024-10-03 11:00:00,0.0,356.0,batch1
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Pressure,mbar,2021-07-09 12:00:00,2025-09-24 12:00:00,mbar,Pressurembar,millibar,2021-07-09 12:00:00,2024-10-03 11:00:00,0.0,356.0,batch1
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,RH,%,2021-07-09 12:00:00,2025-09-24 12:00:00,%,RH,%,2021-07-09 12:00:00,2024-10-03 11:00:00,0.0,356.0,batch1
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,RH 30 cm,%,2021-07-09 12:00:00,2025-09-24 12:00:00,%,RH_30cm,%,,,,,batch4
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Rain,mm,2021-07-09 13:00:00,2025-09-24 12:00:00,mm,Rainmm,mm,2021-07-09 13:00:00,2024-10-03 11:00:00,0.0,356.0,batch1
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Sfc Temp,°C,2022-07-05 12:00:00,2025-09-24 12:00:00,°C,Surface_Temp,celsius,,,,,batch4
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Soil Temp,°C,2021-07-09 12:00:00,2025-09-24 12:00:00,°C,Soil_Temp,celsius,2021-07-09 12:00:00,2024-10-03 11:00:00,0.0,356.0,batch1
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Solar Radiation,W/m²,2021-07-09 12:00:00,2025-09-24 12:00:00,W/m²,SolarRadiationWm,W m-2,2021-07-09 12:00:00,2024-10-03 11:00:00,0.0,356.0,batch1
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Temp,°C,2021-07-09 12:00:00,2025-09-24 12:00:00,°C,TempC,celsius,2021-07-09 12:00:00,2024-10-03 11:00:00,0.0,356.0,batch1
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Temp 30 cm,°C,2021-07-09 12:00:00,2025-09-24 12:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,WC_cal,m³/m³,2021-07-09 12:00:00,2025-09-24 12:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Water Content,m³/m³ 15 cm,2021-07-09 12:00:00,2025-09-24 12:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Water Content,m³/m³ 5 cm,2021-07-09 12:00:00,2025-09-24 12:00:00,m³/m³ 5 cm,Water_Content_m3_m3_5_cm,m3/m3,,,,,batch3
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Water Content,m³/m³ 30 cm,2021-07-09 12:00:00,2025-09-24 12:00:00,m³/m³ 30 cm,Water_Content_m3_m3_30_cm,m3/m3,,,,,batch3
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Wind Direction,ø,2021-07-09 12:00:00,2025-09-24 12:00:00,ø,WindDirection,degree,2021-07-09 12:00:00,2024-10-03 11:00:00,0.0,356.0,batch1
+BarrenWx,Barren,BarrenWx,54.510444,-126.614341,1051,Wind Speed,m/s,2021-07-09 12:00:00,2025-09-24 12:00:00,m/s,WindSpeedms,m s-1,2021-07-09 12:00:00,2024-10-03 11:00:00,0.0,356.0,batch1
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,DewPt,°C,2012-05-24 13:00:00,2026-01-05 10:00:00,°C,DewPtC,celsius,2012-05-24 13:00:00,2025-01-07 10:00:00,0.0,363.0,batch1
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,DewPt 2,°C,2024-07-18 10:00:00,2025-07-24 09:00:00,°C,,,,,,,batch5
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,Gust Speed,m/s,2012-05-24 13:00:00,2026-01-05 10:00:00,m/s,GustSpeedms,m s-1,2012-05-24 13:00:00,2025-01-07 10:00:00,0.0,363.0,batch1
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,Pressure,mbar,2012-05-24 13:00:00,2026-01-05 10:00:00,mbar,Pressurembar,millibar,2012-05-24 13:00:00,2025-01-07 10:00:00,0.0,363.0,batch1
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,RH,%,2012-05-24 13:00:00,2026-01-05 10:00:00,%,RH,%,2012-05-24 13:00:00,2025-01-07 10:00:00,0.0,363.0,batch1
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,RH 2,%,2024-07-18 10:00:00,2025-07-24 09:00:00,%,,,,,,,batch5
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,Rain,mm,2012-05-24 14:00:00,2026-01-05 10:00:00,mm,Rainmm,mm,2012-05-24 14:00:00,2025-01-07 10:00:00,0.0,363.0,batch1
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,Snow depth,cm,2016-10-26 14:00:00,2026-01-04 22:00:00,cm,Snow_Depth,cm,2016-10-26 14:00:00,2025-01-07 10:00:00,0.0,362.0,batch1
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,Soil Temp,°C,2024-07-18 10:00:00,2026-01-05 10:00:00,°C,Soil_Temp,celsius,2024-07-18 10:00:00,2025-01-07 10:00:00,0.0,363.0,batch1
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,Solar Radiation,W/m²,2012-05-24 13:00:00,2026-01-05 10:00:00,W/m²,SolarRadiationWm,W m-2,2012-05-24 13:00:00,2025-01-07 10:00:00,0.0,363.0,batch1
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,Temp,°C,2012-05-24 13:00:00,2026-01-05 10:00:00,°C,TempC,celsius,2012-05-24 13:00:00,2025-01-07 10:00:00,0.0,363.0,batch1
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,Temp 2,°C,2024-07-18 10:00:00,2025-07-24 09:00:00,°C,,,,,,,batch5
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,WC_cal,m³/m³,2017-07-28 13:00:00,2026-01-05 10:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,Water Content,m³/m³ 15 cm,2017-07-27 12:00:00,2026-01-05 10:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,Wind Direction,ø,2012-05-24 13:00:00,2026-01-05 10:00:00,ø,WindDirection,degree,2012-05-24 13:00:00,2025-01-07 10:00:00,0.0,363.0,batch1
+BlackhawkWx,Blackhawk,BlackhawkWx,55.078885,-120.352171,962,Wind Speed,m/s,2012-05-24 13:00:00,2026-01-05 10:00:00,m/s,WindSpeedms,m s-1,2012-05-24 13:00:00,2025-01-07 10:00:00,0.0,363.0,batch1
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,DewPt,°C,2010-06-07 13:00:00,2025-09-23 15:00:00,°C,DewPtC,celsius,2010-06-07 13:00:00,2024-08-07 08:00:00,0.0,412.0,batch1
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,DewPt 30 cm,°C,2020-07-07 17:00:00,2025-09-12 17:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Gust Speed,m/s,2010-06-07 13:00:00,2025-09-23 15:00:00,m/s,GustSpeedms,m s-1,2010-06-07 13:00:00,2024-08-07 08:00:00,0.0,412.0,batch1
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Pressure,mbar,2010-06-07 13:00:00,2025-09-23 15:00:00,mbar,Pressurembar,millibar,2010-06-07 13:00:00,2024-08-07 08:00:00,0.0,412.0,batch1
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,RH,%,2010-06-07 13:00:00,2025-09-23 15:00:00,%,RH,%,2010-06-07 13:00:00,2024-08-07 08:00:00,0.0,412.0,batch1
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,RH 30 cm,%,2020-07-07 17:00:00,2025-09-12 17:00:00,%,RH_30cm,%,,,,,batch4
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Rain,mm,2010-06-07 13:00:00,2025-09-23 15:00:00,mm,Rainmm,mm,2010-06-07 13:00:00,2024-08-07 08:00:00,0.0,412.0,batch1
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Sfc Temp,°C,2024-08-07 09:00:00,2025-09-23 15:00:00,°C,Surface_Temp,celsius,,,,,batch4
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Soil Temp,°C,2024-05-29 15:00:00,2025-09-23 15:00:00,°C,Soil_Temp,celsius,2024-05-29 15:00:00,2024-06-26 21:00:00,0.0,453.0,batch1
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Solar Radiation,W/m²,2010-06-07 13:00:00,2025-09-23 15:00:00,W/m²,SolarRadiationWm,W m-2,2010-06-07 13:00:00,2024-08-07 08:00:00,0.0,412.0,batch1
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Temp,°C,2010-06-07 13:00:00,2025-09-23 15:00:00,°C,TempC,celsius,2010-06-07 13:00:00,2024-08-07 08:00:00,0.0,412.0,batch1
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Temp 30 cm,°C,2020-07-07 17:00:00,2025-09-12 17:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,WC_cal,m³/m³,2017-05-25 17:00:00,2025-09-23 15:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Water Content,m³/m³ 15 cm,2017-05-25 17:00:00,2025-09-23 15:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Wetness,%,2011-07-13 11:00:00,2025-09-23 15:00:00,%,Wetness,%,2011-07-13 11:00:00,2024-08-07 08:00:00,0.0,412.0,batch1
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Wind Direction,ø,2010-06-07 13:00:00,2025-09-23 15:00:00,ø,WindDirection,degree,2010-06-07 13:00:00,2024-08-07 08:00:00,0.0,412.0,batch1
+BoulderWx,Boulder Creek,BoulderWx,55.108173,-127.37474,385,Wind Speed,m/s,2010-06-07 13:00:00,2025-09-23 15:00:00,m/s,WindSpeedms,m s-1,2010-06-07 13:00:00,2024-08-07 08:00:00,0.0,412.0,batch1
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,DewPt,°C,2018-09-13 12:00:00,2026-01-05 10:00:00,°C,DewPtC,celsius,2018-08-29 15:00:00,2025-01-07 11:00:00,14.0,362.0,batch1
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,DewPt 2,°C,2024-10-16 14:00:00,2025-09-05 11:00:00,°C,,,,,,,batch5
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,DewPt 30 cm,°C,2018-08-29 15:00:00,2025-06-11 12:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Gust Speed,m/s,2018-09-13 12:00:00,2026-01-05 10:00:00,m/s,GustSpeedms,m s-1,2018-09-13 12:00:00,2025-01-07 11:00:00,0.0,362.0,batch1
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Pressure,mbar,2018-09-13 12:00:00,2026-01-05 10:00:00,mbar,Pressurembar,millibar,2018-09-13 12:00:00,2025-01-07 11:00:00,0.0,362.0,batch1
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,RH,%,2018-09-13 12:00:00,2026-01-05 10:00:00,%,RH,%,2018-08-29 15:00:00,2025-01-07 11:00:00,14.0,362.0,batch1
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,RH 2,%,2024-10-16 14:00:00,2025-09-05 11:00:00,%,,,,,,,batch5
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,RH 30 cm,%,2018-08-29 15:00:00,2025-06-11 12:00:00,%,RH_30cm,%,,,,,batch4
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Rain,mm,2018-09-13 13:00:00,2026-01-05 10:00:00,mm,Rainmm,mm,2018-09-13 13:00:00,2025-01-07 11:00:00,0.0,362.0,batch1
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Snow depth,cm,2019-11-01 12:00:00,2026-01-05 10:00:00,cm,Snow_Depth,cm,2019-11-01 12:00:00,2025-01-07 11:00:00,0.0,362.0,batch1
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Soil Temp,°C,2024-10-16 14:00:00,2026-01-05 10:00:00,°C,Soil_Temp,celsius,2024-10-16 14:00:00,2025-01-07 11:00:00,0.0,362.0,batch1
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Solar Radiation,W/m²,2018-09-13 12:00:00,2026-01-05 10:00:00,W/m²,SolarRadiationWm,W m-2,2018-09-13 12:00:00,2025-01-07 11:00:00,0.0,362.0,batch1
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Temp,°C,2018-09-13 12:00:00,2026-01-05 10:00:00,°C,TempC,celsius,2018-08-29 15:00:00,2025-01-07 11:00:00,14.0,362.0,batch1
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Temp 2,°C,2024-10-16 14:00:00,2025-09-05 11:00:00,°C,,,,,,,batch5
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Temp 30 cm,°C,2018-08-29 15:00:00,2025-06-11 12:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,WC_cal,m³/m³,2018-09-13 12:00:00,2026-01-05 10:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Water Content,m³/m³ 15 cm,2018-09-13 12:00:00,2026-01-05 10:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Wind Direction,ø,2018-09-13 12:00:00,2026-01-05 10:00:00,ø,WindDirection,degree,2018-09-13 12:00:00,2025-01-07 11:00:00,0.0,362.0,batch1
+BowronPit,BowronPit,BowronPit,53.902111,-122.015389,722,Wind Speed,m/s,2018-09-13 12:00:00,2026-01-05 10:00:00,m/s,WindSpeedms,m s-1,2018-09-13 12:00:00,2025-01-07 11:00:00,0.0,362.0,batch1
+BulkleyWx,PGTIS1,BulkleyWx,53.772183,-122.720729,594,DewPt,°C,2007-07-31 13:00:00,2025-10-30 11:00:00,°C,DewPtC,celsius,2007-07-31 12:00:03,2024-10-24 11:00:00,0.0,371.0,batch1
+BulkleyWx,PGTIS1,BulkleyWx,53.772183,-122.720729,594,Gust Speed,m/s,2007-07-31 13:00:00,2025-10-30 11:00:00,m/s,GustSpeedms,m s-1,2007-07-31 12:00:03,2024-10-24 11:00:00,0.0,371.0,batch1
+BulkleyWx,PGTIS1,BulkleyWx,53.772183,-122.720729,594,Pressure,mbar,2007-07-31 13:00:00,2025-10-30 11:00:00,mbar,Pressurembar,millibar,2007-07-31 12:00:03,2024-10-24 11:00:00,0.0,371.0,batch1
+BulkleyWx,PGTIS1,BulkleyWx,53.772183,-122.720729,594,RH,%,2007-07-31 13:00:00,2025-10-30 11:00:00,%,RH,%,2007-07-31 12:00:03,2024-10-24 11:00:00,0.0,371.0,batch1
+BulkleyWx,PGTIS1,BulkleyWx,53.772183,-122.720729,594,Rain,mm,2007-07-31 13:00:00,2025-10-30 11:00:00,mm,Rainmm,mm,2007-07-31 12:00:03,2024-10-24 11:00:00,0.0,371.0,batch1
+BulkleyWx,PGTIS1,BulkleyWx,53.772183,-122.720729,594,Solar Radiation,W/m²,2007-07-31 13:00:00,2025-10-30 11:00:00,W/m²,SolarRadiationWm,W m-2,2007-07-31 12:00:03,2024-10-24 11:00:00,0.0,371.0,batch1
+BulkleyWx,PGTIS1,BulkleyWx,53.772183,-122.720729,594,Temp,°C,2007-07-31 13:00:00,2025-10-30 11:00:00,°C,TempC,celsius,2007-07-31 12:00:03,2024-10-24 11:00:00,0.0,371.0,batch1
+BulkleyWx,PGTIS1,BulkleyWx,53.772183,-122.720729,594,Wetness,%,2008-06-13 00:00:00,2025-10-30 11:00:00,%,Wetness,%,2007-07-31 12:00:03,2024-10-24 11:00:00,317.0,371.0,batch1
+BulkleyWx,PGTIS1,BulkleyWx,53.772183,-122.720729,594,Wind Direction,ø,2007-07-31 13:00:00,2025-10-30 11:00:00,ø,WindDirection,degree,2007-07-31 12:00:03,2024-10-24 11:00:00,0.0,371.0,batch1
+BulkleyWx,PGTIS1,BulkleyWx,53.772183,-122.720729,594,Wind Speed,m/s,2007-07-31 13:00:00,2025-10-30 11:00:00,m/s,WindSpeedms,m s-1,2007-07-31 12:00:03,2024-10-24 11:00:00,0.0,371.0,batch1
+CPFWx,PGTIS3,CPFWx,53.753775,-122.718864,593,DewPt,°C,2007-08-09 14:00:00,2025-10-30 08:00:00,°C,DewPtC,celsius,2007-08-09 13:00:00,2024-10-24 08:00:00,0.0,371.0,batch1
+CPFWx,PGTIS3,CPFWx,53.753775,-122.718864,593,Gust Speed,m/s,2007-08-09 14:00:00,2025-10-30 08:00:00,m/s,GustSpeedms,m s-1,2007-08-09 13:00:00,2024-10-24 08:00:00,0.0,371.0,batch1
+CPFWx,PGTIS3,CPFWx,53.753775,-122.718864,593,Pressure,mbar,2007-08-09 14:00:00,2025-10-30 08:00:00,mbar,Pressurembar,millibar,2007-08-09 13:00:00,2024-10-24 08:00:00,0.0,371.0,batch1
+CPFWx,PGTIS3,CPFWx,53.753775,-122.718864,593,RH,%,2007-08-09 14:00:00,2025-10-30 08:00:00,%,RH,%,2007-08-09 13:00:00,2024-10-24 08:00:00,0.0,371.0,batch1
+CPFWx,PGTIS3,CPFWx,53.753775,-122.718864,593,Rain,mm,2007-08-09 14:00:00,2025-10-30 08:00:00,mm,Rainmm,mm,2007-08-09 13:00:00,2024-10-24 08:00:00,0.0,371.0,batch1
+CPFWx,PGTIS3,CPFWx,53.753775,-122.718864,593,Solar Radiation,W/m²,2007-08-09 14:00:00,2025-10-30 08:00:00,W/m²,SolarRadiationWm,W m-2,2007-08-09 13:00:00,2024-10-24 08:00:00,0.0,371.0,batch1
+CPFWx,PGTIS3,CPFWx,53.753775,-122.718864,593,Temp,°C,2007-08-09 14:00:00,2025-10-30 08:00:00,°C,TempC,celsius,2007-08-09 13:00:00,2024-10-24 08:00:00,0.0,371.0,batch1
+CPFWx,PGTIS3,CPFWx,53.753775,-122.718864,593,Wetness,%,2008-06-12 15:00:00,2025-10-30 08:00:00,%,Wetness,%,2007-08-09 13:00:00,2024-10-24 08:00:00,308.0,371.0,batch1
+CPFWx,PGTIS3,CPFWx,53.753775,-122.718864,593,Wind Direction,ø,2007-08-09 14:00:00,2025-10-30 08:00:00,ø,WindDirection,degree,2007-08-09 13:00:00,2024-10-24 08:00:00,0.0,371.0,batch1
+CPFWx,PGTIS3,CPFWx,53.753775,-122.718864,593,Wind Speed,m/s,2007-08-09 14:00:00,2025-10-30 08:00:00,m/s,WindSpeedms,m s-1,2007-08-09 13:00:00,2024-10-24 08:00:00,0.0,371.0,batch1
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,DewPt,°C,2012-03-22 11:00:00,2026-01-05 10:00:00,°C,DewPtC,celsius,2012-03-22 11:00:00,2025-01-07 12:00:00,0.0,362.0,batch1
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,DewPt 2,°C,2023-09-14 10:00:00,2025-09-12 08:00:00,°C,,,,,,,batch5
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,Gust Speed,m/s,2012-03-22 11:00:00,2026-01-05 10:00:00,m/s,GustSpeedms,m s-1,2012-03-22 11:00:00,2025-01-07 12:00:00,0.0,362.0,batch1
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,Pressure,mbar,2012-03-22 11:00:00,2026-01-05 10:00:00,mbar,Pressurembar,millibar,2012-03-22 11:00:00,2025-01-07 12:00:00,0.0,362.0,batch1
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,RH,%,2012-03-22 11:00:00,2026-01-05 10:00:00,%,RH,%,2012-03-22 11:00:00,2025-01-07 12:00:00,0.0,362.0,batch1
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,RH 2,%,2023-09-14 10:00:00,2025-09-12 08:00:00,%,,,,,,,batch5
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,Rain,mm,2012-03-22 12:00:00,2026-01-05 10:00:00,mm,Rainmm,mm,2012-03-22 12:00:00,2025-01-07 12:00:00,0.0,362.0,batch1
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,Sfc Temp,°C,2012-03-22 11:00:00,2025-09-12 08:00:00,°C,Surface_Temp,celsius,,,,,batch4
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,Solar Radiation,W/m²,2012-03-22 11:00:00,2026-01-05 10:00:00,W/m²,SolarRadiationWm,W m-2,2012-03-22 11:00:00,2025-01-07 12:00:00,0.0,362.0,batch1
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,Temp,°C,2012-03-22 11:00:00,2026-01-05 10:00:00,°C,TempC,celsius,2012-03-22 11:00:00,2025-01-07 12:00:00,0.0,362.0,batch1
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,Temp 2,°C,2023-09-14 10:00:00,2025-09-12 08:00:00,°C,,,,,,,batch5
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,Wind Direction,ø,2012-03-22 11:00:00,2026-01-05 10:00:00,ø,WindDirection,degree,2012-03-22 11:00:00,2025-01-07 12:00:00,0.0,362.0,batch1
+Canoe Mountain Stn,Canoe Mountain Stn,Canoe Mountain Stn,52.70982,-119.19126,2210,Wind Speed,m/s,2012-03-22 11:00:00,2026-01-05 10:00:00,m/s,WindSpeedms,m s-1,2012-03-22 11:00:00,2025-01-07 12:00:00,0.0,362.0,batch1
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,DewPt,°C,2023-08-04 11:00:00,2026-01-05 11:00:00,°C,DewPtC,celsius,2023-08-04 11:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,DewPt 2,°C,2023-08-04 11:00:00,2026-01-05 11:00:00,°C,,,,,,,batch5
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,Gust Speed,m/s,2023-08-04 11:00:00,2026-01-05 11:00:00,m/s,GustSpeedms,m s-1,2023-08-04 11:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,Pressure,mbar,2023-08-04 11:00:00,2026-01-05 11:00:00,mbar,Pressurembar,millibar,2023-08-04 11:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,RH,%,2023-08-04 11:00:00,2026-01-05 11:00:00,%,RH,%,2023-08-04 11:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,RH 2,%,2023-08-04 11:00:00,2026-01-05 11:00:00,%,,,,,,,batch5
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,Rain,mm,2023-08-04 12:00:00,2026-01-05 11:00:00,mm,Rainmm,mm,2023-08-04 12:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,Solar Radiation,W/m²,2023-08-04 11:00:00,2026-01-05 11:00:00,W/m²,SolarRadiationWm,W m-2,2023-08-04 11:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,Temp,°C,2023-08-04 11:00:00,2026-01-05 11:00:00,°C,TempC,celsius,2023-08-04 11:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,Temp 2,°C,2023-08-04 11:00:00,2026-01-05 11:00:00,°C,,,,,,,batch5
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,Water Content,m³/m³ 5 cm,2023-08-04 12:00:00,2024-08-08 08:00:00,m³/m³ 5 cm,Water_Content_m3_m3_5_cm,m3/m3,,,,,batch3
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,Wind Direction,ø,2023-08-04 11:00:00,2026-01-05 11:00:00,ø,WindDirection,degree,2023-08-04 11:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+Caribou Pass,CaribouPass,Caribou Pass,58.35718,-129.54637,1744,Wind Speed,m/s,2023-08-04 11:00:00,2026-01-05 11:00:00,m/s,WindSpeedms,m s-1,2023-08-04 11:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,DewPt,°C,2021-07-08 12:00:00,2025-09-24 07:00:00,°C,DewPtC,celsius,2021-07-08 12:00:00,2024-10-03 14:00:00,0.0,355.0,batch1
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,DewPt 30 cm,°C,2021-07-08 12:00:00,2025-09-24 08:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Gust Speed,m/s,2021-07-08 12:00:00,2025-09-24 07:00:00,m/s,GustSpeedms,m s-1,2021-07-08 12:00:00,2024-10-03 14:00:00,0.0,355.0,batch1
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Pressure,mbar,2021-07-08 12:00:00,2025-09-24 07:00:00,mbar,Pressurembar,millibar,2021-07-08 12:00:00,2024-10-03 14:00:00,0.0,355.0,batch1
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,RH,%,2021-07-08 12:00:00,2025-09-24 07:00:00,%,RH,%,2021-07-08 12:00:00,2024-10-03 14:00:00,0.0,355.0,batch1
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,RH 30 cm,%,2021-07-08 12:00:00,2025-09-24 08:00:00,%,RH_30cm,%,,,,,batch4
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Rain,mm,2021-07-08 13:00:00,2025-09-24 07:00:00,mm,Rainmm,mm,2021-07-08 13:00:00,2024-10-03 14:00:00,0.0,355.0,batch1
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Sfc Temp,°C,2022-07-07 13:00:00,2025-09-24 07:00:00,°C,Surface_Temp,celsius,,,,,batch4
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Soil Temp,°C,2021-07-08 12:00:00,2025-09-24 07:00:00,°C,Soil_Temp,celsius,2021-07-08 12:00:00,2024-10-03 14:00:00,0.0,355.0,batch1
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Solar Radiation,W/m²,2021-07-08 12:00:00,2025-09-24 07:00:00,W/m²,SolarRadiationWm,W m-2,2021-07-08 12:00:00,2024-10-03 14:00:00,0.0,355.0,batch1
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Temp,°C,2021-07-08 12:00:00,2025-09-24 07:00:00,°C,TempC,celsius,2021-07-08 12:00:00,2024-10-03 14:00:00,0.0,355.0,batch1
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Temp 2,°C,2024-07-25 15:00:00,2025-09-24 07:00:00,°C,,,,,,,batch5
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Temp 30 cm,°C,2021-07-08 12:00:00,2025-09-24 08:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,WC_cal,m³/m³,2021-07-08 12:00:00,2025-09-24 07:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Water Content,m³/m³ 15 cm,2021-07-08 12:00:00,2025-09-24 07:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Water Content,m³/m³ 5 cm,2021-07-08 12:00:00,2025-09-24 07:00:00,m³/m³ 5 cm,Water_Content_m3_m3_5_cm,m3/m3,,,,,batch3
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Water Content,m³/m³ 30 cm,2021-07-08 12:00:00,2025-09-24 07:00:00,m³/m³ 30 cm,Water_Content_m3_m3_30_cm,m3/m3,,,,,batch3
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Wind Direction,ø,2021-07-08 12:00:00,2025-09-24 07:00:00,ø,WindDirection,degree,2021-07-08 12:00:00,2024-10-03 14:00:00,0.0,355.0,batch1
+ChapmanWx,Chapman,ChapmanWx,54.883903,-126.623533,848,Wind Speed,m/s,2021-07-08 12:00:00,2025-09-24 07:00:00,m/s,WindSpeedms,m s-1,2021-07-08 12:00:00,2024-10-03 14:00:00,0.0,355.0,batch1
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,DewPt,°C,2019-07-05 13:00:00,2025-09-16 10:00:00,°C,DewPtC,celsius,2019-07-05 13:00:00,2024-10-09 10:00:00,0.0,342.0,batch1
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,DewPt 2,°C,2024-10-09 11:00:00,2025-09-16 10:00:00,°C,,,,,,,batch5
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,Gust Speed,m/s,2019-07-05 13:00:00,2025-09-16 10:00:00,m/s,GustSpeedms,m s-1,2019-07-05 13:00:00,2024-10-09 10:00:00,0.0,342.0,batch1
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,Pressure,mbar,2019-07-05 13:00:00,2025-09-16 10:00:00,mbar,Pressurembar,millibar,2019-07-05 13:00:00,2024-10-09 10:00:00,0.0,342.0,batch1
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,RH,%,2019-07-05 13:00:00,2025-09-16 10:00:00,%,RH,%,2019-07-05 13:00:00,2024-10-09 10:00:00,0.0,342.0,batch1
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,RH 2,%,2024-10-09 11:00:00,2025-09-16 10:00:00,%,,,,,,,batch5
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,Rain,mm,2019-07-05 14:00:00,2025-09-16 10:00:00,mm,Rainmm,mm,2019-07-05 14:00:00,2024-10-09 10:00:00,0.0,342.0,batch1
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,Soil Temp,°C,2024-06-07 12:00:00,2025-09-16 10:00:00,°C,Soil_Temp,celsius,2024-06-07 12:00:00,2024-10-09 10:00:00,0.0,342.0,batch1
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,Solar Radiation,W/m²,2019-07-05 13:00:00,2025-09-16 10:00:00,W/m²,SolarRadiationWm,W m-2,2019-07-05 13:00:00,2024-10-09 10:00:00,0.0,342.0,batch1
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,Temp,°C,2019-07-05 13:00:00,2025-09-16 10:00:00,°C,TempC,celsius,2019-07-05 13:00:00,2024-10-09 10:00:00,0.0,342.0,batch1
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,Temp 2,°C,2024-10-09 11:00:00,2025-09-16 10:00:00,°C,,,,,,,batch5
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,WC_cal,m³/m³,2019-07-05 13:00:00,2025-09-16 10:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,Water Content,m³/m³ 15 cm,2019-07-05 13:00:00,2025-09-16 10:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,Wetness,%,2019-07-05 13:00:00,2025-09-16 10:00:00,%,Wetness,%,2019-07-05 13:00:00,2024-10-09 10:00:00,0.0,342.0,batch1
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,Wind Direction,ø,2019-07-05 13:00:00,2025-09-16 10:00:00,ø,WindDirection,degree,2019-07-05 13:00:00,2024-10-09 10:00:00,0.0,342.0,batch1
+ChiefLakeWx,ChiefWx,ChiefLakeWx,54.238028,-122.877306,720,Wind Speed,m/s,2019-07-05 13:00:00,2025-09-16 10:00:00,m/s,WindSpeedms,m s-1,2019-07-05 13:00:00,2024-10-09 10:00:00,0.0,342.0,batch1
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,DewPt,°C,2018-09-14 14:00:00,2025-09-05 09:00:00,°C,DewPtC,celsius,2018-08-29 14:00:00,2024-09-12 12:00:00,16.0,357.0,batch1
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,DewPt 30 cm,°C,2018-08-29 14:00:00,2025-09-05 09:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,Gust Speed,m/s,2018-09-14 14:00:00,2025-09-05 09:00:00,m/s,GustSpeedms,m s-1,2018-09-14 14:00:00,2024-09-12 12:00:00,0.0,357.0,batch1
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,Pressure,mbar,2018-09-14 14:00:00,2025-09-05 09:00:00,mbar,Pressurembar,millibar,2018-09-14 14:00:00,2024-09-12 12:00:00,0.0,357.0,batch1
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,RH,%,2018-09-14 14:00:00,2025-09-05 09:00:00,%,RH,%,2018-08-29 14:00:00,2024-09-12 12:00:00,16.0,357.0,batch1
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,RH 30 cm,%,2018-08-29 14:00:00,2025-09-05 09:00:00,%,RH_30cm,%,,,,,batch4
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,Rain,mm,2018-09-14 15:00:00,2025-09-05 09:00:00,mm,Rainmm,mm,2018-09-14 15:00:00,2024-09-12 12:00:00,0.0,357.0,batch1
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,Soil Temp,°C,2024-09-12 13:00:00,2025-09-05 09:00:00,°C,Soil_Temp,celsius,,,,,batch2
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,Solar Radiation,W/m²,2018-09-14 14:00:00,2025-09-05 09:00:00,W/m²,SolarRadiationWm,W m-2,2018-09-14 14:00:00,2024-09-12 12:00:00,0.0,357.0,batch1
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,Temp,°C,2018-09-14 14:00:00,2025-09-05 09:00:00,°C,TempC,celsius,2018-08-29 14:00:00,2024-09-12 12:00:00,16.0,357.0,batch1
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,Temp 30 cm,°C,2018-08-29 14:00:00,2025-09-05 09:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,WC_cal,m³/m³,2019-06-26 10:00:00,2025-09-05 09:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,Water Content,m³/m³ 15 cm,2019-06-26 10:00:00,2025-09-05 09:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,Wind Direction,ø,2018-09-14 14:00:00,2025-09-05 09:00:00,ø,WindDirection,degree,2018-09-14 14:00:00,2024-09-12 12:00:00,0.0,357.0,batch1
+CoalmineWx,CoalmineWx,CoalmineWx,53.741139,-121.784639,840,Wind Speed,m/s,2018-09-14 14:00:00,2025-09-05 09:00:00,m/s,WindSpeedms,m s-1,2018-09-14 14:00:00,2024-09-12 12:00:00,0.0,357.0,batch1
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,DewPt,°C,2023-08-08 14:00:00,2025-11-05 12:00:00,°C,DewPtC,celsius,2023-08-08 14:00:00,2024-10-28 10:00:00,0.0,373.0,batch1
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,DewPt 2,°C,2025-02-25 14:00:00,2025-08-11 10:00:00,°C,,,,,,,batch5
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,Gust Speed,m/s,2023-08-08 14:00:00,2025-11-05 12:00:00,m/s,GustSpeedms,m s-1,2023-08-08 14:00:00,2024-10-28 10:00:00,0.0,373.0,batch1
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,Pressure,mbar,2023-08-08 14:00:00,2025-11-05 12:00:00,mbar,Pressurembar,millibar,2023-08-08 14:00:00,2024-10-28 10:00:00,0.0,373.0,batch1
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,RH,%,2023-08-08 14:00:00,2025-11-05 12:00:00,%,RH,%,2023-08-08 14:00:00,2024-10-28 10:00:00,0.0,373.0,batch1
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,RH 2,%,2025-02-25 14:00:00,2025-08-11 10:00:00,%,,,,,,,batch5
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,Rain,mm,2023-08-08 15:00:00,2025-11-05 12:00:00,mm,Rainmm,mm,2023-08-08 15:00:00,2024-10-28 10:00:00,0.0,373.0,batch1
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,Solar Radiation,W/m²,2023-08-08 14:00:00,2025-11-05 12:00:00,W/m²,SolarRadiationWm,W m-2,2023-08-08 14:00:00,2024-10-28 10:00:00,0.0,373.0,batch1
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,Temp,°C,2023-08-08 14:00:00,2025-11-05 12:00:00,°C,TempC,celsius,2023-08-08 14:00:00,2024-10-28 10:00:00,0.0,373.0,batch1
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,Temp 2,°C,2025-02-25 14:00:00,2025-08-11 10:00:00,°C,,,,,,,batch5
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,Wind Direction,ø,2023-08-08 14:00:00,2025-11-05 12:00:00,ø,WindDirection,degree,2023-08-08 14:00:00,2024-10-28 10:00:00,0.0,373.0,batch1
+CrookedLk,CrookedLk,CrookedLk,59.88626,-126.42886,669,Wind Speed,m/s,2023-08-08 14:00:00,2025-11-05 12:00:00,m/s,WindSpeedms,m s-1,2023-08-08 14:00:00,2024-10-28 10:00:00,0.0,373.0,batch1
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,DewPt,°C,2010-04-29 13:00:00,2025-10-27 11:00:00,°C,DewPtC,celsius,2010-04-29 13:00:00,2024-10-18 13:00:00,0.0,373.0,batch1
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,DewPt 30 cm,°C,2010-04-29 13:00:00,2025-10-27 11:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Gust Speed,m/s,2010-04-29 13:00:00,2025-10-27 11:00:00,m/s,GustSpeedms,m s-1,2010-04-29 13:00:00,2024-10-18 13:00:00,0.0,373.0,batch1
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Pressure,mbar,2010-04-29 13:00:00,2025-10-27 11:00:00,mbar,Pressurembar,millibar,2010-04-29 13:00:00,2024-10-18 13:00:00,0.0,373.0,batch1
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,RH,%,2010-04-29 13:00:00,2025-10-27 11:00:00,%,RH,%,2010-04-29 13:00:00,2024-10-18 13:00:00,0.0,373.0,batch1
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,RH 30 cm,%,2010-04-29 13:00:00,2025-10-27 11:00:00,%,RH_30cm,%,,,,,batch4
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Rain,mm,2010-04-29 13:00:00,2025-10-27 11:00:00,mm,Rainmm,mm,2010-04-29 13:00:00,2024-10-18 13:00:00,0.0,373.0,batch1
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Sfc Temp,°C,2024-08-28 14:00:00,2025-10-27 12:00:00,°C,Surface_Temp,celsius,,,,,batch4
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Soil Temp,°C,2024-08-28 14:00:00,2025-10-27 12:00:00,°C,Soil_Temp,celsius,2024-08-28 14:00:00,2024-10-18 13:00:00,0.0,373.0,batch1
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Solar Radiation,W/m²,2010-04-29 13:00:00,2025-10-27 11:00:00,W/m²,SolarRadiationWm,W m-2,2010-04-29 13:00:00,2024-10-18 13:00:00,0.0,373.0,batch1
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Temp,°C,2010-04-29 13:00:00,2025-10-27 11:00:00,°C,TempC,celsius,2010-04-29 13:00:00,2024-10-18 13:00:00,0.0,373.0,batch1
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Temp 30 cm,°C,2010-04-29 13:00:00,2025-10-27 11:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,WC_cal,m³/m³,2017-09-14 11:00:00,2025-10-27 11:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Water Content,m³/m³ 15 cm,2017-09-14 11:00:00,2025-10-27 11:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Wetness,%,2010-04-29 13:00:00,2025-10-27 11:00:00,%,Wetness,%,2010-04-29 13:00:00,2024-10-18 13:00:00,0.0,373.0,batch1
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Wind Direction,ø,2010-04-29 13:00:00,2025-10-27 11:00:00,ø,WindDirection,degree,2010-04-29 13:00:00,2024-10-18 13:00:00,0.0,373.0,batch1
+CrystalWx,Crystal Lake,CrystalWx,54.423494,-122.627844,744,Wind Speed,m/s,2010-04-29 13:00:00,2025-10-27 11:00:00,m/s,WindSpeedms,m s-1,2010-04-29 13:00:00,2024-10-18 13:00:00,0.0,373.0,batch1
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,DewPt,°C,2021-07-07 17:00:00,2025-09-23 10:00:00,°C,DewPtC,celsius,2021-07-07 17:00:00,2024-10-04 09:00:00,0.0,354.0,batch1
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,DewPt 30 cm,°C,2021-07-07 17:00:00,2025-09-23 10:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Gust Speed,m/s,2021-07-07 17:00:00,2025-09-23 10:00:00,m/s,GustSpeedms,m s-1,2021-07-07 17:00:00,2024-10-04 09:00:00,0.0,354.0,batch1
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Pressure,mbar,2021-07-07 17:00:00,2025-09-23 10:00:00,mbar,Pressurembar,millibar,2021-07-07 17:00:00,2024-10-04 09:00:00,0.0,354.0,batch1
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,RH,%,2021-07-07 17:00:00,2025-09-23 10:00:00,%,RH,%,2021-07-07 17:00:00,2024-10-04 09:00:00,0.0,354.0,batch1
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,RH 30 cm,%,2021-07-07 17:00:00,2025-09-23 10:00:00,%,RH_30cm,%,,,,,batch4
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Rain,mm,2021-07-07 18:00:00,2025-09-23 10:00:00,mm,Rainmm,mm,2021-07-07 18:00:00,2024-10-04 09:00:00,0.0,354.0,batch1
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Sfc Temp,°C,2022-07-06 13:00:00,2025-09-23 10:00:00,°C,Surface_Temp,celsius,,,,,batch4
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Soil Temp,°C,2021-07-07 17:00:00,2025-09-23 10:00:00,°C,Soil_Temp,celsius,2021-07-07 17:00:00,2024-10-04 09:00:00,0.0,354.0,batch1
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Solar Radiation,W/m²,2021-07-07 17:00:00,2025-09-23 10:00:00,W/m²,SolarRadiationWm,W m-2,2021-07-07 17:00:00,2024-10-04 09:00:00,0.0,354.0,batch1
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Temp,°C,2021-07-07 17:00:00,2025-09-23 10:00:00,°C,TempC,celsius,2021-07-07 17:00:00,2024-10-04 09:00:00,0.0,354.0,batch1
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Temp 30 cm,°C,2021-07-07 17:00:00,2025-09-23 10:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,WC_cal,m³/m³,2022-07-06 13:00:00,2025-09-23 10:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Water Content,m³/m³ 15 cm,2021-07-07 17:00:00,2025-09-23 10:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Water Content,m³/m³ 5 cm,2021-07-07 17:00:00,2025-09-23 10:00:00,m³/m³ 5 cm,Water_Content_m3_m3_5_cm,m3/m3,,,,,batch3
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Water Content,m³/m³ 30 cm,2021-07-07 17:00:00,2025-09-23 10:00:00,m³/m³ 30 cm,Water_Content_m3_m3_30_cm,m3/m3,,,,,batch3
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Wind Direction,ø,2021-07-07 17:00:00,2025-09-23 10:00:00,ø,WindDirection,degree,2021-07-07 17:00:00,2024-10-04 09:00:00,0.0,354.0,batch1
+Dennis,Dennis,Dennis,54.78217,-127.514341,895,Wind Speed,m/s,2021-07-07 17:00:00,2025-09-23 10:00:00,m/s,WindSpeedms,m s-1,2021-07-07 17:00:00,2024-10-04 09:00:00,0.0,354.0,batch1
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,DewPt,°C,2013-09-05 14:00:00,2026-01-05 12:00:00,°C,DewPtC,celsius,2013-09-05 14:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,DewPt 2,°C,2024-04-19 13:00:00,2025-09-08 10:00:00,°C,,,,,,,batch5
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Gust Speed,m/s,2013-09-05 14:00:00,2026-01-05 12:00:00,m/s,GustSpeedms,m s-1,2013-09-05 14:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Pressure,mbar,2013-09-05 14:00:00,2026-01-05 12:00:00,mbar,Pressurembar,millibar,2013-09-05 14:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,RH,%,2013-09-05 14:00:00,2026-01-05 12:00:00,%,RH,%,2013-09-05 14:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,RH 2,%,2024-04-19 13:00:00,2025-09-08 10:00:00,%,,,,,,,batch5
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Rain,mm,2013-09-05 15:00:00,2026-01-05 12:00:00,mm,Rainmm,mm,2013-09-05 14:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Rain2,mm,2023-07-14 11:00:00,2026-01-05 12:00:00,mm,,,,,,,batch5
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Sfc Temp,°C,2024-10-26 12:00:00,2025-09-07 10:00:00,°C,Surface_Temp,celsius,,,,,batch4
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Snow depth,cm,2023-07-14 11:00:00,2026-01-05 12:00:00,cm,Snow_Depth,cm,2023-07-14 11:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Soil Temp,°C,2024-10-21 12:00:00,2025-09-07 10:00:00,°C,Soil_Temp,celsius,,,,,batch2
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Solar Radiation,W/m²,2013-09-05 14:00:00,2026-01-05 12:00:00,W/m²,SolarRadiationWm,W m-2,2013-09-05 14:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Temp,°C,2013-09-05 14:00:00,2026-01-05 12:00:00,°C,TempC,celsius,2013-09-05 14:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Temp 2,°C,2024-04-19 13:00:00,2025-09-08 10:00:00,°C,,,,,,,batch5
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,WC_cal,m³/m³,2016-08-08 19:00:00,2026-01-05 12:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Water Content,m³/m³ 15 cm,2016-07-27 07:00:00,2026-01-05 12:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Wind Direction,ø,2013-09-05 14:00:00,2026-01-05 12:00:00,ø,WindDirection,degree,2013-09-05 14:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+DunsterWx,Dunster,DunsterWx,53.114909,-119.835293,890,Wind Speed,m/s,2013-09-05 14:00:00,2026-01-05 12:00:00,m/s,WindSpeedms,m s-1,2013-09-05 14:00:00,2025-01-07 14:00:00,0.0,362.0,batch1
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,DewPt,°C,2007-09-13 13:00:00,2025-09-22 13:00:00,°C,DewPtC,celsius,2007-09-13 12:00:00,2024-09-24 12:00:00,0.0,363.0,batch1
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,DewPt 2,°C,2024-09-24 14:00:00,2025-09-22 12:00:00,°C,,,,,,,batch5
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,DewPt 30 cm,°C,2020-07-07 12:00:00,2025-09-22 13:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Gust Speed,m/s,2007-09-13 13:00:00,2025-09-22 13:00:00,m/s,GustSpeedms,m s-1,2007-09-13 12:00:00,2024-09-24 12:00:00,0.0,363.0,batch1
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Pressure,mbar,2007-09-13 13:00:00,2025-09-22 13:00:00,mbar,Pressurembar,millibar,2007-09-13 12:00:00,2024-09-24 12:00:00,0.0,363.0,batch1
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,RH,%,2007-09-13 13:00:00,2025-09-22 13:00:00,%,RH,%,2007-09-13 12:00:00,2024-09-24 12:00:00,0.0,363.0,batch1
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,RH 2,%,2024-09-24 14:00:00,2025-09-22 12:00:00,%,,,,,,,batch5
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,RH 30 cm,%,2020-07-07 12:00:00,2025-09-22 13:00:00,%,RH_30cm,%,,,,,batch4
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Rain,mm,2007-09-13 13:00:00,2025-09-22 13:00:00,mm,Rainmm,mm,2007-09-13 12:00:00,2024-09-24 12:00:00,0.0,363.0,batch1
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Soil Temp,°C,2024-06-20 14:00:00,2025-08-23 01:00:00,°C,Soil_Temp,celsius,2024-06-20 14:00:00,2024-09-24 12:00:00,0.0,332.0,batch1
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Solar Radiation,W/m²,2007-09-13 13:00:00,2025-09-22 13:00:00,W/m²,SolarRadiationWm,W m-2,2007-09-13 12:00:00,2024-09-24 12:00:00,0.0,363.0,batch1
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Temp,°C,2007-09-13 13:00:00,2025-09-22 13:00:00,°C,TempC,celsius,2007-09-13 12:00:00,2024-09-24 12:00:00,0.0,363.0,batch1
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Temp 2,°C,2024-09-24 14:00:00,2025-09-22 12:00:00,°C,,,,,,,batch5
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Temp 30 cm,°C,2020-07-07 12:00:00,2025-09-22 13:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,WC_cal,m³/m³,2017-05-26 10:00:00,2025-09-22 13:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Water Content,m³/m³ 15 cm,2017-05-26 10:00:00,2025-09-22 13:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Wetness,%,2007-09-13 13:00:00,2025-09-22 13:00:00,%,Wetness,%,2007-09-13 12:00:00,2024-09-24 12:00:00,0.0,363.0,batch1
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Wind Direction,ø,2007-09-13 13:00:00,2025-09-22 13:00:00,ø,WindDirection,degree,2007-09-13 12:00:00,2024-09-24 12:00:00,0.0,363.0,batch1
+EndakoWx,Endako,EndakoWx,54.422392,-125.991293,851,Wind Speed,m/s,2007-09-13 13:00:00,2025-09-22 13:00:00,m/s,WindSpeedms,m s-1,2007-09-13 12:00:00,2024-09-24 12:00:00,0.0,363.0,batch1
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,DewPt,°C,2007-09-14 12:00:00,2025-10-15 10:00:00,°C,DewPtC,celsius,2007-09-14 11:00:00,2024-09-18 11:00:00,0.0,391.0,batch1
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,DewPt 2,°C,2024-09-18 12:00:00,2025-10-15 10:00:00,°C,,,,,,,batch5
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,DewPt 30 cm,°C,2018-10-01 14:00:00,2025-10-15 10:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Gust Speed,m/s,2007-09-14 12:00:00,2025-10-15 10:00:00,m/s,GustSpeedms,m s-1,2007-09-14 11:00:00,2024-09-18 11:00:00,0.0,391.0,batch1
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Pressure,mbar,2007-09-14 12:00:00,2025-10-15 10:00:00,mbar,Pressurembar,millibar,2007-09-14 11:00:00,2024-09-18 11:00:00,0.0,391.0,batch1
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,RH,%,2007-09-14 12:00:00,2025-10-15 10:00:00,%,RH,%,2007-09-14 11:00:00,2024-09-18 11:00:00,0.0,391.0,batch1
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,RH 2,%,2024-09-18 12:00:00,2025-10-15 10:00:00,%,,,,,,,batch5
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,RH 30 cm,%,2018-10-01 14:00:00,2025-10-15 10:00:00,%,RH_30cm,%,,,,,batch4
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Rain,mm,2007-09-14 12:00:00,2025-10-15 10:00:00,mm,Rainmm,mm,2007-09-14 11:00:00,2024-09-18 09:00:00,0.0,392.0,batch1
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Soil Temp,°C,2023-08-22 12:00:00,2025-10-15 10:00:00,°C,Soil_Temp,celsius,2023-08-22 12:00:00,2024-09-18 11:00:00,0.0,391.0,batch1
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Solar Radiation,W/m²,2007-09-14 12:00:00,2025-10-15 10:00:00,W/m²,SolarRadiationWm,W m-2,2007-09-14 11:00:00,2024-09-18 11:00:00,0.0,391.0,batch1
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Temp,°C,2007-09-14 12:00:00,2025-10-15 10:00:00,°C,TempC,celsius,2007-09-14 11:00:00,2024-09-18 11:00:00,0.0,391.0,batch1
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Temp 2,°C,2024-09-18 12:00:00,2025-10-15 10:00:00,°C,,,,,,,batch5
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Temp 30 cm,°C,2018-10-01 14:00:00,2025-10-15 10:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,WC_cal,m³/m³,2016-09-28 14:00:00,2025-10-15 10:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Water Content,m³/m³ 15 cm,2016-09-28 14:00:00,2025-10-15 10:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Wetness,%,2007-09-14 12:00:00,2025-10-15 10:00:00,%,Wetness,%,2007-09-14 11:00:00,2024-09-18 11:00:00,0.0,391.0,batch1
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Wind Direction,ø,2007-09-14 12:00:00,2025-10-15 10:00:00,ø,WindDirection,degree,2007-09-14 11:00:00,2024-09-18 11:00:00,0.0,391.0,batch1
+GeorgeWx,George,GeorgeWx,53.883555,-124.710668,859,Wind Speed,m/s,2007-09-14 12:00:00,2025-10-15 10:00:00,m/s,WindSpeedms,m s-1,2007-09-14 11:00:00,2024-09-18 11:00:00,0.0,391.0,batch1
+GunnelWx,Gunnel1,Gunnel3,58.75475,-123.977683,1460,DewPt,°C,2018-08-15 13:00:00,2022-09-27 13:00:00,°C,DewPtC,celsius,2008-09-04 15:00:00,2022-09-27 13:00:00,3631.0,0.0,batch1
+GunnelWx,Gunnel1,Gunnel3,58.75475,-123.977683,1460,Gust Speed,m/s,2018-08-15 13:00:00,2022-09-27 13:00:00,m/s,GustSpeedms,m s-1,2008-09-04 15:00:00,2022-09-27 13:00:00,3631.0,0.0,batch1
+GunnelWx,Gunnel1,Gunnel3,58.75475,-123.977683,1460,Pressure,mbar,2018-08-15 13:00:00,2022-09-27 13:00:00,mbar,Pressurembar,millibar,2008-09-04 15:00:00,2022-09-27 13:00:00,3631.0,0.0,batch1
+GunnelWx,Gunnel1,Gunnel3,58.75475,-123.977683,1460,RH,%,2018-08-15 13:00:00,2022-09-27 13:00:00,%,RH,%,2008-09-04 15:00:00,2022-09-27 13:00:00,3631.0,0.0,batch1
+GunnelWx,Gunnel1,Gunnel3,58.75475,-123.977683,1460,Rain,mm,2018-08-15 14:00:00,2022-09-27 13:00:00,mm,Rainmm,mm,2008-09-04 15:00:00,2022-09-27 13:00:00,3631.0,0.0,batch1
+GunnelWx,Gunnel1,Gunnel3,58.75475,-123.977683,1460,Solar Radiation,W/m²,2018-08-15 13:00:00,2022-09-27 13:00:00,W/m²,SolarRadiationWm,W m-2,2008-09-04 15:00:00,2022-09-27 13:00:00,3631.0,0.0,batch1
+GunnelWx,Gunnel1,Gunnel3,58.75475,-123.977683,1460,Temp,°C,2018-08-15 13:00:00,2022-09-27 13:00:00,°C,TempC,celsius,2008-09-04 15:00:00,2022-09-27 13:00:00,3631.0,0.0,batch1
+GunnelWx,Gunnel1,Gunnel3,58.75475,-123.977683,1460,Wind Direction,ø,2018-08-15 13:00:00,2022-09-27 13:00:00,ø,WindDirection,degree,2008-09-04 15:00:00,2022-09-27 13:00:00,3631.0,0.0,batch1
+GunnelWx,Gunnel1,Gunnel3,58.75475,-123.977683,1460,Wind Speed,m/s,2018-08-15 13:00:00,2022-09-27 13:00:00,m/s,WindSpeedms,m s-1,2008-09-04 15:00:00,2022-09-27 13:00:00,3631.0,0.0,batch1
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,DewPt,°C,2012-05-23 17:00:00,2026-01-05 14:00:00,°C,DewPtC,celsius,2012-05-23 17:00:00,2025-01-07 15:00:00,0.0,362.0,batch1
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,DewPt 2,°C,2024-07-17 15:00:00,2025-07-23 12:00:00,°C,,,,,,,batch5
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,Gust Speed,m/s,2012-05-23 17:00:00,2026-01-05 14:00:00,m/s,GustSpeedms,m s-1,2012-05-23 17:00:00,2025-01-07 15:00:00,0.0,362.0,batch1
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,Pressure,mbar,2012-05-23 17:00:00,2026-01-05 14:00:00,mbar,Pressurembar,millibar,2012-05-23 17:00:00,2025-01-07 15:00:00,0.0,362.0,batch1
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,RH,%,2012-05-23 17:00:00,2026-01-05 14:00:00,%,RH,%,2012-05-23 17:00:00,2025-01-07 15:00:00,0.0,362.0,batch1
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,RH 2,%,2024-07-17 15:00:00,2025-07-23 12:00:00,%,,,,,,,batch5
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,Rain,mm,2012-05-23 18:00:00,2026-01-05 14:00:00,mm,Rainmm,mm,2012-05-23 18:00:00,2025-01-07 15:00:00,0.0,362.0,batch1
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,Snow depth,cm,2016-10-27 12:00:00,2026-01-05 14:00:00,cm,Snow_Depth,cm,2016-10-27 12:00:00,2025-01-07 15:00:00,0.0,362.0,batch1
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,Soil Temp,°C,2024-07-17 14:00:00,2026-01-05 14:00:00,°C,Soil_Temp,celsius,2024-07-17 14:00:00,2024-07-20 09:00:00,0.0,534.0,batch1
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,Solar Radiation,W/m²,2012-05-23 17:00:00,2026-01-05 14:00:00,W/m²,SolarRadiationWm,W m-2,2012-05-23 17:00:00,2025-01-07 15:00:00,0.0,362.0,batch1
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,Temp,°C,2012-05-23 17:00:00,2026-01-05 14:00:00,°C,TempC,celsius,2012-05-23 17:00:00,2025-01-07 15:00:00,0.0,362.0,batch1
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,Temp 2,°C,2024-07-17 15:00:00,2025-07-23 12:00:00,°C,,,,,,,batch5
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,WC_cal,m³/m³,2019-07-16 16:00:00,2026-01-05 14:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,Water Content,m³/m³ 15 cm,2019-07-16 16:00:00,2026-01-05 14:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,Wind Direction,ø,2012-05-23 17:00:00,2026-01-05 14:00:00,ø,WindDirection,degree,2012-05-23 17:00:00,2025-01-07 15:00:00,0.0,362.0,batch1
+HourglassWx,Hourglass ,HourglassWx,55.21275,-120.771635,1131,Wind Speed,m/s,2012-05-23 17:00:00,2026-01-05 14:00:00,m/s,WindSpeedms,m s-1,2012-05-23 17:00:00,2025-01-07 15:00:00,0.0,362.0,batch1
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,DewPt,°C,2017-08-25 13:00:00,2026-01-05 13:00:00,°C,DewPtC,celsius,2017-08-25 13:00:00,2025-01-09 06:00:00,0.0,361.0,batch1
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,DewPt 2,°C,2024-09-26 10:00:00,2025-09-23 07:00:00,°C,,,,,,,batch5
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,Gust Speed,m/s,2017-08-25 13:00:00,2026-01-05 13:00:00,m/s,GustSpeedms,m s-1,2017-08-25 13:00:00,2025-01-09 06:00:00,0.0,361.0,batch1
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,Pressure,mbar,2017-08-25 13:00:00,2026-01-05 13:00:00,mbar,Pressurembar,millibar,2017-08-25 13:00:00,2025-01-09 06:00:00,0.0,361.0,batch1
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,RH,%,2017-08-25 13:00:00,2026-01-05 13:00:00,%,RH,%,2017-08-25 13:00:00,2025-01-09 06:00:00,0.0,361.0,batch1
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,RH 2,%,2024-09-26 10:00:00,2025-09-23 07:00:00,%,,,,,,,batch5
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,Rain,mm,2017-08-25 14:00:00,2026-01-05 13:00:00,mm,Rainmm,mm,2017-08-25 14:00:00,2025-01-09 06:00:00,0.0,361.0,batch1
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,Sfc temp,°C,2020-08-17 16:00:00,2025-09-23 08:00:00,°C,Surface_Temp,celsius,,,,,batch4
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,Solar Radiation,W/m²,2017-08-25 13:00:00,2026-01-05 13:00:00,W/m²,SolarRadiationWm,W m-2,2017-08-25 13:00:00,2025-01-09 06:00:00,0.0,361.0,batch1
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,Temp,°C,2017-08-25 13:00:00,2026-01-05 13:00:00,°C,TempC,celsius,2017-08-25 13:00:00,2025-01-09 06:00:00,0.0,361.0,batch1
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,Temp 2,°C,2024-09-26 10:00:00,2025-09-23 07:00:00,°C,,,,,,,batch5
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,Wind Direction,ø,2017-08-25 13:00:00,2026-01-05 13:00:00,ø,WindDirection,degree,2017-08-25 13:00:00,2025-01-09 06:00:00,0.0,361.0,batch1
+Hudson Bay Mtn2,HBMtn2,Hudson Bay Mtn2,54.77375,-127.27216,1670,Wind Speed,m/s,2017-08-25 13:00:00,2026-01-05 13:00:00,m/s,WindSpeedms,m s-1,2017-08-25 13:00:00,2025-01-09 06:00:00,0.0,361.0,batch1
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,DewPt,°C,2024-09-25 15:00:00,2025-10-02 09:00:00,°C,DewPtC,celsius,,,,,batch2
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,Gust Speed,m/s,2024-09-25 15:00:00,2025-10-02 09:00:00,m/s,GustSpeedms,m s-1,,,,,batch2
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,Pressure,mbar,2024-09-25 15:00:00,2025-10-02 09:00:00,mbar,Pressurembar,millibar,,,,,batch2
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,RH,%,2024-09-25 15:00:00,2025-10-02 09:00:00,%,RH,%,,,,,batch2
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,Rain,mm,2024-09-25 16:00:00,2025-10-02 09:00:00,mm,Rainmm,mm,,,,,batch2
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,Solar Radiation,W/m²,2024-09-25 15:00:00,2025-10-02 09:00:00,W/m²,SolarRadiationWm,W m-2,,,,,batch2
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,Temp,°C,2024-09-25 15:00:00,2025-10-02 09:00:00,°C,TempC,celsius,,,,,batch2
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,WC_cal,m³/m³,2024-09-25 15:00:00,2025-10-02 09:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,Water Content,m³/m³ 15 cm,2024-09-25 15:00:00,2025-10-02 09:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,Wetness,%,2024-09-25 15:00:00,2025-10-02 09:00:00,%,Wetness,%,,,,,batch2
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,Wind Direction,ø,2024-09-25 15:00:00,2025-10-02 09:00:00,ø,WindDirection,degree,,,,,batch2
+IBB1Wx,IBB1,IBB1Wx,53.72029,-127.25169,1146,Wind Speed,m/s,2024-09-25 15:00:00,2025-10-02 09:00:00,m/s,WindSpeedms,m s-1,,,,,batch2
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,DewPt,°C,2024-07-25 13:00:00,2025-09-25 09:00:00,°C,DewPtC,celsius,2024-07-25 13:00:00,2024-09-16 14:00:00,0.0,373.0,batch1
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,Gust Speed,m/s,2024-07-25 13:00:00,2025-09-25 09:00:00,m/s,GustSpeedms,m s-1,2024-07-25 13:00:00,2024-09-16 14:00:00,0.0,373.0,batch1
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,Pressure,mbar,2024-07-25 13:00:00,2025-09-25 09:00:00,mbar,Pressurembar,millibar,2024-07-25 13:00:00,2024-09-16 14:00:00,0.0,373.0,batch1
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,RH,%,2024-07-25 13:00:00,2025-09-25 09:00:00,%,RH,%,2024-07-25 13:00:00,2024-09-16 14:00:00,0.0,373.0,batch1
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,Rain,mm,2024-07-25 14:00:00,2025-09-25 08:00:00,mm,Rainmm,mm,2024-07-25 14:00:00,2024-09-16 14:00:00,0.0,373.0,batch1
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,Soil Temp,°C,2024-07-25 13:00:00,2025-09-25 09:00:00,°C,Soil_Temp,celsius,2024-07-25 13:00:00,2024-09-16 14:00:00,0.0,373.0,batch1
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,Solar Radiation,W/m²,2024-07-25 13:00:00,2025-09-25 09:00:00,W/m²,SolarRadiationWm,W m-2,2024-07-25 13:00:00,2024-09-16 14:00:00,0.0,373.0,batch1
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,Temp,°C,2024-07-25 13:00:00,2025-09-25 09:00:00,°C,TempC,celsius,2024-07-25 13:00:00,2024-09-16 14:00:00,0.0,373.0,batch1
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,WC_cal,m³/m³,2024-07-25 13:00:00,2025-09-25 09:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,Water Content,m³/m³ 15 cm,2024-07-25 13:00:00,2025-09-25 09:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,Wetness,%,2024-07-25 13:00:00,2025-09-25 09:00:00,%,Wetness,%,2024-07-25 13:00:00,2024-09-16 14:00:00,0.0,373.0,batch1
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,Wind Direction,ø,2024-07-25 13:00:00,2025-09-25 09:00:00,ø,WindDirection,degree,2024-07-25 13:00:00,2024-09-16 14:00:00,0.0,373.0,batch1
+IBB2Wx,IBB2,IBB2Wx,54.81127,-126.92067,967,Wind Speed,m/s,2024-07-25 13:00:00,2025-09-25 09:00:00,m/s,WindSpeedms,m s-1,2024-07-25 13:00:00,2024-09-16 14:00:00,0.0,373.0,batch1
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,DewPt,°C,2023-09-20 14:00:00,2025-09-23 13:00:00,°C,DewPtC,celsius,2023-09-20 14:00:00,2024-09-16 11:00:00,0.0,372.0,batch1
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,Gust Speed,m/s,2023-09-20 14:00:00,2025-09-23 13:00:00,m/s,GustSpeedms,m s-1,2023-09-20 14:00:00,2024-09-16 11:00:00,0.0,372.0,batch1
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,Pressure,mbar,2023-09-20 14:00:00,2025-09-23 13:00:00,mbar,Pressurembar,millibar,2023-09-20 14:00:00,2024-09-16 11:00:00,0.0,372.0,batch1
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,RH,%,2023-09-20 14:00:00,2025-09-23 13:00:00,%,RH,%,2023-09-20 14:00:00,2024-09-16 11:00:00,0.0,372.0,batch1
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,Rain,mm,2023-09-20 15:00:00,2025-09-23 13:00:00,mm,Rainmm,mm,2023-09-20 15:00:00,2024-09-16 11:00:00,0.0,372.0,batch1
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,Soil Temp,°C,2023-09-20 14:00:00,2025-09-23 13:00:00,°C,Soil_Temp,celsius,2023-09-20 14:00:00,2024-09-16 11:00:00,0.0,372.0,batch1
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,Solar Radiation,W/m²,2023-09-20 14:00:00,2025-09-23 13:00:00,W/m²,SolarRadiationWm,W m-2,2023-09-20 14:00:00,2024-09-16 11:00:00,0.0,372.0,batch1
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,Temp,°C,2023-09-20 14:00:00,2025-09-23 13:00:00,°C,TempC,celsius,2023-09-20 14:00:00,2024-09-16 11:00:00,0.0,372.0,batch1
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,WC_cal,m³/m³,2023-09-20 14:00:00,2025-09-23 13:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,Water Content,m³/m³ 15 cm,2023-09-20 14:00:00,2025-09-23 13:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,Wetness,%,2023-09-20 14:00:00,2025-09-23 13:00:00,%,Wetness,%,2023-09-20 14:00:00,2024-09-16 11:00:00,0.0,372.0,batch1
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,Wind Direction,ø,2023-09-20 14:00:00,2025-09-23 13:00:00,ø,WindDirection,degree,2023-09-20 14:00:00,2024-09-16 11:00:00,0.0,372.0,batch1
+IBB3Wx,IBB3,IBB3Wx,54.71172,-127.30577,960,Wind Speed,m/s,2023-09-20 14:00:00,2025-09-23 13:00:00,m/s,WindSpeedms,m s-1,2023-09-20 14:00:00,2024-09-16 11:00:00,0.0,372.0,batch1
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,DewPt,°C,2023-11-01 12:00:00,2025-07-25 12:00:00,°C,DewPtC,celsius,2023-11-01 12:00:00,2024-08-10 14:00:00,0.0,348.0,batch1
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Gust Speed,m/s,2023-06-15 16:00:00,2025-07-25 12:00:00,m/s,GustSpeedms,m s-1,2023-06-15 16:00:00,2024-08-10 14:00:00,0.0,348.0,batch1
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Pressure,mbar,2023-06-15 16:00:00,2025-07-25 12:00:00,mbar,Pressurembar,millibar,2023-06-15 16:00:00,2024-08-07 08:00:00,0.0,352.0,batch1
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,RH,%,2023-06-15 16:00:00,2025-07-25 12:00:00,%,RH,%,2023-07-06 06:00:00,2024-08-10 14:00:00,-21.0,348.0,batch1
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Rain,mm,2023-06-15 17:00:00,2025-07-25 12:00:00,mm,Rainmm,mm,2023-06-15 17:00:00,2024-04-18 23:00:00,0.0,462.0,batch1
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Solar Radiation,W/m²,2023-06-15 16:00:00,2025-07-25 12:00:00,W/m²,SolarRadiationWm,W m-2,2023-06-15 16:00:00,2024-08-10 14:00:00,0.0,348.0,batch1
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Temp,°C,2023-11-01 12:00:00,2025-07-25 12:00:00,°C,TempC,celsius,2023-11-01 12:00:00,2024-08-10 14:00:00,0.0,348.0,batch1
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Wind Direction,ø,2023-06-15 16:00:00,2025-07-25 12:00:00,ø,WindDirection,degree,2023-06-15 16:00:00,2024-08-10 14:00:00,0.0,348.0,batch1
+Inklin,Inklin,Inklin,58.900859,-133.140416,101,Wind Speed,m/s,2023-06-15 16:00:00,2025-07-25 12:00:00,m/s,WindSpeedms,m s-1,2023-06-15 16:00:00,2024-08-10 14:00:00,0.0,348.0,batch1
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,DewPt,°C,2010-07-15 17:00:00,2025-09-17 12:00:00,°C,DewPtC,celsius,2010-07-15 17:00:00,2024-09-16 11:00:00,0.0,366.0,batch1
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,DewPt 2,°C,2023-10-12 12:00:00,2025-09-17 12:00:00,°C,,,,,,,batch5
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,Gust Speed,m/s,2010-07-15 17:00:00,2025-07-03 16:00:00,m/s,GustSpeedms,m s-1,2010-07-15 17:00:00,2024-09-16 11:00:00,0.0,290.0,batch1
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,Pressure,mbar,2010-07-15 17:00:00,2025-07-03 16:00:00,mbar,Pressurembar,millibar,2010-07-15 17:00:00,2024-09-16 11:00:00,0.0,290.0,batch1
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,RH,%,2010-07-15 17:00:00,2025-09-17 12:00:00,%,RH,%,2010-07-15 17:00:00,2024-09-16 11:00:00,0.0,366.0,batch1
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,RH 2,%,2023-10-12 12:00:00,2025-09-17 12:00:00,%,,,,,,,batch5
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,Rain,mm,2010-07-15 18:00:00,2025-07-03 16:00:00,mm,Rainmm,mm,2010-07-15 18:00:00,2024-09-16 11:00:00,0.0,290.0,batch1
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,Sfc Temp,°C,2024-06-13 13:00:00,2025-09-17 11:00:00,°C,Surface_Temp,celsius,,,,,batch4
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,Soil Temp,°C,2024-06-13 13:00:00,2025-09-17 11:00:00,°C,Soil_Temp,celsius,2024-06-13 13:00:00,2024-09-16 10:00:00,0.0,366.0,batch1
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,Solar Radiation,W/m²,2010-07-15 17:00:00,2025-07-03 16:00:00,W/m²,SolarRadiationWm,W m-2,2010-07-15 17:00:00,2024-09-16 11:00:00,0.0,290.0,batch1
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,Temp,°C,2010-07-15 17:00:00,2025-09-17 12:00:00,°C,TempC,celsius,2010-07-15 17:00:00,2024-09-16 11:00:00,0.0,366.0,batch1
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,Temp 2,°C,2023-10-12 12:00:00,2025-09-17 12:00:00,°C,,,,,,,batch5
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,WC_cal,m³/m³,2016-07-13 13:00:00,2025-07-03 16:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,Water Content,m³/m³ 15 cm,2016-07-13 13:00:00,2025-07-03 16:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,Wind Direction,ø,2010-07-15 17:00:00,2025-05-14 14:00:00,ø,WindDirection,degree,2010-07-15 17:00:00,2024-09-16 11:00:00,0.0,240.0,batch1
+Kluskus,BednestiWx,Kluskus,53.397852,-124.513069,1110,Wind Speed,m/s,2010-07-15 17:00:00,2025-07-03 16:00:00,m/s,WindSpeedms,m s-1,2010-07-15 17:00:00,2024-09-16 11:00:00,0.0,290.0,batch1
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,DewPt,°C,2010-04-28 14:00:00,2025-10-27 09:00:00,°C,DewPtC,celsius,2010-04-28 14:00:00,2024-08-28 09:00:00,0.0,425.0,batch1
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,DewPt 30 cm,°C,2010-04-28 14:00:00,2025-10-27 10:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Gust Speed,m/s,2010-04-28 14:00:00,2025-10-27 09:00:00,m/s,GustSpeedms,m s-1,2010-04-28 14:00:00,2024-07-24 11:00:00,0.0,459.0,batch1
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Pressure,mbar,2010-04-28 14:00:00,2025-10-27 09:00:00,mbar,Pressurembar,millibar,2010-04-28 14:00:00,2024-08-28 09:00:00,0.0,425.0,batch1
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,RH,%,2010-04-28 14:00:00,2025-10-27 09:00:00,%,RH,%,2010-04-28 14:00:00,2024-08-28 09:00:00,0.0,425.0,batch1
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,RH 30 cm,%,2010-04-28 14:00:00,2025-10-27 10:00:00,%,RH_30cm,%,,,,,batch4
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Rain,mm,2010-04-28 14:00:00,2025-10-27 09:00:00,mm,Rainmm,mm,2010-04-28 14:00:00,2024-08-28 09:00:00,0.0,425.0,batch1
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Sfc Temp,°C,2024-10-18 12:00:00,2025-10-27 10:00:00,°C,Surface_Temp,celsius,,,,,batch4
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Soil Temp,°C,2024-10-18 12:00:00,2025-10-27 10:00:00,°C,Soil_Temp,celsius,,,,,batch2
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Solar Radiation,W/m²,2010-04-28 14:00:00,2025-10-27 09:00:00,W/m²,SolarRadiationWm,W m-2,2010-04-28 14:00:00,2024-08-28 09:00:00,0.0,425.0,batch1
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Temp,°C,2010-04-28 14:00:00,2025-10-27 09:00:00,°C,TempC,celsius,2010-04-28 14:00:00,2024-08-28 09:00:00,0.0,425.0,batch1
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Temp 30 cm,°C,2010-04-28 14:00:00,2025-10-27 10:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,WC_cal,m³/m³,2017-06-22 11:00:00,2025-10-27 09:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Water Content,m³/m³ 15 cm,2017-06-22 11:00:00,2025-10-27 09:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Wetness,%,2010-04-28 14:00:00,2025-10-27 09:00:00,%,Wetness,%,2010-04-28 14:00:00,2024-08-28 09:00:00,0.0,425.0,batch1
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Wind Direction,ø,2010-04-28 14:00:00,2025-10-27 09:00:00,ø,WindDirection,degree,2010-04-28 14:00:00,2024-08-28 09:00:00,0.0,425.0,batch1
+MacJxnWx,Mackenzie Jxn,MacJxnWx,55.137858,-122.977243,719,Wind Speed,m/s,2010-04-28 14:00:00,2025-10-27 09:00:00,m/s,WindSpeedms,m s-1,2010-04-28 14:00:00,2024-07-24 11:00:00,0.0,459.0,batch1
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,DewPt,°C,2007-07-11 20:00:00,2025-08-08 07:00:00,°C,DewPtC,celsius,2007-07-11 20:00:00,2024-08-14 12:00:00,0.0,358.0,batch1
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,Gust Speed,m/s,2007-07-11 20:00:00,2025-08-08 07:00:00,m/s,GustSpeedms,m s-1,2007-07-11 20:00:00,2024-08-14 12:00:00,0.0,358.0,batch1
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,Pressure,mbar,2007-07-11 20:00:00,2025-08-08 07:00:00,mbar,Pressurembar,millibar,2007-07-11 20:00:00,2024-08-14 12:00:00,0.0,358.0,batch1
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,RH,%,2007-07-11 20:00:00,2025-08-08 07:00:00,%,RH,%,2007-07-11 20:00:00,2024-08-14 12:00:00,0.0,358.0,batch1
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,Rain,mm,2007-07-11 21:00:00,2025-08-08 07:00:00,mm,Rainmm,mm,2007-07-11 21:00:00,2024-08-14 12:00:00,0.0,358.0,batch1
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,Sfc Temp,°C,2007-09-08 10:00:00,2025-08-08 04:00:00,°C,Surface_Temp,celsius,,,,,batch4
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,Soil Temp,°C,2007-09-08 10:00:00,2025-06-13 20:00:00,°C,Soil_Temp,celsius,,,,,batch2
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,Solar Radiation,W/m²,2007-07-11 20:00:00,2025-08-08 07:00:00,W/m²,SolarRadiationWm,W m-2,2007-07-11 20:00:00,2024-08-14 12:00:00,0.0,358.0,batch1
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,Temp,°C,2007-07-11 20:00:00,2025-08-08 07:00:00,°C,TempC,celsius,2007-07-11 20:00:00,2024-08-14 12:00:00,0.0,358.0,batch1
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,WC_cal,m³/m³,2019-08-11 11:00:00,2025-08-08 07:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,Water Content,m³/m³ 15 cm,2019-08-11 11:00:00,2025-08-08 07:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,Wind Direction,ø,2007-07-11 20:00:00,2025-08-08 07:00:00,ø,WindDirection,degree,2007-07-11 20:00:00,2024-08-14 12:00:00,0.0,358.0,batch1
+MiddleforkWx,MF1,MiddleforkWx,57.550917,-122.7963,972,Wind Speed,m/s,2007-07-11 20:00:00,2025-08-08 07:00:00,m/s,WindSpeedms,m s-1,2007-07-11 20:00:00,2024-08-14 12:00:00,0.0,358.0,batch1
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,DewPt,°C,2007-07-12 16:00:00,2025-11-10 05:00:00,°C,DewPtC,celsius,2007-07-12 16:00:00,2025-01-09 08:00:00,0.0,304.0,batch1
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,DewPt 2,°C,2019-08-10 11:00:00,2024-07-20 22:00:00,°C,,,,,,,batch5
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,Gust Speed,m/s,2007-07-12 16:00:00,2024-07-19 09:00:00,m/s,GustSpeedms,m s-1,2007-07-12 16:00:00,2024-07-19 09:00:00,0.0,0.0,batch1
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,Pressure,mbar,2007-07-12 16:00:00,2025-09-11 08:00:00,mbar,Pressurembar,millibar,2007-07-12 16:00:00,2025-01-09 08:00:00,0.0,245.0,batch1
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,RH,%,2007-07-12 16:00:00,2025-11-10 05:00:00,%,RH,%,2007-07-12 16:00:00,2025-01-09 08:00:00,0.0,304.0,batch1
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,RH 2,%,2019-08-10 11:00:00,2024-07-20 22:00:00,%,,,,,,,batch5
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,Rain,mm,2007-07-12 16:00:00,2025-12-01 09:00:00,mm,Rainmm,mm,2007-07-12 16:00:00,2025-01-09 08:00:00,0.0,326.0,batch1
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,Sfc Temp,°C,2007-09-05 12:00:00,2019-09-21 14:00:00,°C,Surface_Temp,celsius,,,,,batch4
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,Soil Temp,°C,2007-09-05 12:00:00,2019-09-12 13:00:00,°C,Soil_Temp,celsius,,,,,batch2
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,Solar Radiation,W/m²,2007-07-12 16:00:00,2025-09-11 08:00:00,W/m²,SolarRadiationWm,W m-2,2007-07-12 16:00:00,2025-01-09 08:00:00,0.0,245.0,batch1
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,Temp,°C,2007-07-12 16:00:00,2025-11-10 05:00:00,°C,TempC,celsius,2007-07-12 16:00:00,2025-01-09 08:00:00,0.0,304.0,batch1
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,Temp 2,°C,2019-08-10 11:00:00,2024-07-20 22:00:00,°C,,,,,,,batch5
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,Wind Direction,ø,2007-07-12 16:00:00,2024-07-19 09:00:00,ø,WindDirection,degree,2007-07-12 16:00:00,2024-07-19 09:00:00,0.0,0.0,batch1
+NondaWx,Nonda1,NondaWx,59.002111,-125.509361,1683,Wind Speed,m/s,2007-07-12 16:00:00,2024-07-19 09:00:00,m/s,WindSpeedms,m s-1,2007-07-12 16:00:00,2024-07-19 09:00:00,0.0,0.0,batch1
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,DewPt,°C,2008-09-08 16:00:00,2026-01-05 15:00:00,°C,DewPtC,celsius,2008-09-08 16:00:00,2025-01-09 08:00:00,0.0,361.0,batch1
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,DewPt 2,°C,2024-08-15 10:00:00,2026-01-05 15:00:00,°C,,,,,,,batch5
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,Gust Speed,m/s,2008-09-08 16:00:00,2026-01-05 15:00:00,m/s,GustSpeedms,m s-1,2008-09-08 16:00:00,2025-01-09 08:00:00,0.0,361.0,batch1
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,Pressure,mbar,2008-09-08 16:00:00,2026-01-05 15:00:00,mbar,Pressurembar,millibar,2008-09-08 16:00:00,2025-01-09 08:00:00,0.0,361.0,batch1
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,RH,%,2008-09-08 16:00:00,2026-01-05 15:00:00,%,RH,%,2008-09-08 16:00:00,2025-01-09 08:00:00,0.0,361.0,batch1
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,RH 2,%,2024-08-15 10:00:00,2026-01-05 15:00:00,%,,,,,,,batch5
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,Rain,mm,2008-09-08 16:00:00,2026-01-05 15:00:00,mm,Rainmm,mm,2008-09-08 16:00:00,2025-01-09 08:00:00,0.0,361.0,batch1
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,Rain raw,mm,2008-09-08 16:00:00,2026-01-05 15:00:00,mm,Rainmm_raw,mm,,,,,batch4
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,Sfc temp,°C,2017-07-25 13:00:00,2025-08-07 15:00:00,°C,Surface_Temp,celsius,,,,,batch4
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,Soil temp,°C,2017-07-25 13:00:00,2025-08-07 15:00:00,°C,Soil_Temp,celsius,,,,,batch4
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,Solar Radiation,W/m²,2008-09-08 16:00:00,2026-01-05 15:00:00,W/m²,SolarRadiationWm,W m-2,2008-09-08 16:00:00,2025-01-09 08:00:00,0.0,361.0,batch1
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,Temp,°C,2008-09-08 16:00:00,2026-01-05 15:00:00,°C,TempC,celsius,2008-09-08 16:00:00,2025-01-09 08:00:00,0.0,361.0,batch1
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,Temp 2,°C,2024-08-15 10:00:00,2026-01-05 15:00:00,°C,,,,,,,batch5
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,Wind Direction,ø,2008-09-08 16:00:00,2026-01-05 15:00:00,ø,WindDirection,degree,2008-09-08 16:00:00,2025-01-09 08:00:00,0.0,361.0,batch1
+PinkWx,Pink1,PinkWx,57.06163,-122.86491,1756,Wind Speed,m/s,2008-09-08 16:00:00,2026-01-05 15:00:00,m/s,WindSpeedms,m s-1,2008-09-08 16:00:00,2025-01-09 08:00:00,0.0,361.0,batch1
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,DewPt,°C,2007-07-04 10:00:00,2025-09-16 08:00:00,°C,DewPtC,celsius,2007-07-04 10:00:00,2024-10-09 08:00:00,0.0,342.0,batch1
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,DewPt 2,°C,2018-05-17 10:00:00,2025-06-12 07:00:00,°C,,,,,,,batch5
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Gust Speed,m/s,2007-07-04 10:00:00,2025-09-16 08:00:00,m/s,GustSpeedms,m s-1,2007-07-04 10:00:00,2024-10-09 08:00:00,0.0,342.0,batch1
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Pressure,mbar,2007-07-04 10:00:00,2025-09-16 08:00:00,mbar,Pressurembar,millibar,2007-07-04 10:00:00,2024-10-09 08:00:00,0.0,342.0,batch1
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,RH,%,2007-07-04 10:00:00,2025-09-16 08:00:00,%,RH,%,2007-07-04 10:00:00,2024-10-09 08:00:00,0.0,342.0,batch1
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,RH 2,%,2018-05-17 10:00:00,2025-06-12 07:00:00,%,,,,,,,batch5
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Rain,mm,2007-07-04 10:00:00,2025-09-16 08:00:00,mm,Rainmm,mm,2007-07-04 10:00:00,2024-10-09 08:00:00,0.0,342.0,batch1
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Sfc Temp,°C,2007-07-04 15:00:00,2025-09-16 08:00:00,°C,Surface_Temp,celsius,,,,,batch4
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Soil Temp,°C,2007-07-04 15:00:00,2025-09-16 08:00:00,°C,Soil_Temp,celsius,,,,,batch2
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Solar Radiation,W/m²,2007-07-04 10:00:00,2025-09-16 08:00:00,W/m²,SolarRadiationWm,W m-2,2007-07-04 10:00:00,2024-10-09 08:00:00,0.0,342.0,batch1
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Temp,°C,2007-07-04 10:00:00,2025-09-16 08:00:00,°C,TempC,celsius,2007-07-04 10:00:00,2024-10-09 08:00:00,0.0,342.0,batch1
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Temp 2,°C,2018-05-17 10:00:00,2025-06-12 07:00:00,°C,,,,,,,batch5
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,WC_cal,m³/m³,2017-06-16 11:00:00,2025-09-16 08:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Water Content,m³/m³ 15 cm,2017-06-16 11:00:00,2025-09-16 08:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Water Content,m³/m³ 5 cm,2017-06-16 11:00:00,2025-08-19 08:00:00,m³/m³ 5 cm,Water_Content_m3_m3_5_cm,m3/m3,,,,,batch3
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Wind Direction,ø,2007-07-04 10:00:00,2025-09-16 08:00:00,ø,WindDirection,degree,2007-07-04 10:00:00,2024-10-09 08:00:00,0.0,342.0,batch1
+SaxtonWx,Saxton,SaxtonWx,54.027523,-123.300774,718,Wind Speed,m/s,2007-07-04 10:00:00,2025-09-16 08:00:00,m/s,WindSpeedms,m s-1,2007-07-04 10:00:00,2024-10-09 08:00:00,0.0,342.0,batch1
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,DewPt,°C,2023-07-13 12:00:00,2025-09-09 10:00:00,°C,DewPtC,celsius,2023-07-13 12:00:00,2024-09-26 10:11:00,0.0,347.0,batch1
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,DewPt 2,°C,2025-07-03 11:00:00,2025-09-09 09:00:00,°C,,,,,,,batch5
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,Gust Speed,m/s,2023-07-13 12:00:00,2025-09-09 10:00:00,m/s,GustSpeedms,m s-1,2023-07-13 12:00:00,2024-09-26 10:11:00,0.0,347.0,batch1
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,Pressure,mbar,2023-07-13 12:00:00,2025-09-09 10:00:00,mbar,Pressurembar,millibar,2023-07-13 12:00:00,2024-09-26 10:11:00,0.0,347.0,batch1
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,RH,%,2023-07-13 12:00:00,2025-09-09 10:00:00,%,RH,%,2023-07-13 12:00:00,2024-09-26 10:11:00,0.0,347.0,batch1
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,RH 2,%,2025-07-03 11:00:00,2025-09-09 09:00:00,%,,,,,,,batch5
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,Rain,mm,2023-07-13 13:00:00,2025-09-09 10:00:00,mm,Rainmm,mm,2023-07-13 13:00:00,2024-09-26 10:11:00,0.0,347.0,batch1
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,Soil Temp,°C,2023-07-13 12:00:00,2025-09-09 10:00:00,°C,Soil_Temp,celsius,2023-07-13 12:00:00,2024-09-26 10:11:00,0.0,347.0,batch1
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,Solar Radiation,W/m²,2023-07-13 12:00:00,2025-09-09 10:00:00,W/m²,SolarRadiationWm,W m-2,2023-07-13 12:00:00,2024-09-26 10:11:00,0.0,347.0,batch1
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,Temp,°C,2023-07-13 12:00:00,2025-09-09 10:00:00,°C,TempC,celsius,2023-07-13 12:00:00,2024-09-26 10:11:00,0.0,347.0,batch1
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,Temp 2,°C,2025-07-03 11:00:00,2025-09-09 09:00:00,°C,,,,,,,batch5
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,WC_cal,m³/m³,2023-07-13 12:00:00,2025-09-09 10:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,Water Content,m³/m³ 15 cm,2023-07-13 12:00:00,2025-09-09 10:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,Wetness,%,2023-07-13 12:00:00,2025-09-09 10:00:00,%,Wetness,%,2023-07-13 12:00:00,2024-09-26 10:11:00,0.0,347.0,batch1
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,Wind Direction,ø,2023-07-13 12:00:00,2025-09-09 10:00:00,ø,WindDirection,degree,2023-07-13 12:00:00,2024-09-26 10:11:00,0.0,347.0,batch1
+SeebachWx,Seebach,SeebachWx,54.355,122.058,780,Wind Speed,m/s,2023-07-13 12:00:00,2025-09-09 10:00:00,m/s,WindSpeedms,m s-1,2023-07-13 12:00:00,2024-09-26 10:11:00,0.0,347.0,batch1
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,DewPt,°C,2009-09-09 16:00:00,2026-01-06 09:00:00,°C,DewPtC,celsius,2012-08-17 12:00:00,2025-01-09 08:00:00,-1073.0,362.0,batch1
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,DewPt 2,°C,2023-09-15 12:00:00,2026-01-06 09:00:00,°C,,,,,,,batch5
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Gust Speed,m/s,2009-09-09 16:00:00,2026-01-06 09:00:00,m/s,GustSpeedms,m s-1,2009-09-09 16:00:00,2025-01-09 08:00:00,0.0,362.0,batch1
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Pressure,mbar,2009-09-09 16:00:00,2026-01-06 09:00:00,mbar,Pressurembar,millibar,2009-09-09 16:00:00,2025-01-09 08:00:00,0.0,362.0,batch1
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,RH,%,2009-09-09 16:00:00,2026-01-06 09:00:00,%,RH,%,2009-09-09 16:00:00,2025-01-09 08:00:00,0.0,362.0,batch1
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,RH 2,%,2023-09-15 12:00:00,2026-01-06 09:00:00,%,,,,,,,batch5
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Rain,mm,2009-09-09 17:00:00,2026-01-06 09:00:00,mm,Rainmm,mm,2009-09-09 17:00:00,2025-01-09 08:00:00,0.0,362.0,batch1
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Sfc temp,°C,2021-09-30 12:00:00,2022-09-06 18:00:00,°C,Surface_Temp,celsius,,,,,batch4
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Snow depth,cm,2022-09-28 09:00:00,2023-09-15 10:00:00,cm,Snow_Depth,cm,2022-09-28 09:00:00,2023-09-15 10:00:00,0.0,0.0,batch1
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Solar Radiation,W/m²,2009-09-09 16:00:00,2026-01-06 09:00:00,W/m²,SolarRadiationWm,W m-2,2009-09-09 16:00:00,2025-01-09 08:00:00,0.0,362.0,batch1
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Temp,°C,2009-09-09 16:00:00,2026-01-06 09:00:00,°C,TempC,celsius,2009-09-09 16:00:00,2025-01-09 08:00:00,0.0,362.0,batch1
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Temp 2,°C,2023-09-15 12:00:00,2026-01-06 09:00:00,°C,,,,,,,batch5
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Wind Direction,ø,2009-09-09 16:00:00,2026-01-06 09:00:00,ø,WindDirection,degree,2009-09-09 16:00:00,2025-01-09 08:00:00,0.0,362.0,batch1
+Sunbeam,Mcbride Mountain Stn,Sunbeam,53.33869,-120.12108,2000,Wind Speed,m/s,2009-09-09 16:00:00,2026-01-06 09:00:00,m/s,WindSpeedms,m s-1,2009-09-09 16:00:00,2025-01-09 08:00:00,0.0,362.0,batch1
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,DewPt,°C,2021-07-29 13:00:00,2025-08-25 11:00:00,°C,DewPtC,celsius,2021-07-29 13:00:00,2024-07-22 03:00:00,0.0,399.0,batch1
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,DewPt 30 cm,°C,2021-07-21 15:00:00,2025-10-02 14:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Gust Speed,m/s,2021-07-29 13:00:00,2025-10-02 15:00:00,m/s,GustSpeedms,m s-1,2021-07-29 13:00:00,2024-10-10 12:00:00,0.0,357.0,batch1
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,RH,%,2021-07-29 13:00:00,2025-08-25 12:00:00,%,RH,%,2021-07-29 13:00:00,2024-07-22 03:00:00,0.0,399.0,batch1
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,RH 30 cm,%,2021-07-21 15:00:00,2025-10-02 14:00:00,%,RH_30cm,%,,,,,batch4
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Rain,mm,2021-07-29 14:00:00,2025-10-02 15:00:00,mm,Rainmm,mm,2021-07-29 14:00:00,2024-10-10 12:00:00,0.0,357.0,batch1
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Sfc Temp,°C,2022-07-19 15:00:00,2025-10-02 14:00:00,°C,Surface_Temp,celsius,,,,,batch4
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Soil Temp,°C,2021-07-21 15:00:00,2025-08-04 03:00:00,°C,Soil_Temp,celsius,2021-07-21 15:00:00,2024-07-18 06:00:00,0.0,381.0,batch1
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Temp,°C,2021-07-29 13:00:00,2025-08-25 11:00:00,°C,TempC,celsius,2021-07-29 13:00:00,2024-07-22 03:00:00,0.0,399.0,batch1
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Temp 30 cm,°C,2021-07-21 15:00:00,2025-10-02 14:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,WC_cal,m³/m³,2021-07-21 15:00:00,2025-08-04 03:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Water Content,m³/m³ 15 cm,2021-07-21 15:00:00,2025-08-04 03:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Water Content,m³/m³ 5 cm,2021-07-21 15:00:00,2025-08-04 03:00:00,m³/m³ 5 cm,Water_Content_m3_m3_5_cm,m3/m3,,,,,batch3
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Water Content,m³/m³ 30 cm,2021-07-21 15:00:00,2025-08-04 03:00:00,m³/m³ 30 cm,Water_Content_m3_m3_30_cm,m3/m3,,,,,batch3
+Tamarac,Bednesti,Tamarac,53.871334,-123.370441,865,Wind Speed,m/s,2021-07-29 13:00:00,2025-10-02 15:00:00,m/s,WindSpeedms,m s-1,2021-07-29 13:00:00,2024-10-10 12:00:00,0.0,357.0,batch1
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,DewPt,°C,2007-09-12 17:00:00,2025-09-22 10:00:00,°C,DewPtC,celsius,2007-09-12 16:00:00,2024-09-24 10:00:00,0.0,363.0,batch1
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,DewPt 2,°C,2024-09-24 12:00:00,2025-09-22 10:00:00,°C,,,,,,,batch5
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,DewPt 30 cm,°C,2007-09-12 18:00:00,2025-09-22 10:00:00,°C,DewPt_30cm,celsius,,,,,batch4
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Gust Speed,m/s,2007-09-12 17:00:00,2025-09-22 10:00:00,m/s,GustSpeedms,m s-1,2007-09-12 16:00:00,2024-09-24 10:00:00,0.0,363.0,batch1
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Pressure,mbar,2007-09-12 17:00:00,2025-09-22 10:00:00,mbar,Pressurembar,millibar,2007-09-12 16:00:00,2024-09-24 10:00:00,0.0,363.0,batch1
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,RH,%,2007-09-12 17:00:00,2025-09-22 10:00:00,%,RH,%,2007-09-12 16:00:00,2024-09-24 10:00:00,0.0,363.0,batch1
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,RH 2,%,2024-09-24 12:00:00,2025-09-22 10:00:00,%,,,,,,,batch5
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,RH 30 cm,%,2007-09-12 18:00:00,2025-09-22 10:00:00,%,RH_30cm,%,,,,,batch4
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Rain,mm,2007-09-12 17:00:00,2025-09-22 10:00:00,mm,Rainmm,mm,2007-09-12 16:00:00,2024-09-24 10:00:00,0.0,363.0,batch1
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Soil Temp,°C,2023-06-23 13:00:00,2024-11-24 09:00:00,°C,Soil_Temp,celsius,2023-06-23 13:00:00,2024-09-24 10:00:00,0.0,60.0,batch1
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Solar Radiation,W/m²,2007-09-12 17:00:00,2025-09-22 10:00:00,W/m²,SolarRadiationWm,W m-2,2007-09-12 16:00:00,2024-09-24 10:00:00,0.0,363.0,batch1
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Temp,°C,2007-09-12 17:00:00,2025-09-22 10:00:00,°C,TempC,celsius,2007-09-12 16:00:00,2024-09-24 10:00:00,0.0,363.0,batch1
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Temp 2,°C,2024-09-24 12:00:00,2025-09-22 10:00:00,°C,,,,,,,batch5
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Temp 30 cm,°C,2007-09-12 18:00:00,2025-09-22 10:00:00,°C,TempC_30_cm,celsius,,,,,batch4
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,WC_cal,m³/m³,2016-09-29 12:00:00,2025-08-03 05:00:00,m³/m³,Water_Content_Cal_m3_m3_15_cm,m3/m3,,,,,batch4
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Water Content,m³/m³ 15 cm,2016-09-29 12:00:00,2025-09-22 10:00:00,m³/m³ 15 cm,Water_Content_m3_m3_15_cm,m3/m3,,,,,batch3
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Wetness,%,2007-09-12 17:00:00,2025-09-22 10:00:00,%,Wetness,%,2007-09-12 16:00:00,2024-09-24 10:00:00,0.0,363.0,batch1
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Wind Direction,ø,2007-09-12 17:00:00,2025-09-22 10:00:00,ø,WindDirection,degree,2007-09-12 16:00:00,2024-09-24 10:00:00,0.0,363.0,batch1
+ThompsonWx,Thompson,ThompsonWx,54.333115,-126.099445,869,Wind Speed,m/s,2007-09-12 17:00:00,2025-09-22 10:00:00,m/s,WindSpeedms,m s-1,2007-09-12 16:00:00,2024-09-24 10:00:00,0.0,363.0,batch1
+Willow-BowronWx,PGTIS2,Willow-BowronWx,53.772577,-122.724634,596,DewPt,°C,2007-07-31 15:00:00,2025-10-30 10:00:00,°C,DewPtC,celsius,2007-07-31 15:00:00,2024-10-24 09:00:00,0.0,371.0,batch1
+Willow-BowronWx,PGTIS2,Willow-BowronWx,53.772577,-122.724634,596,Gust Speed,m/s,2007-07-31 15:00:00,2025-10-30 10:00:00,m/s,GustSpeedms,m s-1,2007-07-31 15:00:00,2024-10-24 09:00:00,0.0,371.0,batch1
+Willow-BowronWx,PGTIS2,Willow-BowronWx,53.772577,-122.724634,596,Pressure,mbar,2007-07-31 15:00:00,2025-10-30 10:00:00,mbar,Pressurembar,millibar,2007-07-31 15:00:00,2024-10-24 09:00:00,0.0,371.0,batch1
+Willow-BowronWx,PGTIS2,Willow-BowronWx,53.772577,-122.724634,596,RH,%,2007-07-31 15:00:00,2025-10-30 10:00:00,%,RH,%,2007-07-31 15:00:00,2024-10-24 09:00:00,0.0,371.0,batch1
+Willow-BowronWx,PGTIS2,Willow-BowronWx,53.772577,-122.724634,596,Rain,mm,2007-07-31 15:00:00,2025-10-30 10:00:00,mm,Rainmm,mm,2007-07-31 15:00:00,2024-10-24 09:00:00,0.0,371.0,batch1
+Willow-BowronWx,PGTIS2,Willow-BowronWx,53.772577,-122.724634,596,Solar Radiation,W/m²,2007-07-31 15:00:00,2025-10-30 10:00:00,W/m²,SolarRadiationWm,W m-2,2007-07-31 15:00:00,2024-10-24 09:00:00,0.0,371.0,batch1
+Willow-BowronWx,PGTIS2,Willow-BowronWx,53.772577,-122.724634,596,Temp,°C,2007-07-31 15:00:00,2025-10-30 10:00:00,°C,TempC,celsius,2007-07-31 15:00:00,2024-10-24 09:00:00,0.0,371.0,batch1
+Willow-BowronWx,PGTIS2,Willow-BowronWx,53.772577,-122.724634,596,Wetness,%,2008-06-12 13:00:00,2025-10-30 10:00:00,%,Wetness,%,2008-06-12 13:00:00,2024-10-24 09:00:00,0.0,371.0,batch1
+Willow-BowronWx,PGTIS2,Willow-BowronWx,53.772577,-122.724634,596,Wind Direction,ø,2007-07-31 15:00:00,2025-10-30 10:00:00,ø,WindDirection,degree,2007-07-31 15:00:00,2024-10-24 09:00:00,0.0,371.0,batch1
+Willow-BowronWx,PGTIS2,Willow-BowronWx,53.772577,-122.724634,596,Wind Speed,m/s,2007-07-31 15:00:00,2025-10-30 10:00:00,m/s,WindSpeedms,m s-1,2007-07-31 15:00:00,2024-10-24 09:00:00,0.0,371.0,batch1

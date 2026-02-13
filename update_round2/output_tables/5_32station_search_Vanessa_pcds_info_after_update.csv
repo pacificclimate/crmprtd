@@ -1,0 +1,33 @@
+station_id,station_name,lat,lon,elev,native_id,mod_user
+1604,BulkleyWx,53.772183,-122.720729,594,PGTIS1,tongli1997
+13070,ChiefLakeWx,54.238028,-122.877306,720,ChiefWx,tongli1997
+1606,CPFWx,53.753775,-122.718864,593,PGTIS3,tongli1997
+12058,CrystalWx,54.423494,-122.627844,744,Crystal Lake,tongli1997
+13256,Dennis,54.76159,-127.46765,895,Dennis,tongli1997
+1600,EndakoWx,54.422392,-125.991293,851,Endako,tongli1997
+1602,GeorgeWx,53.883555,-124.710668,859,George,tongli1997
+1595,GunnelWx,58.75475,-123.977683,1460,Gunnel1,tongli1997
+12060,HourglassWx,55.21275,-120.771635,1131,Hourglass ,tongli1997
+12434,Hudson Bay Mtn2,54.77375,-127.27216,1670,HBMtn2,tongli1997
+12061,Kluskus,53.397852,-124.513069,1110,BednestiWx,tongli1997
+1597,PinkWx,57.06163,-122.86491,1756,Pink1,tongli1997
+1598,SaxtonWx,54.027523,-123.300774,718,Saxton,tongli1997
+1605,Willow-BowronWx,53.772577,-122.724634,596,PGTIS2,tongli1997
+12438,BowronPit,53.902111,-122.015389,722,BowronPit,tongli1997
+12055,BlackhawkWx,55.078885,-120.352171,962,Blackhawk,tongli1997
+12059,DunsterWx,53.114909,-119.835293,890,Dunster,tongli1997
+12062,MacJxnWx,55.137858,-122.977243,719,Mackenzie Jxn,tongli1997
+13069,Sunbeam,53.33869,-120.12108,2000,Mcbride Mountain Stn,tongli1997
+13182,BarrenWx,54.510444,-126.614341,1051,Barren,tongli1997
+12057,Canoe Mountain Stn,52.70982,-119.19126,2210,Canoe Mountain Stn,tongli1997
+13220,Caribou Pass,58.35718,-129.54637,1744,CaribouPass,tongli1997
+13184,ChapmanWx,54.883903,-126.623533,848,Chapman,tongli1997
+12435,Gunnel3,58.745694,-123.977778,1486,GunnelReal,tongli1997
+1596,MiddleforkWx,57.550917,-122.7963,972,MF1,tongli1997
+1594,NondaWx,59.002111,-125.509361,1683,Nonda1,tongli1997
+12436,Perkins Peak Stn,51.81296,-125.03981,2092,Perkins Peak Stn,tongli1997
+1601,ThompsonWx,54.333115,-126.099445,869,Thompson,tongli1997
+12056,BoulderWx,55.108173,-127.37474,385,Boulder Creek,tongli1997
+1599,SmithersCmpd,54.773403,-127.139994,484,SmithersCmpd,tongli1997
+12439,CoalmineWx,53.741139,-121.784639,840,CoalmineWx,tongli1997
+12433,Gnat Pass Stn,58.18275,-129.89044,1656,Gnat Pass Stn,tongli1997
