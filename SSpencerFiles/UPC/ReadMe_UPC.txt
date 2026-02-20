@@ -21,3 +21,6 @@ for all stations using the R-code UPC_Timeseries.R
 Contact:
 Dave Spittlehouse, dspittlehouse@telus.net
 2 January 2026
+
+
+Note that the site called Geonor is actually just an offshoot site for Penticton Creek’s PL site.  Data within the Geonor data sets can be amalgamated with the PL Site.  Sheena has not checked to see if there is differences between precip collected by the Tipping bucket and the Geonor gauges (which is an all season gauge).  I would keep both sets of data (appropriately labeled of course).
