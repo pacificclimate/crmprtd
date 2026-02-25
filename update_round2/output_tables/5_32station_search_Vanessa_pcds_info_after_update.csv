@@ -1,4 +1,6 @@
 station_id,station_name,lat,lon,elev,native_id,mod_user
+1601,ThompsonWx,54.333115,-126.099445,869,Thompson,tongli1997
+12056,BoulderWx,55.108173,-127.37474,385,Boulder Creek,tongli1997
 1604,BulkleyWx,53.772183,-122.720729,594,PGTIS1,tongli1997
 13070,ChiefLakeWx,54.238028,-122.877306,720,ChiefWx,tongli1997
 1606,CPFWx,53.753775,-122.718864,593,PGTIS3,tongli1997
@@ -22,12 +24,10 @@ station_id,station_name,lat,lon,elev,native_id,mod_user
 12057,Canoe Mountain Stn,52.70982,-119.19126,2210,Canoe Mountain Stn,tongli1997
 13220,Caribou Pass,58.35718,-129.54637,1744,CaribouPass,tongli1997
 13184,ChapmanWx,54.883903,-126.623533,848,Chapman,tongli1997
+12439,CoalmineWx,53.741139,-121.784639,840,CoalmineWx,tongli1997
+12433,Gnat Pass Stn,58.18275,-129.89044,1656,Gnat Pass Stn,tongli1997
 12435,Gunnel3,58.745694,-123.977778,1486,GunnelReal,tongli1997
 1596,MiddleforkWx,57.550917,-122.7963,972,MF1,tongli1997
 1594,NondaWx,59.002111,-125.509361,1683,Nonda1,tongli1997
 12436,Perkins Peak Stn,51.81296,-125.03981,2092,Perkins Peak Stn,tongli1997
-1601,ThompsonWx,54.333115,-126.099445,869,Thompson,tongli1997
-12056,BoulderWx,55.108173,-127.37474,385,Boulder Creek,tongli1997
 1599,SmithersCmpd,54.773403,-127.139994,484,SmithersCmpd,tongli1997
-12439,CoalmineWx,53.741139,-121.784639,840,CoalmineWx,tongli1997
-12433,Gnat Pass Stn,58.18275,-129.89044,1656,Gnat Pass Stn,tongli1997

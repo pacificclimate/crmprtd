@@ -25,18 +25,3 @@ vars_id,network_id,unit,precision,standard_name,cell_method,long_description,net
 834,11,m3/m3,,liquid_water_content_of_soil_layer,time: mean (interval: 1 hour),Liquid water content of soil - 5 cm,Water_Content_m3_m3_5_cm,Soil Liquid Water Content - 5cm,,2025-02-11 16:03:39.747374,crmp
 832,11,cm,,surface_snow_depth,time: point,Surface snow depth,Snow_Depth,Snow Depth,Snow Depth,2025-02-11 16:03:39.747374,crmp
 682,11,%,,volume_fraction_of_condensed_water_in_soil ,time:point,Soil Moisture at 20cm depth,Wetness_20cm,Wetness_20cm,Wetness_20cm,2025-02-11 16:03:39.747374,crmp
-1299,11,celsius,,soil_temperature,time: mean (interval: 1 hour),Soil temperature - 25cm,Soil_Temp_25cm,Soil temperature - 25cm,soil_temperature_25cm,2026-02-06 13:10:51.846794,tongli1997
-1300,11,celsius,,soil_temperature,time: mean (interval: 1 hour),Soil temperature - 50cm,Soil_Temp_50cm,Soil temperature - 50cm,soil_temperature_50cm,2026-02-06 13:10:51.846794,tongli1997
-1301,11,celsius,,soil_temperature,time: mean (interval: 1 hour),Soil temperature - 75cm,Soil_Temp_75cm,Soil temperature - 75cm,soil_temperature_75cm,2026-02-06 13:10:51.846794,tongli1997
-1302,11,mm,,lwe_thickness_of_precipitation_amount_raw,time: sum,Raw depth of water-equivalent rain,Rainmm_raw,Rainmm_raw,lwe_thickness_of_precipitation_amount_sum_raw,2026-02-06 13:10:51.846794,tongli1997
-1303,11,m3/m3,,liquid_water_content_of_soil_layer,time: mean (interval: 1 hour),Calibrated liquid water content of soil - 15 cm,Water_Content_Cal_m3_m3_15_cm,Calibrated Soil Liquid Water Content - 15 cm,soil_liquid_water_content_cal_15cm,2026-02-06 13:10:51.846794,tongli1997
-1304,11,celsius,,air_temperature,time: mean,air_temperature_mean - 30cm,TempC_30_cm,Temperature - 30cm (Mean),air_temperature_mean_30cm,2026-02-11 09:20:10.504086,tongli1997
-1305,11,%,,relative_humidity,time: mean,Relative Humidity (Mean) - 30cm,RH_30cm,Relative Humidity (Mean) - 30cm,relative_humidity_mean_30cm,2026-02-11 09:20:10.504086,tongli1997
-1306,11,celsius,,dew_point_temperature,time: mean,Dew Point Temperature (Mean) - 30cm,DewPt_30cm,Dew Point Temperature (Mean) - 30cm,dew_point_temperature_mean_30cm,2026-02-11 09:20:10.504086,tongli1997
-1307,11,celsius,,surface_temperature,time: mean (interval: 1 hour),Surface temperature,Surface_Temp,Surface temperature,surface_temperature,2026-02-11 09:56:45.416639,tongli1997
-1357,11,celsius,,air_temperature,time: point,,air_temp,Temperature,T,2026-02-12 11:31:42.271180,tongli1997
-1358,11,mm,,thickness_of_rainfall_amount,time: sum (interval: 1 hour),,rnfl_amt_pst1hr,Rainfall 1hr,1hr rain,2026-02-12 11:31:42.271180,tongli1997
-1359,11,%,,relative_humidity,time: point,,rel_hum,Relative Humidity,RH,2026-02-12 11:31:42.271180,tongli1997
-1360,11,km/h,,wind_speed,time: mean,,avg_wnd_spd_10m_pst10mts,Wind Speed,Wind Speed,2026-02-12 11:31:42.271180,tongli1997
-1361,11,degrees,,wind_from_direction,time: mean,,avg_wnd_dir_10m_pst10mts,Wind Direction,wdir,2026-02-12 11:31:42.271180,tongli1997
-1362,11,mm,,thickness_of_rainfall_amount,time: sum (interval: 24 hour),,rnfl_amt_pst24hrs,Rainfall 24hr,rain_24hr,2026-02-12 11:31:42.271180,tongli1997

@@ -21,7 +21,7 @@ def safe_read_csv(path):
 
 
 
-def extract_new_data_rows(row, data_path, network_name="BC-FERN"):
+def extract_new_data_rows(row, data_path, network_name="FLNRO-FERN"):
     """
     Extract time-value pairs outside the database range for a given station variable.
     If DB times are missing, all data are returned.
@@ -33,7 +33,7 @@ def extract_new_data_rows(row, data_path, network_name="BC-FERN"):
     data_path : str
         Directory path containing the raw station CSV files.
     network_name : str, optional
-        Network name for Row construction (default: 'BC-FERN').
+        Network name for Row construction (default: 'FLNRO-FERN').
 
     Returns
     -------

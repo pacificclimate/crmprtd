@@ -1,0 +1,53 @@
+ISSUE,Station ID,old_network_id,Network Name,old_net_name,new_net_name,new_network_id,new_network
+Attribution,2569,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2532,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2551,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2521,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2567,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2522,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2548,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2547,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2541,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2565,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2526,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+"Attribution, ID, Name, Location",13011,12,BC-FWx -> MVRD-WS,BC-FWx,MVRD-WS,15,False
+"Attribution, ID, Name, Location",13012,12,BC-FWx -> MVRD-WS,BC-FWx,MVRD-WS,15,False
+"Attribution, ID, Name, Location",13013,12,BC-FWx -> MVRD-WS,BC-FWx,MVRD-WS,15,False
+"Attribution, Location",11017,12,BC-FWx -> BC-FERN,BC-FWx,BC-FERN,11,False
+"Attribution, Location",12464,12,BC-FWx -> BC-FERN,BC-FWx,BC-FERN,11,False
+"Concatenate, Attribution",12560,9,BC-Air,BC-Air,BC-Air,9,False
+Attribution,2556,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2576,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2523,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2528,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2527,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2555,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2564,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2574,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2540,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2531,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2538,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2575,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2517,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2544,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,12498,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2542,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2559,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2550,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2578,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2577,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2570,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2553,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2530,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,12499,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,12500,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2515,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2563,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2580,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,12497,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2536,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2571,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2513,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2554,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2543,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
+Attribution,2534,14,BC-Snow -> BCH-GSO-HMP,BC-Snow,BCH-GSO-HMP,5,False
