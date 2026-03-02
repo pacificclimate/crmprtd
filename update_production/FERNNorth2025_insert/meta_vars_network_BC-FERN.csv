@@ -1,0 +1,27 @@
+vars_id,network_id,unit,precision,standard_name,cell_method,long_description,net_var_name,display_name,short_name,mod_time,mod_user
+534,11,%,,relative_humidity,time: maximum,,RHx,Relative Humidity (Max.),relative_humidity_maximum,2025-02-11 16:03:39.747374,crmp
+506,11,m s-1,,wind_speed,time: mean,,WindSpeedms,Wind Speed (Mean),wind_speed_mean,2025-02-11 16:03:39.747374,crmp
+538,11,m s-1,,wind_speed,time: minimum,,Wind_n,Wind Speed (Min.),wind_speed_minimum,2025-02-11 16:03:39.747374,crmp
+504,11,%,,relative_humidity,time: mean,,RH,Relative Humidity (Mean),relative_humidity_mean,2025-02-11 16:03:39.747374,crmp
+505,11,celsius,,dew_point_temperature,time: mean,,DewPtC,Dew Point Temperature (Mean),dew_point_temperature_mean,2025-02-11 16:03:39.747374,crmp
+502,11,millibar,,air_pressure,time: point,,Pressurembar,Air Pressure (Point),air_pressure_point,2025-02-11 16:03:39.747374,crmp
+501,11,mm,,lwe_thickness_of_precipitation_amount,time: sum,depth of water-equivalent rain,Rainmm,Precipitation Amount,lwe_thickness_of_precipitation_amount_sum,2025-02-11 16:03:39.747374,crmp
+529,11,celsius,,air_temperature,time: mean,,Tm,Temperature (Mean),air_temperature_mean,2025-02-11 16:03:39.747374,crmp
+530,11,celsius,,air_temperature,time: maximum,,Tx,Temperature (Max.),air_temperature_maximum,2025-02-11 16:03:39.747374,crmp
+531,11,celsius,,air_temperature,time: minimum,,Tn,Temperature (Min.),air_temperature_minimum,2025-02-11 16:03:39.747374,crmp
+503,11,celsius,,air_temperature,time: point,,TempC,Temperature (Point),air_temperature_point,2025-02-11 16:03:39.747374,crmp
+508,11,degree,,wind_from_direction,time: mean,,WindDirection,Wind Direction (Mean),wind_from_direction_mean,2025-02-11 16:03:39.747374,crmp
+535,11,%,,relative_humidity,time: minimum,,RHn,Relative Humidity (Min.),relative_humidity_minimum,2025-02-11 16:03:39.747374,crmp
+507,11,m s-1,,wind_speed_of_gust,time: maximum,,GustSpeedms,Wind Gust (Max.),wind_speed_of_gust_maximum,2025-02-11 16:03:39.747374,crmp
+585,11,celsius,,air_temperature,t: maximum within days t: mean within months t: mean over years,Climatological mean of monthly mean maximum daily temperature,Tx_Climatology,Temperature Climatology (Max.),air_temperaturet: maximum within days t: mean within months t: mean over years,2025-02-11 16:03:39.747374,crmp
+509,11,W m-2,,surface_downwelling_shortwave_flux,time: mean,,SolarRadiationWm,Incoming Shortwave,surface_downwelling_shortwave_flux_mean,2025-02-11 16:03:39.747374,crmp
+510,11,%,,volume_fraction_of_condensed_water_in_soil,time: point,,Wetness,Soil Moisture,volume_fraction_of_condensed_water_in_soil_point,2025-02-11 16:03:39.747374,crmp
+586,11,celsius,,air_temperature,t: minimum within days t: mean within months t: mean over years,Climatological mean of monthly mean minimum daily temperature,Tn_Climatology,Temperature Climatology (Min.),air_temperaturet: minimum within days t: mean within months t: mean over years,2025-02-11 16:03:39.747374,crmp
+587,11,celsius,,air_temperature,t: mean within days t: mean within months t: mean over years,Climatological mean of monthly mean of mean daily temperature,T_mean_Climatology,Temperature Climatology (Mean),air_temperaturet: mean within days t: mean within months t: mean over years,2025-02-11 16:03:39.747374,crmp
+588,11,mm,,lwe_thickness_of_precipitation_amount,t: sum within months t: mean over years,Climatological mean of monthly total precipitation,Precip_Climatology,Precipitation Climatology,lwe_thickness_of_precipitation_amountt: sum within months t: mean over years,2025-02-11 16:03:39.747374,crmp
+833,11,celsius,,soil_temperature,time: mean (interval: 1 hour),Soil temperature,Soil_Temp,Soil Temperature,Soil Temperature,2025-02-11 16:03:39.747374,crmp
+835,11,m3/m3,,liquid_water_content_of_soil_layer,time: mean (interval: 1 hour),Liquid water content of soil - 15 cm,Water_Content_m3_m3_15_cm,Soil Liquid Water Content - 15 cm,,2025-02-11 16:03:39.747374,crmp
+836,11,m3/m3,,liquid_water_content_of_soil_layer,time: mean (interval: 1 hour),Liquid water content of soil - 30 cm,Water_Content_m3_m3_30_cm,Soil Liquid Water Content - 30 cm,,2025-02-11 16:03:39.747374,crmp
+834,11,m3/m3,,liquid_water_content_of_soil_layer,time: mean (interval: 1 hour),Liquid water content of soil - 5 cm,Water_Content_m3_m3_5_cm,Soil Liquid Water Content - 5cm,,2025-02-11 16:03:39.747374,crmp
+832,11,cm,,surface_snow_depth,time: point,Surface snow depth,Snow_Depth,Snow Depth,Snow Depth,2025-02-11 16:03:39.747374,crmp
+682,11,%,,volume_fraction_of_condensed_water_in_soil ,time:point,Soil Moisture at 20cm depth,Wetness_20cm,Wetness_20cm,Wetness_20cm,2025-02-11 16:03:39.747374,crmp
