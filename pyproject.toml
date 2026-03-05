@@ -63,6 +63,8 @@ requests = { version = "*", extras = ["security"] }
 pycds = "5.0.0"
 pint = "*"
 pysftp = "*"
+# Paramiko 4.0.0 dropped support for DSA keys which are used by pysftp, see https://www.paramiko.org/changelog.html
+paramiko = ">=3.5.1,<4.0.0"
 urllib3 = "<2"
 python-json-logger = { version = "*", optional = true }
 black = "25.1.0"

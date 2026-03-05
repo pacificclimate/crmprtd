@@ -1735,4 +1735,4 @@ jsonlogger = ["python-json-logger"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<3.14"
-content-hash = "2af8d31f9e6f619583c5be4ed808d498a62526ebc3c41c800c26ff227e81fc81"
+content-hash = "fd684e508fe5b5b707c1b19a55b16facfd536b9a449428a273a451884ddc3a59"
