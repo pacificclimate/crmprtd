@@ -1,5 +1,11 @@
 # News / Release Notes
 
+## 5.0.7
+
+_2026-Mar-05_
+
+Fix paramiko version to prevent dependency errors when using pysftp
+
 ## 5.0.6
 
 _2025-Dec-17_
