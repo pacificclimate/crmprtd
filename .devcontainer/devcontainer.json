@@ -67,8 +67,8 @@
         "${localEnv:USER}_crmprtd_devcontainer"
     ],
 
-    "mounts":[
-        "source=/Users/tongli1997/pcic-storage/data/projects/crmp/data/fern/,target=/fern_data,type=bind,consistency=cached"
-]
+//     "mounts":[
+//         "source=/Users/tongli1997/pcic-storage/data/projects/crmp/data/fern/,target=/fern_data,type=bind,consistency=cached"
+// ]
 
 }
