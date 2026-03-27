@@ -1,60 +1,111 @@
-import matplotlib.pyplot as plt
 
 import matplotlib.pyplot as plt
-import pandas as pd
 
-def plot_missing_periods(df, title="Time series with missing periods", 
-                         series_label="Observed", color_series="gray", 
-                         color_missing="red", alpha_missing=0.3, figsize=(12,5)):
+def plot_weather_data(df, title):
     """
-    Plot a time series and highlight missing timestamps or consecutive missing periods.
+    Plot temperature and precipitation time series.
+    """
+    fig, axes = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+    
+    axes[0].plot(df.index, df["temp"], color='#e63946', lw=0.8)
+    axes[0].set_ylabel("Temperature (°C)")
+    axes[0].set_title("Synthetic Temperature with Outliers, Missing, and Streaks")
+    
+    axes[1].plot(df.index, df["precip"], color='#0081a7', lw=0.8)
+    axes[1].set_ylabel("Precipitation (mm)")
+    axes[1].set_title(title)
+    
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_timeseries_with_missing(
+    df,
+    missing_times,
+    value_col=None,
+    figsize=(12, 5),
+    line_color='gray',
+    missing_color='#e63946',
+    alpha=0.6,
+    lw=1.0,
+    
+    title="Time series with missing timestamps"
+):
+    """
+    Plot time series with vertical lines marking missing timestamps.
 
     Parameters
     ----------
-    df : pd.DataFrame or pd.Series
-        Time series with DatetimeIndex. If DataFrame, the first column is used.
-    title : str
-        Plot title.
-    series_label : str
-        Label for the observed series.
-    color_series : str
-        Color for the observed time series.
-    color_missing : str
-        Color for missing periods.
-    alpha_missing : float
-        Transparency for missing regions.
+    df : pandas.DataFrame
+        Time-indexed dataframe
+    missing_times : array-like (DatetimeIndex or list)
+        Missing timestamps
+    value_col : str or None
+        Column name to plot (if None, use first column)
     figsize : tuple
-        Figure size.
+    line_color : str
+    missing_color : str
+    alpha : float
+        Transparency for missing lines
+    lw : float
+        Line width for time series
+    title : str
     """
-    # Convert DataFrame to Series if needed
-    if isinstance(df, pd.DataFrame):
-        series = df.iloc[:,0]
+
+    # select column
+    if value_col is None:
+        series = df.iloc[:, 0]
     else:
-        series = df
+        series = df[value_col]
 
     fig, ax = plt.subplots(figsize=figsize)
 
-    # Plot the observed series
-    ax.plot(series.index, series.values, color=color_series, lw=0.5, label=series_label)
+    # plot time series
+    ax.plot(series.index, series, color=line_color, lw=lw, label='Observed')
 
-    # Detect missing points
-    missing_mask = series.isna()
-    groups = (missing_mask != missing_mask.shift()).cumsum()
-
-    # Highlight missing periods
-    for _, g in series.groupby(groups):
-        if g.isna().all():
-            ax.axvspan(
-                g.index.min(),
-                g.index.max(),
-                color=color_missing,
-                alpha=alpha_missing,
-                lw=0,
-                zorder=2
-            )
+    # vertical lines for missing timestamps
+    ax.vlines(
+        x=missing_times,
+        ymin=series.min(),
+        ymax=series.max(),
+        color=missing_color,
+        alpha=alpha,
+        label='Missing'
+    )
 
     ax.set_title(title)
     ax.set_ylabel("Value")
     ax.legend()
+
     plt.show()
-    
+
+    # return fig, ax
+
+
+
+def plot_out_range(df, min_val, max_val, flag=None):
+    fig, ax = plt.subplots(figsize=(12,5))
+
+    # main line
+    ax.plot(df.index, df.iloc[:,0], color='gray', linewidth=1, label="Temperature")
+
+    # out-of-range points
+    if flag is not None:
+        mask = flag.iloc[:,0] == 1
+        ax.scatter(
+            df.index[mask],
+            df.iloc[:,0][mask],
+            color='orange',
+            s=10,
+            label="Out of range"
+        )
+
+
+    ax.axhline(min_val, linestyle="--", color="#0081a7", alpha=0.5)
+    ax.axhline(max_val, linestyle="--", color="#0081a7", alpha=0.5)
+
+    ax.set_ylabel("Temperature (°C)")
+    ax.set_title("Ou-of-range Check: Temperature Time Series")
+    ax.legend()
+
+    plt.show()
