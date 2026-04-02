@@ -5,8 +5,8 @@ import copy
 import os
 import sys
 import logging
-import pytz
-from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo 
+from datetime import datetime, timedelta, timezone
 from argparse import ArgumentParser
 from time import sleep
 from importlib.resources import files
@@ -14,43 +14,41 @@ from importlib.resources import files
 # Import from crmprtd
 from crmprtd import (
     add_logging_args,
+    add_network_arg,
     add_province_args,
+    get_defaults_module,
     setup_logging,
     add_bulk_args,
     add_time_range_args,
-    ensure_log_directory,
+    ensure_directory,
     network_alias_names,
     network_aliases,
 )
 from crmprtd.download_cache_process import (
     main as download_cache_process_main,
     describe_network,
-    default_cache_filename,
 )
 
 
 def process(current_time, opts, args):
+    network_defaults = get_defaults_module(opts.network_name)
+
     # Generate cache filename if directory specified
     cache_filename = None
     if opts.directory:
 
-        cache_filename = default_cache_filename(
+        cache_filename = network_defaults.default_cache_filename(
             timestamp=current_time,
-            network_name=opts.network,
-            tag=opts.tag,
-            frequency=opts.frequency if opts.network == "ec" else None,
-            province=opts.province if opts.network == "ec" else None,
+            **opts
         )
 
         # Replace the default cache directory with the user-specified directory
         cache_filename = cache_filename.replace(
-            f"~/{opts.network}/cache/", f"{opts.directory}/{opts.network}/cache/"
+            f"~/{opts.network_name}/cache/", f"{opts.directory}/{opts.network_name}/cache/"
         )
 
         # ensure directory exists
-        cache_dir = os.path.dirname(cache_filename)
-        if not os.path.exists(cache_dir):
-            os.makedirs(cache_dir, exist_ok=True)
+        ensure_directory(os.path.dirname(cache_filename))
 
     # Build argument list for download_cache_process main function
     # Start with base arguments from the original args list
@@ -60,7 +58,7 @@ def process(current_time, opts, args):
     fun_args = [
         *base_args,
         "--network",
-        opts.network,
+        opts.network_name,
         # "--log_conf",
         # opts.log_conf,
         "--log_filename",
@@ -72,11 +70,11 @@ def process(current_time, opts, args):
     ]
 
     # Add frequency if provided (only for EC network, as other networks don't use it)
-    if opts.network == "ec" and opts.frequency:
+    if opts.network_name == "ec" and opts.frequency:
         fun_args.extend(["--frequency", opts.frequency])
 
     # Add province if provided
-    if opts.network == "ec" and opts.province:
+    if opts.network_name == "ec" and opts.province:
         fun_args.extend(["--province", opts.province])
 
     # Add tag if provided
@@ -99,9 +97,18 @@ def run(opts, args):
     Main function to run bulk pipeline operations using download_cache_process
     for time ranges with specified frequency
     """
-    # Create log directory if it doesn't exist
-    if opts.log_filename:
-        ensure_log_directory(opts.log_filename)
+
+    network_defaults = get_defaults_module(opts.network_name)
+
+    if not opts.log_filename:
+        opts.log_filename = network_defaults.default_log_filename(
+            network_name=opts.network_name,
+            tag=opts.tag,
+            frequency=opts.frequency,
+            province=opts.province if opts.network_name == "ec" else None,
+        )
+
+    ensure_directory(opts.log_filename)
 
     # Setup logging first
     setup_logging(
@@ -115,7 +122,7 @@ def run(opts, args):
     log = logging.getLogger("crmprtd")
 
     log.info(f"Parsed opts: {opts}")
-    log.info(f"Network description: {describe_network(opts.network)}")
+    log.info(f"Network description: {describe_network(opts.network_name)}")
 
     try:
         stime = datetime.strptime(opts.stime, "%Y-%m-%d %H:%M:%S")
@@ -145,13 +152,13 @@ def run(opts, args):
             log.info(f"Processing time: {iter_time_str}")
 
             try:
-                if opts.network == "ec" and not opts.province:
+                if opts.network_name == "ec" and not opts.province:
                     log.error(
                         "For network 'ec', province must be specified using --province option"
                     )
                     raise ValueError("Province must be specified for EC network")
                 # Process each province if specified
-                if opts.network == "ec":
+                if opts.network_name == "ec":
                     for p in opts.province:
                         log.info(f"Processing province: {p}")
                         copts = copy.copy(opts)
@@ -195,6 +202,12 @@ def main():
         "downloads are desired, omit inclusion of connection string arguments."
     )
 
+    add_network_arg(parser)
+
+    opts, args = parser.parse_known_args(sysargs)
+
+    network_defaults = get_defaults_module(opts.network_name)
+
     add_logging_args(parser)
     add_bulk_args(parser)
     add_time_range_args(parser)
@@ -205,13 +218,8 @@ def main():
         dest="tag",
         help="Tag to include in cache and log filenames",
     )
+
     # Control options
-    parser.add_argument(
-        "--force",
-        dest="force",
-        action="store_true",
-        help="Continue processing if individual operations fail",
-    )
     parser.add_argument(
         "--delay",
         dest="delay",
@@ -229,10 +237,10 @@ def main():
     # Set defaults
     parser.set_defaults(
         log_conf=default_log_conf,
-        log_filename="/tmp/crmp/bulk_pipeline.log",
+        log_filename=None,
         log_level="INFO",
         error_email="pcic.devops@uvic.ca",
-        etime=datetime.now(pytz.timezone("UTC")).strftime("%Y-%m-%d %H:%M:%S"),
+        etime=network_defaults.default_end_time(),
         dry_run=False,
         force=False,
         delay=3,
@@ -240,20 +248,19 @@ def main():
 
     opts, args = parser.parse_known_args(sysargs)
 
-    if opts.network == "ec":
+    # Additional arguments for specific networks, currently only EC so I've not migrated
+    # then to network defaults or similar yet.
+    if opts.network_name == "ec":
         add_province_args(parser)
         opts, args = parser.parse_known_args(sysargs)
         # Normalize to lowercase.
         opts.province = {p.lower() for p in opts.province}
 
-    # Validate arguments
-    if not opts.network:
-        parser.error("Network (-N/--network) is required")
-
-    if opts.network in network_alias_names:
-        for alias in network_aliases[opts.network]:
+    # Network aliases can represent multiple networks, so we loop through them here
+    if opts.network_name in network_alias_names:
+        for alias in network_aliases[opts.network_name]:
             copts = copy.copy(opts)
-            copts.network = alias
+            copts.network_name = alias
             run(copts, args)
     else:
         run(opts, args)

@@ -6,15 +6,16 @@ TODO: More doc.
       Factor out long lists of hard-coded network names
 """
 
+
+
 import datetime
 from argparse import ArgumentParser
 from typing import List, Optional
 import logging
 
-import pytz
-
 from crmprtd import (
     NETWORKS,
+    get_defaults_module,
     network_alias_names,
     network_aliases,
     add_province_args,
@@ -32,127 +33,39 @@ def check_network_name(network_name):
         raise ValueError(f"Network name '{network_name}' is not recognized.")
 
 
-def default_log_filename(
-    network_name: Optional[str] = None,
-    tag: Optional[str] = None,
-    frequency: Optional[str] = None,
-    province: Optional[str] = None,
-    **_,
-):
-    """Return log filename (filepath). It depends on several parameters, starting
-    with the network. Its pattern is similar, but not identical, to that of the cache
-    filename.
-
-    :param network_name: Network name to include in filename.
-    :param tag: Tag to include in filename.
-    :param frequency: Download frequency to include in filename (network ec only).
-    :param province: Province code (2 letters) to include in filename (network ec only).
-    :param _: Ignored additional kw args.
-    :return: Filename.
-    """
-    check_network_name(network_name)
-    filepath = f"~/{network_name}/logs"
-    tag_prefix = f"{tag}_" if tag is not None else ""
-    if network_name in ("ec",):
-        assert frequency is not None
-        assert province is not None
-        return f"{filepath}/{tag_prefix}{province.lower()}_{frequency}_json.log"
-    return f"{filepath}/{tag_prefix}{network_name}_json.log"
-
-
-def the_log_filename(log_filename: Optional[str] = None, **kwargs):
-    return log_filename or default_log_filename(**kwargs)
-
-
-def default_cache_filename(
-    timestamp: datetime.datetime = datetime.datetime.now(),
-    timestamp_format: str = "%Y-%m-%dT%H:%M:%S",
-    network_name: Optional[str] = None,
-    tag: Optional[str] = None,
-    frequency: Optional[str] = None,
-    province: Optional[str] = None,
-    **_,
-) -> str:
-    """Return cache filename (filepath). It depends on several parameters, starting
-    with the network. Its pattern is similar, but not identical, to that of the log
-    filename.
-
-    :param timestamp: Timestamp to include in filename.
-    :param timestamp_format: Format for converting timestamp to string.
-    :param network_name: Network name to include in filename.
-    :param tag: Tag to include in filename.
-    :param frequency: Download frequency to include in filename (network ec only).
-    :param province: Province code (2 letters) to include in filename (network ec only).
-    :param _: Ignored additional kw args.
-    :return: Filename.
-    """
-    check_network_name(network_name)
-    ts = timestamp.strftime(timestamp_format)
-    filepath = f"~/{network_name}/cache"
-    tag_prefix = f"{tag}_" if tag is not None else ""
-    if network_name in ("ec",):
-        assert frequency is not None
-        assert province is not None
-        return f"{filepath}/{tag_prefix}{frequency}_{province.lower()}_{ts}.xml"
-    if network_name in (
-        "bc_env_snow",
-        "bc_forestry",
-        "bc_riotinto",
-        "bc_tran",
-        "dfo_ccg_lighthouse",
-        "nt_forestry",
-        "nt_water",
-        "yt_gov",
-        "yt_water",
-        "yt_avalanche",
-        "yt_firewx",
-    ):
-        return f"{filepath}/{tag_prefix}{network_name}_{ts}.xml"
-    return f"{filepath}/{tag_prefix}{network_name}_{ts}.txt"
-
-
-def the_cache_filename(cache_filename: Optional[str] = None, **kwargs) -> str:
-    return cache_filename or default_cache_filename(**kwargs)
-
-
 # TODO: This is inconsistent with how all the other functions pull the log config
 # They use crmprtd/data/logging.yaml, but this uses a default of the home directory
-def log_args(**kwargs) -> List[str]:
+def log_args(
+    network_name: str, log_filename: Optional[str] = None, **kwargs
+) -> List[str]:
     """Return logging args. Only the log filename depends on the arguments."""
+    network_defaults = get_defaults_module(network_name)
+
     return [
         "-L",
         "~/logging.yaml",
         "--log_filename",
-        the_log_filename(**kwargs),
+        log_filename or network_defaults.default_log_filename(network_name = network_name, **kwargs),
     ]
 
 
-def to_utc(d: datetime.datetime, tz_string: str = "Canada/Pacific"):
-    if d.tzinfo is not None and d.tzinfo.utcoffset(d) is not None:
-        # d is not localized. Make it so.
-        tz = pytz.timezone(tz_string)
-        d = tz.localize(d)
-    return d.astimezone(pytz.utc)
-
-
 def download_args(
-    network_name: Optional[str] = None,
+    network_name: str,
     frequency: Optional[str] = None,
     province: Optional[str] = None,
     time: Optional[datetime.datetime] = None,  # TODO: use now()?
-    start_time: Optional[datetime.datetime] = None,
     **_,
 ) -> List[str]:
     """Return command-line args for download phase. They depend on the network and
     other arguments.
 
     :param time:
-    :param start_time:
     :param network_name: Network name.
     :param _: Remainder args. Passed through.
     :return: List of download args.
     """
     check_network_name(network_name)
+    network_defaults = get_defaults_module(network_name)
 
     common_args = f"-N {network_name} ".split()
     net_args = None
@@ -160,37 +73,10 @@ def download_args(
     # Set net_args per network.
     if network_name == "_test":
         net_args = []
-    if network_name == "bc_hydro":
-        net_args = "-f sftp2.bchydro.com -F pcic -S ~/.ssh/id_rsa".split()
-    if network_name == "crd":
-        net_args = f"--auth_fname ~/.rtd_auth.yaml --auth_key={network_name}".split()
-    if network_name == "ec":
-        if province is None or frequency is None:
-            raise ValueError("EC network requires both province and frequency")
-        net_args = f"-p {province.lower()} -F {frequency}".split()
-    if network_name in (
-        "bc_env_snow",
-        "bc_forestry",
-        "bc_riotinto",
-        "bc_tran",
-        "dfo_ccg_lighthouse",
-        "nt_forestry",
-        "nt_water",
-        "yt_gov",
-        "yt_water",
-        "yt_avalanche",
-        "yt_firewx",
-    ):
-        if time is None:
-            raise ValueError(f"Network {network_name} requires a time parameter")
-        ts = to_utc(time).strftime("%Y/%m/%d %H:00:00")
-        net_args = ["-d", f'"{ts}"']
-    if network_name == "moti":
-        net_args = f"-u https://prdoas5.apps.th.gov.bc.ca/saw-data/sawr7110 --auth_fname ~/.rtd_auth.yaml --auth_key={network_name}".split()
-    if network_name == "wamr":
-        net_args = []
-    if network_name == "wmb":
-        net_args = f"--auth_fname ~/.rtd_auth.yaml --auth_key={network_name}".split()
+    else:
+        net_args = network_defaults.default_download_args(
+            time=time, province=province, frequency=frequency
+        )
 
     assert net_args is not None
     return common_args + net_args
@@ -208,18 +94,31 @@ def dispatch_network(
     **kwargs,
 ) -> None:
     """
-    Dispatch a single network to the download-and-process pipeline.
-
-    :param cache_filename: Custom cache filename.
-    :param connection_string: Database connection string for "process" step.
-    :param time: Custom time to use for downloading. If None, use network defaults.
-    :param kwargs: Remaining args, passed through to various subfunctions. Note that
-        network name is one of these args.
-    :param dry_run: If true, print commands but don't run them.
-    :return: None. Side effect: Download and process network specified in args.
+    Dispatch a single network through the download and process pipeline.
+    
+    Handles network-specific logic, including handling of special networks like "_test"
+    and "ec", by appending appropriate arguments and invoking the download-and-process
+    sequence.
+    
+    :param cache_filename: Optional custom filename for cache storage. If None, defaults
+     are used based on network-specific logic and parameters.
+    :param connection_string: Optional database connection string for the processing
+                              step. If not provided, no database operations occur.
+    :param dry_run: If True, commands are displayed without being executed. This is
+                    useful for verifying the command flow without actual processing.
+    :param time: Optional datetime object to specify custom download time. If None,
+                 network-specific default time logic is applied.
+    :param kwargs: Additional keyword arguments passed throughout the pipeline. Expected
+                   to contain a valid 'network_name' key along with other customization.
+    :raises ValueError: If provided network name is unrecognized, or if specific
+                        network requirements like province codes (e.g., for "ec") are
+                        unmet.
+    :return: None. The function executes the download and processing pipeline with
+             side effects based on given parameters.
     """
     network_name = kwargs["network_name"]
     check_network_name(network_name)
+    network_defaults = get_defaults_module(network_name)
 
     if network_name == "_test":
         # Use custom time if provided, otherwise no time parameter
@@ -227,19 +126,24 @@ def dispatch_network(
             network_name=network_name,
             log_args=log_args(**kwargs),
             download_args=download_args(time=time, **kwargs),
-            cache_filename=the_cache_filename(
-                cache_filename=cache_filename,
-                timestamp=time if time else datetime.datetime.now(),
+            cache_filename=cache_filename
+            or network_defaults.default_cache_filename(
+                timestamp=time,
                 **kwargs,
             ),
             connection_string=connection_string,
-            dry_run=dry_run,
+            dry_run=dry_run or False,
         )
+    # Somewhere we have to break out the multiple provinces for EC into individual processing
+    # units. So far this is the most logical place, but we could have it be part of network
+    # defaults if we were smart about it.
     elif network_name == "ec":
         provinces = kwargs.pop("province")
 
         if not provinces or len(provinces) == 0:
             raise ValueError("EC network requires at least one province code")
+
+        use_time = (time if time else network_defaults.default_time())
 
         # Use custom time if provided, otherwise let EC network use its defaults
         for province in provinces:
@@ -247,51 +151,26 @@ def dispatch_network(
                 network_name=network_name,
                 log_args=log_args(**kwargs, province=province),
                 download_args=download_args(time=time, province=province, **kwargs),
-                cache_filename=the_cache_filename(
+                cache_filename=cache_filename
+                or network_defaults.default_cache_filename(
                     cache_filename=cache_filename,
                     province=province,
-                    timestamp=time if time else datetime.datetime.now(),
+                    timestamp=use_time,
                     **kwargs,
                 ),
                 connection_string=connection_string,
                 dry_run=dry_run,
             )
-    elif network_name in (
-        "bc_env_snow",
-        "bc_forestry",
-        "bc_riotinto",
-        "bc_tran",
-        "dfo_ccg_lighthouse",
-        "nt_forestry",
-        "nt_water",
-        "yt_gov",
-        "yt_water",
-        "yt_avalanche",
-        "yt_firewx",
-    ):
-        # Use custom time if provided, otherwise default to "an hour ago"
-        use_time = (
-            time if time else (datetime.datetime.now() - datetime.timedelta(hours=1))
-        )
-        download_and_process(
-            network_name=network_name,
-            log_args=log_args(**kwargs),
-            download_args=download_args(**kwargs, time=use_time),
-            cache_filename=the_cache_filename(
-                cache_filename=cache_filename, timestamp=use_time, **kwargs
-            ),
-            connection_string=connection_string,
-            dry_run=dry_run,
-        )
     else:
-        # Use custom time if provided, otherwise default to "now"
-        use_time = time if time else datetime.datetime.now()
+        # Use custom time if provided, otherwise let network use its defaults
+        use_time = (time if time else network_defaults.default_time())
         download_and_process(
             network_name=network_name,
             log_args=log_args(**kwargs),
             download_args=download_args(**kwargs, time=use_time),
-            cache_filename=the_cache_filename(
-                cache_filename=cache_filename, timestamp=use_time, **kwargs
+            cache_filename=cache_filename
+            or network_defaults.default_cache_filename(
+                cache_filename=cache_filename, timestamp=use_time, **kwargs 
             ),
             connection_string=connection_string,
             dry_run=dry_run,
