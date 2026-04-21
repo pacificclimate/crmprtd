@@ -9,11 +9,11 @@ def plot_weather_data(df, title):
     
     axes[0].plot(df.index, df["temp"], color='#e63946', lw=0.8)
     axes[0].set_ylabel("Temperature (°C)")
-    axes[0].set_title("Synthetic Temperature with Outliers, Missing, and Streaks")
+    axes[0].set_title(title)
     
     axes[1].plot(df.index, df["precip"], color='#0081a7', lw=0.8)
     axes[1].set_ylabel("Precipitation (mm)")
-    axes[1].set_title(title)
+    # axes[1].set_title(title)
     
     plt.tight_layout()
     plt.show()
