@@ -73,7 +73,7 @@ def generate_synthetic_weather_data(start="2015-01-01", end="2020-12-31", seed=4
 
         # --- 1. Outliers (random positions per year) ---
         outlier_days = np.random.choice(len(idx), size=3, replace=False)
-        df.loc[idx[outlier_days], "temp"] += np.random.choice([20, -15, 25], size=3)
+        df.loc[idx[outlier_days], "temp"] += np.random.choice([40, -40, 50], size=3)
         df.loc[idx[outlier_days], "precip"] += np.random.choice([30, 50, 40], size=3)
 
         # --- 2. Missing values ---
@@ -86,5 +86,58 @@ def generate_synthetic_weather_data(start="2015-01-01", end="2020-12-31", seed=4
             start_i = np.random.randint(0, len(idx) - 25)
             streak_idx = idx[start_i:start_i + 22]
             df.loc[streak_idx, "temp"] = 15.0
+
+    return df
+
+
+def generate_climate_outlier_test_data(start="2012-01-01", end="2024-12-31", seed=42):
+
+    import numpy as np
+    import pandas as pd
+
+    np.random.seed(seed)
+
+    time = pd.date_range(start, end, freq="D")
+    n = len(time)
+
+    # --- FIX HERE ---
+    doy = time.dayofyear.values.copy()
+    doy[doy == 366] = 365
+
+    temp = 10 + 15 * np.sin(2 * np.pi * doy / 365) + np.random.normal(0, 2, n)
+
+    precip = np.random.gamma(shape=1.2, scale=2.0, size=n)
+    precip[np.random.rand(n) < 0.7] = 0
+
+    df = pd.DataFrame({"temp": temp, "precip": precip}, index=time)
+
+
+    # ================================
+    # 🔥 Inject guaranteed QC failures
+    # ================================
+
+    years = df.index.year.unique()
+
+    for year in years:
+
+        idx = df.loc[str(year)].index
+
+        # --- 1. EXTREME temperature outliers (guaranteed z > 6) ---
+        out_idx = np.random.choice(idx, size=3, replace=False)
+        df.loc[out_idx, "temp"] = df["temp"].mean() + np.random.choice([60, -60, 80])
+
+        # --- 2. EXTREME precipitation spikes ---
+        rain_idx = np.random.choice(idx, size=2, replace=False)
+        df.loc[rain_idx, "precip"] = 200  # absurdly high → always > 9×P95
+
+        # --- 3. Flat-line streak (sensor failure) ---
+        if len(idx) > 50:
+            start_i = np.random.randint(0, len(idx) - 30)
+            streak = idx[start_i:start_i + 25]
+            df.loc[streak, "temp"] = 5.0  # constant
+
+        # --- 4. Missing values ---
+        miss_idx = np.random.choice(idx, size=3, replace=False)
+        df.loc[miss_idx, ["temp", "precip"]] = np.nan
 
     return df

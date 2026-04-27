@@ -3,18 +3,21 @@ import matplotlib.pyplot as plt
 
 def plot_weather_data(df, title):
     """
-    Plot temperature and precipitation time series.
+    Plot all variables in a time series DataFrame.
     """
-    fig, axes = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
-    
-    axes[0].plot(df.index, df["temp"], color='#e63946', lw=0.8)
-    axes[0].set_ylabel("Temperature (°C)")
+
+    n_vars = len(df.columns)
+    fig, axes = plt.subplots(n_vars, 1, figsize=(12, 2.5 * n_vars), sharex=True)
+
+    if n_vars == 1:
+        axes = [axes]
+
+    for ax, col in zip(axes, df.columns):
+        ax.plot(df.index, df[col], lw=0.8, color = 'gray')
+        ax.set_ylabel(col)
+
     axes[0].set_title(title)
-    
-    axes[1].plot(df.index, df["precip"], color='#0081a7', lw=0.8)
-    axes[1].set_ylabel("Precipitation (mm)")
-    # axes[1].set_title(title)
-    
+
     plt.tight_layout()
     plt.show()
 
