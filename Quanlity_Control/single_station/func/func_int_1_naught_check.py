@@ -86,7 +86,7 @@ def qc_naught_and_trace(df):
 
     # temperature zeros
     # trace variables
-    for col in ["tmin", "tmax"]:
+    for col in ["temp", "tmin", "tmax"]:
         if col in df.columns:
             result[f"{col}_zero"] = qc_temperature_zero_check(df)
 

@@ -1,10 +1,3 @@
-# Check for
-# 1. Duplicate entire years: “All values in one year = another year”
-# 2. Duplicate months within the same year: “One month = another month”
-# 3. Same calendar month across years: “Jan 2000 = Jan 2001”
-# 4. Identical value–streak checks: If the same value repeats for many consecutive days, it’s unusual and probably an error.
-
-
 import numpy as np
 import pandas as pd
 
@@ -71,7 +64,6 @@ def detect_duplicate_months_within_year(df):
     return duplicates
 
 
-
 def detect_duplicate_same_month_across_years(df):
     df = df.copy()
     df['year'] = df.index.year
@@ -95,68 +87,14 @@ def detect_duplicate_same_month_across_years(df):
 
 
 
-def identical_value_streak_check(df, value_col, threshold, skip_zeros=False):
-    """
-    Return streaks of identical values using real datetime index.
-    """
-
-    series = df[value_col]
-    flagged = []
-
-    count = 1
-    start_idx = 0
-
-    for i in range(1, len(series)):
-        prev_val = series.iloc[i - 1]
-        curr_val = series.iloc[i]
-
-        # Skip zeros if needed
-        if skip_zeros and (prev_val == 0 or curr_val == 0):
-            if count >= threshold:
-                flagged.append((
-                    df.index[start_idx],
-                    df.index[i - 1],
-                    prev_val
-                ))
-            count = 1
-            start_idx = i
-            continue
-
-        # Skip missing
-        if pd.isna(curr_val) or pd.isna(prev_val):
-            continue
-
-        if curr_val == prev_val:
-            if count == 1:
-                start_idx = i - 1
-            count += 1
-        else:
-            if count >= threshold:
-                flagged.append((
-                    df.index[start_idx],
-                    df.index[i - 1],
-                    prev_val
-                ))
-            count = 1
-
-    # last streak
-    if count >= threshold:
-        flagged.append((
-            df.index[start_idx],
-            df.index[len(series) - 1],
-            series.iloc[-1]
-        ))
-
-    return flagged
-
-
-        
 
 def qc_tmax_tmin_flatline(df,
                           tmax_col="tmax",
                           tmin_col="tmin",
                           threshold_days=10):
-
+    """
+    Check for flatline months where TMAX == TMIN on many days.
+    """
     df = df.copy()
 
     # ensure datetime index
@@ -185,30 +123,25 @@ def qc_tmax_tmin_flatline(df,
     return flags
 
 
-def duplicate_check_temperature(df, value_col):
+def duplicate_check(df, value_col):
     """
-    Run duplicate checks depending on variable type.
+    Run duplicate checks for any variable.
+    Excludes identical value streak check (see identify_value_streaks instead).
     """
-
     result = {}
 
     # -------------------------------------------------
-    # always-run checks (except SNWD special case below)
+    # always-run checks (except SNWD special case)
     # -------------------------------------------------
     if value_col != "snw_dpth":
         result["duplicate_years"] = detect_duplicate_years(df)
         result["duplicate_months_within_year"] = detect_duplicate_months_within_year(df)
         result["duplicate_same_month_across_years"] = detect_duplicate_same_month_across_years(df)
-
-        result["identical_value_streaks"] = identical_value_streak_check(
-            df, value_col, threshold=20
-        )
     else:
         # SNWD skips these checks
         result["duplicate_years"] = None
         result["duplicate_months_within_year"] = None
         result["duplicate_same_month_across_years"] = None
-        result["identical_value_streaks"] = None
 
     # -------------------------------------------------
     # tmin / tmax specific logic
@@ -220,7 +153,12 @@ def duplicate_check_temperature(df, value_col):
 
     return result
 
+
+
 def print_duplicate_summary(result, value_col):
+    """
+    Print summary of duplicate checks (excludes streak check).
+    """
     print("\n===== DUPLICATE CHECK SUMMARY =====\n")
 
     has_issue = False
@@ -234,8 +172,7 @@ def print_duplicate_summary(result, value_col):
     if is_snwd:
         print("❄️ SNOW DEPTH VARIABLE")
         print("   - duplicate_months_within_year: skipped")
-        print("   - duplicate_same_month_across_years: skipped")
-        print("   - identical_value_streaks: skipped\n")
+        print("   - duplicate_same_month_across_years: skipped\n")
 
     # ---- Years ----
     if result.get("duplicate_years"):
@@ -279,20 +216,6 @@ def print_duplicate_summary(result, value_col):
     else:
         print("\n🌍 Duplicate Months (across years): SKIPPED")
 
-    # ---- Identical Value Streaks ----
-    streaks = result.get("identical_value_streaks", None)
-
-    if not is_snwd:
-        if streaks:
-            has_issue = True
-            print("\n🔴 Identical Value Streaks:")
-            for start_idx, end_idx, val in streaks:
-                print(f"  - {start_idx} → {end_idx}: value = {val}")
-        else:
-            print("\n🔴 Identical Value Streaks: None")
-    else:
-        print("\n🔴 Identical Value Streaks: SKIPPED")
-
     # ---- TMAX / TMIN flatline (ONLY by name) ----
     if value_col in ["tmin", "tmax"]:
         tmax_tmin = result.get("tmin_tmax_equal", None)
@@ -305,7 +228,7 @@ def print_duplicate_summary(result, value_col):
                 print("\n🌡️ TMAX–TMIN Flatline Months:")
                 flagged_days = flag_flatline[flag_flatline == 1].index
                 print(f"  - Flatline days: {len(flagged_days)}")
-                print(f"  - Example dates: list(flagged_days[:5])")
+                print(f"  - Example dates: {list(flagged_days[:5])}")
             else:
                 print("\n🌡️ TMAX–TMIN Flatline Months: None")
 
@@ -320,8 +243,11 @@ def print_duplicate_summary(result, value_col):
     print("=================================\n")
 
 
-def duplicate_summary_for_ppt(result, value_col):
 
+def duplicate_summary_for_report(result, value_col):
+    """
+    Generate summary dict for reporting (excludes streak check).
+    """
     is_snwd = "snw" in value_col and "dpth" in value_col
     is_temp = value_col in ["tmin", "tmax"]
 
@@ -336,9 +262,6 @@ def duplicate_summary_for_ppt(result, value_col):
 
         "n_duplicate_months_across_years": 0 if is_snwd else
             (len(result.get("duplicate_same_month_across_years", [])) if result.get("duplicate_same_month_across_years") else 0),
-
-        "n_streaks": 0 if is_snwd else
-            (len(result.get("identical_value_streaks", [])) if result.get("identical_value_streaks") else 0),
 
         # default: always 0 unless tmin/tmax
         "tmax_tmin_flatline_days": 0
@@ -357,3 +280,5 @@ def duplicate_summary_for_ppt(result, value_col):
                 summary["tmax_tmin_flatline_days"] = int(flat.sum())
 
     return summary
+
+
