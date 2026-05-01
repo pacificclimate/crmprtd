@@ -1,6 +1,6 @@
-
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 
 def plot_weather_data(df, color_map=None, title="Weather Data"):
 
@@ -184,11 +184,12 @@ def plot_out_range_single(df, min_val, max_val, flag=None, var_name=""):
     plt.show()
 
 
-
 def plot_multi_range_check(
     df,
     wmo_rules,
     range_results,
+    color_map,
+    outrange_scatter_color,
     figsize=(12, 2.8),
     lw=1.0,
     alpha=0.7
@@ -207,13 +208,20 @@ def plot_multi_range_check(
         series = df[var]
         bounds = wmo_rules[var]
         res = range_results[var]
-
         flag = res["flag"]
 
+        var_color = color_map.get(var, "black")
+
         # -------------------------
-        # main line
+        # main line (use color_map)
         # -------------------------
-        ax.plot(series.index, series, color="gray", lw=lw)
+        ax.plot(
+            series.index,
+            series,
+            color=var_color,
+            lw=lw,
+            label=var
+        )
 
         # -------------------------
         # out-of-range points
@@ -223,7 +231,7 @@ def plot_multi_range_check(
         ax.scatter(
             series.index[mask],
             series[mask],
-            color="orange",
+            color=outrange_scatter_color,   # keep consistent warning color
             s=10,
             alpha=alpha,
             label="Out of range"
@@ -232,8 +240,19 @@ def plot_multi_range_check(
         # -------------------------
         # thresholds
         # -------------------------
-        ax.axhline(bounds["min"], linestyle="--", color="#0081a7", alpha=0.5)
-        ax.axhline(bounds["max"], linestyle="--", color="#0081a7", alpha=0.5)
+        ax.axhline(
+            bounds["min"],
+            linestyle="--",
+            color=var_color,
+            alpha=0.4
+        )
+
+        ax.axhline(
+            bounds["max"],
+            linestyle="--",
+            color=var_color,
+            alpha=0.4
+        )
 
         # -------------------------
         # summary stats
@@ -268,56 +287,6 @@ def plot_multi_range_check(
     plt.tight_layout()
     plt.show()
 
-
-def plot_gap_multi(df, gap_flags, color_map, figsize=(12, 2.5)):
-
-    cols = gap_flags.columns
-    n = len(cols)
-
-    fig, axes = plt.subplots(n, 1, figsize=(figsize[0], figsize[1]*n), sharex=True)
-
-    if n == 1:
-        axes = [axes]
-
-    for ax, col in zip(axes, cols):
-
-        series = df[col]
-        color = color_map.get(col, "gray")
-
-        # main line
-        ax.plot(series.index, series, color=color, lw=0.8, label=col)
-
-        # flagged points
-        mask = gap_flags[col]
-
-        if mask.sum() > 0:
-            ax.scatter(
-                series.index[mask],
-                series[mask],
-                color="darkred",
-                s=15,
-                label="Gap flagged"
-            )
-
-        # summary text
-        ax.text(
-            0.01, 0.9,
-            f"{mask.sum()} gap flags",
-            transform=ax.transAxes,
-            fontsize=9,
-            bbox=dict(boxstyle="round", alpha=0.2)
-        )
-
-        ax.set_ylabel(col)
-        ax.legend()
-
-    axes[0].set_title("Gap Check (All Variables)")
-    plt.tight_layout()
-    plt.show()
-
-
-import matplotlib.pyplot as plt
-import numpy as np
 
 def plot_clim_check_multi(
     df,
@@ -431,6 +400,482 @@ def plot_clim_check_multi(
         ax.legend(by_label.values(), by_label.keys(), loc = 'upper right')
 
     axes[0].set_title("QC Check (Gap + Climatological)")
+
+    plt.tight_layout()
+    plt.show()
+
+
+
+def plot_inttemp_tas_timeseries(
+    df,
+    color_map,
+    missing_color,
+    state_color,
+    title="Internal and temporal consistency checks - Temp, TMAX, TMIN"
+):
+    fig, axes = plt.subplots(2, 1, figsize=(14, 8), sharex=True)
+
+    # ----------------------------
+    # TOP: temperature time series
+    # ----------------------------
+    axes[0].plot(
+        df.index, df["temp"],
+        label="Temp",
+        lw=0.8,
+        color=color_map.get("temp", "black")
+    )
+
+    axes[0].plot(
+        df.index, df["tmax"],
+        label="Tmax",
+        lw=0.8,
+        color=color_map.get("tmax", "black")
+    )
+
+    axes[0].plot(
+        df.index, df["tmin"],
+        label="Tmin",
+        lw=0.8,
+        color=color_map.get("tmin", "black")
+    )
+
+    axes[0].set_ylabel("Temperature (°C)")
+    axes[0].set_title(title)
+
+    # ----------------------------
+    # overlay QC flags
+    # ----------------------------
+    for label, marker in zip(["suspect", "bad"], ["o", "x"]):
+        subset = df[df["qc_label"] == label]
+        axes[0].scatter(
+            subset.index,
+            subset["temp"],
+            label=label,
+            marker=marker,
+            s=20,
+            color="red" if label == "bad" else "orange"
+        )
+
+    ymin = df[["tmin", "temp", "tmax"]].min().min()
+    subset = df[df["qc_label"] == "missing"]
+
+    axes[0].scatter(
+        subset.index,
+        [ymin - 2] * len(subset),
+        marker="s",
+        s=20,
+        color=missing_color,
+        label="missing"
+    )
+
+    axes[0].legend()
+
+    # ----------------------------
+    # BOTTOM: QC state timeline
+    # ----------------------------
+    axes[1].plot(
+        df.index,
+        df["qc_code"],
+        drawstyle="steps-mid",
+        color=state_color
+    )
+
+    axes[1].set_ylabel("QC Code")
+    axes[1].set_yticks([0, 1, 2, 3])
+    axes[1].set_yticklabels(["missing", "good", "suspect", "bad"])
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_inttemp_snow_tmin_timeseries(
+    df,
+    snow_temp_qc,
+    color_map,
+    missing_color,
+    state_color,
+    title="Snow–Temperature QC Check"
+):
+
+    fig, axes = plt.subplots(2, 1, figsize=(14, 8), sharex=True)
+
+    # --------------------------------------------------
+    # TOP: physical variables
+    # --------------------------------------------------
+    axes[0].plot(
+        df.index, df["snw_fall"],
+        label="Snowfall",
+        lw=0.8,
+        color=color_map.get("snw_fall", "black")
+    )
+
+    axes[0].plot(
+        df.index, df["snw_dpth"],
+        label="Snow Depth",
+        lw=0.8,
+        color=color_map.get("snw_dpth", "black")
+    )
+
+    axes[0].plot(
+        df.index, df["tmin"],
+        label="Tmin",
+        lw=0.8,
+        color=color_map.get("tmin", "black")
+    )
+
+    axes[0].set_ylabel("Values")
+    axes[0].set_title(title)
+
+    # --------------------------------------------------
+    # QC flags
+    # --------------------------------------------------
+    snow_flag = snow_temp_qc["flag_snow_warm"]
+    snwd_flag = snow_temp_qc["flag_snwd_warm"]
+
+    f_snow = snow_flag.fillna(False)
+    f_snwd = snwd_flag.fillna(False)
+
+    # flagged points
+    axes[0].scatter(
+        df.index[f_snow],
+        df.loc[f_snow, "snw_fall"],
+        marker="o",
+        s=25,
+        color="orange",
+        label="snow_warm"
+    )
+
+    axes[0].scatter(
+        df.index[f_snwd],
+        df.loc[f_snwd, "snw_dpth"],
+        marker="x",
+        s=25,
+        color="red",
+        label="snwd_warm"
+    )
+
+    # --------------------------------------------------
+    # missing QC
+    # --------------------------------------------------
+    missing = snow_flag.isna() | snwd_flag.isna()
+
+    if missing.any():
+        ymin = np.nanmin(df[["snw_fall", "snw_dpth", "tmin"]].values)
+
+        axes[0].scatter(
+            df.index[missing],
+            [ymin - 1] * missing.sum(),
+            marker="s",
+            s=20,
+            color=missing_color,
+            label="missing"
+        )
+
+    axes[0].legend()
+
+    # --------------------------------------------------
+    # BOTTOM: TWO QC timelines (stacked style)
+    # --------------------------------------------------
+
+    # convert flags safely to numeric
+    snow_num = snow_flag.map({True: 2, False: 1})
+    snwd_num = snwd_flag.map({True: 2, False: 1})
+
+    # missing handling
+    snow_num = snow_num.fillna(0)
+    snwd_num = snwd_num.fillna(0)
+
+    # vertical separation (key fix)
+    snow_offset = 0
+    snwd_offset = 2.5
+
+    axes[1].plot(
+        df.index,
+        snow_num + snow_offset,
+        drawstyle="steps-mid",
+        color=state_color[0],
+        label="snow_warm"
+    )
+
+    axes[1].plot(
+        df.index,
+        snwd_num + snwd_offset,
+        drawstyle="steps-mid",
+        color=state_color[1],
+        label="snwd_warm"
+    )
+
+    axes[1].set_yticks([0, 1, 2, 2.5, 3.5, 4.5])
+    axes[1].set_yticklabels([
+        "snow: missing", "snow: ok", "snow: flag",
+        "snwd: missing", "snwd: ok", "snwd: flag"
+    ])
+
+    axes[1].set_title("QC Timeline")
+    axes[1].legend()
+
+    plt.tight_layout()
+    plt.show()
+
+
+def plot_inttemp_snow_fall_dpth_timeseries(
+    df,
+    snow_qc,
+    color_map,
+    missing_color,
+    state_color,
+    title="Snow QC Check"
+):
+
+    fig, axes = plt.subplots(2, 1, figsize=(14, 8), sharex=True)
+
+    # --------------------------------------------------
+    # TOP: physical variables
+    # --------------------------------------------------
+    axes[0].plot(
+        df.index, df["snw_fall"],
+        label="Snowfall",
+        lw=0.8,
+        color=color_map.get("snw_fall", "black")
+    )
+
+    axes[0].plot(
+        df.index, df["snw_dpth"],
+        label="Snow Depth",
+        lw=0.8,
+        color=color_map.get("snw_dpth", "black")
+    )
+
+    axes[0].set_ylabel("Snow Variables")
+    axes[0].set_title(title)
+
+    # --------------------------------------------------
+    # QC FLAGS
+    # --------------------------------------------------
+    flag_col = snow_qc["flag_snow_snwd"]
+
+    # encode: 0 = missing, 1 = ok, 2 = flag
+    flag_num = flag_col.map({False: 1, True: 2}).fillna(0)
+
+    flagged = flag_num == 2
+    missing = flag_col.isna()
+
+    # --------------------------------------------------
+    # TOP PANEL: flagged points
+    # --------------------------------------------------
+    axes[0].scatter(
+        df.index[flagged],
+        df.loc[flagged, "snw_fall"],
+        marker="x",
+        s=20,
+        color=state_color[1] if isinstance(state_color, (list, tuple)) else state_color,
+        label="flagged"
+    )
+
+    axes[0].scatter(
+        df.index[flagged],
+        df.loc[flagged, "snw_dpth"],
+        marker="x",
+        s=20,
+        color=state_color[1] if isinstance(state_color, (list, tuple)) else state_color
+    )
+
+    # missing QC
+    if missing.any():
+        ymin = np.nanmin(df[["snw_fall", "snw_dpth"]].values)
+
+        axes[0].scatter(
+            df.index[missing],
+            [ymin - 5] * missing.sum(),
+            marker="s",
+            s=20,
+            color=missing_color,
+            label="missing"
+        )
+
+    axes[0].legend()
+
+    # --------------------------------------------------
+    # BOTTOM: QC timelines (snow + snwd_prev)
+    # --------------------------------------------------
+
+    # encode QC states
+    snow_num = snow_qc["flag_snow_snwd"].map({False: 1, True: 2})
+    snwd_num = snow_qc["flag_snwd_prev"].map({False: 1, True: 2})
+
+    snow_num = snow_num.fillna(0)
+    snwd_num = snwd_num.fillna(0)
+
+    # vertical separation (key idea)
+    snow_offset = 0
+    snwd_offset = 2.5
+
+    # snow QC line
+    axes[1].plot(
+        df.index,
+        snow_num + snow_offset - 0.5,
+        drawstyle="steps-mid",
+        color=state_color[0] if isinstance(state_color, (list, tuple)) else state_color,
+        label="snow QC"
+    )
+
+    # snwd_prev QC line
+    axes[1].plot(
+        df.index,
+        snwd_num + snwd_offset - 0.5,
+        drawstyle="steps-mid",
+        color=state_color[1] if isinstance(state_color, (list, tuple)) else state_color,
+        label="snwd_prev QC"
+    )
+
+    # --------------------------------------------------
+    # axis formatting
+    # --------------------------------------------------
+    axes[1].set_ylabel("QC State")
+
+    axes[1].set_yticks([
+        -0.5, 0.5, 1.5,      # snow band
+        2.0, 3.0, 4.0        # snwd_prev band
+    ])
+
+    axes[1].set_yticklabels([
+        "snow: missing", "snow: ok", "snow: flag",
+        "snwd: missing", "snwd: ok", "snwd: flag"
+    ])
+
+    axes[1].set_title("QC Timeline (snow + lagged snow depth)")
+    axes[1].legend()
+
+
+    plt.tight_layout()
+    plt.show()
+    
+
+
+def plot_inttemp_snow_precip_timeseries(
+    df,
+    snow_precip_qc,
+    color_map,
+    missing_color,
+    state_color,
+    title="Snow–Precipitation QC Check"
+):
+
+    fig, axes = plt.subplots(2, 1, figsize=(14, 8), sharex=True)
+
+    # --------------------------------------------------
+    # TOP: physical variables
+    # --------------------------------------------------
+    axes[0].plot(
+        df.index, df["snw_fall"],
+        label="Snowfall",
+        lw=0.8,
+        color=color_map.get("snw_fall", "black")
+    )
+
+    axes[0].plot(
+        df.index, df["snw_dpth"],
+        label="Snow Depth",
+        lw=0.8,
+        color=color_map.get("snw_dpth", "black")
+    )
+
+    axes[0].plot(
+        df.index, df["precip"],
+        label="Precip",
+        lw=0.8,
+        color=color_map.get("precip", "gray")
+    )
+
+    axes[0].set_ylabel("Values")
+    axes[0].set_title(title)
+
+    # --------------------------------------------------
+    # helper
+    # --------------------------------------------------
+    def to_num(flag):
+        return flag.map({True: 1, False: 0})
+
+    # --------------------------------------------------
+    # flag groups (now using color_map + state_color)
+    # --------------------------------------------------
+    flag_groups = [
+        ("flag_snow_no_prcp", "o",
+         state_color[0], "snow_no_prcp", "snw_fall"),
+
+        ("flag_snow_prcp_ratio", "x",
+         state_color[1], "snow_ratio", "snw_fall"),
+
+        ("flag_snwd_no_prcp", "o",
+         state_color[2], "snwd_no_prcp", "snw_dpth"),
+
+        ("flag_snwd_prcp_ratio", "x",
+         state_color[3], "snwd_ratio", "snw_dpth"),
+    ]
+
+    # --------------------------------------------------
+    # TOP: flagged points
+    # --------------------------------------------------
+    for col, marker, color, label, var in flag_groups:
+        flag = to_num(snow_precip_qc[col])
+        f = flag == 1
+
+        axes[0].scatter(
+            df.index[f],
+            df.loc[f, var],
+            marker=marker,
+            s=25,
+            color=color,
+            label=label
+        )
+
+    # missing QC
+    missing = snow_precip_qc["flag_missing_any"] == 1
+
+    if missing.any():
+        ymin = np.nanmin(df[["snw_fall", "snw_dpth", "precip"]].values)
+
+        axes[0].scatter(
+            df.index[missing],
+            [ymin - 10] * missing.sum(),
+            marker="s",
+            s=20,
+            color=missing_color,
+            label="missing QC"
+        )
+
+    axes[0].legend(ncol=2)
+
+    # --------------------------------------------------
+    # BOTTOM: stacked QC timeline
+    # --------------------------------------------------
+    y_offset = 0
+    yticks = []
+    ylabels = []
+
+    for col, _, color, label, _ in flag_groups:
+        flag = to_num(snow_precip_qc[col])
+
+        y = flag.fillna(-0.5) + y_offset
+
+        axes[1].plot(
+            df.index,
+            y,
+            drawstyle="steps-mid",
+            color=color,
+            label=label
+        )
+
+        yticks.extend([y_offset - 0.5, y_offset, y_offset + 1])
+        ylabels.extend(["missing", "ok", "flag"])
+
+        y_offset += 1.8
+
+    axes[1].set_ylabel("QC State")
+    axes[1].set_yticks(yticks)
+    axes[1].set_yticklabels(ylabels)
+    axes[1].set_title("QC Timeline")
+    axes[1].legend(ncol=2)
 
     plt.tight_layout()
     plt.show()
