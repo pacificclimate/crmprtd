@@ -227,6 +227,11 @@ def plot_multi_range_check(
         # out-of-range points
         # -------------------------
         mask = flag == 1
+        
+        # Also flag negative values if min bound is None (for precip/snow variables)
+        if bounds["min"] is None:
+            negative_mask = series < 0
+            mask = mask | negative_mask
 
         ax.scatter(
             series.index[mask],
@@ -240,25 +245,32 @@ def plot_multi_range_check(
         # -------------------------
         # thresholds
         # -------------------------
-        ax.axhline(
-            bounds["min"],
-            linestyle="--",
-            color=var_color,
-            alpha=0.4
-        )
+        if bounds["min"] is not None:
+            ax.axhline(
+                bounds["min"],
+                linestyle="--",
+                color=var_color,
+                alpha=0.4
+            )
 
-        ax.axhline(
-            bounds["max"],
-            linestyle="--",
-            color=var_color,
-            alpha=0.4
-        )
+        if bounds["max"] is not None:
+            ax.axhline(
+                bounds["max"],
+                linestyle="--",
+                color=var_color,
+                alpha=0.4
+            )
 
         # -------------------------
         # summary stats
         # -------------------------
-        n_below = (series < bounds["min"]).sum()
-        n_above = (series > bounds["max"]).sum()
+        if bounds["min"] is not None:
+            n_below = (series < bounds["min"]).sum()
+        else:
+            # If no explicit min bound, check for negative values (invalid for precip/snow vars)
+            n_below = (series < 0).sum()
+        
+        n_above = (series > bounds["max"]).sum() if bounds["max"] is not None else 0
         n_total = mask.sum()
 
         text = (
@@ -554,6 +566,7 @@ def plot_inttemp_snow_tmin_timeseries(
         label="snwd_warm"
     )
 
+    axes[0].axhline(7, color = '#d6ccc2', label = "7°C")
     # --------------------------------------------------
     # missing QC
     # --------------------------------------------------

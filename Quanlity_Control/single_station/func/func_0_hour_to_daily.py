@@ -1,15 +1,10 @@
 import numpy as np
 
-
-def hourly_to_daily(df, cols, agg_map, min_hours):
+def hourly_to_daily(df, cols, agg_map, min_hours, snwd_hour=4):
     """
     Convert hourly data to daily with validity filtering.
 
-    df        : DataFrame with datetime index
-    cols      : columns to check for validity
-    agg_map   : dict of aggregation rules
-    min_hours : minimum valid hourly observations per day
-                (int or dict per column)
+    snwd_hour : hour of day to extract snow depth (local time)
     """
 
     df = df.sort_index()
@@ -29,10 +24,24 @@ def hourly_to_daily(df, cols, agg_map, min_hours):
     else:
         valid_days = valid_counts.ge(min_hours).all(axis=1)
 
-    # --- aggregate ---
-    daily = df.resample("1D").agg(agg_map)
+    # --- normal aggregation (exclude snw_dpth for now) ---
+    agg_map_clean = {k: v for k, v in agg_map.items() if k != "snw_dpth"}
+    daily = df.resample("1D").agg(agg_map_clean)
 
-    # --- apply mask ---
+    # --- handle snow depth at fixed hour ---
+    if "snw_dpth" in cols:
+        snwd = df["snw_dpth"].copy()
+
+        # select values at target hour
+        snwd_at_hour = snwd[snwd.index.hour == snwd_hour]
+
+        # group by day
+        snwd_daily = snwd_at_hour.groupby(snwd_at_hour.index.floor("D")).first()
+
+        # attach to daily
+        daily["snw_dpth"] = snwd_daily
+
+    # --- apply validity mask ---
     daily = daily.where(valid_days)
 
     return daily
