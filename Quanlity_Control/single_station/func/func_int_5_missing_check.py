@@ -112,7 +112,7 @@ def check_missing_timestamps(df, value_col=None, freq=None, return_full=False):
 
         # snow season defined from snowfall activity
         season_bounds = get_snow_seasons(df, "snw_fall")
-        print(season_bounds)
+        # print(season_bounds)
 
         missing_eval = 0
         total_eval_season = 0

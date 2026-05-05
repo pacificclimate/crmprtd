@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 def hourly_to_daily(df, cols, agg_map, min_hours, snwd_hour=4):
     """
@@ -45,3 +46,50 @@ def hourly_to_daily(df, cols, agg_map, min_hours, snwd_hour=4):
     daily = daily.where(valid_days)
 
     return daily
+
+
+
+
+def build_daily_all(df_station):
+    df_station = df_station.copy()
+    df_station["obs_time"] = pd.to_datetime(df_station["obs_time"])
+    df_sql = df_station.pivot_table(
+        index="obs_time",
+        columns="net_var_name",
+        values="datum"
+    ).sort_index()
+    df_sql = df_sql.rename(columns={
+        "min_air_temp_snc_last_reset": "tmin",
+        "max_air_temp_snc_last_reset": "tmax",
+        "air_temp": "temp",
+        "pcpn_amt_pst1hr": "precip",
+        "snwfl_amt_pst1hr": "snw_fall"
+    })
+    expected_cols = ["temp", "tmin", "tmax", "precip", "snw_fall", "snw_dpth"]
+    df_sql = df_sql.reindex(columns=expected_cols)
+    start_time = df_sql.apply(lambda col: col.first_valid_index()).min()
+    if pd.isna(start_time):
+        df_trim = df_sql
+    else:
+        df_trim = df_sql.loc[start_time:]
+
+    daily_tas = hourly_to_daily(
+        df_trim,
+        cols=["tmax", "tmin", "temp"],
+        agg_map={"temp": "mean", "tmax": "max", "tmin": "min"},
+        min_hours=18
+    )
+    daily_sn = hourly_to_daily(
+        df_trim,
+        cols=["snw_fall", "snw_dpth"],
+        agg_map={"snw_fall": "sum"},
+        min_hours=18,
+        snwd_hour=4
+    )
+    daily_precip = hourly_to_daily(
+        df_trim,
+        cols=["precip"],
+        agg_map={"precip": "sum"},
+        min_hours=18
+    )
+    return pd.concat([daily_tas, daily_precip, daily_sn], axis=1)

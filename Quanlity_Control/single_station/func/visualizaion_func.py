@@ -190,6 +190,7 @@ def plot_multi_range_check(
     range_results,
     color_map,
     outrange_scatter_color,
+    title = "WMO Range Check",
     figsize=(12, 2.8),
     lw=1.0,
     alpha=0.7
@@ -294,7 +295,7 @@ def plot_multi_range_check(
         ax.set_ylabel(var)
         ax.legend(loc="upper right")
 
-    axes[0].set_title("WMO Range Check (All Variables)")
+    axes[0].set_title(title)
 
     plt.tight_layout()
     plt.show()
@@ -308,7 +309,8 @@ def plot_clim_check_multi(
     show_gap=True,
     show_clim=True,
     hide_flagged=False,
-    figsize=(12, 2.5)
+    figsize=(12, 2.5),
+    title = "QC Check (Gap + Climatological)",
 ):
 
     cols = gap_flags.columns
@@ -411,7 +413,7 @@ def plot_clim_check_multi(
         by_label = dict(zip(labels, handles))
         ax.legend(by_label.values(), by_label.keys(), loc = 'upper right')
 
-    axes[0].set_title("QC Check (Gap + Climatological)")
+    axes[0].set_title(title)
 
     plt.tight_layout()
     plt.show()
