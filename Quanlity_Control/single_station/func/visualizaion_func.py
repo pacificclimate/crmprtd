@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
+
 def plot_weather_data(df, color_map=None, title="Weather Data"):
 
     # default to gray if no color_map provided
@@ -40,7 +41,7 @@ def plot_timeseries_with_naught_missing_multi(
     title="Time series with QC + missing"
 ):
 
-    print(naught_all.columns)
+    # print(naught_all.columns)
     if value_cols is None:
         value_cols = df.columns
 
@@ -892,3 +893,191 @@ def plot_inttemp_snow_precip_timeseries(
 
     plt.tight_layout()
     plt.show()
+
+
+def plot_station_qc(
+    station_id,
+    daily_all,
+    daily_cleaned,
+    result,
+    value_cols,
+    color_map,
+    plots=None
+):
+    """
+    Plot selected QC diagnostics for one station.
+
+    Parameters
+    ----------
+    station_id : int or str
+        Station ID
+
+    daily_all : DataFrame
+        Raw daily data
+
+    daily_cleaned : DataFrame
+        Cleaned daily data
+
+    result : dict
+        Output from run_qc_result_pipeline()
+
+    value_cols : list
+        Variable columns
+
+    color_map : dict
+        Variable color mapping
+
+    plots : list or None
+        Which plots to generate.
+        If None -> plot everything.
+
+        Available options:
+        ------------------
+        "raw"
+        "naught_missing"
+        "range"
+        "cleaned"
+        "clim"
+        "inttemp_tas"
+        "inttemp_snow_tmin"
+        "inttemp_snow_fall_dpth"
+        "inttemp_snow_precip"
+    """
+
+    # --------------------------------------------------
+    # Default: plot everything
+    # --------------------------------------------------
+    if plots is None:
+        plots = [
+            "raw",
+            "naught_missing",
+            "range",
+            "cleaned",
+            "clim",
+            "inttemp_tas",
+            "inttemp_snow_tmin",
+            "inttemp_snow_fall_dpth",
+            "inttemp_snow_precip"
+        ]
+
+    # --------------------------------------------------
+    # Raw data
+    # --------------------------------------------------
+    if "raw" in plots:
+        plot_weather_data(
+            daily_all,
+            color_map=color_map,
+            title=f"Station {station_id}: raw daily data"
+        )
+
+    # --------------------------------------------------
+    # Naught + missing
+    # --------------------------------------------------
+    if "naught_missing" in plots:
+        plot_timeseries_with_naught_missing_multi(
+            df=daily_all,
+            color_map=color_map,
+            naught_all=result["naught_all"],
+            miss_result_dict=result["miss_result_dict"],
+            value_cols=value_cols,
+            title=f"Station {station_id}: raw daily series with naught + missing flags"
+        )
+
+    # --------------------------------------------------
+    # Range check
+    # --------------------------------------------------
+    if "range" in plots:
+        plot_multi_range_check(
+            df=daily_all,
+            wmo_rules=result["wmo_rules"],
+            range_results=result["range_results"],
+            color_map=color_map,
+            outrange_scatter_color="#843939",
+            title=f"Station {station_id}: WMO Range Check"
+        )
+
+    # --------------------------------------------------
+    # Cleaned data
+    # --------------------------------------------------
+    if "cleaned" in plots:
+        plot_weather_data(
+            daily_cleaned,
+            color_map=color_map,
+            title=f"Station {station_id}: cleaned daily data"
+        )
+
+    # --------------------------------------------------
+    # Gap + climatology
+    # --------------------------------------------------
+    if "clim" in plots:
+
+        gap_flags = (
+            pd.concat(
+                {col: res["flag"] for col, res in result["gap_result_dict"].items()},
+                axis=1
+            )
+            if result["gap_result_dict"]
+            else pd.DataFrame(index=daily_all.index)
+        )
+
+        plot_clim_check_multi(
+            df=daily_cleaned,
+            color_map=color_map,
+            gap_flags=gap_flags,
+            clim_flags=result["clim_flag_df"],
+            show_gap=True,
+            show_clim=True,
+            title=f"Station {station_id}: Climatological check"
+        )
+
+    # --------------------------------------------------
+    # Temperature internal consistency
+    # --------------------------------------------------
+    if "inttemp_tas" in plots:
+        plot_inttemp_tas_timeseries(
+            result["inttemp_tas_result"],
+            color_map=color_map,
+            missing_color="gray",
+            state_color="#7d4f50",
+            title=f"Station {station_id}: temperature internal consistency"
+        )
+
+    # --------------------------------------------------
+    # Snow-temperature consistency
+    # --------------------------------------------------
+    if "inttemp_snow_tmin" in plots:
+        plot_inttemp_snow_tmin_timeseries(
+            daily_cleaned,
+            result["inttemp_snow_tmin_result"],
+            color_map=color_map,
+            missing_color="gray",
+            state_color=["#7d4f50", "#6b705c"],
+            title=f"Station {station_id}: snow–temperature consistency"
+        )
+
+    # --------------------------------------------------
+    # Snowfall-snow depth consistency
+    # --------------------------------------------------
+    if "inttemp_snow_fall_dpth" in plots:
+        plot_inttemp_snow_fall_dpth_timeseries(
+            daily_cleaned,
+            result["inttemp_snow_fall_dpth_result"],
+            color_map=color_map,
+            missing_color="gray",
+            state_color=["#7d4f50", "#6b705c"],
+            title=f"Station {station_id}: snowfall–snow depth consistency"
+        )
+
+    # --------------------------------------------------
+    # Snow-precipitation consistency
+    # --------------------------------------------------
+    if "inttemp_snow_precip" in plots:
+        plot_inttemp_snow_precip_timeseries(
+            daily_cleaned,
+            result["inttemp_snow_precip_result"],
+            color_map=color_map,
+            missing_color="gray",
+            state_color=["#7d4f50", "#6b705c", "#cb997e", "#415a77"],
+            title=f"Station {station_id}: snow–precipitation consistency"
+        )
+
