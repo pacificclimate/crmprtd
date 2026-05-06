@@ -32,7 +32,6 @@ def plot_timeseries_with_naught_missing_multi(
     df,
     color_map,
     naught_all=None,
-    naught_map=None,
     miss_result_dict=None,
     value_cols=None,
     figsize=(12, 2.5),
@@ -41,6 +40,7 @@ def plot_timeseries_with_naught_missing_multi(
     title="Time series with QC + missing"
 ):
 
+    print(naught_all.columns)
     if value_cols is None:
         value_cols = df.columns
 
@@ -72,35 +72,33 @@ def plot_timeseries_with_naught_missing_multi(
         # =========================
         # QC flags (TOP)
         # =========================
-        if naught_all is not None and naught_map is not None:
+        if naught_all is not None and col in naught_all.columns:
 
-            qc_col = naught_map.get(col, None)
+            qc_series = naught_all[col]
 
-            if qc_col in naught_all.columns:
+            flagged_times = naught_all.index[qc_series == 1]
 
-                flagged_times = naught_all.index[naught_all[qc_col]]
-
-                if len(flagged_times) > 0:
-                    ax.scatter(
-                        flagged_times,
-                        [y_max + offset] * len(flagged_times),
-                        color="red",
-                        marker="o",
-                        s=15,
-                        alpha=0.7,
-                        label="QC flag"
-                    )
-
-                n_flagged = naught_all[qc_col].sum()
-
-                ax.text(
-                    0.01, 0.95,   # TOP
-                    f"{n_flagged} naught flags",
-                    transform=ax.transAxes,
-                    fontsize=9,
-                    verticalalignment='top',
-                    bbox=dict(boxstyle="round", alpha=0.2, color="red")
+            if len(flagged_times) > 0:
+                ax.scatter(
+                    flagged_times,
+                    [y_max + offset] * len(flagged_times),
+                    color="red",
+                    marker="o",
+                    s=15,
+                    alpha=0.7,
+                    label="QC flag"
                 )
+
+            n_flagged = qc_series.sum()
+
+            ax.text(
+                0.01, 0.95,
+                f"{n_flagged} naught flags",
+                transform=ax.transAxes,
+                fontsize=9,
+                verticalalignment='top',
+                bbox=dict(boxstyle="round", alpha=0.2, color="red")
+            )
 
         # =========================
         # Missing info (BELOW QC)

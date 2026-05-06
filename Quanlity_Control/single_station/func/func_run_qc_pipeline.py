@@ -16,14 +16,15 @@ from func_inttemp_3_snow_fall_dpth_check import inttemp_snow_fall_dpth_consisten
 from func_inttempt_4_snow_precipitation_check import inttemp_snow_precip_consistency
 from func_QC_cleanning import apply_qc_cleaning, apply_inttemp_tas_qc
 from func_station_quality_evaluation import (
-    summarize_flagged_values,
-    analyze_temporal_coverage,
+    # summarize_flagged_values,
     evaluate_station_quality,
     get_station_rating
 )
 
+from func_analyze_temporal_coverage import analyze_temporal_coverage
 
-def run_qc_pipeline(daily_all, value_cols):
+
+def run_qc_result_pipeline(daily_all, value_cols):
 
     # --------------------------------------------------
     # 1. Detect trace / zero values (instrument-level flags)
@@ -173,56 +174,13 @@ def run_qc_pipeline(daily_all, value_cols):
     inttemp_snow_fall_dpth_result = inttemp_snow_fall_dpth_consistency(daily_cleaned)
     inttemp_snow_precip_result = inttemp_snow_precip_consistency(daily_cleaned)
 
-    # --------------------------------------------------
-    # 10. Summarize all QC flags into one dataset
-    # --------------------------------------------------
-    summary_flags = summarize_flagged_values(
-        daily_cleaned,
-        value_cols,
-        dup_result_dict,
-        ind_result_dict,
-        pd.concat(
-            {col: res["flag"] for col, res in gap_result_dict.items()},
-            axis=1
-        ) if gap_result_dict else pd.DataFrame(index=daily_cleaned.index),
-        clim_flag_df,
-        inttemp_tas_result,
-        inttemp_snow_tmin_result,
-        inttemp_snow_fall_dpth_result,
-        inttemp_snow_precip_result
-    )
 
-    # print(summary_flags)
-
-    # --------------------------------------------------
-    # 11. Evaluate data completeness and quality
-    # --------------------------------------------------
-    completeness_by_year = analyze_temporal_coverage(
-        daily_cleaned, value_cols, miss_result_dict
-    )
-
-    variable_quality = evaluate_station_quality(
-        daily_cleaned,
-        value_cols,
-        miss_result_dict,
-        summary_flags
-    )
-
-    # Overall station rating
-    station_rating, recommendation = get_station_rating(
-        [q["rating"] for q in variable_quality.values()]
-    )
 
     # --------------------------------------------------
     # Return all outputs for further analysis / plotting
     # --------------------------------------------------
     return {
         "daily_cleaned": daily_cleaned,
-        "summary_flags": summary_flags,
-        "completeness_by_year": completeness_by_year,
-        "variable_quality": variable_quality,
-        "station_rating": station_rating,
-        "recommendation": recommendation,
         "naught_result": naught_result,
         "naught_all": naught_all,
         "miss_result_dict": miss_result_dict,

@@ -117,8 +117,8 @@ def qc_tmax_tmin_flatline(df,
 
     flags = pd.DataFrame(index=df.index)
 
-    flags["flag_tmax_tmin_equal"] = equal_flag.astype(bool)
-    flags["flag_month_flatline"] = flag_month.astype(bool)
+    # flags["flag_tmax_tmin_equal"] = equal_flag.astype(bool)
+    flags["tmin_tmax_equal"] = flag_month.astype(bool)
 
     return flags
 
@@ -221,7 +221,7 @@ def print_duplicate_summary(result, value_col):
         tmax_tmin = result.get("tmin_tmax_equal", None)
 
         if tmax_tmin is not None:
-            flag_flatline = tmax_tmin.get("flag_month_flatline", None)
+            flag_flatline = tmax_tmin.get("tmin_tmax_equal", None)
 
             if flag_flatline is not None and flag_flatline.any():
                 has_issue = True

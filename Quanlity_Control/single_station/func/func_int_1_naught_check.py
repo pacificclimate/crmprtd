@@ -112,11 +112,11 @@ def qc_naught_and_trace(df):
     # trace variables
     for col in ["temp", "tmin", "tmax"]:
         if col in df.columns:
-            result[f"{col}_zero"] = qc_temperature_zero_check(df)
+            result[f"{col}"] = qc_temperature_zero_check(df)
 
     # trace variables
     for col in ["precip", "snw_fall", "snw_dpth"]:
         if col in df.columns:
-            result[f"{col}_trace"] = qc_trace_values(df, col)
+            result[f"{col}"] = qc_trace_values(df, col)
 
     return result

@@ -6,7 +6,7 @@ def get_streak_threshold(value_col):
     Return appropriate streak threshold for each variable.
     
     TMAX/TMIN: 20 or more
-    SNOW: 10 or more (nonzero)
+    SNOW: 90 or more (nonzero)
     SNWD: 90 or more (nonzero)
     PRECIP: 20 or more
     Default: 20
@@ -14,7 +14,7 @@ def get_streak_threshold(value_col):
     thresholds = {
         "tmax": 20,
         "tmin": 20,
-        "snow": 10,
+        "snw_fall": 90,
         "snw_dpth": 90,
         "precip": 20,
         "ppt": 20,
@@ -26,7 +26,7 @@ def should_skip_zeros_for_streak(value_col):
     Return True if zeros should be skipped in streak detection.
     SNOW and SNWD should skip zeros (we want nonzero streaks).
     """
-    return value_col.lower() in ["snow", "snw_dpth"]
+    return value_col.lower() in ["snw_fall", "snw_dpth"]
 
 
 def identical_value_streak_check(df, value_col, threshold, skip_zeros=False):
