@@ -165,14 +165,14 @@ def run_qc_result_pipeline(daily_all, value_cols):
     inttemp_tas_result = inttemp_temperature_consistency(daily_cleaned)
 
     # Apply QC removal for bad internal consistency
-    daily_cleaned = apply_inttemp_tas_qc(
+    daily_cleaned_final = apply_inttemp_tas_qc(
         daily_cleaned, inttemp_tas_result
     )
 
     # Additional consistency checks
-    inttemp_snow_tmin_result = inttemp_snow_temp_consistency(daily_cleaned)
-    inttemp_snow_fall_dpth_result = inttemp_snow_fall_dpth_consistency(daily_cleaned)
-    inttemp_snow_precip_result = inttemp_snow_precip_consistency(daily_cleaned)
+    inttemp_snow_tmin_result = inttemp_snow_temp_consistency(daily_cleaned_final)
+    inttemp_snow_fall_dpth_result = inttemp_snow_fall_dpth_consistency(daily_cleaned_final)
+    inttemp_snow_precip_result = inttemp_snow_precip_consistency(daily_cleaned_final)
 
 
 
@@ -180,7 +180,8 @@ def run_qc_result_pipeline(daily_all, value_cols):
     # Return all outputs for further analysis / plotting
     # --------------------------------------------------
     return {
-        "daily_cleaned": daily_cleaned,
+        "daily_cleaned": daily_cleaned_final,
+        "daily_cleaned_half": daily_cleaned,
         "naught_result": naught_result,
         "naught_all": naught_all,
         "miss_result_dict": miss_result_dict,

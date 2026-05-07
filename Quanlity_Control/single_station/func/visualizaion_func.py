@@ -5,21 +5,35 @@ import numpy as np
 
 def plot_weather_data(df, color_map=None, title="Weather Data"):
 
-    # default to gray if no color_map provided
+    value_cols = ["temp", "tmin", "tmax",
+                  "precip", "snw_fall", "snw_dpth"]
+
+    # keep only columns that actually exist
+    plot_cols = [col for col in value_cols if col in df.columns]
+
+    # default colors
     if color_map is None:
         color_map = {}
 
-    n_vars = len(df.columns)
-    fig, axes = plt.subplots(n_vars, 1, figsize=(12, 2.5 * n_vars), sharex=True)
+    n_vars = len(plot_cols)
+
+    fig, axes = plt.subplots(
+        n_vars, 1,
+        figsize=(12, 2.5 * n_vars),
+        sharex=True
+    )
 
     if n_vars == 1:
         axes = [axes]
 
-    for ax, col in zip(axes, df.columns):
+    for ax, col in zip(axes, plot_cols):
 
-        color = color_map.get(col, "gray")  # fallback always gray
+        color = color_map.get(col, "gray")
 
-        ax.plot(df.index, df[col], lw=0.8, color=color)
+        ax.plot(df.index, df[col],
+                lw=0.8,
+                color=color)
+
         ax.set_ylabel(col)
 
     axes[0].set_title(title)
@@ -420,7 +434,8 @@ def plot_clim_check_multi(
 
 
 def plot_inttemp_tas_timeseries(
-    df,
+    daily_cleaned, 
+    inttemp_tas_result,
     color_map,
     missing_color,
     state_color,
@@ -432,21 +447,21 @@ def plot_inttemp_tas_timeseries(
     # TOP: temperature time series
     # ----------------------------
     axes[0].plot(
-        df.index, df["temp"],
+        daily_cleaned.index, daily_cleaned["temp"],
         label="Temp",
         lw=0.8,
         color=color_map.get("temp", "black")
     )
 
     axes[0].plot(
-        df.index, df["tmax"],
+        daily_cleaned.index, daily_cleaned["tmax"],
         label="Tmax",
         lw=0.8,
         color=color_map.get("tmax", "black")
     )
 
     axes[0].plot(
-        df.index, df["tmin"],
+        daily_cleaned.index, daily_cleaned["tmin"],
         label="Tmin",
         lw=0.8,
         color=color_map.get("tmin", "black")
@@ -459,7 +474,7 @@ def plot_inttemp_tas_timeseries(
     # overlay QC flags
     # ----------------------------
     for label, marker in zip(["suspect", "bad"], ["o", "x"]):
-        subset = df[df["qc_label"] == label]
+        subset = inttemp_tas_result[inttemp_tas_result["qc_label"] == label]
         axes[0].scatter(
             subset.index,
             subset["temp"],
@@ -469,8 +484,8 @@ def plot_inttemp_tas_timeseries(
             color="red" if label == "bad" else "orange"
         )
 
-    ymin = df[["tmin", "temp", "tmax"]].min().min()
-    subset = df[df["qc_label"] == "missing"]
+    ymin = daily_cleaned[["tmin", "temp", "tmax"]].min().min()
+    subset = inttemp_tas_result[inttemp_tas_result["qc_label"] == "missing"]
 
     axes[0].scatter(
         subset.index,
@@ -487,8 +502,8 @@ def plot_inttemp_tas_timeseries(
     # BOTTOM: QC state timeline
     # ----------------------------
     axes[1].plot(
-        df.index,
-        df["qc_code"],
+        inttemp_tas_result.index,
+        inttemp_tas_result["qc_code"],
         drawstyle="steps-mid",
         color=state_color
     )
@@ -1035,6 +1050,7 @@ def plot_station_qc(
     # --------------------------------------------------
     if "inttemp_tas" in plots:
         plot_inttemp_tas_timeseries(
+            daily_cleaned,
             result["inttemp_tas_result"],
             color_map=color_map,
             missing_color="gray",

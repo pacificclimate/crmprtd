@@ -99,6 +99,9 @@ def apply_qc_cleaning(
         streak_mask = pd.Series(False, index=daily_cleaned.index)
 
         for start, end, _ in streaks:
+            # print(pd.to_datetime(start))
+            # print(pd.to_datetime(end))
+
             streak_mask |= (
                 (daily_cleaned.index >= pd.to_datetime(start)) &
                 (daily_cleaned.index <= pd.to_datetime(end))
@@ -131,21 +134,23 @@ def apply_inttemp_tas_qc(daily_cleaned, inttemp_tas_result):
 
     df = daily_cleaned.copy()
 
-    if "inttemp_tas" in df.columns:
+    # if "inttemp_tas" in df.columns:
+    # handle dict or DataFrame input
+    qc_series = (
+        inttemp_tas_result.get("qc_label")
+        if isinstance(inttemp_tas_result, dict)
+        else inttemp_tas_result["qc_label"]
+        if "qc_label" in inttemp_tas_result
+        else None
+    )
+    # print(qc_series)
 
-        # handle dict or DataFrame input
-        qc_series = (
-            inttemp_tas_result.get("qc_label")
-            if isinstance(inttemp_tas_result, dict)
-            else inttemp_tas_result["qc_label"]
-            if "qc_label" in inttemp_tas_result
-            else None
-        )
+    if qc_series is not None:
+        qc_series = qc_series.reindex(df.index)
 
-        if qc_series is not None:
-            qc_series = qc_series.reindex(df.index)
-
-            mask = qc_series == "bad"
-            df.loc[mask, "inttemp_tas"] = np.nan
+        mask = qc_series == "bad"
+        df.loc[mask, "temp"] = np.nan
+        df.loc[mask, "tmin"] = np.nan
+        df.loc[mask, "tmax"] = np.nan
 
     return df

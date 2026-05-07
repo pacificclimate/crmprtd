@@ -193,12 +193,18 @@ def evaluate_station_quality(daily_cleaned, value_cols, miss_result_dict, summar
         flag_rate = flag_rate_by_var.get(var, 0)
 
         # Missing rating
-        if missing_rate >= THRESH["missing"]["unusable"]:
+        if pd.isna(missing_rate):
             missing_rating = "UNUSABLE"
+
+        elif missing_rate >= THRESH["missing"]["unusable"]:
+            missing_rating = "UNUSABLE"
+
         elif missing_rate >= THRESH["missing"]["problematic"]:
             missing_rating = "PROBLEMATIC"
+
         elif missing_rate >= THRESH["missing"]["caution"]:
             missing_rating = "CAUTION"
+
         else:
             missing_rating = "GOOD"
 
@@ -222,7 +228,10 @@ def evaluate_station_quality(daily_cleaned, value_cols, miss_result_dict, summar
         final_rating = max(ratings, key=lambda r: PRIORITY[r])
 
         issues = []
-        if missing_rating != "GOOD":
+        if pd.isna(missing_rate):
+            issues.append("Missing rate unavailable (all values missing?)")
+
+        elif missing_rating != "GOOD":
             issues.append(f"Missing rate {missing_rate:.1f}%")
         if flag_rating != "GOOD":
             issues.append(f"Flag rate {flag_rate:.1f}%")
@@ -257,21 +266,6 @@ def evaluate_station_quality(daily_cleaned, value_cols, miss_result_dict, summar
             print(f"   ⚠️ {issue}")
         print()
 
-    # Temporal coverage
-    print("TEMPORAL COVERAGE ASSESSMENT")
-    print("-" * 80)
-    print()
-
-    years = sorted(daily_cleaned.index.year.unique())
-    print(f"Period: {daily_cleaned.index.min().date()} → {daily_cleaned.index.max().date()}")
-    print(f"Years: {years[0]}–{years[-1]} ({len(years)} years)")
-
-    year_gaps = [(years[i], years[i+1]) for i in range(len(years)-1) if years[i+1] - years[i] > 1]
-    if year_gaps:
-        print(f"Status: ❌ NOT CONTINUOUS ({len(year_gaps)} gaps)")
-    else:
-        print("Status: ✅ CONTINUOUS")
-    print()
 
     # Summary counts
     rating_counts = pd.Series([q["rating"] for q in variable_quality.values()]).value_counts().to_dict()

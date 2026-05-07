@@ -426,10 +426,8 @@ def summarize_variable_flag_rate(flag_summary_df):
     return summary
 
 def create_station_evaluation_summary(
+    daily_cleaned,
     station_id,
-    analysis_start_date,
-    analysis_end_date,
-    years_covered,
     completeness_by_year,
     variable_quality,
     station_rating,
@@ -449,13 +447,16 @@ def create_station_evaluation_summary(
     
     records = []
     
-    # Extract year range from completeness_by_year or use years_covered
-    if isinstance(years_covered, str):
-        year_range = years_covered
-    else:
-        year_range = f"{years_covered[0]}–{years_covered[-1]}" if years_covered else "N/A"
-    
+
     for var in value_cols:
+
+        valid_mask = daily_cleaned[var].notna()
+        start_date = daily_cleaned.index[valid_mask][0]
+        end_date = daily_cleaned.index[valid_mask][-1]
+        years_covered = list(range(start_date.year, end_date.year + 1))
+        year_range = f"{years_covered[0]}–{years_covered[-1]}" if years_covered else "N/A"
+
+
         var_info = variable_quality.get(var, {})
         
         has_large_gap = "YES" if var_info.get('has_large_gap', False) else "NO"
@@ -463,28 +464,31 @@ def create_station_evaluation_summary(
         records.append({
             'station_id': station_id,
             'variable': var,
-            'analysis_period_start': analysis_start_date,
-            'analysis_period_end': analysis_end_date,
-            'years_covered': year_range,
-            'total_years': len(years_covered) if isinstance(years_covered, (list, tuple)) else 1,
-            'large_gaps': has_large_gap,
+            'rating': var_info.get('rating', 'UNKNOWN'),
+            'years_covered': years_covered,
             'missing_rate_pct': round(var_info.get('missing_rate', 0), 2),
             'flag_rate_pct': round(var_info.get('flag_rate', 0), 2),
-            'rating': var_info.get('rating', 'UNKNOWN'),
+            'analysis_period_start': start_date,
+            'analysis_period_end': end_date,
+            'total_years': len(years_covered) if isinstance(years_covered, (list, tuple)) else 1,
+            'large_gaps': has_large_gap,
+
         })
+
     
     # Add overall station summary as an aggregate row
     records.append({
         'station_id': station_id,
         'variable': '*** STATION OVERALL ***',
-        'analysis_period_start': analysis_start_date,
-        'analysis_period_end': analysis_end_date,
-        'years_covered': year_range,
-        'total_years': len(years_covered) if isinstance(years_covered, (list, tuple)) else 1,
-        'large_gaps': 'N/A',
+        'rating': station_rating,
         'missing_rate_pct': None,
         'flag_rate_pct': None,
-        'rating': station_rating,
+        'analysis_period_start': start_date,
+        'analysis_period_end': end_date,
+        'years_covered': 'N/A',
+        'total_years': 'N/A',
+        'large_gaps': 'N/A',
+
     })
     
     return pd.DataFrame(records)

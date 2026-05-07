@@ -5,21 +5,21 @@ def get_streak_threshold(value_col):
     """
     Return appropriate streak threshold for each variable.
     
-    TMAX/TMIN: 20 or more
+    TMAX/TMIN: 5 or more
     SNOW: 90 or more (nonzero)
     SNWD: 90 or more (nonzero)
-    PRECIP: 20 or more
-    Default: 20
+    PRECIP: 5 or more
+    Default: 5
     """
     thresholds = {
-        "tmax": 20,
-        "tmin": 20,
+        "tmax": 5,
+        "tmin": 5,
         "snw_fall": 90,
         "snw_dpth": 90,
-        "precip": 20,
-        "ppt": 20,
+        "precip": 5,
+        "ppt": 5,
     }
-    return thresholds.get(value_col.lower(), 20)
+    return thresholds.get(value_col.lower(), 5)
 
 def should_skip_zeros_for_streak(value_col):
     """
@@ -30,25 +30,7 @@ def should_skip_zeros_for_streak(value_col):
 
 
 def identical_value_streak_check(df, value_col, threshold, skip_zeros=False):
-    """
-    Return streaks of identical values using real datetime index.
-    
-    Parameters:
-    -----------
-    df : DataFrame
-        Input data with datetime index
-    value_col : str
-        Column name to check
-    threshold : int
-        Minimum consecutive identical values to flag
-    skip_zeros : bool
-        If True, skip zero values in streak counting
-    
-    Returns:
-    --------
-    list of tuples
-        (start_date, end_date, value) for each flagged streak
-    """
+
     series = df[value_col]
     flagged = []
 
@@ -56,10 +38,23 @@ def identical_value_streak_check(df, value_col, threshold, skip_zeros=False):
     start_idx = 0
 
     for i in range(1, len(series)):
+
         prev_val = series.iloc[i - 1]
         curr_val = series.iloc[i]
 
-        # Skip zeros if needed
+        # handle NaNs (force break)
+        if pd.isna(prev_val) or pd.isna(curr_val):
+            if count >= threshold:
+                flagged.append((
+                    df.index[start_idx],
+                    df.index[i - 1],
+                    series.iloc[i - 1]
+                ))
+            count = 1
+            start_idx = i
+            continue
+
+        # skip zeros logic (treat as break)
         if skip_zeros and (prev_val == 0 or curr_val == 0):
             if count >= threshold:
                 flagged.append((
@@ -71,16 +66,13 @@ def identical_value_streak_check(df, value_col, threshold, skip_zeros=False):
             start_idx = i
             continue
 
-        # Skip missing
-        if pd.isna(curr_val) or pd.isna(prev_val):
-            count = 1
-            start_idx = i
-            continue
-
+        # streak continues
         if curr_val == prev_val:
             if count == 1:
                 start_idx = i - 1
             count += 1
+
+        # streak breaks → finalize
         else:
             if count >= threshold:
                 flagged.append((
@@ -89,8 +81,9 @@ def identical_value_streak_check(df, value_col, threshold, skip_zeros=False):
                     prev_val
                 ))
             count = 1
+            start_idx = i
 
-    # last streak
+    # finalize last streak
     if count >= threshold:
         flagged.append((
             df.index[start_idx],
