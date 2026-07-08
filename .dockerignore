@@ -1,0 +1,41 @@
+# Keep the build context small and reproducible. The image installs from
+# pyproject.toml + poetry.lock and the crmprtd package source only.
+
+# VCS and CI
+.git
+.github
+.hg*
+
+# Local dev environments and caches
+.venv
+venv
+env
+.cache
+.pytest_cache
+__pycache__
+*.py[cod]
+*.egg-info
+build
+dist
+
+# Devcontainer / editor
+.devcontainer
+.vscode
+
+# Logs and local working data (see .gitignore)
+*.log
+infill-*/
+download/
+devenv/
+speed_test
+
+# Docs and scratch
+docs
+scripts
+CONTEXT.md
+NEWS.md
+
+# Secrets / local config that must never enter an image
+.pgpass
+auth.yaml
+*.rtd_auth.yaml
