@@ -126,6 +126,7 @@ def process(
     insert_strategy=InsertStrategy.BULK,
     bulk_chunk_size=1000,
     input_stream=None,  # *binary stream* if using a file use open(filname, "rb")
+    sesh=None,  # reuse an existing session (e.g. bulk_process); else one is created
 ):
     """
     Executes stages of the data processing pipeline.
@@ -165,9 +166,10 @@ def process(
     log.info(f"Unique normalized rows: {len(rows)}")
     log.info("Normalize: done")
 
-    engine = create_engine(connection_string)
-    Session = sessionmaker(engine)
-    sesh = Session()
+    if sesh is None:
+        engine = create_engine(connection_string)
+        Session = sessionmaker(engine)
+        sesh = Session()
 
     # Optionally infer variables and stations/histories.
     if do_infer:
@@ -212,6 +214,7 @@ def process(
     )
     log.info("Insert: done")
     log.info("Data insertion results", extra={"results": results, "network": network})
+    return results
 
 
 def gulpy_plus_plus():
