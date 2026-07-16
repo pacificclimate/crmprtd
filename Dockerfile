@@ -64,12 +64,14 @@ RUN poetry install --only main --all-extras
 FROM python:${PYTHON_VERSION}-slim AS runtime
 
 # Runtime shared libraries for the compiled wheels: libpq5 (psycopg2),
-# libxml2 + libxslt1.1 (lxml).
+# libxml2 + libxslt1.1 (lxml). jq is included so tasks can query/shape the
+# JSON logs and results the scripts emit (e.g. the "results" summary lines).
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         libpq5 \
         libxml2 \
         libxslt1.1 \
+        jq \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PYTHONUNBUFFERED=1 \
