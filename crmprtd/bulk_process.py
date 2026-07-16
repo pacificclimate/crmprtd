@@ -238,7 +238,6 @@ def main():
         log_conf=default_log_conf,
         log_filename="/tmp/crmp/bulk_process.log",
         log_level="INFO",
-        error_email="pcic.devops@uvic.ca",
         force=False,
         move_processed=False,
     )
