@@ -1,0 +1,16 @@
+vars_id,net_var_name,canonical_variable,source_type,daily_aggregation,priority,source_family,mapping_status,review_note
+721,air_temp,air_temperature,point,mean,1,modern,candidate,Preferred modern point temperature; compare overlap with vars_id 434
+434,CURRENT_AIR_TEMPERATURE1,air_temperature,point,mean,2,legacy,candidate,Primary legacy point-temperature candidate
+436,CURRENT_AIR_TEMPERATURE2,air_temperature,point,mean,3,legacy_fallback,candidate,Secondary legacy sensor; use only after sensor review
+722,min_air_temp_snc_last_reset,daily_min_temperature,running_minimum,last,1,modern,candidate,Reset time must be established before daily aggregation
+435,MINIMUM_AIR_TEMPERATURE,daily_min_temperature,interval_minimum,min,2,legacy,candidate,Legacy extrema candidate; temporal meaning needs confirmation
+721,air_temp,daily_min_temperature,point_fallback,min,3,derived_fallback,candidate,Derive daily minimum only when point-temperature completeness passes
+720,max_air_temp_snc_last_reset,daily_max_temperature,running_maximum,last,1,modern,candidate,Reset time must be established before daily aggregation
+433,MAXIMUM_AIR_TEMPERATURE,daily_max_temperature,interval_maximum,max,2,legacy,candidate,Legacy extrema candidate; temporal meaning needs confirmation
+721,air_temp,daily_max_temperature,point_fallback,max,3,derived_fallback,candidate,Derive daily maximum only when point-temperature completeness passes
+726,pcpn_amt_pst1hr,precipitation_amount,one_hour_amount,sum,1,modern,candidate,Preferred modern hourly amount after negative/sentinel cleaning
+442,HOURLY_PRECIPITATION,precipitation_amount,hourly_or_daily_amount,review,2,legacy,candidate,Cell method conflicts with name; inspect cadence and repeats before aggregation
+728,snwfl_amt_pst1hr,snowfall_amount,one_hour_amount,sum,1,modern,candidate,Preferred modern hourly amount after negative/sentinel cleaning
+451,STANDARD_SNOW,snowfall_amount,interval_amount,review,2,legacy,candidate,Aggregation interval is not explicit
+727,snw_dpth,snow_depth,point,fixed_hour,1,modern,candidate,Preferred modern point depth; choose local observation hour
+450,HEIGHT_OF_SNOW,snow_depth,point,fixed_hour,2,legacy,candidate,Legacy point depth; compare overlap with vars_id 727
