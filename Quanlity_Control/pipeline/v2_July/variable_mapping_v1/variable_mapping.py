@@ -52,10 +52,8 @@ CANDIDATE_MAPPINGS = pd.DataFrame(
         (436, "CURRENT_AIR_TEMPERATURE2", "air_temperature", "point", "mean", 3, "legacy_fallback"),
         (722, "min_air_temp_snc_last_reset", "daily_min_temperature", "running_minimum", "last", 1, "modern"),
         (435, "MINIMUM_AIR_TEMPERATURE", "daily_min_temperature", "interval_minimum", "min", 2, "legacy"),
-        (721, "air_temp", "daily_min_temperature", "point_fallback", "min", 3, "derived_fallback"),
         (720, "max_air_temp_snc_last_reset", "daily_max_temperature", "running_maximum", "last", 1, "modern"),
         (433, "MAXIMUM_AIR_TEMPERATURE", "daily_max_temperature", "interval_maximum", "max", 2, "legacy"),
-        (721, "air_temp", "daily_max_temperature", "point_fallback", "max", 3, "derived_fallback"),
         (726, "pcpn_amt_pst1hr", "precipitation_amount", "one_hour_amount", "sum", 1, "modern"),
         (442, "HOURLY_PRECIPITATION", "precipitation_amount", "hourly_or_daily_amount", "review", 2, "legacy"),
         (728, "snwfl_amt_pst1hr", "snowfall_amount", "one_hour_amount", "sum", 1, "modern"),
@@ -203,7 +201,9 @@ def fetch_candidate_observations(
 ) -> pd.DataFrame:
     """Load candidate observations for detailed cadence and overlap review."""
     history_ids = tuple(int(x) for x in history_ids)
-    vars_ids = tuple(int(x) for x in (vars_ids or CANDIDATE_MAPPINGS["vars_id"].unique()))
+    if vars_ids is None:
+        vars_ids = CANDIDATE_MAPPINGS["vars_id"].unique()
+    vars_ids = tuple(int(x) for x in vars_ids)
     query = sa.text(
         """
         SELECT h.station_id, h.station_name, o.history_id, o.vars_id,
