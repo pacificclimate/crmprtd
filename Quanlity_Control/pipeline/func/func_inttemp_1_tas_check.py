@@ -36,17 +36,21 @@ def inttemp_temperature_consistency(
     TOBS = df[tobs_col]
 
     # ------------------------------------------------------------
-    # 2. Missing mask
-    # (all variables missing)
+    # 2. Complete-triplet mask
+    # Cross-variable consistency is meaningful only when all three values are
+    # present. Incomplete rows are not evaluated and must not remove a valid
+    # temperature observation.
     # ------------------------------------------------------------
-    missing = TMAX.isna() & TMIN.isna() & TOBS.isna()
+    complete_triplet = TMAX.notna() & TMIN.notna() & TOBS.notna()
+    missing = ~complete_triplet
+    previous_complete_triplet = complete_triplet.shift(1, fill_value=False)
 
     # ------------------------------------------------------------
     # 3. Basic physical consistency
     # TMAX >= TOBS >= TMIN
     # ------------------------------------------------------------
     flag_basic = ~((TMAX >= TMIN) & (TMAX >= TOBS) & (TOBS >= TMIN))
-    flag_basic = flag_basic & ~missing
+    flag_basic = flag_basic & complete_triplet
 
     # ------------------------------------------------------------
     # 4. Spike / dip check
@@ -56,7 +60,7 @@ def inttemp_temperature_consistency(
         ((TMIN - TMIN.shift(1)).abs() > spike_threshold) |
         ((TOBS - TOBS.shift(1)).abs() > spike_threshold)
     )
-    flag_spike = flag_spike & ~missing
+    flag_spike = flag_spike & complete_triplet & previous_complete_triplet
 
     # ------------------------------------------------------------
     # 5. Lagged consistency
@@ -73,7 +77,7 @@ def inttemp_temperature_consistency(
         (TMAX < (tmax_prev_max - lag_threshold)) |
         (TMIN > (tmin_prev_min + lag_threshold))
     )
-    flag_lag = flag_lag & ~missing
+    flag_lag = flag_lag & complete_triplet & previous_complete_triplet
 
     # ------------------------------------------------------------
     # 6. Combine flags
@@ -126,4 +130,3 @@ def inttemp_temperature_consistency(
     result = df.join(qc_flags)
 
     return result
-

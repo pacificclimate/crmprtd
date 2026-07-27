@@ -13,7 +13,6 @@ MAPPING_COLUMNS = [
     "vars_id",
     "net_var_name",
     "canonical_variable",
-    "source_type",
     "daily_aggregation",
     "priority",
     "source_family",

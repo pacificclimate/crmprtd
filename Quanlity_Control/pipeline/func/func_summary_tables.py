@@ -446,15 +446,21 @@ def create_station_evaluation_summary(
         value_cols = ["temp", "tmin", "tmax", "precip", "snw_fall", "snw_dpth"]
     
     records = []
-    
+    overall_start = daily_cleaned.index.min() if not daily_cleaned.empty else pd.NaT
+    overall_end = daily_cleaned.index.max() if not daily_cleaned.empty else pd.NaT
 
     for var in value_cols:
 
         valid_mask = daily_cleaned[var].notna()
-        start_date = daily_cleaned.index[valid_mask][0]
-        end_date = daily_cleaned.index[valid_mask][-1]
-        years_covered = list(range(start_date.year, end_date.year + 1))
-        year_range = f"{years_covered[0]}–{years_covered[-1]}" if years_covered else "N/A"
+        valid_dates = daily_cleaned.index[valid_mask]
+        if valid_dates.empty:
+            start_date = pd.NaT
+            end_date = pd.NaT
+            years_covered = []
+        else:
+            start_date = valid_dates[0]
+            end_date = valid_dates[-1]
+            years_covered = sorted(valid_dates.year.unique().tolist())
 
 
         var_info = variable_quality.get(var, {})
@@ -483,8 +489,8 @@ def create_station_evaluation_summary(
         'rating': station_rating,
         'missing_rate_pct': None,
         'flag_rate_pct': None,
-        'analysis_period_start': start_date,
-        'analysis_period_end': end_date,
+        'analysis_period_start': overall_start,
+        'analysis_period_end': overall_end,
         'years_covered': 'N/A',
         'total_years': 'N/A',
         'large_gaps': 'N/A',

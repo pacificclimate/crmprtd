@@ -1,0 +1,7 @@
+network_id,canonical_variable,source_vars_ids,time_match,overlap_method,single_source_method
+2,air_temperature,"[434, 721]",exact_timestamp,mean,use_available
+2,daily_max_temperature,"[433, 720]",exact_timestamp,mean,use_available
+2,daily_min_temperature,"[435, 722]",exact_timestamp,mean,use_available
+2,precipitation_amount,"[442, 726]",exact_timestamp,mean,use_available
+2,snow_depth,"[450, 727]",exact_timestamp,mean,use_available
+2,snowfall_amount,"[451, 728]",exact_timestamp,mean,use_available

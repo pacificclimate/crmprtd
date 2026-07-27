@@ -97,9 +97,7 @@ def profile_candidate_variables(
         """
         SELECT h.station_id, MAX(h.station_name) AS station_name, o.vars_id,
                v.net_var_name::text AS net_var_name,
-               COUNT(*) AS row_count,
-               COUNT(o.datum) AS nonnull_count,
-               COUNT(DISTINCT o.obs_time::date) AS active_days,
+               COUNT(DISTINCT EXTRACT(YEAR FROM o.obs_time)) AS active_years,
                MIN(o.obs_time) AS first_observation,
                MAX(o.obs_time) AS last_observation,
                MIN(o.datum) AS observed_min,
@@ -124,11 +122,14 @@ def profile_candidate_variables(
     )
     if profile.empty:
         return profile
-    profile["coverage_days"] = (
+    coverage_years = (
         profile["last_observation"] - profile["first_observation"]
-    ).dt.total_seconds().div(86400).add(1)
-    profile["active_day_pct"] = 100 * profile["active_days"] / profile["coverage_days"]
-    profile["nonnull_pct"] = 100 * profile["nonnull_count"] / profile["row_count"]
+    ).dt.total_seconds().div(86400 * 365.25).add(1 / 365.25)
+    profile.insert(
+        profile.columns.get_loc("active_years") + 1,
+        "coverage_years",
+        coverage_years,
+    )
     return profile
 
 
@@ -140,16 +141,14 @@ def summarize_candidate_profiles(profile: pd.DataFrame) -> pd.DataFrame:
         profile.groupby(["vars_id", "net_var_name"], as_index=False)
         .agg(
             station_count=("station_id", "nunique"),
-            total_rows=("row_count", "sum"),
-            total_nonnull=("nonnull_count", "sum"),
             first_observation=("first_observation", "min"),
             last_observation=("last_observation", "max"),
-            median_station_span_days=("coverage_days", "median"),
-            median_active_days=("active_days", "median"),
-            median_active_day_pct=("active_day_pct", "median"),
-            median_nonnull_pct=("nonnull_pct", "median"),
+            median_station_span_years=("coverage_years", "median"),
+            median_active_years=("active_years", "median"),
         )
-        .sort_values(["station_count", "total_nonnull"], ascending=False)
+        .sort_values(
+            ["station_count", "median_active_years"], ascending=False
+        )
     )
 
 

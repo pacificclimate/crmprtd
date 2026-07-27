@@ -18,16 +18,17 @@ def hourly_to_daily(df, cols, agg_map, min_hours, snwd_hour=4):
 
     # --- build validity mask ---
     if isinstance(min_hours, dict):
-        valid_days = np.ones(len(valid_counts), dtype=bool)
-        for c in cols:
-            valid_days &= valid_counts[c] >= min_hours.get(c, 0)
-        valid_days = pd.Series(valid_days, index=valid_counts.index)
+        thresholds = pd.Series(
+            {column: min_hours.get(column, 0) for column in cols}
+        )
+        valid_days = valid_counts[cols].ge(thresholds, axis="columns")
     else:
-        valid_days = valid_counts.ge(min_hours).all(axis=1)
+        valid_days = valid_counts[cols].ge(min_hours)
 
     # --- normal aggregation (exclude snw_dpth for now) ---
     agg_map_clean = {k: v for k, v in agg_map.items() if k != "snw_dpth"}
     daily = df.resample("1D").agg(agg_map_clean)
+    daily = daily.where(valid_days.reindex(columns=daily.columns, fill_value=False))
 
     # --- handle snow depth at fixed hour ---
     if "snw_dpth" in cols:
@@ -40,7 +41,7 @@ def hourly_to_daily(df, cols, agg_map, min_hours, snwd_hour=4):
         snwd_daily = snwd_at_hour.groupby(snwd_at_hour.index.floor("D")).first()
 
         # attach to daily
-        daily["snw_dpth"] = snwd_daily
+        daily["snw_dpth"] = snwd_daily.where(valid_days["snw_dpth"])
 
     # --- apply validity mask ---
     daily = daily.where(valid_days)
