@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 def hourly_to_daily(df, cols, agg_map, min_hours, snwd_hour=4):
@@ -51,7 +50,29 @@ def hourly_to_daily(df, cols, agg_map, min_hours, snwd_hour=4):
 
 
 
-def build_daily_all(df_station):
+def build_daily_all(df_station, variable_frequencies=None):
+    """Build daily QC inputs from a mixture of hourly and daily sources.
+
+    Parameters
+    ----------
+    df_station : DataFrame
+        Long-form observations with ``obs_time``, ``net_var_name``, and
+        ``datum`` columns.
+    variable_frequencies : dict, optional
+        QC variable names mapped to ``"hourly"`` or ``"daily"``. Variables
+        not listed are treated as hourly for backward compatibility.
+    """
+    variable_frequencies = variable_frequencies or {}
+    invalid_frequencies = {
+        variable: frequency
+        for variable, frequency in variable_frequencies.items()
+        if frequency not in {"hourly", "daily"}
+    }
+    if invalid_frequencies:
+        raise ValueError(
+            f"Unsupported variable frequencies: {invalid_frequencies}"
+        )
+
     df_station = df_station.copy()
     df_station["obs_time"] = pd.to_datetime(df_station["obs_time"])
     df_sql = df_station.pivot_table(
@@ -68,10 +89,15 @@ def build_daily_all(df_station):
     })
     expected_cols = ["temp", "tmin", "tmax", "precip", "snw_fall", "snw_dpth"]
     df_sql = df_sql.reindex(columns=expected_cols)
-    start_time = df_sql.apply(lambda col: col.first_valid_index()).min()
-    if pd.isna(start_time):
+    first_valid_times = [
+        column.first_valid_index()
+        for _, column in df_sql.items()
+        if column.first_valid_index() is not None
+    ]
+    if not first_valid_times:
         df_trim = df_sql
     else:
+        start_time = min(first_valid_times)
         df_trim = df_sql.loc[start_time:]
 
     daily_tas = hourly_to_daily(
@@ -93,4 +119,16 @@ def build_daily_all(df_station):
         agg_map={"precip": "sum"},
         min_hours=18
     )
-    return pd.concat([daily_tas, daily_precip, daily_sn], axis=1)
+    daily = pd.concat([daily_tas, daily_precip, daily_sn], axis=1)
+
+    # Daily source values have already undergone their source aggregation.
+    # Preserve them without applying the hourly 18-observation requirement.
+    for variable, frequency in variable_frequencies.items():
+        if frequency != "daily" or variable not in df_trim.columns:
+            continue
+        # The value already represents a daily statistic or accumulation, so
+        # do not apply min/max/sum again. ``first`` also preserves NaN for a
+        # day with no reported value instead of turning a missing sum into 0.
+        daily[variable] = df_trim[variable].resample("1D").first()
+
+    return daily.reindex(columns=expected_cols).sort_index()

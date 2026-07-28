@@ -59,6 +59,43 @@ CANONICAL_TO_QC_VARIABLE = {
 }
 
 
+def build_qc_frequency_map(rules: pd.DataFrame) -> dict[str, str]:
+    """Map final-rule cadence values to the QC variable names.
+
+    ``exact_timestamp`` is retained as a backward-compatible synonym for
+    hourly input. Mixed or irregular source cadences require source-level
+    handling before observations can be combined and are rejected here.
+    """
+    required = {"canonical_variable", "time_match"}
+    missing = required - set(rules.columns)
+    if missing:
+        raise ValueError(
+            f"Final rules are missing frequency columns: {sorted(missing)}"
+        )
+
+    frequency_map: dict[str, str] = {}
+    for row in rules.itertuples(index=False):
+        canonical_variable = row.canonical_variable
+        if canonical_variable not in CANONICAL_TO_QC_VARIABLE:
+            raise ValueError(
+                f"Unknown canonical variable: {canonical_variable}"
+            )
+
+        saved_frequency = str(row.time_match).strip().lower()
+        frequency = (
+            "hourly" if saved_frequency == "exact_timestamp"
+            else saved_frequency
+        )
+        if frequency not in {"hourly", "daily"}:
+            raise ValueError(
+                f"Unsupported time_match {row.time_match!r} for "
+                f"{canonical_variable}; expected 'hourly' or 'daily'."
+            )
+        frequency_map[CANONICAL_TO_QC_VARIABLE[canonical_variable]] = frequency
+
+    return frequency_map
+
+
 def load_candidate_mappings(path: str | Path) -> pd.DataFrame:
     """Load a candidate-mapping registry."""
     path = Path(path)

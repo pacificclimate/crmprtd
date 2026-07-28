@@ -158,7 +158,7 @@ def evaluate_station_quality(daily_cleaned, value_cols, miss_result_dict, summar
     # Thresholds
     THRESH = {
         "missing": {"caution": 20, "problematic": 30, "unusable": 60},
-        "flag": {"caution": 20, "unreliable": 30},
+        "flag": {"caution": 10, "unreliable": 20},
         "gap_days": 365
     }
 

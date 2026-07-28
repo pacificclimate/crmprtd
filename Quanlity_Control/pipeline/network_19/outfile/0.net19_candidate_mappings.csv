@@ -1,0 +1,8 @@
+network_id,vars_id,net_var_name,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+19,542,air_temperature,air_temperature,mean,1,network19_auto,needs_review
+19,544,air_temperature_yesterday_high,daily_max_temperature,max,1,network19_auto,needs_review
+19,545,air_temperature_yesterday_low,daily_min_temperature,min,1,network19_auto,needs_review
+19,837,rain_amount,precipitation_amount,sum,1,network19_auto,needs_review
+19,546,total_precipitation,precipitation_amount,sum,2,network19_auto,needs_review
+19,547,total_rain,precipitation_amount,sum,3,network19_auto,needs_review
+19,548,snow_amount,snowfall_amount,sum,1,network19_auto,needs_review
