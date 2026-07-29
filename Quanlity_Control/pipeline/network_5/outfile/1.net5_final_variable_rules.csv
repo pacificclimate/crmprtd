@@ -1,0 +1,7 @@
+network_id,canonical_variable,source_vars_ids,time_match,overlap_method,single_source_method
+5,air_temperature,"[1328, 1329]",hourly,mean,use_available
+5,daily_max_temperature,[464],daily,mean,use_available
+5,daily_min_temperature,[463],daily,mean,use_available
+5,precipitation_amount,[465],daily,mean,use_available
+5,snow_depth,"[468, 1331]","mixed:468=daily,1331=hourly",mean,use_available
+5,snowfall_amount,[467],daily,mean,use_available

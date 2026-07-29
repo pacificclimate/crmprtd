@@ -1,0 +1,15 @@
+network_id,vars_id,net_var_name,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+5,657,AirTemp,air_temperature,mean,1,network5_auto,needs_review
+5,1328,air_temp_1,air_temperature,mean,2,network5_auto,needs_review
+5,1329,air_temp_2,air_temperature,mean,3,network5_auto,needs_review
+5,464,MAX_TEMP,daily_max_temperature,max,1,network5_auto,needs_review
+5,463,MIN_TEMP,daily_min_temperature,min,1,network5_auto,needs_review
+5,1332,cum_pcpn_amt,precipitation_amount,sum,1,network5_auto,needs_review
+5,1333,pcpn_amt_pst1hr,precipitation_amount,sum,2,network5_auto,needs_review
+5,1334,pcpn_amt_pst24hrs,precipitation_amount,sum,3,network5_auto,needs_review
+5,465,ONE_DAY_PRECIPITATION,precipitation_amount,sum,4,network5_auto,needs_review
+5,466,ONE_DAY_RAIN,precipitation_amount,sum,5,network5_auto,needs_review
+5,655,Precip,precipitation_amount,sum,6,network5_auto,needs_review
+5,468,SNOW_ON_THE_GROUND,snow_depth,fixed_hour,1,network5_reviewed,candidate
+5,1331,snw_dpth,snow_depth,fixed_hour,2,network5_auto,needs_review
+5,467,ONE_DAY_SNOW,snowfall_amount,sum,1,network5_auto,needs_review

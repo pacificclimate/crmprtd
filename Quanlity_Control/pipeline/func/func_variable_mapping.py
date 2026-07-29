@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import json
 from pathlib import Path
+import re
 from typing import Iterable
 
 import numpy as np
@@ -63,8 +64,8 @@ def build_qc_frequency_map(rules: pd.DataFrame) -> dict[str, str]:
     """Map final-rule cadence values to the QC variable names.
 
     ``exact_timestamp`` is retained as a backward-compatible synonym for
-    hourly input. Mixed or irregular source cadences require source-level
-    handling before observations can be combined and are rejected here.
+    hourly input. Mixed source cadences are normalized source-by-source by
+    :func:`combine_final_rule_observations` and therefore enter QC as daily.
     """
     required = {"canonical_variable", "time_match"}
     missing = required - set(rules.columns)
@@ -82,10 +83,13 @@ def build_qc_frequency_map(rules: pd.DataFrame) -> dict[str, str]:
             )
 
         saved_frequency = str(row.time_match).strip().lower()
-        frequency = (
-            "hourly" if saved_frequency == "exact_timestamp"
-            else saved_frequency
-        )
+        if saved_frequency.startswith("mixed:"):
+            frequency = "daily"
+        else:
+            frequency = (
+                "hourly" if saved_frequency == "exact_timestamp"
+                else saved_frequency
+            )
         if frequency not in {"hourly", "daily"}:
             raise ValueError(
                 f"Unsupported time_match {row.time_match!r} for "
@@ -255,11 +259,13 @@ def combine_final_rule_observations(
     observations: pd.DataFrame,
     rules: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Apply exact-time mean/fallback rules and return QC variable names.
+    """Combine selected sources and normalize mixed cadences to daily.
 
     Each source is reduced to one value before cross-source averaging, so a
     duplicated source observation cannot receive extra weight. One available
-    source is retained automatically when the other source is absent.
+    source is retained automatically when the other source is absent. For a
+    ``mixed:ID=frequency,...`` rule, subdaily sources are aggregated to daily
+    before they are combined with sources that already report daily values.
     """
     required = {"station_id", "station_name", "vars_id", "obs_time", "datum"}
     missing = required - set(observations.columns)
@@ -284,14 +290,123 @@ def combine_final_rule_observations(
     combined_input = combined_input.dropna(
         subset=["canonical_variable", "datum"]
     )
-    per_source = (
-        combined_input
-        .groupby(
-            ["station_id", "station_name", "obs_time", "vars_id", "canonical_variable"],
-            as_index=False,
+    combined_input["obs_time"] = pd.to_datetime(combined_input["obs_time"])
+    exact_parts = []
+    daily_parts = []
+    daily_aggregations = {
+        "air_temperature": "mean",
+        "daily_min_temperature": "min",
+        "daily_max_temperature": "max",
+        "precipitation_amount": "sum",
+        "snowfall_amount": "sum",
+    }
+
+    for rule in rules.itertuples(index=False):
+        canonical_variable = rule.canonical_variable
+        source_ids = [int(value) for value in rule.source_vars_ids]
+        saved_frequency = str(rule.time_match).strip().lower()
+        rule_input = combined_input[
+            combined_input["vars_id"].isin(source_ids)
+        ].copy()
+
+        if not saved_frequency.startswith("mixed:"):
+            exact_parts.append(rule_input)
+            continue
+
+        frequency_by_source = {}
+        for item in saved_frequency.removeprefix("mixed:").split(","):
+            source_text, separator, frequency = item.partition("=")
+            if not separator:
+                raise ValueError(f"Invalid mixed time_match item: {item!r}")
+            frequency_by_source[int(source_text)] = frequency
+        missing_frequencies = set(source_ids) - set(frequency_by_source)
+        if missing_frequencies:
+            raise ValueError(
+                "Mixed time_match is missing source frequencies for "
+                f"{sorted(missing_frequencies)}"
+            )
+
+        for source_id in source_ids:
+            source = rule_input[rule_input["vars_id"] == source_id].copy()
+            if source.empty:
+                continue
+            frequency = frequency_by_source[source_id]
+            if frequency == "exact_timestamp":
+                frequency = "hourly"
+            if (
+                frequency not in {"hourly", "daily"}
+                and not re.fullmatch(r"irregular_([0-9.]+)_hours", frequency)
+            ):
+                raise ValueError(
+                    f"Unsupported source frequency {frequency!r} for "
+                    f"vars_id {source_id}"
+                )
+            source = source.sort_values("obs_time")
+            source["obs_time"] = source["obs_time"].dt.floor("D")
+            group_columns = [
+                "station_id", "station_name", "obs_time", "vars_id",
+                "canonical_variable",
+            ]
+
+            if frequency == "daily":
+                source_daily = (
+                    source.groupby(group_columns, as_index=False)
+                    .agg(datum=("datum", "first"))
+                )
+            elif canonical_variable == "snow_depth":
+                # Snow depth is an instantaneous state, not an amount to sum.
+                # Match the existing QC convention by retaining 04:00 only.
+                original_source = rule_input[
+                    rule_input["vars_id"] == source_id
+                ].copy()
+                original_source = original_source[
+                    original_source["obs_time"].dt.hour == 4
+                ]
+                original_source["obs_time"] = (
+                    original_source["obs_time"].dt.floor("D")
+                )
+                source_daily = (
+                    original_source.sort_values("obs_time")
+                    .groupby(group_columns, as_index=False)
+                    .agg(datum=("datum", "first"))
+                )
+            else:
+                aggregation = daily_aggregations[canonical_variable]
+                grouped = source.groupby(group_columns)["datum"]
+                source_daily = grouped.agg(
+                    datum=aggregation, valid_count="count"
+                ).reset_index()
+                interval_hours = 1.0
+                irregular_match = re.fullmatch(
+                    r"irregular_([0-9.]+)_hours", frequency
+                )
+                if irregular_match:
+                    interval_hours = float(irregular_match.group(1))
+                minimum_count = int(np.ceil(0.75 * 24 / interval_hours))
+                source_daily.loc[
+                    source_daily["valid_count"] < minimum_count, "datum"
+                ] = np.nan
+                source_daily = source_daily.drop(columns="valid_count")
+
+            daily_parts.append(source_daily)
+
+    per_source_parts = []
+    if exact_parts:
+        exact_input = pd.concat(exact_parts, ignore_index=True)
+        per_source_parts.append(
+            exact_input.groupby(
+                ["station_id", "station_name", "obs_time", "vars_id",
+                 "canonical_variable"],
+                as_index=False,
+            ).agg(datum=("datum", "mean"))
         )
-        .agg(datum=("datum", "mean"))
-    )
+    if daily_parts:
+        per_source_parts.append(pd.concat(daily_parts, ignore_index=True))
+    if not per_source_parts:
+        return pd.DataFrame(columns=[
+            "station_id", "station_name", "obs_time", "net_var_name", "datum",
+        ])
+    per_source = pd.concat(per_source_parts, ignore_index=True)
     combined = (
         per_source
         .groupby(
@@ -346,6 +461,62 @@ def select_candidate_stations(
         engine,
         params={"network_id": network_id, "vars_ids": list(vars_ids),
                 "station_limit": int(limit), "station_offset": int(offset)},
+    )
+
+
+def summarize_variable_station_presence(
+    engine: sa.Engine,
+    vars_ids: Iterable[int],
+    network_id: int = 2,
+) -> pd.DataFrame:
+    """List stations having at least one non-null observation per variable.
+
+    EXISTS lets PostgreSQL stop searching as soon as it finds a qualifying
+    observation, avoiding the full time-series aggregation performed by
+    ``profile_candidate_variables``.
+    """
+    vars_ids = tuple(int(value) for value in vars_ids)
+    query = sa.text(
+        """
+        WITH stations AS (
+            SELECT s.station_id, MAX(h.station_name) AS station_name
+            FROM meta_station s
+            JOIN meta_history h USING (station_id)
+            WHERE s.network_id = :network_id
+            GROUP BY s.station_id
+        )
+        SELECT requested.vars_id,
+               MAX(v.net_var_name::text) AS net_var_name,
+               COUNT(DISTINCT stations.station_id) AS station_count,
+               STRING_AGG(
+                   DISTINCT stations.station_id::text, ', '
+                   ORDER BY stations.station_id::text
+               ) AS station_ids,
+               STRING_AGG(
+                   DISTINCT stations.station_name, '; '
+                   ORDER BY stations.station_name
+               ) AS station_names
+        FROM stations
+        CROSS JOIN unnest(CAST(:vars_ids AS integer[]))
+            AS requested(vars_id)
+        JOIN meta_vars v ON v.vars_id = requested.vars_id
+        WHERE EXISTS (
+              SELECT 1
+              FROM obs_raw o
+              JOIN meta_history observation_history USING (history_id)
+              WHERE observation_history.station_id = stations.station_id
+                AND o.vars_id = requested.vars_id
+                AND o.datum IS NOT NULL
+              LIMIT 1
+          )
+        GROUP BY requested.vars_id
+        ORDER BY requested.vars_id
+        """
+    )
+    return pd.read_sql(
+        query,
+        engine,
+        params={"network_id": network_id, "vars_ids": list(vars_ids)},
     )
 
 

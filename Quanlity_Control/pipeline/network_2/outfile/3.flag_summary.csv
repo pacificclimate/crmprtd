@@ -29,7 +29,7 @@ station_id,variable,flag_type,count,percentage
 2789,snw_dpth,duplicate_years,0,0.0
 2789,tmin_tmax,tmax_tmin_month_equal,0,0.0
 2789,temp,missing,856,8.22
-2789,tmin,missing,3828,36.75
+2789,tmin,missing,3828,36.74
 2789,tmax,missing,3814,36.61
 2789,precip,missing,1753,16.83
 2789,snw_fall,missing,130,2.41
@@ -233,9 +233,9 @@ station_id,variable,flag_type,count,percentage
 2797,snw_dpth,duplicate_years,0,0.0
 2797,tmin_tmax,tmax_tmin_month_equal,0,0.0
 2797,temp,missing,2402,17.91
-2797,tmin,missing,5451,40.64
-2797,tmax,missing,5447,40.61
-2797,precip,missing,5890,43.92
+2797,tmin,missing,5452,40.65
+2797,tmax,missing,5448,40.62
+2797,precip,missing,5891,43.92
 2797,snw_fall,missing,0,
 2797,snw_dpth,missing,0,
 2797,temp,streak,0,0.0
@@ -301,9 +301,9 @@ station_id,variable,flag_type,count,percentage
 2798,snw_dpth,duplicate_years,0,0.0
 2798,tmin_tmax,tmax_tmin_month_equal,0,0.0
 2798,temp,missing,1647,14.67
-2798,tmin,missing,4748,42.29
-2798,tmax,missing,4798,42.73
-2798,precip,missing,4893,43.58
+2798,tmin,missing,4749,42.29
+2798,tmax,missing,4799,42.74
+2798,precip,missing,4894,43.58
 2798,snw_fall,missing,0,
 2798,snw_dpth,missing,0,
 2798,temp,streak,0,0.0
@@ -437,7 +437,7 @@ station_id,variable,flag_type,count,percentage
 2800,snw_dpth,duplicate_years,0,0.0
 2800,tmin_tmax,tmax_tmin_month_equal,0,0.0
 2800,temp,missing,464,6.73
-2800,tmin,missing,3675,53.34
+2800,tmin,missing,3675,53.33
 2800,tmax,missing,3674,53.32
 2800,precip,missing,1296,18.81
 2800,snw_fall,missing,39,1.69
@@ -504,9 +504,9 @@ station_id,variable,flag_type,count,percentage
 2803,snw_fall,duplicate_months_across_years,0,0.0
 2803,snw_dpth,duplicate_years,0,0.0
 2803,tmin_tmax,tmax_tmin_month_equal,0,0.0
-2803,temp,missing,1427,15.93
-2803,tmin,missing,4399,49.1
-2803,tmax,missing,4399,49.1
+2803,temp,missing,1427,15.92
+2803,tmin,missing,4399,49.09
+2803,tmax,missing,4399,49.09
 2803,precip,missing,4568,50.98
 2803,snw_fall,missing,79,2.04
 2803,snw_dpth,missing,87,2.24
