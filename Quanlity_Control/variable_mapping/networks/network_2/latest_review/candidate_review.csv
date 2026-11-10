@@ -1,0 +1,17 @@
+network_id,vars_id,net_var_name,canonical_variable,daily_aggregation,decision,source_family,recent_non_null_station_count,source_checked_at_utc,latest_observation_from_cutoff,priority
+2,434,CURRENT_AIR_TEMPERATURE1,air_temperature,mean,manual decision,network2_auto,0,2026-11-10T18:58:00.713682+00:00,,1
+2,436,CURRENT_AIR_TEMPERATURE2,air_temperature,mean,manual decision,network2_auto,0,2026-11-10T18:58:00.713682+00:00,,2
+2,721,air_temp,air_temperature,mean,automatic keep,network2_auto,20,2026-11-10T18:58:00.713682+00:00,2026-11-10 10:00:00,3
+2,433,MAXIMUM_AIR_TEMPERATURE,daily_max_temperature,max,manual decision,network2_auto,0,2026-11-10T19:00:02.935295+00:00,,1
+2,720,max_air_temp_snc_last_reset,daily_max_temperature,max,automatic keep,network2_auto,14,2026-11-10T19:00:02.935295+00:00,2026-11-10 10:00:00,2
+2,435,MINIMUM_AIR_TEMPERATURE,daily_min_temperature,min,manual decision,network2_auto,0,2026-11-10T18:59:40.309032+00:00,,1
+2,722,min_air_temp_snc_last_reset,daily_min_temperature,min,automatic keep,network2_auto,14,2026-11-10T18:59:40.309032+00:00,2026-11-10 10:00:00,2
+2,440,PRECIPITATION_GAUGE_TOTAL,precipitation_amount,sum,manual decision,network2_auto,0,2026-11-10T19:00:18.345481+00:00,,3
+2,441,PRECIPITATION_NEW,precipitation_amount,sum,manual decision,network2_auto,0,2026-11-10T19:00:18.345481+00:00,,4
+2,442,HOURLY_PRECIPITATION,precipitation_amount,sum,manual decision,network2_auto,0,2026-11-10T19:00:18.345481+00:00,,5
+2,443,PRECIP_DETECTOR_RATIO,precipitation_amount,sum,manual decision,network2_auto,0,2026-11-10T19:00:18.345481+00:00,,6
+2,726,pcpn_amt_pst1hr,precipitation_amount,sum,automatic keep,network2_auto,17,2026-11-10T19:00:18.345481+00:00,2026-11-10 06:00:00,1
+2,450,HEIGHT_OF_SNOW,snow_depth,fixed_hour,manual decision,network2_auto,0,2026-11-10T19:01:06.302600+00:00,,1
+2,727,snw_dpth,snow_depth,fixed_hour,automatic keep,network2_auto,18,2026-11-10T19:01:06.302600+00:00,2026-11-10 10:00:00,2
+2,451,STANDARD_SNOW,snowfall_amount,sum,manual decision,network2_auto,0,2026-11-10T19:00:57.163434+00:00,,1
+2,728,snwfl_amt_pst1hr,snowfall_amount,sum,automatic keep,network2_auto,17,2026-11-10T19:00:57.163434+00:00,2026-11-10 10:00:00,2
