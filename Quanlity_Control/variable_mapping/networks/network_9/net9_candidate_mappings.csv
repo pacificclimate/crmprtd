@@ -1,0 +1,4 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+9,472,TEMP_MEAN,122,hourly,air_temperature,mean,1,network9_auto,needs_review
+9,693,avg_air_temp_pst1hr,90,hourly,air_temperature,mean,2,network9_auto,needs_review
+9,473,PRECIP_TOTAL,9,hourly,precipitation_amount,difference,1,network9_auto,needs_review

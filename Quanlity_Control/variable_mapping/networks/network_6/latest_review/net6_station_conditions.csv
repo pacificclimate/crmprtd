@@ -1,0 +1,40 @@
+station_id,vars_id,latest_observation_from_cutoff,has_recent_non_null_observations,network_id,canonical_variable
+2422,1201,2026-11-11 15:00:00,True,6,air_temperature
+2423,1201,2026-11-11 06:00:00,True,6,air_temperature
+2424,1201,2026-11-11 15:00:00,True,6,air_temperature
+2425,1201,2026-08-12 12:00:00,True,6,air_temperature
+2426,1201,2026-11-12 16:00:00,True,6,air_temperature
+2427,1201,2026-11-12 16:00:00,True,6,air_temperature
+2423,470,,False,6,daily_max_temperature
+2424,470,,False,6,daily_max_temperature
+2425,470,,False,6,daily_max_temperature
+2426,470,,False,6,daily_max_temperature
+2427,470,,False,6,daily_max_temperature
+2423,1205,2026-11-11 06:00:00,True,6,daily_max_temperature
+2424,1205,2026-11-11 15:00:00,True,6,daily_max_temperature
+2425,1205,2026-08-12 12:00:00,True,6,daily_max_temperature
+2426,1205,2026-11-12 16:00:00,True,6,daily_max_temperature
+2427,1205,2026-11-12 16:00:00,True,6,daily_max_temperature
+2423,469,,False,6,daily_min_temperature
+2424,469,,False,6,daily_min_temperature
+2425,469,,False,6,daily_min_temperature
+2426,469,,False,6,daily_min_temperature
+2427,469,,False,6,daily_min_temperature
+2423,1206,2026-11-11 06:00:00,True,6,daily_min_temperature
+2424,1206,2026-11-11 15:00:00,True,6,daily_min_temperature
+2425,1206,2026-08-12 12:00:00,True,6,daily_min_temperature
+2426,1206,2026-11-12 16:00:00,True,6,daily_min_temperature
+2427,1206,2026-11-12 16:00:00,True,6,daily_min_temperature
+2422,471,,False,6,precipitation_amount
+2423,471,,False,6,precipitation_amount
+2424,471,,False,6,precipitation_amount
+2425,471,,False,6,precipitation_amount
+2426,471,,False,6,precipitation_amount
+2427,471,,False,6,precipitation_amount
+2422,1198,2026-11-11 15:00:00,True,6,precipitation_amount
+2423,1198,2026-07-28 06:00:00,True,6,precipitation_amount
+2424,1198,2026-08-12 12:00:00,True,6,precipitation_amount
+2425,1198,2026-08-12 12:00:00,True,6,precipitation_amount
+2426,1198,2026-11-10 10:00:00,True,6,precipitation_amount
+2427,1198,2026-11-12 16:00:00,True,6,precipitation_amount
+2423,1210,2026-11-11 06:00:00,True,6,snow_depth

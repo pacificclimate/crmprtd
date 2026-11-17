@@ -1,0 +1,6 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+15,792,TEMP_MEAN,0,,air_temperature,mean,1,network15_auto,excluded
+15,1345,temperature,3,hourly,air_temperature,mean,2,network15_auto,needs_review
+15,800,avg_air_temp_pst1hr,0,,air_temperature,mean,3,network15_auto,excluded
+15,793,PRECIP_TOTAL,0,,precipitation_amount,difference,1,network15_auto,excluded
+15,1344,precipitation,3,hourly,precipitation_amount,sum,2,network15_auto,needs_review

@@ -1,0 +1,11 @@
+station_id,net_var_name,row_count,removed_count,removed_pct,network_id,canonical_variable
+1581,TEMP_MEAN,74716,0,0.0,72,air_temperature
+1584,TEMP_MEAN,86744,0,0.0,72,air_temperature
+1591,TEMP_MEAN,12912,0,0.0,72,air_temperature
+2632,TEMP_MEAN,68503,0,0.0,72,air_temperature
+2633,TEMP_MEAN,66459,0,0.0,72,air_temperature
+2634,TEMP_MEAN,14028,0,0.0,72,air_temperature
+2647,TEMP_MEAN,81144,0,0.0,72,air_temperature
+12089,TEMP_MEAN,18735,0,0.0,72,air_temperature
+12232,TEMP_MEAN,18757,2,0.010662685930585914,72,air_temperature
+12536,TEMP_MEAN,74982,0,0.0,72,air_temperature

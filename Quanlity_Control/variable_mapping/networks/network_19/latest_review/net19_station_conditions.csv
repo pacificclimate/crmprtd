@@ -1,0 +1,121 @@
+station_id,vars_id,latest_observation_from_cutoff,has_recent_non_null_observations,network_id,canonical_variable
+6625,542,2026-11-12 16:00:00,True,19,air_temperature
+6634,542,,False,19,air_temperature
+6652,542,,False,19,air_temperature
+6661,542,,False,19,air_temperature
+10830,542,2026-11-12 16:00:00,True,19,air_temperature
+10833,542,2026-11-12 16:00:00,True,19,air_temperature
+10988,542,2026-11-12 16:00:00,True,19,air_temperature
+12012,542,2026-11-12 16:00:00,True,19,air_temperature
+15121,542,2026-11-12 16:00:00,True,19,air_temperature
+15164,542,2026-11-12 16:00:00,True,19,air_temperature
+15175,542,2026-11-12 16:00:00,True,19,air_temperature
+15199,542,2026-11-12 16:00:00,True,19,air_temperature
+15210,542,2026-11-12 16:00:00,True,19,air_temperature
+15421,542,2026-10-28 00:00:00,True,19,air_temperature
+15429,542,2026-10-30 19:00:00,True,19,air_temperature
+15430,542,2026-10-30 20:00:00,True,19,air_temperature
+15552,542,2026-11-04 18:00:00,True,19,air_temperature
+15597,542,2026-11-06 13:00:00,True,19,air_temperature
+15678,542,2026-11-09 19:00:00,True,19,air_temperature
+15720,542,2026-11-11 11:00:00,True,19,air_temperature
+6576,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+6605,544,,False,19,daily_max_temperature
+6618,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+6621,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+6655,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+6673,544,,False,19,daily_max_temperature
+6674,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+10814,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+10836,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+13024,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+15169,544,2026-11-10 16:00:00,True,19,daily_max_temperature
+15182,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+15186,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+15194,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+15209,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+15220,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+15222,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+15315,544,2026-11-07 16:00:00,True,19,daily_max_temperature
+15387,544,2026-11-11 16:00:00,True,19,daily_max_temperature
+15420,544,2026-10-27 16:00:00,True,19,daily_max_temperature
+6576,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+6605,545,,False,19,daily_min_temperature
+6618,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+6621,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+6655,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+6673,545,,False,19,daily_min_temperature
+6674,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+10814,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+10836,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+13024,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+15169,545,2026-11-10 16:00:00,True,19,daily_min_temperature
+15182,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+15186,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+15194,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+15209,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+15220,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+15222,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+15315,545,2026-11-07 16:00:00,True,19,daily_min_temperature
+15387,545,2026-11-11 16:00:00,True,19,daily_min_temperature
+15420,545,2026-10-27 16:00:00,True,19,daily_min_temperature
+6576,546,2026-11-11 16:00:00,True,19,precipitation_amount
+6626,546,,False,19,precipitation_amount
+6640,546,,False,19,precipitation_amount
+6671,546,2026-11-11 16:00:00,True,19,precipitation_amount
+6691,546,,False,19,precipitation_amount
+10813,546,2026-11-11 16:00:00,True,19,precipitation_amount
+10815,546,2026-11-11 16:00:00,True,19,precipitation_amount
+10822,546,2026-11-11 16:00:00,True,19,precipitation_amount
+10895,546,,False,19,precipitation_amount
+10952,546,2026-11-11 16:00:00,True,19,precipitation_amount
+15128,546,2026-11-07 16:00:00,True,19,precipitation_amount
+15131,546,2026-11-11 16:00:00,True,19,precipitation_amount
+15137,546,2026-07-17 16:00:00,True,19,precipitation_amount
+15155,546,2026-11-11 16:00:00,True,19,precipitation_amount
+15157,546,2026-11-11 16:00:00,True,19,precipitation_amount
+15193,546,2026-11-10 16:00:00,True,19,precipitation_amount
+15211,546,2026-11-09 16:00:00,True,19,precipitation_amount
+15212,546,2026-11-11 16:00:00,True,19,precipitation_amount
+15507,546,2026-11-02 15:00:00,True,19,precipitation_amount
+15583,546,2026-11-05 16:00:00,True,19,precipitation_amount
+6576,547,,False,19,precipitation_amount
+6626,547,,False,19,precipitation_amount
+6640,547,,False,19,precipitation_amount
+6671,547,,False,19,precipitation_amount
+6691,547,,False,19,precipitation_amount
+10813,547,,False,19,precipitation_amount
+10815,547,,False,19,precipitation_amount
+10822,547,,False,19,precipitation_amount
+10895,547,,False,19,precipitation_amount
+10952,547,,False,19,precipitation_amount
+15128,547,,False,19,precipitation_amount
+15131,547,,False,19,precipitation_amount
+15137,547,,False,19,precipitation_amount
+15155,547,,False,19,precipitation_amount
+15157,547,,False,19,precipitation_amount
+15193,547,,False,19,precipitation_amount
+15211,547,,False,19,precipitation_amount
+15212,547,,False,19,precipitation_amount
+15507,547,,False,19,precipitation_amount
+15583,547,,False,19,precipitation_amount
+6566,548,,False,19,snowfall_amount
+6583,548,2026-11-11 16:00:00,True,19,snowfall_amount
+6605,548,,False,19,snowfall_amount
+6618,548,,False,19,snowfall_amount
+6624,548,,False,19,snowfall_amount
+6632,548,,False,19,snowfall_amount
+6638,548,,False,19,snowfall_amount
+6656,548,,False,19,snowfall_amount
+6676,548,,False,19,snowfall_amount
+6683,548,,False,19,snowfall_amount
+6688,548,,False,19,snowfall_amount
+6692,548,,False,19,snowfall_amount
+10821,548,,False,19,snowfall_amount
+10825,548,2026-11-11 16:00:00,True,19,snowfall_amount
+10907,548,2026-11-11 16:00:00,True,19,snowfall_amount
+10913,548,,False,19,snowfall_amount
+10955,548,,False,19,snowfall_amount
+10958,548,,False,19,snowfall_amount
+15174,548,2026-11-11 16:00:00,True,19,snowfall_amount
+15197,548,2026-11-11 16:00:00,True,19,snowfall_amount

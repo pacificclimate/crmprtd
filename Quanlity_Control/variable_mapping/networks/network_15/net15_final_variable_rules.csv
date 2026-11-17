@@ -1,0 +1,3 @@
+network_id,canonical_variable,source_vars_ids,source_vars_time_scales,candidate_vars_ids,recent_source_vars_ids,recent_source_latest_observations,auto_keep_from,source_check_scope,source_station_limit,source_random_seed,source_station_count,source_station_ids,source_checked_at_utc,time_match,overlap_method,single_source_method
+15,air_temperature,[1345],"{""1345"": ""hourly""}","[792, 800, 1345]",[],{},2026-01-01,random_stations_with_all_candidates,20,42,3,"[13011, 13012, 13013]",2026-11-13T21:02:40.186988+00:00,exact_timestamp,mean,use_available
+15,precipitation_amount,[1344],"{""1344"": ""hourly""}","[793, 1344]",[],{},2026-01-01,random_stations_with_all_candidates,20,42,3,"[13011, 13012, 13013]",2026-11-13T21:02:41.320471+00:00,exact_timestamp,mean,use_available

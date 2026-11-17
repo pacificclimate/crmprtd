@@ -1,0 +1,6 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,decision,source_family,recent_non_null_station_count,source_checked_at_utc,latest_observation_from_cutoff,priority
+71,1314,temperature,12,hourly,air_temperature,mean,automatic keep,network71_auto,9,2026-11-13T21:55:17.557646+00:00,2026-02-26 02:00:00,1
+71,1316,air_temp,9,hourly,air_temperature,mean,automatic keep,network71_auto,9,2026-11-13T21:55:17.557646+00:00,2026-02-26 14:00:00,2
+71,1318,rnfl_amt_pst1hr,9,hourly,precipitation_amount,sum,manual decision,network71_auto,9,2026-11-13T21:55:52.799691+00:00,2026-02-26 14:00:00,1
+71,1323,precipitation,12,hourly,precipitation_amount,sum,manual decision,network71_auto,9,2026-11-13T21:55:52.799691+00:00,2026-02-26 02:00:00,2
+71,1322,snw_dpth,8,hourly,snow_depth,fixed_hour,automatic keep,network71_auto,2,2026-11-13T21:56:06.087469+00:00,2026-02-26 14:00:00,1

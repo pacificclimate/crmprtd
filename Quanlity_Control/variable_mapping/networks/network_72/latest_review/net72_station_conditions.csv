@@ -1,0 +1,11 @@
+station_id,vars_id,latest_observation_from_cutoff,has_recent_non_null_observations,network_id,canonical_variable
+1581,1336,,False,72,air_temperature
+1584,1336,,False,72,air_temperature
+1591,1336,,False,72,air_temperature
+2632,1336,,False,72,air_temperature
+2633,1336,,False,72,air_temperature
+2634,1336,,False,72,air_temperature
+2647,1336,,False,72,air_temperature
+12089,1336,,False,72,air_temperature
+12232,1336,,False,72,air_temperature
+12536,1336,,False,72,air_temperature

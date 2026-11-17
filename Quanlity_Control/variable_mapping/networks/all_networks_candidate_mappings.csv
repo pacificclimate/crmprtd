@@ -1,0 +1,137 @@
+network_id,canonical_variable,vars_id,net_var_name,standard_name,cell_method,long_description,display_name,network_station_count,source_time_scale,daily_aggregation
+1,daily_max_temperature,428,MAX_TEMP,air_temperature,time: maximum,Maximum daily temperature,Temperature (Max.),2792,daily,as_is
+1,daily_min_temperature,427,MIN_TEMP,air_temperature,time: minimum,Minimum daily temperature,Temperature (Min.),2792,daily,as_is
+1,precipitation_amount,429,ONE_DAY_PRECIPITATION,lwe_thickness_of_precipitation_amount,time: sum,Daily precipitation,Precipitation Amount,3445,daily,as_is
+1,precipitation_amount,430,ONE_DAY_RAIN,thickness_of_rainfall_amount,time: sum,Daily rainfall,Rainfall Amount,3293,daily,as_is
+1,snow_depth,432,SNOW_ON_THE_GROUND,surface_snow_thickness,time: point,Amount of snow on the ground,Surface Snow Depth (Point),2189,daily,as_is
+1,snowfall_amount,431,ONE_DAY_SNOW,thickness_of_snowfall_amount,time: sum,Daily snow accumulation,Snowfall Amount,3283,daily,as_is
+2,air_temperature,434,CURRENT_AIR_TEMPERATURE1,air_temperature,time: point,,Temperature (Point),176,hourly,mean
+2,air_temperature,436,CURRENT_AIR_TEMPERATURE2,air_temperature,time: point,,Temperature (Point),118,hourly,mean
+2,air_temperature,721,air_temp,air_temperature,time: point,,Temperature (Mean),194,hourly,mean
+2,daily_max_temperature,433,MAXIMUM_AIR_TEMPERATURE,air_temperature,time: maximum,,Temperature (Max.),130,hourly,max
+2,daily_max_temperature,720,max_air_temp_snc_last_reset,air_temperature,time: maximum,,Temperature (Max.),194,hourly,max
+2,daily_min_temperature,435,MINIMUM_AIR_TEMPERATURE,air_temperature,time: minimum,,Temperature (Min.),130,hourly,min
+2,daily_min_temperature,722,min_air_temp_snc_last_reset,air_temperature,time: minimum,,Temperature (Min.),194,hourly,min
+2,precipitation_amount,440,PRECIPITATION_GAUGE_TOTAL,lwe_thickness_of_precipitation_amount,t: sum over days interval: irregular,,Precipitation (Cumulative),122,hourly,difference
+2,precipitation_amount,441,PRECIPITATION_NEW,lwe_thickness_of_precipitation_amount,time: sum,,Precipitation Amount,129,hourly,sum
+2,precipitation_amount,442,HOURLY_PRECIPITATION,lwe_thickness_of_precipitation_amount,t: sum within days interval: daily,,Precipitation Amount,169,hourly,last
+2,precipitation_amount,443,PRECIP_DETECTOR_RATIO,foo_bar,time: mean,,Rainfall Amount,65,hourly,not_applicable
+2,precipitation_amount,726,pcpn_amt_pst1hr,lwe_thickness_of_precipitation_amount,time: sum (interval: 1 hour),,Precipitation Amount,172,hourly,sum
+2,precipitation_amount,732,pcpn_amt_pst24hrs,lwe_thickness_of_precipitation_amount,time: sum (interval: 24 hour),,Precipitation 24hr,149,hourly,fixed_hour_previous_day
+2,snow_depth,450,HEIGHT_OF_SNOW,surface_snow_thickness,time: point,,Surface Snow Depth (Point),131,hourly,fixed_hour
+2,snow_depth,727,snw_dpth,surface_snow_thickness,time: point,,Snow Depth,153,hourly,fixed_hour
+2,snowfall_amount,451,STANDARD_SNOW,thickness_of_snowfall_amount,time: sum,,Snowfall Amount,116,hourly,sum
+2,snowfall_amount,728,snwfl_amt_pst1hr,snowfall_amount,time: sum (interval: 1 hour),,Snowfall,165,hourly,sum
+3,air_temperature,453,CURRENT_AIR_TEMPERATURE1,air_temperature,time: point,,Temperature (Point),173,hourly,mean
+3,daily_max_temperature,452,MAXIMUM_AIR_TEMPERATURE,air_temperature,time: maximum,,Temperature (Max.),173,hourly,max
+3,daily_min_temperature,454,MINIMUM_AIR_TEMPERATURE,air_temperature,time: minimum,,Temperature (Min.),173,hourly,min
+3,precipitation_amount,456,PRECIPITATION_NEW,lwe_thickness_of_precipitation_amount,time: sum,,Precipitation Amount,140,hourly,sum
+3,snow_depth,459,HEIGHT_OF_SNOW,surface_snow_thickness,time: point,,Surface Snow Depth (Point),171,hourly,fixed_hour
+3,snowfall_amount,460,STORM_SNOW,snowfall_amount,time: sum,,Rainfall Amount,162,hourly,sum
+3,snowfall_amount,461,INTERVAL_SNOW,snowfall_amount,time: sum,,Rainfall Amount,77,hourly,sum
+3,snowfall_amount,462,STANDARD_SNOW,thickness_of_snowfall_amount,time: sum,,Snowfall Amount,169,hourly,sum
+5,air_temperature,657,AirTemp,air_temperature,time: point,Hourly air temperature instantaneous,Temperature (Point),136,hourly,mean
+5,air_temperature,675,L_down_corr_Avg,downwelling_longwave_flux_in_air,time: mean,downwelling longwave radiation (temperature corrected),Downwelling Longwave Radiation - temperature corrected,4,hourly,mean
+5,air_temperature,677,L_up_corr_Avg,upwelling_longwave_flux_in_air,time: mean,upwelling longwave radiation (temperature corrected),Upwelling Longwave Radiation - temperature corrected,4,hourly,mean
+5,air_temperature,1328,air_temp_1,air_temperature,time: point,,Temperature (Mean),38,hourly,mean
+5,air_temperature,1329,air_temp_2,air_temperature,time: point,,Temperature (Mean),13,hourly,mean
+5,daily_max_temperature,464,MAX_TEMP,air_temperature,time: maximum,Maximum daily temperature,Temperature (Max.),183,daily,as_is
+5,daily_min_temperature,463,MIN_TEMP,air_temperature,time: minimum,Minimum daily temperature,Temperature (Min.),183,daily,as_is
+5,precipitation_amount,465,ONE_DAY_PRECIPITATION,lwe_thickness_of_precipitation_amount,time: sum,Daily precipitation,Precipitation Amount,175,daily,as_is
+5,precipitation_amount,466,ONE_DAY_RAIN,thickness_of_rainfall_amount,time: sum,Daily rainfall,Rainfall Amount,2,hourly,sum
+5,precipitation_amount,655,Precip,lwe_thickness_of_precipitation_amount,t: sum over days interval: irregular,Standpipe total precipitation since last gauge reset,Precipitation (Cumulative),0,hourly,difference
+5,precipitation_amount,1332,cum_pcpn_amt,lwe_thickness_of_precipitation_amount,time: sum,,Cumulative Precipitation,21,hourly,difference
+5,precipitation_amount,1333,pcpn_amt_pst1hr,lwe_thickness_of_precipitation_amount,time: sum (interval: 1 hour),,Precipitation 1hr,35,hourly,sum
+5,precipitation_amount,1334,pcpn_amt_pst24hrs,lwe_thickness_of_precipitation_amount,time: sum (interval: 24 hour),,Precipitation 24hr,21,hourly,fixed_hour_previous_day
+5,snow_depth,468,SNOW_ON_THE_GROUND,surface_snow_thickness,time: point,Amount of snow on the ground,Surface Snow Depth (Point),70,daily,as_is
+5,snow_depth,1331,snw_dpth,surface_snow_thickness,time: sum,,Snow Depth,26,hourly,fixed_hour
+5,snowfall_amount,467,ONE_DAY_SNOW,thickness_of_snowfall_amount,time: sum,Daily snow accumulation,Snowfall Amount,50,daily,as_is
+6,air_temperature,1201,air_temp,air_temperature,time: point,,air_temp,6,hourly,mean
+6,daily_max_temperature,470,tasmax,air_temperature,time: maximum,Maximum temperature,Temperature (Max.),6,daily,as_is
+6,daily_max_temperature,1205,max_air_temp_pst1hr,air_temperature,time: maximum (interval: 1 hour),,max_air_temp_pst1hr,5,hourly,max
+6,daily_min_temperature,469,tasmin,air_temperature,time: minimum,Minimum temperature,Temperature (Min.),6,daily,as_is
+6,daily_min_temperature,1206,min_air_temp_pst1hr,air_temperature,time: minimum (interval: 1 hour),,min_air_temp_pst1hr,5,hourly,min
+6,precipitation_amount,471,pcp,lwe_thickness_of_precipitation_amount,time: sum,Accumulated precipitation,Precipitation Amount,6,daily,as_is
+6,precipitation_amount,1198,pcpn_amt_pst1hr,lwe_thickness_of_precipitation_amount,time: sum (interval: 1 hour),,pcpn_amt_pst1hr,6,hourly,sum
+6,precipitation_amount,1204,avg_cum_pcpn_gag_wt_pst1mt,lwe_thickness_of_precipitation_amount,time: mean (interval: 1 month),,avg_cum_pcpn_gag_wt_pst1mt,6,hourly,difference
+6,precipitation_amount,1207,pcpn_amt_pst3hrs,lwe_thickness_of_precipitation,time: sum (interval: 3 hour),,pcpn_amt_pst3hrs,6,hourly,sum
+6,precipitation_amount,1211,pcpn_amt_pst6hrs,lwe_thickness_of_precipitation,time: sum (interval: 6 hour),,pcpn_amt_pst6hrs,6,hourly,sum
+6,snow_depth,1210,snw_dpth,surface_snow_depth,time: point,,snw_dpth,1,daily,as_is
+9,air_temperature,472,TEMP_MEAN,air_temperature,time: mean,Present temperature,Temperature (Mean),122,hourly,mean
+9,air_temperature,693,avg_air_temp_pst1hr,air_temperature,time: mean,,Temperature (Mean),90,hourly,mean
+9,precipitation_amount,473,PRECIP_TOTAL,lwe_thickness_of_precipitation_amount,time: sum,Hourly precipitation,Precipitation Amount,9,hourly,difference
+10,daily_max_temperature,494,TMax,air_temperature,time: maximum,Maximum temperature,Temperature (Max.),40,daily,as_is
+10,daily_min_temperature,493,TMin,air_temperature,time: minimum,Minimum temperature,Temperature (Min.),40,daily,as_is
+10,precipitation_amount,495,Prec,lwe_thickness_of_precipitation_amount,time: sum,Accumulated precipitation,Precipitation Amount,40,daily,as_is
+11,air_temperature,503,TempC,air_temperature,time: point,,Temperature (Point),36,hourly,mean
+11,air_temperature,529,Tm,air_temperature,time: mean,,Temperature (Mean),8,daily,as_is
+11,air_temperature,1268,TempC_30_cm,air_temperature,time: mean,air_temperature_mean - 30cm,Temperature - 30cm (Mean),0,hourly,mean
+11,air_temperature,1349,air_temp,air_temperature,time: point,,Temperature,1,hourly,mean
+11,daily_max_temperature,530,Tx,air_temperature,time: maximum,,Temperature (Max.),9,hourly,max
+11,daily_min_temperature,531,Tn,air_temperature,time: minimum,,Temperature (Min.),9,hourly,min
+11,precipitation_amount,501,Rainmm,lwe_thickness_of_precipitation_amount,time: sum,depth of water-equivalent rain,Precipitation Amount,43,hourly,sum
+11,precipitation_amount,1266,Rainmm_raw,lwe_thickness_of_precipitation_amount_raw,time: sum,Raw depth of water-equivalent rain,Rainmm_raw,0,hourly,sum
+11,precipitation_amount,1350,rnfl_amt_pst1hr,thickness_of_rainfall_amount,time: sum (interval: 1 hour),,Rainfall 1hr,1,hourly,sum
+11,precipitation_amount,1354,rnfl_amt_pst24hrs,thickness_of_rainfall_amount,time: sum (interval: 24 hour),,Rainfall 24hr,1,hourly,fixed_hour_previous_day
+11,snow_depth,832,Snow_Depth,surface_snow_depth,time: point,Surface snow depth,Snow Depth,5,hourly,fixed_hour
+12,air_temperature,497,temperature,air_temperature,time: point,,Temperature (Point),839,hourly,mean
+12,air_temperature,711,air_temp,air_temperature,time: point,,Temperature,254,hourly,mean
+12,precipitation_amount,496,precipitation,lwe_thickness_of_precipitation_amount,time: sum,depth of water-equivalent rain,Precipitation Amount,840,hourly,sum
+12,precipitation_amount,712,rnfl_amt_pst1hr,thickness_of_rainfall_amount,time: sum (interval: 1 hour),,Rainfall 1hr,255,hourly,sum
+12,precipitation_amount,718,rnfl_amt_pst24hrs,thickness_of_rainfall_amount,time: sum (interval: 24 hour),,Rainfall 24hr,254,hourly,fixed_hour_previous_day
+12,snow_depth,736,snw_dpth,surface_snow_thickness,time: point,,Snow Depth,131,hourly,fixed_hour
+14,air_temperature,658,Temp,air_temperature,time: point,Hourly air temperature instantaneous,Temperature (Point),1,hourly,mean
+14,air_temperature,701,air_temp_1,air_temperature,time: point,,Temperature (Mean),29,hourly,mean
+14,air_temperature,702,air_temp_2,air_temperature,time: point,,Temperature (Mean),17,hourly,mean
+14,daily_max_temperature,512,MAX_TEMP,air_temperature,time: maximum,Maximum daily temperature,Temperature (Max.),26,daily,as_is
+14,daily_min_temperature,511,MIN_TEMP,air_temperature,time: minimum,Minimum daily temperature,Temperature (Min.),26,daily,as_is
+14,precipitation_amount,513,ONE_DAY_PRECIPITATION,lwe_thickness_of_precipitation_amount,time: sum,Daily precipitation,Precipitation Amount,26,daily,as_is
+14,precipitation_amount,514,ONE_DAY_RAIN,thickness_of_rainfall_amount,time: sum,Daily rainfall,Rainfall Amount,0,,sum
+14,precipitation_amount,656,RGuage_mm,lwe_thickness_of_precipitation_amount,t: sum over days interval: irregular,Standpipe total precipitation since last gauge reset,Precipitation (Cumulative),0,,difference
+14,precipitation_amount,705,cum_pcpn_amt,lwe_thickness_of_precipitation_amount,time: sum,,Cumulative Precipitation,22,hourly,difference
+14,precipitation_amount,706,pcpn_amt_pst1hr,lwe_thickness_of_precipitation_amount,time: sum (interval: 1 hour),,Precipitation 1hr,111,hourly,sum
+14,precipitation_amount,710,pcpn_amt_pst24hrs,lwe_thickness_of_precipitation_amount,time: sum (interval: 24 hour),,Precipitation 24hr,103,hourly,fixed_hour_previous_day
+14,snow_depth,704,snw_dpth,surface_snow_thickness,time: sum,,Snow Depth,115,hourly,fixed_hour
+14,snowfall_amount,515,ONE_DAY_SNOW,thickness_of_snowfall_amount,time: sum,Daily snow accumulation,Snowfall Amount,26,daily,as_is
+15,air_temperature,792,TEMP_MEAN,air_temperature,time: mean,Present temperature,Temperature (Mean),0,,mean
+15,air_temperature,800,avg_air_temp_pst1hr,air_temperature,time: mean,,Temperature (Mean),0,,mean
+15,air_temperature,1345,temperature,air_temperature,time: point,,Temperature (Point),3,hourly,mean
+15,precipitation_amount,793,PRECIP_TOTAL,lwe_thickness_of_precipitation_amount,time: sum,Hourly precipitation,Precipitation Amount,0,,difference
+15,precipitation_amount,1344,precipitation,lwe_thickness_of_precipitation_amount,time: sum,depth of water-equivalent rain,Precipitation Amount,3,hourly,sum
+16,air_temperature,540,TEMP_MEAN,air_temperature,time: mean,Present temperature,Temperature (Mean),20,hourly,mean
+16,precipitation_amount,541,PRECIP_TOTAL,lwe_thickness_of_precipitation_amount,time: sum,Hourly precipitation,Precipitation Amount,22,hourly,difference
+17,daily_max_temperature,518,MAXTMP,air_temperature,time: maximum,Maximum daily temperature,Temperature (Max.),1343,daily,as_is
+17,daily_min_temperature,517,MINTMP,air_temperature,time: minimum,Minimum daily temperature,Temperature (Min.),1343,daily,as_is
+17,precipitation_amount,519,PPT,lwe_thickness_of_precipitation_amount,time: sum,Daily Precipitation,Precipitation Amount,338,daily,as_is
+17,precipitation_amount,526,ACCPPT1,lwe_thickness_of_precipitation,time: sum,Accumulated Precipitation Monthly,Precipitation (Cumulative),2989,daily,as_is
+17,precipitation_amount,527,ACCPPT2,lwe_thickness_of_precipitation,time: sum,Accumulated Precipiation ~Monthly,Precipitation (Cumulative),2755,daily,as_is
+17,snow_depth,528,SNOWDEPTH,surface_snow_thickness,time: point,Accumulated Snow Depth,Surface Snow Depth (Point),2116,daily,as_is
+19,air_temperature,542,air_temperature,air_temperature,time: point,Hourly air temperature,Temperature (Point),671,hourly,mean
+19,daily_max_temperature,544,air_temperature_yesterday_high,air_temperature,time: maximum,Maximum daily air temperature,Temperature (Max.),282,daily,as_is
+19,daily_min_temperature,545,air_temperature_yesterday_low,air_temperature,time: minimum,Minimum daily air temperature,Temperature (Min.),282,daily,as_is
+19,precipitation_amount,546,total_precipitation,lwe_thickness_of_precipitation_amount,time: sum,Daily precipitation amount,Precipitation Amount,267,daily,as_is
+19,precipitation_amount,547,total_rain,thickness_of_rainfall_amount,time: sum,Daily rainfall amount,Rainfall Amount,0,daily,as_is
+19,precipitation_amount,837,rain_amount,thickness_of_rainfall_amount,time: sum,Daily rainfall,Rainfall,26,daily,as_is
+19,snowfall_amount,548,snow_amount,thickness_of_snowfall_amount,time: sum,Daily snowfall,Snowfall Amount,98,hourly,sum
+35,air_temperature,768,AirTC,air_temperature,time: point,,Temperature,17,hourly,mean
+35,precipitation_amount,763,Rain_Tot,lwe_thickness_of_rainfall_amount,time: sum,,Rain,14,hourly,difference
+35,snow_depth,770,DBTCDT,surface_snow_depth,time: point,,Snow Depth,15,hourly,fixed_hour
+36,air_temperature,739,AirTemperature,air_temperature,time: point,,Air temperature,20,hourly,mean
+36,daily_max_temperature,1307,MAX_TEMP_h,air_temperature,time: maximum,Maximum hourly temperature,Temperature (Max. h),2,hourly,max
+36,daily_min_temperature,1308,MIN_TEMP_h,air_temperature,time: minimum,Minimum hourly temperature,Temperature (Min. h),2,hourly,min
+36,precipitation_amount,737,Rain,rainfall_amount,time: sum,,Rain,18,,sum
+36,precipitation_amount,738,Precipitation,lwe_thickness_of_precipitation_amount,time: sum,,Precipitation,13,hourly,sum
+36,precipitation_amount,1311,Rain_h,rainfall_amount,time: sum,Hourly accumulated rainfall,Hourly Rainfall,1,hourly,sum
+36,snow_depth,741,SnowDepth,surface_snow_thickness,time: point,,Snow Depth,14,hourly,fixed_hour
+70,air_temperature,1305,TEMP_MEAN,air_temperature,time: mean,Present temperature,Temperature (Mean),1,hourly,mean
+70,air_temperature,1306,avg_air_temp_pst1hr,air_temperature,time: mean,,Temperature (Mean),1,hourly,mean
+71,air_temperature,1314,temperature,air_temperature,time: point,,Temperature (Point),12,hourly,mean
+71,air_temperature,1316,air_temp,air_temperature,time: point,,Temperature,9,hourly,mean
+71,precipitation_amount,1318,rnfl_amt_pst1hr,thickness_of_rainfall_amount,time: sum (interval: 1 hour),,Rainfall 1hr,9,hourly,sum
+71,precipitation_amount,1323,precipitation,lwe_thickness_of_precipitation_amount,time: sum,depth of water-equivalent rain,Precipitation Amount,12,hourly,sum
+71,snow_depth,1322,snw_dpth,surface_snow_thickness,time: point,,Snow Depth,8,hourly,fixed_hour
+72,air_temperature,1336,TEMP_MEAN,air_temperature,time: mean,Present temperature,Temperature (Mean),10,hourly,mean
+75,air_temperature,1339,temperature,air_temperature,time: point,,Temperature (Point),11,hourly,mean
+75,precipitation_amount,1343,precipitation,lwe_thickness_of_precipitation_amount,time: sum,depth of water-equivalent rain,Precipitation Amount,10,hourly,sum
+76,air_temperature,1295,TEMP_MEAN,air_temperature,time: mean,Present temperature,Temperature (Mean),1,hourly,mean
+76,air_temperature,1297,avg_air_temp_pst1hr,air_temperature,time: mean,,Temperature (Mean),1,hourly,mean

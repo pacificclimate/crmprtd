@@ -1,0 +1,12 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+6,1201,air_temp,6,hourly,air_temperature,mean,1,network6_auto,needs_review
+6,470,tasmax,6,daily,daily_max_temperature,as_is,1,network6_auto,needs_review
+6,1205,max_air_temp_pst1hr,5,hourly,daily_max_temperature,max,2,network6_auto,needs_review
+6,469,tasmin,6,daily,daily_min_temperature,as_is,1,network6_auto,needs_review
+6,1206,min_air_temp_pst1hr,5,hourly,daily_min_temperature,min,2,network6_auto,needs_review
+6,471,pcp,6,daily,precipitation_amount,as_is,1,network6_auto,needs_review
+6,1198,pcpn_amt_pst1hr,6,hourly,precipitation_amount,sum,2,network6_auto,needs_review
+6,1207,pcpn_amt_pst3hrs,6,hourly,precipitation_amount,sum,3,network6_auto,excluded
+6,1211,pcpn_amt_pst6hrs,6,hourly,precipitation_amount,sum,4,network6_auto,excluded
+6,1204,avg_cum_pcpn_gag_wt_pst1mt,6,hourly,precipitation_amount,difference,5,network6_auto,excluded
+6,1210,snw_dpth,1,daily,snow_depth,as_is,1,network6_auto,needs_review

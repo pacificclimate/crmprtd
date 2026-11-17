@@ -1,0 +1,9 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,decision,source_family,recent_non_null_station_count,source_checked_at_utc,latest_observation_from_cutoff,priority
+6,1201,air_temp,6,hourly,air_temperature,mean,automatic keep,network6_auto,6,2026-11-13T00:34:37.384355+00:00,2026-11-12 16:00:00,1
+6,470,tasmax,6,daily,daily_max_temperature,as_is,manual decision,network6_auto,0,2026-11-13T00:34:39.239244+00:00,,1
+6,1205,max_air_temp_pst1hr,5,hourly,daily_max_temperature,max,automatic keep,network6_auto,5,2026-11-13T00:34:39.239244+00:00,2026-11-12 16:00:00,2
+6,469,tasmin,6,daily,daily_min_temperature,as_is,manual decision,network6_auto,0,2026-11-13T00:34:38.255806+00:00,,1
+6,1206,min_air_temp_pst1hr,5,hourly,daily_min_temperature,min,automatic keep,network6_auto,5,2026-11-13T00:34:38.255806+00:00,2026-11-12 16:00:00,2
+6,471,pcp,6,daily,precipitation_amount,as_is,manual decision,network6_auto,0,2026-11-13T00:34:40.165584+00:00,,1
+6,1198,pcpn_amt_pst1hr,6,hourly,precipitation_amount,sum,manual decision,network6_auto,6,2026-11-13T00:34:40.165584+00:00,2026-11-12 16:00:00,2
+6,1210,snw_dpth,1,daily,snow_depth,as_is,automatic keep,network6_auto,1,2026-11-13T00:34:41.350549+00:00,2026-11-11 06:00:00,1

@@ -1,0 +1,3 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+75,1339,temperature,11,hourly,air_temperature,mean,1,network75_auto,needs_review
+75,1343,precipitation,10,hourly,precipitation_amount,sum,1,network75_auto,needs_review

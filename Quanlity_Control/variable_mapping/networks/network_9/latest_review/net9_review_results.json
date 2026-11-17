@@ -1,0 +1,142 @@
+{
+  "run_dir": "/Users/tongli1997/crmprtd/Quanlity_Control/variable_mapping/networks/network_9/latest_review",
+  "network_id": 9,
+  "candidate_ids": {
+    "air_temperature": [
+      472,
+      693
+    ],
+    "daily_min_temperature": [],
+    "daily_max_temperature": [],
+    "precipitation_amount": [
+      473
+    ],
+    "snowfall_amount": [],
+    "snow_depth": []
+  },
+  "excluded_candidate_ids": {
+    "air_temperature": [],
+    "daily_min_temperature": [],
+    "daily_max_temperature": [],
+    "precipitation_amount": [],
+    "snowfall_amount": [],
+    "snow_depth": []
+  },
+  "source_vars_time_scales": {
+    "472": "hourly",
+    "693": "hourly",
+    "473": "hourly"
+  },
+  "output_prefix": "net9_",
+  "rules": [
+    {
+      "network_id": 9,
+      "canonical_variable": "air_temperature",
+      "source_vars_ids": "[]",
+      "source_vars_time_scales": "{}",
+      "candidate_vars_ids": "[472, 693]",
+      "auto_keep_from": "2026-01-01",
+      "source_check_scope": "random_stations_with_all_candidates",
+      "source_station_limit": 20,
+      "source_random_seed": 42,
+      "source_station_count": 20,
+      "source_station_ids": "[1557, 1561, 1572, 1578, 1589, 2594, 2604, 2608, 2612, 2619, 2626, 2642, 3278, 12093, 12170, 12182, 12300, 12324, 12426, 12454]",
+      "source_checked_at_utc": "2026-11-13T00:34:42.019038+00:00",
+      "recent_source_vars_ids": "[]",
+      "recent_source_latest_observations": "{}",
+      "time_match": "exact_timestamp",
+      "overlap_method": "mean",
+      "single_source_method": "use_available"
+    },
+    {
+      "network_id": 9,
+      "canonical_variable": "precipitation_amount",
+      "source_vars_ids": "[]",
+      "source_vars_time_scales": "{}",
+      "candidate_vars_ids": "[473]",
+      "auto_keep_from": "2026-01-01",
+      "source_check_scope": "random_stations_with_all_candidates",
+      "source_station_limit": 20,
+      "source_random_seed": 42,
+      "source_station_count": 9,
+      "source_station_ids": "[1560, 1571, 1574, 1582, 1589, 1593, 2604, 2639, 2648]",
+      "source_checked_at_utc": "2026-11-13T00:34:48.790116+00:00",
+      "recent_source_vars_ids": "[]",
+      "recent_source_latest_observations": "{}",
+      "time_match": "exact_timestamp",
+      "overlap_method": "mean",
+      "single_source_method": "use_available"
+    }
+  ],
+  "status": [
+    {
+      "canonical_variable": "air_temperature",
+      "status": "ok",
+      "eligible_station_count": 89,
+      "source_station_count": 20,
+      "plot_station_ids": [
+        1557,
+        1572,
+        1578,
+        1589,
+        2594,
+        2604,
+        2642,
+        3278,
+        12093,
+        12182
+      ],
+      "station_selection_method": "all_candidates"
+    },
+    {
+      "canonical_variable": "daily_min_temperature",
+      "status": "no_candidates",
+      "eligible_station_count": 0,
+      "source_station_count": 0,
+      "plot_station_ids": [],
+      "station_selection_method": "not_applicable"
+    },
+    {
+      "canonical_variable": "daily_max_temperature",
+      "status": "no_candidates",
+      "eligible_station_count": 0,
+      "source_station_count": 0,
+      "plot_station_ids": [],
+      "station_selection_method": "not_applicable"
+    },
+    {
+      "canonical_variable": "precipitation_amount",
+      "status": "ok",
+      "eligible_station_count": 9,
+      "source_station_count": 9,
+      "plot_station_ids": [
+        1560,
+        1571,
+        1574,
+        1582,
+        1589,
+        1593,
+        2604,
+        2639,
+        2648
+      ],
+      "station_selection_method": "all_candidates"
+    },
+    {
+      "canonical_variable": "snowfall_amount",
+      "status": "no_candidates",
+      "eligible_station_count": 0,
+      "source_station_count": 0,
+      "plot_station_ids": [],
+      "station_selection_method": "not_applicable"
+    },
+    {
+      "canonical_variable": "snow_depth",
+      "status": "no_candidates",
+      "eligible_station_count": 0,
+      "source_station_count": 0,
+      "plot_station_ids": [],
+      "station_selection_method": "not_applicable"
+    }
+  ]
+}

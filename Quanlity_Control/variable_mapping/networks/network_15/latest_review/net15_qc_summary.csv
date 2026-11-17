@@ -1,0 +1,7 @@
+station_id,net_var_name,row_count,removed_count,removed_pct,network_id,canonical_variable
+13011,temperature,25260,0,0.0,15,air_temperature
+13012,temperature,27361,1,0.0036548371770037643,15,air_temperature
+13013,temperature,25207,0,0.0,15,air_temperature
+13011,precipitation,25259,0,0.0,15,precipitation_amount
+13012,precipitation,27360,0,0.0,15,precipitation_amount
+13013,precipitation,25207,0,0.0,15,precipitation_amount

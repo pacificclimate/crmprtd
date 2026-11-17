@@ -1,0 +1,17 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,decision,source_family,recent_non_null_station_count,source_checked_at_utc,latest_observation_from_cutoff,priority
+5,657,AirTemp,136,hourly,air_temperature,mean,automatic keep,network5_auto,13,2026-11-13T00:44:26.423921+00:00,2026-11-10 15:15:00,1
+5,675,L_down_corr_Avg,4,hourly,air_temperature,mean,manual decision,network5_auto,0,2026-11-13T00:44:26.423921+00:00,,4
+5,677,L_up_corr_Avg,4,hourly,air_temperature,mean,manual decision,network5_auto,0,2026-11-13T00:44:26.423921+00:00,,5
+5,1328,air_temp_1,38,hourly,air_temperature,mean,manual decision,network5_auto,0,2026-11-13T00:44:26.423921+00:00,,2
+5,1329,air_temp_2,13,hourly,air_temperature,mean,manual decision,network5_auto,0,2026-11-13T00:44:26.423921+00:00,,3
+5,464,MAX_TEMP,183,daily,daily_max_temperature,as_is,automatic keep,network5_auto,7,2026-11-13T00:44:37.667330+00:00,2026-09-30 00:00:00,1
+5,463,MIN_TEMP,183,daily,daily_min_temperature,as_is,automatic keep,network5_auto,7,2026-11-13T00:44:36.160950+00:00,2026-09-30 00:00:00,1
+5,465,ONE_DAY_PRECIPITATION,175,daily,precipitation_amount,as_is,automatic keep,network5_auto,6,2026-11-13T00:44:47.918127+00:00,2026-09-30 00:00:00,4
+5,466,ONE_DAY_RAIN,2,hourly,precipitation_amount,sum,manual decision,network5_auto,0,2026-11-13T00:44:47.918127+00:00,,5
+5,655,Precip,0,hourly,precipitation_amount,difference,manual decision,network5_auto,0,2026-11-13T00:44:47.918127+00:00,,6
+5,1332,cum_pcpn_amt,21,hourly,precipitation_amount,difference,manual decision,network5_auto,0,2026-11-13T00:44:47.918127+00:00,,1
+5,1333,pcpn_amt_pst1hr,35,hourly,precipitation_amount,sum,manual decision,network5_auto,0,2026-11-13T00:44:47.918127+00:00,,2
+5,1334,pcpn_amt_pst24hrs,21,hourly,precipitation_amount,fixed_hour_previous_day,manual decision,network5_auto,0,2026-11-13T00:44:47.918127+00:00,,3
+5,468,SNOW_ON_THE_GROUND,70,daily,snow_depth,as_is,manual decision,network5_reviewed,0,2026-11-13T00:44:51.893112+00:00,,1
+5,1331,snw_dpth,26,hourly,snow_depth,fixed_hour,manual decision,network5_auto,0,2026-11-13T00:44:51.893112+00:00,,2
+5,467,ONE_DAY_SNOW,50,daily,snowfall_amount,as_is,manual decision,network5_auto,0,2026-11-13T00:44:50.402623+00:00,,1

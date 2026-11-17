@@ -1,0 +1,7 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,decision,source_family,recent_non_null_station_count,source_checked_at_utc,latest_observation_from_cutoff,priority
+17,518,MAXTMP,1343,daily,daily_max_temperature,as_is,manual decision,network17_auto,0,2026-11-13T21:07:46.386519+00:00,,1
+17,517,MINTMP,1343,daily,daily_min_temperature,as_is,manual decision,network17_auto,0,2026-11-13T21:07:44.432547+00:00,,1
+17,519,PPT,338,daily,precipitation_amount,as_is,manual decision,network17_auto,0,2026-11-13T21:07:47.711631+00:00,,1
+17,526,ACCPPT1,2989,daily,precipitation_amount,as_is,manual decision,network17_auto,0,2026-11-13T21:07:47.711631+00:00,,2
+17,527,ACCPPT2,2755,daily,precipitation_amount,as_is,manual decision,network17_auto,0,2026-11-13T21:07:47.711631+00:00,,3
+17,528,SNOWDEPTH,2116,daily,snow_depth,as_is,manual decision,network17_auto,0,2026-11-13T21:07:49.502899+00:00,,1

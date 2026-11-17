@@ -1,0 +1,7 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+12,497,temperature,839,hourly,air_temperature,mean,1,network12_auto,needs_review
+12,711,air_temp,254,hourly,air_temperature,mean,2,network12_auto,needs_review
+12,496,precipitation,840,hourly,precipitation_amount,sum,1,network12_auto,needs_review
+12,712,rnfl_amt_pst1hr,255,hourly,precipitation_amount,sum,2,network12_auto,needs_review
+12,718,rnfl_amt_pst24hrs,254,hourly,precipitation_amount,fixed_hour_previous_day,3,network12_auto,needs_review
+12,736,snw_dpth,131,hourly,snow_depth,fixed_hour,1,network12_auto,needs_review

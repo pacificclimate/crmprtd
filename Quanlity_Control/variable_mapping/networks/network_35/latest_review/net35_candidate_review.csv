@@ -1,0 +1,4 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,decision,source_family,recent_non_null_station_count,source_checked_at_utc,latest_observation_from_cutoff,priority
+35,768,AirTC,17,hourly,air_temperature,mean,manual decision,network35_auto,0,2026-11-13T21:16:02.190290+00:00,,1
+35,763,Rain_Tot,14,hourly,precipitation_amount,difference,manual decision,network35_auto,0,2026-11-13T21:16:12.435278+00:00,,1
+35,770,DBTCDT,15,hourly,snow_depth,fixed_hour,manual decision,network35_auto,0,2026-11-13T21:16:19.624210+00:00,,1

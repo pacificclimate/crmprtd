@@ -1,0 +1,4 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,decision,source_family,recent_non_null_station_count,source_checked_at_utc,latest_observation_from_cutoff,priority
+10,494,TMax,40,daily,daily_max_temperature,as_is,manual decision,network10_auto,0,2026-11-13T00:34:52.205439+00:00,,1
+10,493,TMin,40,daily,daily_min_temperature,as_is,manual decision,network10_auto,0,2026-11-13T00:34:51.151068+00:00,,1
+10,495,Prec,40,daily,precipitation_amount,as_is,manual decision,network10_auto,0,2026-11-13T00:34:53.223595+00:00,,1

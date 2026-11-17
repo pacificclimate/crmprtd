@@ -1,0 +1,2 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,decision,source_family,recent_non_null_station_count,source_checked_at_utc,latest_observation_from_cutoff,priority
+72,1336,TEMP_MEAN,10,hourly,air_temperature,mean,manual decision,network72_auto,0,2026-11-13T21:59:47.806977+00:00,,1

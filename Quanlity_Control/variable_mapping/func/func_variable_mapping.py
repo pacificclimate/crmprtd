@@ -17,12 +17,27 @@ MAPPING_COLUMNS = [
     "network_id",
     "vars_id",
     "net_var_name",
+    "network_station_count",
+    "source_time_scale",
     "canonical_variable",
     "daily_aggregation",
     "priority",
     "source_family",
     "mapping_status",
 ]
+
+REQUIRED_MAPPING_COLUMNS = [
+    column for column in MAPPING_COLUMNS
+    if column not in {
+        "network_station_count", "source_time_scale",
+    }
+]
+
+VALID_SOURCE_TIME_SCALES = {"hourly", "daily"}
+VALID_DAILY_AGGREGATIONS = {
+    "mean", "min", "max", "sum", "fixed_hour", "as_is", "last",
+    "difference", "fixed_hour_previous_day", "not_applicable",
+}
 
 CANONICAL_VARIABLES = (
     "air_temperature",
@@ -106,9 +121,29 @@ def load_candidate_mappings(path: str | Path) -> pd.DataFrame:
     if not path.exists():
         return pd.DataFrame(columns=MAPPING_COLUMNS)
     mappings = pd.read_csv(path)
-    missing = set(MAPPING_COLUMNS) - set(mappings.columns)
+    missing = set(REQUIRED_MAPPING_COLUMNS) - set(mappings.columns)
     if missing:
         raise ValueError(f"Candidate registry is missing columns: {sorted(missing)}")
+    if "network_station_count" not in mappings:
+        mappings["network_station_count"] = pd.NA
+    if "source_time_scale" not in mappings:
+        mappings["source_time_scale"] = pd.NA
+    mappings["network_station_count"] = pd.to_numeric(
+        mappings["network_station_count"], errors="coerce"
+    ).astype("Int64")
+    invalid_scales = (
+        mappings["source_time_scale"].dropna().astype(str).str.strip().str.lower()
+        .loc[lambda values: ~values.isin(VALID_SOURCE_TIME_SCALES)]
+    )
+    if not invalid_scales.empty:
+        raise ValueError(
+            "Candidate registry source_time_scale must be 'hourly' or 'daily'; "
+            f"found {sorted(invalid_scales.unique())}."
+        )
+    mappings["source_time_scale"] = (
+        mappings["source_time_scale"].astype("string").str.strip().str.lower()
+    )
+    mappings = _normalize_daily_processing_columns(mappings)
     return mappings[MAPPING_COLUMNS].sort_values(
         ["network_id", "canonical_variable", "priority", "vars_id"]
     ).reset_index(drop=True)
@@ -121,13 +156,33 @@ def save_candidate_mappings(
 ) -> pd.DataFrame:
     """Replace one network's rows and save the combined registry."""
     path = Path(path)
-    required = set(MAPPING_COLUMNS) - {"network_id"}
+    required = set(REQUIRED_MAPPING_COLUMNS) - {"network_id"}
     missing = required - set(mappings.columns)
     if missing:
         raise ValueError(f"Mappings are missing columns: {sorted(missing)}")
 
     new_rows = mappings.copy()
     new_rows["network_id"] = int(network_id)
+    if "network_station_count" not in new_rows:
+        new_rows["network_station_count"] = pd.NA
+    if "source_time_scale" not in new_rows:
+        new_rows["source_time_scale"] = pd.NA
+    new_rows["network_station_count"] = pd.to_numeric(
+        new_rows["network_station_count"], errors="coerce"
+    ).astype("Int64")
+    invalid_scales = (
+        new_rows["source_time_scale"].dropna().astype(str).str.strip().str.lower()
+        .loc[lambda values: ~values.isin(VALID_SOURCE_TIME_SCALES)]
+    )
+    if not invalid_scales.empty:
+        raise ValueError(
+            "Mappings source_time_scale must be 'hourly' or 'daily'; "
+            f"found {sorted(invalid_scales.unique())}."
+        )
+    new_rows["source_time_scale"] = (
+        new_rows["source_time_scale"].astype("string").str.strip().str.lower()
+    )
+    new_rows = _normalize_daily_processing_columns(new_rows)
     existing = load_candidate_mappings(path)
     existing = existing[existing["network_id"] != int(network_id)]
     combined = pd.concat([existing, new_rows[MAPPING_COLUMNS]], ignore_index=True)
@@ -137,6 +192,21 @@ def save_candidate_mappings(
     path.parent.mkdir(parents=True, exist_ok=True)
     combined.to_csv(path, index=False)
     return combined
+
+
+def _normalize_daily_processing_columns(frame: pd.DataFrame) -> pd.DataFrame:
+    """Normalize and validate the daily aggregation field."""
+    normalized = frame.copy()
+    invalid_aggregations = sorted(set(
+        normalized["daily_aggregation"].dropna().astype(str)
+        .str.strip().str.lower()) - VALID_DAILY_AGGREGATIONS)
+    if invalid_aggregations:
+        raise ValueError(
+            f"Invalid daily_aggregation values: {invalid_aggregations}.")
+    normalized["daily_aggregation"] = (
+        normalized["daily_aggregation"].astype("string").str.strip().str.lower()
+    )
+    return normalized
 
 
 def mappings_by_network(path: str | Path) -> dict[int, pd.DataFrame]:
@@ -429,14 +499,17 @@ def select_candidate_stations(
     network_id: int = 2,
     limit: int | None = 5,
     offset: int = 0,
+    match: str = "all",
 ) -> pd.DataFrame:
-    """Select stations containing every requested candidate variable.
+    """Select stations containing all or any requested candidate variables.
 
     Pass ``limit=None`` to return all matching stations.
     """
+    if match not in {"all", "any"}:
+        raise ValueError("match must be 'all' or 'any'.")
     vars_ids = tuple(int(value) for value in vars_ids)
-    query = sa.text(
-        """
+    if match == "all":
+        query_text = """
         SELECT s.station_id, MAX(h.station_name) AS station_name
         FROM meta_station s
         JOIN meta_history h USING (station_id)
@@ -458,7 +531,20 @@ def select_candidate_stations(
         LIMIT :station_limit
         OFFSET :station_offset
         """
-    )
+    else:
+        query_text = """
+        SELECT s.station_id, MAX(h.station_name) AS station_name
+        FROM meta_station s
+        JOIN meta_history h USING (station_id)
+        JOIN obs_raw o USING (history_id)
+        WHERE s.network_id = :network_id
+          AND o.vars_id = ANY(CAST(:vars_ids AS integer[]))
+        GROUP BY s.station_id
+        ORDER BY s.station_id
+        LIMIT :station_limit
+        OFFSET :station_offset
+        """
+    query = sa.text(query_text)
     return pd.read_sql(
         query,
         engine,
@@ -522,6 +608,291 @@ def summarize_variable_station_presence(
         engine,
         params={"network_id": network_id, "vars_ids": list(vars_ids)},
     )
+
+
+def add_network_station_counts(
+    engine: sa.Engine,
+    mappings: pd.DataFrame,
+    network_id: int,
+) -> pd.DataFrame:
+    """Attach whole-network non-null station counts to candidate mappings."""
+    enriched = mappings.drop(columns="network_station_count", errors="ignore").copy()
+    if enriched.empty:
+        enriched["network_station_count"] = pd.Series(dtype="int64")
+        return enriched
+
+    vars_ids = sorted({int(value) for value in enriched["vars_id"]})
+    presence = summarize_variable_station_presence(
+        engine, vars_ids, network_id=int(network_id))
+    if presence.empty:
+        counts = pd.DataFrame(columns=["vars_id", "network_station_count"])
+    else:
+        counts = presence[["vars_id", "station_count"]].rename(
+            columns={"station_count": "network_station_count"})
+    enriched = enriched.merge(
+        counts, on="vars_id", how="left", validate="many_to_one", sort=False)
+    enriched["network_station_count"] = (
+        enriched["network_station_count"].fillna(0).astype(int))
+    return enriched
+
+
+def classify_source_time_scale(
+    timestamps: Iterable,
+    metadata_text: str = "",
+    history_frequency: str | None = None,
+) -> str | None:
+    """Classify reporting cadence from sampled times, then explicit metadata."""
+    times = pd.Series(pd.to_datetime(list(timestamps), errors="coerce"))
+    times = times.dropna().drop_duplicates().sort_values()
+    if len(times) >= 2:
+        gap_hours = times.diff().dropna().dt.total_seconds().div(3600)
+        gap_hours = gap_hours[gap_hours > 0]
+        if not gap_hours.empty:
+            median_hours = float(gap_hours.median())
+            if median_hours <= 6:
+                return "hourly"
+            if 18 <= median_hours <= 30:
+                return "daily"
+
+    frequency = str(history_frequency or "").strip().lower()
+    if re.search(r"(?:^|\W)(?:hourly|1[\s_-]*hour(?:ly)?)(?:$|\W)", frequency):
+        return "hourly"
+    if re.search(r"(?:^|\W)(?:daily|1[\s_-]*day|one[\s_-]*day)(?:$|\W)", frequency):
+        return "daily"
+
+    metadata = str(metadata_text or "").strip().lower()
+    if re.search(
+        r"(?:^|\W)(?:hourly|1[\s_-]*(?:h|hr|hour)|60[\s_-]*min)(?:$|\W)",
+        metadata,
+    ):
+        return "hourly"
+    if re.search(r"(?:^|\W)(?:daily|one[\s_-]*day)(?:$|\W)", metadata):
+        return "daily"
+    return None
+
+
+def _sample_source_time_scale_evidence(
+    engine: sa.Engine,
+    vars_id: int,
+    sample_size: int = 300,
+) -> tuple[pd.DatetimeIndex, str | None]:
+    """Sample recent timestamps from one history containing a candidate."""
+    history = pd.read_sql(
+        sa.text(
+            """
+            SELECT o.history_id, h.freq::text AS history_frequency
+            FROM obs_raw o
+            JOIN meta_history h USING (history_id)
+            WHERE o.vars_id = :vars_id AND o.datum IS NOT NULL
+            LIMIT 1
+            """
+        ),
+        engine,
+        params={"vars_id": int(vars_id)},
+    )
+    if history.empty:
+        return pd.DatetimeIndex([]), None
+    row = history.iloc[0]
+    observations = pd.read_sql(
+        sa.text(
+            """
+            SELECT obs_time
+            FROM obs_raw
+            WHERE vars_id = :vars_id
+              AND history_id = :history_id
+              AND datum IS NOT NULL
+            ORDER BY obs_time DESC
+            LIMIT :sample_size
+            """
+        ),
+        engine,
+        params={
+            "vars_id": int(vars_id),
+            "history_id": int(row["history_id"]),
+            "sample_size": int(sample_size),
+        },
+    )
+    history_frequency = row.get("history_frequency")
+    if pd.isna(history_frequency):
+        history_frequency = None
+    return pd.DatetimeIndex(pd.to_datetime(observations["obs_time"])), history_frequency
+
+
+def add_candidate_time_scales(
+    engine: sa.Engine,
+    mappings: pd.DataFrame,
+    metadata: pd.DataFrame,
+    network_id: int,
+    overrides: dict[int, str] | None = None,
+    sample_size: int = 300,
+) -> pd.DataFrame:
+    """Attach hourly/daily reporting cadence to every reviewed candidate."""
+    enriched = mappings.drop(columns="source_time_scale", errors="ignore").copy()
+    if "network_station_count" in enriched.columns:
+        zero_station_count = pd.to_numeric(
+            enriched["network_station_count"], errors="coerce").eq(0)
+        enriched.loc[zero_station_count, "mapping_status"] = "excluded"
+    if enriched.empty:
+        enriched["source_time_scale"] = pd.Series(dtype="string")
+        return enriched
+
+    overrides = {int(key): str(value).strip().lower()
+                 for key, value in (overrides or {}).items()}
+    invalid_values = sorted(
+        {value for value in overrides.values()
+         if value not in VALID_SOURCE_TIME_SCALES})
+    if invalid_values:
+        raise ValueError(
+            "Source time-scale overrides must be 'hourly' or 'daily'; "
+            f"found {invalid_values}."
+        )
+
+    candidate_ids = sorted({int(value) for value in enriched["vars_id"]})
+    unknown_ids = sorted(set(overrides) - set(candidate_ids))
+    if unknown_ids:
+        raise ValueError(
+            f"Source time-scale override IDs are not candidates: {unknown_ids}."
+        )
+
+    metadata_columns = [
+        "net_var_name", "standard_name", "cell_method", "display_name",
+        "short_name", "long_description", "unit",
+    ]
+    metadata_by_id = (
+        metadata.drop_duplicates("vars_id").set_index("vars_id")
+        if "vars_id" in metadata.columns else pd.DataFrame()
+    )
+    active_ids = sorted({
+        int(value) for value in enriched.loc[
+            enriched["mapping_status"].ne("excluded"), "vars_id"]
+    })
+    detected: dict[int, str] = {}
+    unresolved: list[int] = []
+    for vars_id in active_ids:
+        if vars_id in overrides:
+            detected[vars_id] = overrides[vars_id]
+            continue
+        timestamps, history_frequency = _sample_source_time_scale_evidence(
+            engine, vars_id, sample_size)
+        pieces: list[str] = []
+        if not metadata_by_id.empty and vars_id in metadata_by_id.index:
+            row = metadata_by_id.loc[vars_id]
+            if isinstance(row, pd.DataFrame):
+                row = row.iloc[0]
+            pieces = [str(row[name]) for name in metadata_columns
+                      if name in row.index and pd.notna(row[name])]
+        scale = classify_source_time_scale(
+            timestamps, " | ".join(pieces), history_frequency)
+        if scale is None:
+            unresolved.append(vars_id)
+        else:
+            detected[vars_id] = scale
+
+    if unresolved:
+        raise ValueError(
+            f"Unresolved daily/hourly source time scales for network {network_id}: "
+            f"{unresolved}. Add reviewed entries to "
+            "SOURCE_TIME_SCALE_OVERRIDES_BY_NETWORK."
+        )
+
+    enriched["source_time_scale"] = (
+        enriched["vars_id"].astype(int).map(detected).astype("string"))
+    return enriched
+
+
+def add_candidate_daily_processing(
+    mappings: pd.DataFrame,
+    metadata: pd.DataFrame,
+    overrides: dict[int, dict] | None = None,
+) -> pd.DataFrame:
+    """Attach source-aware aggregation; daily source values pass through."""
+    enriched = mappings.drop(columns=[
+        "daily_boundary_hour", "daily_time_basis", "daily_processing_status",
+    ], errors="ignore").copy()
+    if enriched.empty:
+        return enriched
+
+    metadata_by_id = (
+        metadata.drop_duplicates("vars_id").set_index("vars_id")
+        if "vars_id" in metadata.columns else pd.DataFrame()
+    )
+    metadata_columns = [
+        "net_var_name", "standard_name", "cell_method", "display_name",
+        "short_name", "long_description",
+    ]
+    canonical_defaults = {
+        "air_temperature": "mean",
+        "daily_min_temperature": "min",
+        "daily_max_temperature": "max",
+        "snowfall_amount": "sum",
+        "snow_depth": "fixed_hour",
+    }
+    rows = []
+    for row in enriched.to_dict("records"):
+        vars_id = int(row["vars_id"])
+        pieces = [str(row.get("net_var_name") or "")]
+        if not metadata_by_id.empty and vars_id in metadata_by_id.index:
+            meta = metadata_by_id.loc[vars_id]
+            if isinstance(meta, pd.DataFrame):
+                meta = meta.iloc[0]
+            pieces.extend(
+                str(meta.get(column)) for column in metadata_columns
+                if column in meta.index and pd.notna(meta.get(column))
+            )
+        text = re.sub(r"[_-]+", " ", " | ".join(pieces).lower())
+        canonical = row["canonical_variable"]
+        scale = str(row.get("source_time_scale") or "").strip().lower()
+
+        if scale == "daily":
+            aggregation = "as_is"
+        elif canonical != "precipitation_amount":
+            aggregation = canonical_defaults.get(
+                canonical, str(row.get("daily_aggregation") or ""))
+        elif re.search(r"\b(?:detector|ratio|status|flag)\b", text):
+            aggregation = "not_applicable"
+            row["mapping_status"] = "excluded"
+        else:
+            if re.search(
+                r"(?:past|pst)\s*24\s*(?:h|hr|hrs|hour|hours)\b", text
+            ) or re.search(r"interval\s*:\s*24\s*hour", text):
+                aggregation = "fixed_hour_previous_day"
+            elif ("within days" in text and
+                  re.search(r"interval\s*:\s*daily", text)):
+                aggregation = "last"
+            elif re.search(
+                r"\b(?:cum|cumulative|accppt\d*|gauge total|precip total|"
+                r"precipitation total|rain tot|total precipitation)\b", text
+            ) or "over days interval: irregular" in text:
+                aggregation = "difference"
+            else:
+                aggregation = "sum"
+
+        row["daily_aggregation"] = aggregation
+        rows.append(row)
+
+    result = pd.DataFrame(rows)
+    overrides = {int(key): value for key, value in (overrides or {}).items()}
+    candidate_ids = {int(value) for value in result["vars_id"]}
+    unknown_ids = sorted(set(overrides) - candidate_ids)
+    if unknown_ids:
+        raise ValueError(
+            f"Daily-processing override IDs are not candidates: {unknown_ids}.")
+    allowed_override_fields = {"daily_aggregation"}
+    for vars_id, values in overrides.items():
+        if not isinstance(values, dict):
+            raise ValueError(
+                f"Daily-processing override for vars_id {vars_id} must be a dict.")
+        invalid_fields = sorted(set(values) - allowed_override_fields)
+        if invalid_fields:
+            raise ValueError(
+                f"Invalid daily-processing override fields for vars_id "
+                f"{vars_id}: {invalid_fields}.")
+        mask = result["vars_id"].astype(int).eq(vars_id)
+        for field, value in values.items():
+            result.loc[mask, field] = value
+
+    result = _normalize_daily_processing_columns(result)
+    return result
 
 
 def profile_candidate_variables(

@@ -1,0 +1,22 @@
+station_id,vars_id,latest_observation_from_cutoff,has_recent_non_null_observations,network_id,canonical_variable
+11430,1339,2026-02-26 02:00:00,True,75,air_temperature
+11431,1339,2026-02-26 02:00:00,True,75,air_temperature
+11432,1339,2026-02-26 02:00:00,True,75,air_temperature
+11433,1339,2026-02-26 02:00:00,True,75,air_temperature
+12036,1339,2026-02-26 02:00:00,True,75,air_temperature
+12037,1339,2026-02-26 02:00:00,True,75,air_temperature
+12038,1339,2026-02-26 02:00:00,True,75,air_temperature
+12039,1339,2026-02-26 02:00:00,True,75,air_temperature
+12042,1339,,False,75,air_temperature
+12051,1339,2026-02-26 02:00:00,True,75,air_temperature
+12960,1339,,False,75,air_temperature
+11430,1343,2026-02-26 02:00:00,True,75,precipitation_amount
+11431,1343,2026-02-26 02:00:00,True,75,precipitation_amount
+11432,1343,2026-02-26 02:00:00,True,75,precipitation_amount
+11433,1343,2026-02-26 02:00:00,True,75,precipitation_amount
+12036,1343,2026-02-26 02:00:00,True,75,precipitation_amount
+12037,1343,2026-02-26 02:00:00,True,75,precipitation_amount
+12038,1343,2026-02-26 02:00:00,True,75,precipitation_amount
+12039,1343,2026-02-26 02:00:00,True,75,precipitation_amount
+12042,1343,,False,75,precipitation_amount
+12051,1343,2026-02-26 02:00:00,True,75,precipitation_amount

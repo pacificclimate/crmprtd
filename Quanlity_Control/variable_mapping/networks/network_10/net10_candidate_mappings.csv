@@ -1,0 +1,4 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+10,494,TMax,40,daily,daily_max_temperature,as_is,1,network10_auto,needs_review
+10,493,TMin,40,daily,daily_min_temperature,as_is,1,network10_auto,needs_review
+10,495,Prec,40,daily,precipitation_amount,as_is,1,network10_auto,needs_review

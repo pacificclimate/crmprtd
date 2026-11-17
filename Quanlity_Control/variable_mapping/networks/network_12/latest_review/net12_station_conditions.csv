@@ -1,0 +1,121 @@
+station_id,vars_id,latest_observation_from_cutoff,has_recent_non_null_observations,network_id,canonical_variable
+1648,497,2026-11-12 02:00:00,True,12,air_temperature
+1659,497,2026-11-12 02:00:00,True,12,air_temperature
+1679,497,2026-11-12 02:00:00,True,12,air_temperature
+1689,497,2026-11-12 02:00:00,True,12,air_temperature
+1699,497,2026-11-12 02:00:00,True,12,air_temperature
+1751,497,2026-11-12 02:00:00,True,12,air_temperature
+1767,497,2026-11-11 23:00:00,True,12,air_temperature
+1792,497,2026-11-12 02:00:00,True,12,air_temperature
+1848,497,2026-11-12 02:00:00,True,12,air_temperature
+1897,497,2026-11-12 02:00:00,True,12,air_temperature
+2107,497,2026-11-12 02:00:00,True,12,air_temperature
+2292,497,2026-10-27 08:00:00,True,12,air_temperature
+2294,497,2026-11-12 02:00:00,True,12,air_temperature
+2299,497,2026-11-12 02:00:00,True,12,air_temperature
+2317,497,2026-11-12 02:00:00,True,12,air_temperature
+2359,497,2026-10-27 20:00:00,True,12,air_temperature
+10997,497,2026-11-12 02:00:00,True,12,air_temperature
+11421,497,2026-11-12 02:00:00,True,12,air_temperature
+12035,497,2026-11-12 02:00:00,True,12,air_temperature
+15032,497,2026-11-12 02:00:00,True,12,air_temperature
+1648,711,2026-11-12 15:00:00,True,12,air_temperature
+1659,711,2026-11-12 16:00:00,True,12,air_temperature
+1679,711,2026-11-12 16:00:00,True,12,air_temperature
+1689,711,2026-11-12 16:00:00,True,12,air_temperature
+1699,711,2026-11-12 15:00:00,True,12,air_temperature
+1751,711,2026-11-12 16:00:00,True,12,air_temperature
+1767,711,2026-11-12 14:00:00,True,12,air_temperature
+1792,711,2026-11-12 16:00:00,True,12,air_temperature
+1848,711,2026-11-12 16:00:00,True,12,air_temperature
+1897,711,2026-11-12 16:00:00,True,12,air_temperature
+2107,711,2026-11-12 16:00:00,True,12,air_temperature
+2292,711,2026-10-27 07:00:00,True,12,air_temperature
+2294,711,2026-11-12 16:00:00,True,12,air_temperature
+2299,711,2026-11-12 14:00:00,True,12,air_temperature
+2317,711,2026-11-12 16:00:00,True,12,air_temperature
+2359,711,2026-10-27 22:00:00,True,12,air_temperature
+10997,711,2026-11-12 16:00:00,True,12,air_temperature
+11421,711,2026-11-12 16:00:00,True,12,air_temperature
+12035,711,2026-11-12 16:00:00,True,12,air_temperature
+15032,711,2026-11-12 16:00:00,True,12,air_temperature
+1648,496,2026-11-12 02:00:00,True,12,precipitation_amount
+1659,496,2026-11-12 02:00:00,True,12,precipitation_amount
+1679,496,2026-11-12 02:00:00,True,12,precipitation_amount
+1689,496,2026-11-12 02:00:00,True,12,precipitation_amount
+1699,496,2026-11-12 02:00:00,True,12,precipitation_amount
+1751,496,2026-11-12 02:00:00,True,12,precipitation_amount
+1767,496,2026-11-11 23:00:00,True,12,precipitation_amount
+1792,496,2026-11-12 02:00:00,True,12,precipitation_amount
+1848,496,2026-11-12 02:00:00,True,12,precipitation_amount
+1897,496,2026-11-12 02:00:00,True,12,precipitation_amount
+1961,496,2026-11-12 02:00:00,True,12,precipitation_amount
+1980,496,,False,12,precipitation_amount
+2055,496,2026-11-12 01:00:00,True,12,precipitation_amount
+2238,496,2026-11-12 02:00:00,True,12,precipitation_amount
+2289,496,2026-11-12 02:00:00,True,12,precipitation_amount
+2295,496,2026-11-12 02:00:00,True,12,precipitation_amount
+2315,496,2026-10-27 01:00:00,True,12,precipitation_amount
+10980,496,2026-10-27 20:00:00,True,12,precipitation_amount
+10989,496,2026-11-12 02:00:00,True,12,precipitation_amount
+12035,496,2026-11-12 02:00:00,True,12,precipitation_amount
+1648,712,2026-11-12 15:00:00,True,12,precipitation_amount
+1659,712,2026-11-12 16:00:00,True,12,precipitation_amount
+1679,712,2026-11-12 16:00:00,True,12,precipitation_amount
+1689,712,2026-11-12 16:00:00,True,12,precipitation_amount
+1699,712,2026-11-12 15:00:00,True,12,precipitation_amount
+1751,712,2026-11-12 16:00:00,True,12,precipitation_amount
+1767,712,2026-11-12 14:00:00,True,12,precipitation_amount
+1792,712,2026-11-12 16:00:00,True,12,precipitation_amount
+1848,712,2026-11-12 16:00:00,True,12,precipitation_amount
+1897,712,2026-11-12 16:00:00,True,12,precipitation_amount
+1961,712,2026-11-12 16:00:00,True,12,precipitation_amount
+1980,712,,False,12,precipitation_amount
+2055,712,2026-11-12 16:00:00,True,12,precipitation_amount
+2238,712,2026-11-12 16:00:00,True,12,precipitation_amount
+2289,712,2026-11-12 16:00:00,True,12,precipitation_amount
+2295,712,2026-11-12 16:00:00,True,12,precipitation_amount
+2315,712,2026-10-27 09:00:00,True,12,precipitation_amount
+10980,712,2026-10-27 22:00:00,True,12,precipitation_amount
+10989,712,2026-11-12 16:00:00,True,12,precipitation_amount
+12035,712,2026-11-12 16:00:00,True,12,precipitation_amount
+1648,718,2026-11-12 15:00:00,True,12,precipitation_amount
+1659,718,2026-11-12 16:00:00,True,12,precipitation_amount
+1679,718,2026-11-12 16:00:00,True,12,precipitation_amount
+1689,718,2026-11-12 16:00:00,True,12,precipitation_amount
+1699,718,2026-11-12 15:00:00,True,12,precipitation_amount
+1751,718,2026-11-12 16:00:00,True,12,precipitation_amount
+1767,718,2026-11-12 14:00:00,True,12,precipitation_amount
+1792,718,2026-11-12 16:00:00,True,12,precipitation_amount
+1848,718,2026-11-12 16:00:00,True,12,precipitation_amount
+1897,718,2026-11-12 16:00:00,True,12,precipitation_amount
+1961,718,2026-11-12 16:00:00,True,12,precipitation_amount
+1980,718,,False,12,precipitation_amount
+2055,718,2026-11-12 16:00:00,True,12,precipitation_amount
+2238,718,2026-11-12 16:00:00,True,12,precipitation_amount
+2289,718,2026-11-12 16:00:00,True,12,precipitation_amount
+2295,718,2026-11-12 16:00:00,True,12,precipitation_amount
+2315,718,2026-10-27 09:00:00,True,12,precipitation_amount
+10980,718,2026-10-27 22:00:00,True,12,precipitation_amount
+10989,718,2026-11-12 16:00:00,True,12,precipitation_amount
+12035,718,2026-11-12 16:00:00,True,12,precipitation_amount
+1637,736,2026-11-12 16:00:00,True,12,snow_depth
+1696,736,,False,12,snow_depth
+1716,736,,False,12,snow_depth
+1719,736,,False,12,snow_depth
+1723,736,,False,12,snow_depth
+1743,736,,False,12,snow_depth
+1753,736,,False,12,snow_depth
+1792,736,,False,12,snow_depth
+1794,736,2026-11-12 15:00:00,True,12,snow_depth
+1841,736,,False,12,snow_depth
+1866,736,,False,12,snow_depth
+1912,736,2026-10-30 16:00:00,True,12,snow_depth
+1917,736,,False,12,snow_depth
+1934,736,2026-06-03 10:00:00,True,12,snow_depth
+1964,736,,False,12,snow_depth
+1967,736,,False,12,snow_depth
+1969,736,,False,12,snow_depth
+1976,736,,False,12,snow_depth
+2269,736,,False,12,snow_depth
+10985,736,2026-11-12 16:00:00,True,12,snow_depth

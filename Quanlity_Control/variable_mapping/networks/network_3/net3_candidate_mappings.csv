@@ -1,0 +1,9 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+3,453,CURRENT_AIR_TEMPERATURE1,173,hourly,air_temperature,mean,1,network3_auto,needs_review
+3,452,MAXIMUM_AIR_TEMPERATURE,173,hourly,daily_max_temperature,max,1,network3_auto,needs_review
+3,454,MINIMUM_AIR_TEMPERATURE,173,hourly,daily_min_temperature,min,1,network3_auto,needs_review
+3,456,PRECIPITATION_NEW,140,hourly,precipitation_amount,sum,1,network3_auto,needs_review
+3,459,HEIGHT_OF_SNOW,171,hourly,snow_depth,fixed_hour,1,network3_auto,needs_review
+3,462,STANDARD_SNOW,169,hourly,snowfall_amount,sum,1,network3_auto,needs_review
+3,460,STORM_SNOW,162,hourly,snowfall_amount,sum,2,network3_auto,needs_review
+3,461,INTERVAL_SNOW,77,hourly,snowfall_amount,sum,3,network3_auto,needs_review

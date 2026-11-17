@@ -1,0 +1,244 @@
+{
+  "run_dir": "/Users/tongli1997/crmprtd/Quanlity_Control/variable_mapping/networks/network_19/latest_review",
+  "network_id": 19,
+  "candidate_ids": {
+    "air_temperature": [
+      542
+    ],
+    "daily_min_temperature": [
+      545
+    ],
+    "daily_max_temperature": [
+      544
+    ],
+    "precipitation_amount": [
+      546,
+      547
+    ],
+    "snowfall_amount": [
+      548
+    ],
+    "snow_depth": []
+  },
+  "excluded_candidate_ids": {
+    "air_temperature": [],
+    "daily_min_temperature": [],
+    "daily_max_temperature": [],
+    "precipitation_amount": [
+      837
+    ],
+    "snowfall_amount": [],
+    "snow_depth": []
+  },
+  "source_vars_time_scales": {
+    "542": "hourly",
+    "544": "daily",
+    "545": "daily",
+    "546": "daily",
+    "547": "daily",
+    "548": "hourly"
+  },
+  "output_prefix": "net19_",
+  "rules": [
+    {
+      "network_id": 19,
+      "canonical_variable": "air_temperature",
+      "source_vars_ids": "[542]",
+      "source_vars_time_scales": "{\"542\": \"hourly\"}",
+      "candidate_vars_ids": "[542]",
+      "auto_keep_from": "2026-01-01",
+      "source_check_scope": "random_stations_with_all_candidates",
+      "source_station_limit": 20,
+      "source_random_seed": 42,
+      "source_station_count": 20,
+      "source_station_ids": "[6625, 6634, 6652, 6661, 10830, 10833, 10988, 12012, 15121, 15164, 15175, 15199, 15210, 15421, 15429, 15430, 15552, 15597, 15678, 15720]",
+      "source_checked_at_utc": "2026-11-13T00:41:21.007574+00:00",
+      "recent_source_vars_ids": "[542]",
+      "recent_source_latest_observations": "{\"542\": \"2026-11-12T16:00:00\"}",
+      "time_match": "exact_timestamp",
+      "overlap_method": "mean",
+      "single_source_method": "use_available"
+    },
+    {
+      "network_id": 19,
+      "canonical_variable": "daily_min_temperature",
+      "source_vars_ids": "[545]",
+      "source_vars_time_scales": "{\"545\": \"daily\"}",
+      "candidate_vars_ids": "[545]",
+      "auto_keep_from": "2026-01-01",
+      "source_check_scope": "random_stations_with_all_candidates",
+      "source_station_limit": 20,
+      "source_random_seed": 42,
+      "source_station_count": 20,
+      "source_station_ids": "[6576, 6605, 6618, 6621, 6655, 6673, 6674, 10814, 10836, 13024, 15169, 15182, 15186, 15194, 15209, 15220, 15222, 15315, 15387, 15420]",
+      "source_checked_at_utc": "2026-11-13T00:41:54.393791+00:00",
+      "recent_source_vars_ids": "[545]",
+      "recent_source_latest_observations": "{\"545\": \"2026-11-11T16:00:00\"}",
+      "time_match": "exact_timestamp",
+      "overlap_method": "mean",
+      "single_source_method": "use_available"
+    },
+    {
+      "network_id": 19,
+      "canonical_variable": "daily_max_temperature",
+      "source_vars_ids": "[544]",
+      "source_vars_time_scales": "{\"544\": \"daily\"}",
+      "candidate_vars_ids": "[544]",
+      "auto_keep_from": "2026-01-01",
+      "source_check_scope": "random_stations_with_all_candidates",
+      "source_station_limit": 20,
+      "source_random_seed": 42,
+      "source_station_count": 20,
+      "source_station_ids": "[6576, 6605, 6618, 6621, 6655, 6673, 6674, 10814, 10836, 13024, 15169, 15182, 15186, 15194, 15209, 15220, 15222, 15315, 15387, 15420]",
+      "source_checked_at_utc": "2026-11-13T00:41:56.808500+00:00",
+      "recent_source_vars_ids": "[544]",
+      "recent_source_latest_observations": "{\"544\": \"2026-11-11T16:00:00\"}",
+      "time_match": "exact_timestamp",
+      "overlap_method": "mean",
+      "single_source_method": "use_available"
+    },
+    {
+      "network_id": 19,
+      "canonical_variable": "precipitation_amount",
+      "source_vars_ids": "[546]",
+      "source_vars_time_scales": "{\"546\": \"daily\"}",
+      "candidate_vars_ids": "[546, 547, 837]",
+      "auto_keep_from": "2026-01-01",
+      "source_check_scope": "random_stations_with_all_candidates",
+      "source_station_limit": 20,
+      "source_random_seed": 42,
+      "source_station_count": 20,
+      "source_station_ids": "[6576, 6626, 6640, 6671, 6691, 10813, 10815, 10822, 10895, 10952, 15128, 15131, 15137, 15155, 15157, 15193, 15211, 15212, 15507, 15583]",
+      "source_checked_at_utc": "2026-11-13T00:42:00.456060+00:00",
+      "recent_source_vars_ids": "[546]",
+      "recent_source_latest_observations": "{\"546\": \"2026-11-11T16:00:00\"}",
+      "time_match": "exact_timestamp",
+      "overlap_method": "mean",
+      "single_source_method": "use_available"
+    },
+    {
+      "network_id": 19,
+      "canonical_variable": "snowfall_amount",
+      "source_vars_ids": "[548]",
+      "source_vars_time_scales": "{\"548\": \"hourly\"}",
+      "candidate_vars_ids": "[548]",
+      "auto_keep_from": "2026-01-01",
+      "source_check_scope": "random_stations_with_all_candidates",
+      "source_station_limit": 20,
+      "source_random_seed": 42,
+      "source_station_count": 20,
+      "source_station_ids": "[6566, 6583, 6605, 6618, 6624, 6632, 6638, 6656, 6676, 6683, 6688, 6692, 10821, 10825, 10907, 10913, 10955, 10958, 15174, 15197]",
+      "source_checked_at_utc": "2026-11-13T00:42:01.726773+00:00",
+      "recent_source_vars_ids": "[548]",
+      "recent_source_latest_observations": "{\"548\": \"2026-11-11T16:00:00\"}",
+      "time_match": "exact_timestamp",
+      "overlap_method": "mean",
+      "single_source_method": "use_available"
+    }
+  ],
+  "status": [
+    {
+      "canonical_variable": "air_temperature",
+      "status": "ok",
+      "eligible_station_count": 671,
+      "source_station_count": 20,
+      "plot_station_ids": [
+        6661,
+        10833,
+        10988,
+        15175,
+        15210,
+        15429,
+        15430,
+        15552,
+        15597,
+        15720
+      ],
+      "station_selection_method": "all_candidates"
+    },
+    {
+      "canonical_variable": "daily_min_temperature",
+      "status": "ok",
+      "eligible_station_count": 282,
+      "source_station_count": 20,
+      "plot_station_ids": [
+        6576,
+        6655,
+        6673,
+        6674,
+        10814,
+        13024,
+        15194,
+        15222,
+        15315,
+        15387
+      ],
+      "station_selection_method": "all_candidates"
+    },
+    {
+      "canonical_variable": "daily_max_temperature",
+      "status": "ok",
+      "eligible_station_count": 282,
+      "source_station_count": 20,
+      "plot_station_ids": [
+        6576,
+        6655,
+        6673,
+        6674,
+        10814,
+        13024,
+        15194,
+        15222,
+        15315,
+        15387
+      ],
+      "station_selection_method": "all_candidates"
+    },
+    {
+      "canonical_variable": "precipitation_amount",
+      "status": "ok",
+      "eligible_station_count": 267,
+      "source_station_count": 20,
+      "plot_station_ids": [
+        6626,
+        6640,
+        6671,
+        10815,
+        15128,
+        15137,
+        15157,
+        15193,
+        15211,
+        15583
+      ],
+      "station_selection_method": "any_candidate_fallback"
+    },
+    {
+      "canonical_variable": "snowfall_amount",
+      "status": "ok",
+      "eligible_station_count": 98,
+      "source_station_count": 20,
+      "plot_station_ids": [
+        6566,
+        6605,
+        6624,
+        6676,
+        6683,
+        10821,
+        10825,
+        10955,
+        10958,
+        15197
+      ],
+      "station_selection_method": "all_candidates"
+    },
+    {
+      "canonical_variable": "snow_depth",
+      "status": "no_candidates",
+      "eligible_station_count": 0,
+      "source_station_count": 0,
+      "plot_station_ids": [],
+      "station_selection_method": "not_applicable"
+    }
+  ]
+}

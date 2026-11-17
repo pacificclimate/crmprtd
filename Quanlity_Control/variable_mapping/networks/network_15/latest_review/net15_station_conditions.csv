@@ -1,0 +1,7 @@
+station_id,vars_id,latest_observation_from_cutoff,has_recent_non_null_observations,network_id,canonical_variable
+13011,1345,,False,15,air_temperature
+13012,1345,,False,15,air_temperature
+13013,1345,,False,15,air_temperature
+13011,1344,,False,15,precipitation_amount
+13012,1344,,False,15,precipitation_amount
+13013,1344,,False,15,precipitation_amount

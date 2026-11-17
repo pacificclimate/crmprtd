@@ -1,0 +1,3 @@
+station_id,net_var_name,row_count,removed_count,removed_pct,network_id,canonical_variable
+12559,TEMP_MEAN,25508,0,0.0,70,air_temperature
+12559,avg_air_temp_pst1hr,26144,0,0.0,70,air_temperature

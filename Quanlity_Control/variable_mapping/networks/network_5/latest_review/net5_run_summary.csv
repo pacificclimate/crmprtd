@@ -1,0 +1,7 @@
+canonical_variable,status,eligible_station_count,source_station_count,plot_station_ids,station_selection_method
+air_temperature,ok,174,20,"[2443, 2477, 2508, 2580, 12414, 12415, 13094, 13097, 13101, 13119]",any_candidate_fallback
+daily_min_temperature,ok,183,20,"[2443, 2447, 2453, 2471, 2498, 2542, 2565, 2575, 13095, 13104]",all_candidates
+daily_max_temperature,ok,183,20,"[2443, 2447, 2453, 2471, 2498, 2542, 2565, 2575, 13095, 13104]",all_candidates
+precipitation_amount,ok,182,20,"[2443, 2447, 2453, 2471, 2498, 2541, 2543, 2575, 13092, 13103]",any_candidate_fallback
+snowfall_amount,ok,50,20,"[2536, 2542, 2544, 2554, 2555, 2564, 2567, 2577, 12345, 12351]",all_candidates
+snow_depth,ok,16,16,"[2513, 2515, 2517, 2534, 2540, 2553, 2556, 2564, 2571, 2574]",all_candidates

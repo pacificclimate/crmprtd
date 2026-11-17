@@ -1,0 +1,4 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+35,768,AirTC,17,hourly,air_temperature,mean,1,network35_auto,needs_review
+35,763,Rain_Tot,14,hourly,precipitation_amount,difference,1,network35_auto,needs_review
+35,770,DBTCDT,15,hourly,snow_depth,fixed_hour,1,network35_auto,needs_review

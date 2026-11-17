@@ -1,0 +1,7 @@
+canonical_variable,status,eligible_station_count,source_station_count,plot_station_ids,station_selection_method
+air_temperature,ok,1,1,[12559],all_candidates
+daily_min_temperature,no_candidates,0,0,[],not_applicable
+daily_max_temperature,no_candidates,0,0,[],not_applicable
+precipitation_amount,no_candidates,0,0,[],not_applicable
+snowfall_amount,no_candidates,0,0,[],not_applicable
+snow_depth,no_candidates,0,0,[],not_applicable

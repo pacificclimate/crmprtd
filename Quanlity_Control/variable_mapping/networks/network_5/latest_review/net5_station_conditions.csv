@@ -1,0 +1,313 @@
+station_id,vars_id,latest_observation_from_cutoff,has_recent_non_null_observations,network_id,canonical_variable
+2437,657,,False,5,air_temperature
+2443,657,,False,5,air_temperature
+2457,657,,False,5,air_temperature
+2464,657,,False,5,air_temperature
+2477,657,2026-11-10 14:15:00,True,5,air_temperature
+2480,657,2026-11-10 15:15:00,True,5,air_temperature
+2487,657,2026-11-10 13:30:00,True,5,air_temperature
+2493,657,2026-11-10 14:15:00,True,5,air_temperature
+2502,657,,False,5,air_temperature
+2508,657,,False,5,air_temperature
+2580,657,,False,5,air_temperature
+12389,657,2026-11-10 14:45:00,True,5,air_temperature
+12390,657,2026-11-10 14:45:00,True,5,air_temperature
+12414,657,2026-11-10 14:30:00,True,5,air_temperature
+12415,657,2026-11-10 14:45:00,True,5,air_temperature
+13094,657,2026-11-10 15:15:00,True,5,air_temperature
+13097,657,2026-11-10 15:00:00,True,5,air_temperature
+13101,657,2026-11-10 15:15:00,True,5,air_temperature
+13118,657,2026-11-10 14:30:00,True,5,air_temperature
+13119,657,2026-11-10 14:30:00,True,5,air_temperature
+2437,675,,False,5,air_temperature
+2443,675,,False,5,air_temperature
+2457,675,,False,5,air_temperature
+2464,675,,False,5,air_temperature
+2477,675,,False,5,air_temperature
+2480,675,,False,5,air_temperature
+2487,675,,False,5,air_temperature
+2493,675,,False,5,air_temperature
+2502,675,,False,5,air_temperature
+2508,675,,False,5,air_temperature
+2580,675,,False,5,air_temperature
+12389,675,,False,5,air_temperature
+12390,675,,False,5,air_temperature
+12414,675,,False,5,air_temperature
+12415,675,,False,5,air_temperature
+13094,675,,False,5,air_temperature
+13097,675,,False,5,air_temperature
+13101,675,,False,5,air_temperature
+13118,675,,False,5,air_temperature
+13119,675,,False,5,air_temperature
+2437,677,,False,5,air_temperature
+2443,677,,False,5,air_temperature
+2457,677,,False,5,air_temperature
+2464,677,,False,5,air_temperature
+2477,677,,False,5,air_temperature
+2480,677,,False,5,air_temperature
+2487,677,,False,5,air_temperature
+2493,677,,False,5,air_temperature
+2502,677,,False,5,air_temperature
+2508,677,,False,5,air_temperature
+2580,677,,False,5,air_temperature
+12389,677,,False,5,air_temperature
+12390,677,,False,5,air_temperature
+12414,677,,False,5,air_temperature
+12415,677,,False,5,air_temperature
+13094,677,,False,5,air_temperature
+13097,677,,False,5,air_temperature
+13101,677,,False,5,air_temperature
+13118,677,,False,5,air_temperature
+13119,677,,False,5,air_temperature
+2437,1328,,False,5,air_temperature
+2443,1328,,False,5,air_temperature
+2457,1328,,False,5,air_temperature
+2464,1328,,False,5,air_temperature
+2477,1328,,False,5,air_temperature
+2480,1328,,False,5,air_temperature
+2487,1328,,False,5,air_temperature
+2493,1328,,False,5,air_temperature
+2502,1328,,False,5,air_temperature
+2508,1328,,False,5,air_temperature
+2580,1328,,False,5,air_temperature
+12389,1328,,False,5,air_temperature
+12390,1328,,False,5,air_temperature
+12414,1328,,False,5,air_temperature
+12415,1328,,False,5,air_temperature
+13094,1328,,False,5,air_temperature
+13097,1328,,False,5,air_temperature
+13101,1328,,False,5,air_temperature
+13118,1328,,False,5,air_temperature
+13119,1328,,False,5,air_temperature
+2437,1329,,False,5,air_temperature
+2443,1329,,False,5,air_temperature
+2457,1329,,False,5,air_temperature
+2464,1329,,False,5,air_temperature
+2477,1329,,False,5,air_temperature
+2480,1329,,False,5,air_temperature
+2487,1329,,False,5,air_temperature
+2493,1329,,False,5,air_temperature
+2502,1329,,False,5,air_temperature
+2508,1329,,False,5,air_temperature
+2580,1329,,False,5,air_temperature
+12389,1329,,False,5,air_temperature
+12390,1329,,False,5,air_temperature
+12414,1329,,False,5,air_temperature
+12415,1329,,False,5,air_temperature
+13094,1329,,False,5,air_temperature
+13097,1329,,False,5,air_temperature
+13101,1329,,False,5,air_temperature
+13118,1329,,False,5,air_temperature
+13119,1329,,False,5,air_temperature
+2443,464,,False,5,daily_max_temperature
+2444,464,,False,5,daily_max_temperature
+2447,464,,False,5,daily_max_temperature
+2453,464,,False,5,daily_max_temperature
+2464,464,,False,5,daily_max_temperature
+2471,464,,False,5,daily_max_temperature
+2474,464,2026-09-30 00:00:00,True,5,daily_max_temperature
+2480,464,2026-09-30 00:00:00,True,5,daily_max_temperature
+2485,464,2026-09-30 00:00:00,True,5,daily_max_temperature
+2498,464,,False,5,daily_max_temperature
+2499,464,,False,5,daily_max_temperature
+2513,464,,False,5,daily_max_temperature
+2541,464,,False,5,daily_max_temperature
+2542,464,,False,5,daily_max_temperature
+2565,464,,False,5,daily_max_temperature
+2575,464,,False,5,daily_max_temperature
+13095,464,2026-09-30 00:00:00,True,5,daily_max_temperature
+13104,464,2026-09-30 00:00:00,True,5,daily_max_temperature
+13117,464,2026-09-30 00:00:00,True,5,daily_max_temperature
+13213,464,2026-09-30 00:00:00,True,5,daily_max_temperature
+2443,463,,False,5,daily_min_temperature
+2444,463,,False,5,daily_min_temperature
+2447,463,,False,5,daily_min_temperature
+2453,463,,False,5,daily_min_temperature
+2464,463,,False,5,daily_min_temperature
+2471,463,,False,5,daily_min_temperature
+2474,463,2026-09-30 00:00:00,True,5,daily_min_temperature
+2480,463,2026-09-30 00:00:00,True,5,daily_min_temperature
+2485,463,2026-09-30 00:00:00,True,5,daily_min_temperature
+2498,463,,False,5,daily_min_temperature
+2499,463,,False,5,daily_min_temperature
+2513,463,,False,5,daily_min_temperature
+2541,463,,False,5,daily_min_temperature
+2542,463,,False,5,daily_min_temperature
+2565,463,,False,5,daily_min_temperature
+2575,463,,False,5,daily_min_temperature
+13095,463,2026-09-30 00:00:00,True,5,daily_min_temperature
+13104,463,2026-09-30 00:00:00,True,5,daily_min_temperature
+13117,463,2026-09-30 00:00:00,True,5,daily_min_temperature
+13213,463,2026-09-30 00:00:00,True,5,daily_min_temperature
+2443,465,,False,5,precipitation_amount
+2444,465,,False,5,precipitation_amount
+2447,465,,False,5,precipitation_amount
+2453,465,,False,5,precipitation_amount
+2471,465,,False,5,precipitation_amount
+2474,465,2026-09-30 00:00:00,True,5,precipitation_amount
+2480,465,2026-09-30 00:00:00,True,5,precipitation_amount
+2485,465,2026-09-30 00:00:00,True,5,precipitation_amount
+2498,465,,False,5,precipitation_amount
+2499,465,,False,5,precipitation_amount
+2540,465,,False,5,precipitation_amount
+2541,465,,False,5,precipitation_amount
+2542,465,,False,5,precipitation_amount
+2543,465,,False,5,precipitation_amount
+2567,465,,False,5,precipitation_amount
+2575,465,,False,5,precipitation_amount
+12393,465,,False,5,precipitation_amount
+13092,465,2026-09-30 00:00:00,True,5,precipitation_amount
+13103,465,2026-09-30 00:00:00,True,5,precipitation_amount
+13117,465,2026-09-30 00:00:00,True,5,precipitation_amount
+2443,466,,False,5,precipitation_amount
+2444,466,,False,5,precipitation_amount
+2447,466,,False,5,precipitation_amount
+2453,466,,False,5,precipitation_amount
+2471,466,,False,5,precipitation_amount
+2474,466,,False,5,precipitation_amount
+2480,466,,False,5,precipitation_amount
+2485,466,,False,5,precipitation_amount
+2498,466,,False,5,precipitation_amount
+2499,466,,False,5,precipitation_amount
+2540,466,,False,5,precipitation_amount
+2541,466,,False,5,precipitation_amount
+2542,466,,False,5,precipitation_amount
+2543,466,,False,5,precipitation_amount
+2567,466,,False,5,precipitation_amount
+2575,466,,False,5,precipitation_amount
+12393,466,,False,5,precipitation_amount
+13092,466,,False,5,precipitation_amount
+13103,466,,False,5,precipitation_amount
+13117,466,,False,5,precipitation_amount
+2443,655,,False,5,precipitation_amount
+2444,655,,False,5,precipitation_amount
+2447,655,,False,5,precipitation_amount
+2453,655,,False,5,precipitation_amount
+2471,655,,False,5,precipitation_amount
+2474,655,,False,5,precipitation_amount
+2480,655,,False,5,precipitation_amount
+2485,655,,False,5,precipitation_amount
+2498,655,,False,5,precipitation_amount
+2499,655,,False,5,precipitation_amount
+2540,655,,False,5,precipitation_amount
+2541,655,,False,5,precipitation_amount
+2542,655,,False,5,precipitation_amount
+2543,655,,False,5,precipitation_amount
+2567,655,,False,5,precipitation_amount
+2575,655,,False,5,precipitation_amount
+12393,655,,False,5,precipitation_amount
+13092,655,,False,5,precipitation_amount
+13103,655,,False,5,precipitation_amount
+13117,655,,False,5,precipitation_amount
+2443,1332,,False,5,precipitation_amount
+2444,1332,,False,5,precipitation_amount
+2447,1332,,False,5,precipitation_amount
+2453,1332,,False,5,precipitation_amount
+2471,1332,,False,5,precipitation_amount
+2474,1332,,False,5,precipitation_amount
+2480,1332,,False,5,precipitation_amount
+2485,1332,,False,5,precipitation_amount
+2498,1332,,False,5,precipitation_amount
+2499,1332,,False,5,precipitation_amount
+2540,1332,,False,5,precipitation_amount
+2541,1332,,False,5,precipitation_amount
+2542,1332,,False,5,precipitation_amount
+2543,1332,,False,5,precipitation_amount
+2567,1332,,False,5,precipitation_amount
+2575,1332,,False,5,precipitation_amount
+12393,1332,,False,5,precipitation_amount
+13092,1332,,False,5,precipitation_amount
+13103,1332,,False,5,precipitation_amount
+13117,1332,,False,5,precipitation_amount
+2443,1333,,False,5,precipitation_amount
+2444,1333,,False,5,precipitation_amount
+2447,1333,,False,5,precipitation_amount
+2453,1333,,False,5,precipitation_amount
+2471,1333,,False,5,precipitation_amount
+2474,1333,,False,5,precipitation_amount
+2480,1333,,False,5,precipitation_amount
+2485,1333,,False,5,precipitation_amount
+2498,1333,,False,5,precipitation_amount
+2499,1333,,False,5,precipitation_amount
+2540,1333,,False,5,precipitation_amount
+2541,1333,,False,5,precipitation_amount
+2542,1333,,False,5,precipitation_amount
+2543,1333,,False,5,precipitation_amount
+2567,1333,,False,5,precipitation_amount
+2575,1333,,False,5,precipitation_amount
+12393,1333,,False,5,precipitation_amount
+13092,1333,,False,5,precipitation_amount
+13103,1333,,False,5,precipitation_amount
+13117,1333,,False,5,precipitation_amount
+2443,1334,,False,5,precipitation_amount
+2444,1334,,False,5,precipitation_amount
+2447,1334,,False,5,precipitation_amount
+2453,1334,,False,5,precipitation_amount
+2471,1334,,False,5,precipitation_amount
+2474,1334,,False,5,precipitation_amount
+2480,1334,,False,5,precipitation_amount
+2485,1334,,False,5,precipitation_amount
+2498,1334,,False,5,precipitation_amount
+2499,1334,,False,5,precipitation_amount
+2540,1334,,False,5,precipitation_amount
+2541,1334,,False,5,precipitation_amount
+2542,1334,,False,5,precipitation_amount
+2543,1334,,False,5,precipitation_amount
+2567,1334,,False,5,precipitation_amount
+2575,1334,,False,5,precipitation_amount
+12393,1334,,False,5,precipitation_amount
+13092,1334,,False,5,precipitation_amount
+13103,1334,,False,5,precipitation_amount
+13117,1334,,False,5,precipitation_amount
+2513,468,,False,5,snow_depth
+2515,468,,False,5,snow_depth
+2517,468,,False,5,snow_depth
+2523,468,,False,5,snow_depth
+2531,468,,False,5,snow_depth
+2534,468,,False,5,snow_depth
+2536,468,,False,5,snow_depth
+2538,468,,False,5,snow_depth
+2540,468,,False,5,snow_depth
+2553,468,,False,5,snow_depth
+2554,468,,False,5,snow_depth
+2556,468,,False,5,snow_depth
+2563,468,,False,5,snow_depth
+2564,468,,False,5,snow_depth
+2571,468,,False,5,snow_depth
+2574,468,,False,5,snow_depth
+2513,1331,,False,5,snow_depth
+2515,1331,,False,5,snow_depth
+2517,1331,,False,5,snow_depth
+2523,1331,,False,5,snow_depth
+2531,1331,,False,5,snow_depth
+2534,1331,,False,5,snow_depth
+2536,1331,,False,5,snow_depth
+2538,1331,,False,5,snow_depth
+2540,1331,,False,5,snow_depth
+2553,1331,,False,5,snow_depth
+2554,1331,,False,5,snow_depth
+2556,1331,,False,5,snow_depth
+2563,1331,,False,5,snow_depth
+2564,1331,,False,5,snow_depth
+2571,1331,,False,5,snow_depth
+2574,1331,,False,5,snow_depth
+2521,467,,False,5,snowfall_amount
+2522,467,,False,5,snowfall_amount
+2526,467,,False,5,snowfall_amount
+2528,467,,False,5,snowfall_amount
+2534,467,,False,5,snowfall_amount
+2536,467,,False,5,snowfall_amount
+2540,467,,False,5,snowfall_amount
+2542,467,,False,5,snowfall_amount
+2544,467,,False,5,snowfall_amount
+2554,467,,False,5,snowfall_amount
+2555,467,,False,5,snowfall_amount
+2564,467,,False,5,snowfall_amount
+2567,467,,False,5,snowfall_amount
+2575,467,,False,5,snowfall_amount
+2577,467,,False,5,snowfall_amount
+2580,467,,False,5,snowfall_amount
+12345,467,,False,5,snowfall_amount
+12347,467,,False,5,snowfall_amount
+12349,467,,False,5,snowfall_amount
+12351,467,,False,5,snowfall_amount

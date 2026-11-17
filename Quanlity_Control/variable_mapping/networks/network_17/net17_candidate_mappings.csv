@@ -1,0 +1,7 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+17,518,MAXTMP,1343,daily,daily_max_temperature,as_is,1,network17_auto,needs_review
+17,517,MINTMP,1343,daily,daily_min_temperature,as_is,1,network17_auto,needs_review
+17,519,PPT,338,daily,precipitation_amount,as_is,1,network17_auto,needs_review
+17,526,ACCPPT1,2989,daily,precipitation_amount,as_is,2,network17_auto,needs_review
+17,527,ACCPPT2,2755,daily,precipitation_amount,as_is,3,network17_auto,needs_review
+17,528,SNOWDEPTH,2116,daily,snow_depth,as_is,1,network17_auto,needs_review

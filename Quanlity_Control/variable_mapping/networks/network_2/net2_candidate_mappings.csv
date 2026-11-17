@@ -1,0 +1,17 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+2,434,CURRENT_AIR_TEMPERATURE1,176,hourly,air_temperature,mean,1,network2_auto,needs_review
+2,436,CURRENT_AIR_TEMPERATURE2,118,hourly,air_temperature,mean,2,network2_auto,needs_review
+2,721,air_temp,194,hourly,air_temperature,mean,3,network2_auto,needs_review
+2,433,MAXIMUM_AIR_TEMPERATURE,130,hourly,daily_max_temperature,max,1,network2_auto,needs_review
+2,720,max_air_temp_snc_last_reset,194,hourly,daily_max_temperature,max,2,network2_auto,needs_review
+2,435,MINIMUM_AIR_TEMPERATURE,130,hourly,daily_min_temperature,min,1,network2_auto,needs_review
+2,722,min_air_temp_snc_last_reset,194,hourly,daily_min_temperature,min,2,network2_auto,needs_review
+2,726,pcpn_amt_pst1hr,172,hourly,precipitation_amount,sum,1,network2_auto,needs_review
+2,732,pcpn_amt_pst24hrs,149,hourly,precipitation_amount,fixed_hour_previous_day,2,network2_auto,needs_review
+2,440,PRECIPITATION_GAUGE_TOTAL,122,hourly,precipitation_amount,difference,3,network2_auto,needs_review
+2,441,PRECIPITATION_NEW,129,hourly,precipitation_amount,sum,4,network2_auto,needs_review
+2,442,HOURLY_PRECIPITATION,169,hourly,precipitation_amount,last,5,network2_auto,needs_review
+2,450,HEIGHT_OF_SNOW,131,hourly,snow_depth,fixed_hour,1,network2_auto,needs_review
+2,727,snw_dpth,153,hourly,snow_depth,fixed_hour,2,network2_auto,needs_review
+2,451,STANDARD_SNOW,116,hourly,snowfall_amount,sum,1,network2_auto,needs_review
+2,728,snwfl_amt_pst1hr,165,hourly,snowfall_amount,sum,2,network2_auto,needs_review

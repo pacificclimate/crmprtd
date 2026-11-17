@@ -1,0 +1,7 @@
+canonical_variable,status,eligible_station_count,source_station_count,plot_station_ids,station_selection_method
+air_temperature,ok,11,11,"[11430, 11431, 11432, 11433, 12036, 12037, 12039, 12042, 12051, 12960]",all_candidates
+daily_min_temperature,no_candidates,0,0,[],not_applicable
+daily_max_temperature,no_candidates,0,0,[],not_applicable
+precipitation_amount,ok,10,10,"[11430, 11431, 11432, 11433, 12036, 12037, 12038, 12039, 12042, 12051]",all_candidates
+snowfall_amount,no_candidates,0,0,[],not_applicable
+snow_depth,no_candidates,0,0,[],not_applicable

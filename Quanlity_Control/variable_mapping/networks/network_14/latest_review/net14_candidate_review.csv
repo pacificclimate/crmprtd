@@ -1,0 +1,14 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,decision,source_family,recent_non_null_station_count,source_checked_at_utc,latest_observation_from_cutoff,priority
+14,658,Temp,1,hourly,air_temperature,mean,manual decision,network14_auto,0,2026-11-13T18:37:19.445676+00:00,,1
+14,701,air_temp_1,29,hourly,air_temperature,mean,manual decision,network14_auto,0,2026-11-13T18:37:19.445676+00:00,,2
+14,702,air_temp_2,17,hourly,air_temperature,mean,manual decision,network14_auto,0,2026-11-13T18:37:19.445676+00:00,,3
+14,512,MAX_TEMP,26,daily,daily_max_temperature,as_is,manual decision,network14_auto,0,2026-11-13T18:37:29.702036+00:00,,1
+14,511,MIN_TEMP,26,daily,daily_min_temperature,as_is,manual decision,network14_auto,0,2026-11-13T18:37:28.307334+00:00,,1
+14,513,ONE_DAY_PRECIPITATION,26,daily,precipitation_amount,as_is,manual decision,network14_auto,0,2026-11-13T18:37:47.097636+00:00,,4
+14,514,ONE_DAY_RAIN,0,daily,precipitation_amount,sum,manual decision,network14_auto,0,2026-11-13T18:37:47.097636+00:00,,5
+14,656,RGuage_mm,0,daily,precipitation_amount,difference,manual decision,network14_auto,0,2026-11-13T18:37:47.097636+00:00,,6
+14,705,cum_pcpn_amt,22,hourly,precipitation_amount,difference,manual decision,network14_auto,0,2026-11-13T18:37:47.097636+00:00,,1
+14,706,pcpn_amt_pst1hr,111,hourly,precipitation_amount,sum,manual decision,network14_auto,14,2026-11-13T18:37:47.097636+00:00,2026-11-13 10:00:00,2
+14,710,pcpn_amt_pst24hrs,103,hourly,precipitation_amount,fixed_hour_previous_day,manual decision,network14_auto,14,2026-11-13T18:37:47.097636+00:00,2026-11-13 10:00:00,3
+14,704,snw_dpth,115,hourly,snow_depth,fixed_hour,automatic keep,network14_auto,14,2026-11-13T18:37:54.879314+00:00,2026-11-13 10:00:00,1
+14,515,ONE_DAY_SNOW,26,daily,snowfall_amount,as_is,manual decision,network14_auto,0,2026-11-13T18:37:52.960304+00:00,,1

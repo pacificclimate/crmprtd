@@ -1,0 +1,7 @@
+network_id,vars_id,net_var_name,network_station_count,source_time_scale,canonical_variable,daily_aggregation,priority,source_family,mapping_status
+1,428,MAX_TEMP,2792,daily,daily_max_temperature,as_is,1,network1_auto,needs_review
+1,427,MIN_TEMP,2792,daily,daily_min_temperature,as_is,1,network1_auto,needs_review
+1,429,ONE_DAY_PRECIPITATION,3445,daily,precipitation_amount,as_is,1,network1_auto,needs_review
+1,430,ONE_DAY_RAIN,3293,daily,precipitation_amount,as_is,2,network1_auto,needs_review
+1,432,SNOW_ON_THE_GROUND,2189,daily,snow_depth,as_is,1,network1_reviewed,candidate
+1,431,ONE_DAY_SNOW,3283,daily,snowfall_amount,as_is,1,network1_auto,needs_review
